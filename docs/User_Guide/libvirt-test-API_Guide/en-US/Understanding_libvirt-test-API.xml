@@ -1,0 +1,257 @@
+﻿<?xml version='1.0'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+]>
+
+<chapter id="libvirt-test-API-Understanding_libvirt-test-API">
+	<title>Understanding libvirt-test-API</title>
+  
+  <para>Libvirt-test-API is a powerful test tool designed to complement existing libvirt test tools such as libvirt-TCK. Libvirt-test-API provides a set of simple testing procedures specifically targeting libvirt API functionality. Through the collaboration of existing libvirt test tools together with libvirt-test-API, libvirt testing can now be approached from multiple angles; increasing the extent and comprehensiveness of testing.</para>
+  
+  <para>The following section provides information about libvirt-test-API and its functionality.</para>
+  
+  
+	<section id="Understanding_libvirt-test-API-About_libvirt-test-API">
+	  <title>About libvirt-test-API</title>
+	  
+	  <para>Libvirt-test-API is based on libvirt bindings for common languages and it provides the low-level subroutines for libvirt bindings API. These subroutines conform to those specified at <ulink type="http" url="http://www.libvirt.org">www.libvirt.org</ulink> and can be used in the test cases to create the desired test run.</para>
+	  
+	  <para>Libvirt-test-API is:</para>
+	  <itemizedlist>
+	    <listitem>
+	      <para><application>Easy to use</application>: libvirt-test-API uses a text configuration file to set the test parameters, it then runs the test and collects the logs.</para>
+	    </listitem>
+	    <listitem>
+	      <para><application>Portable</application>: libvirt-test-API can run locally or be used with another test harness, for example Autotest, without modification.</para>
+	    </listitem>
+	    <listitem>
+	      <para><application>Expandable</application>: libvirt-test-API provides a repository for the test cases, which can be expanded or further developed by the community.</para>
+	    </listitem>
+	  </itemizedlist>
+	  
+	  <para>Libvirt-test-API complements libivrt-TCK by providing the following extended functionality:</para>
+	  <table id="libvirt-test-API-libvirt_TCK" frame='all'>
+      <title>Libvirt-test-API functionality</title>
+      <tgroup cols='4'>
+        <thead>
+          <row>
+            <entry align="center">Functionality</entry>
+            <entry align="center">Libvirt-TCK</entry>
+            <entry align="center">Libvirt-test-API</entry>
+            <entry align="center">Added benefit</entry>
+          </row>
+        </thead>
+        <tbody>
+          <row>
+            <entry><application>Supported programming languages</application></entry>
+            <entry>Perl</entry>
+            <entry>Perl, Python, (planned support for Java, Ruby).</entry>
+            <entry>Additional choice of programming languages to develop test cases.</entry>
+          </row>
+          <row>
+            <entry><application>Test case execution</application></entry>
+            <entry>Serial</entry>
+            <entry>Serial, Parallel.</entry>
+            <entry>Option to run test cases in parallel.</entry>
+          </row>
+          <row>
+            <entry><application>Configuration</application></entry>
+            <entry>Can define common configuration parameters for test cases.</entry>
+            <entry>Support for common configuration and can define logic for test case assembly.</entry>
+            <entry>Generate multiple test cases via a single configuration file.</entry>
+          </row>
+          <row>
+            <entry><application>Test object</application></entry>
+            <entry>Compatibility between libvirt and hypervisor.</entry>
+            <entry>Compatibility and functionality of the guest.</entry>
+            <entry>Functionality testing of the guest.</entry>
+          </row>
+          <row>
+            <entry><application>Test purpose</application></entry>
+            <entry>Developer focus</entry>
+            <entry>End user focus</entry>
+            <entry>Additional testing from the end user's perspective.</entry>
+          </row>
+          <row>
+            <entry><application>Code re-usability</application></entry>
+            <entry>To change testing logic, test case needs some code re-written.</entry>
+            <entry>Test cases are defined by components. To change testing logic, only the configuration text file needs to be modified.</entry>
+            <entry>Higher code re-usability</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+	  
+	  
+	</section><!--End About libvirt-test-API-->
+	
+	
+	<section id="Understanding_libvirt-test-API-libvirt-test-API_framework">
+	  <title>Libvirt-test-API framework</title>
+	  
+	  <para>The diagram below depicts the components of libvirt-test-API and how they connect with one another.</para>
+	  <figure>
+      <title>Libvirt-test-API framework</title>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="images/libvirt-test-API_framework.png" format="PNG" />
+        </imageobject>
+      </mediaobject>
+    </figure>
+	
+	  <para>The components are described in more detail below.</para>
+    
+    <bridgehead renderas="sect3">Configuration file</bridgehead>
+    <blockquote>
+      <para>The configuration file is a '.conf' text file that defines what the test suite does on each test run. The configuration file defines the test cases, their arguments and values. The configuration file structure is as follows:</para>
+      
+      <example>
+        <title>Configuration file structure</title>
+<programlisting>
+module_1:test_case_1
+    argument_1
+        value_1
+        value_2
+    argument_2
+        value_1
+        
+module_2:test_case_2
+    argument_1
+        value_2
+</programlisting>
+      </example>
+      
+      <para>The configuration file enables individual test cases to be combined together to achieve the desired test run. To see examples of configuration files, see <xref linkend="Creating_a_configuration_file-Configuration_file_examples" />.</para>
+    </blockquote>
+    
+    
+    <bridgehead renderas="sect3">Parser</bridgehead>
+    <blockquote>
+      <para>The parser converts the configuration file into a list data structure of activities that define the test run.</para>
+      <para>Activities are a logical structure of test cases, and their sequence is determined by the configuration file.</para>
+      <para>A test run consists of one or more test activities, and each activity is composed of one or more test cases.</para>
+      
+      <example>
+        <title>List data structure</title>
+<programlisting>
+[
+  [{'module_1:test_case_1': {'argument_1': 'value_1', 'argument_2': 'value_1'}}, {'module_2:test_case_2': {'argument_1': 'value_1'}}],
+  [{'module_1:test_case_1': {'argument_1': 'value_2', 'argument_2': 'value_1'}}, {'module_2:test_case_2': {'argument_1': 'value_1'}}]
+] 
+</programlisting>
+      </example>
+    </blockquote>
+    
+    
+    <bridgehead renderas="sect3">Generator</bridgehead>
+    <blockquote>
+      <para>The generator is the core of the framework and performs the following functions:</para>
+      <orderedlist>
+        <listitem>
+          <para>Filters the list data structure from the parser and creates a new list of unique test cases. The list of test cases is then sent to the proxy.</para>
+        </listitem>
+        <listitem>
+          <para>Separates each activity and removes the module name.</para>
+        </listitem>
+        <listitem>
+          <para>Receives a list of callable function objects, created by the proxy from the list in step 1.</para>
+        </listitem>
+        <listitem>
+          <para>Combines the lists from step 2 and step 3 to generate a callable subroutine.</para>
+        </listitem>
+      </orderedlist>
+      <para>The subroutine is now ready to be called by the processor, if mutliprocessing is set to enable, or begin a test run immediately from the generator.</para>
+    </blockquote>
+    
+    
+    <bridgehead renderas="sect3">Proxy</bridgehead>
+    <blockquote>
+      <para>The proxy examines the list of unique test cases, received from the generator in step 1, and imports each test case from the appropriate module directory.</para>
+      <para>For example, if the module name is 'domain' then the proxy imports the test case from the <filename>/repos/domain</filename> directory. The proxy then returns a list of the callable function objects of the test cases so the generator can call these functions.</para>
+    </blockquote>
+    
+    
+    <bridgehead renderas="sect3">Test case repository</bridgehead>
+    <blockquote>
+      <para>The test case repository is a directory structure that contains a sub-directory for each module. The module directory contains the test cases for that module.</para>
+      <example>
+        <title>Test case repository directory structure.</title>
+<screen>
+repos
+|-- module_1
+|   `-- test_case_1.py
+`-- module_2
+    `-- test_case_2.py
+</screen>
+      </example>
+    </blockquote>
+    
+    
+    <bridgehead renderas="sect3">/lib</bridgehead>
+    <blockquote>
+      <para><filename>/lib</filename> is a directory that contains the basic subroutines that call the API functions of libvirt bindings languages to form basic unit classes. The test case initiates the first action by calling these subroutines.</para>
+    </blockquote>
+    
+    
+    <bridgehead renderas="sect3">/utils</bridgehead>
+    <blockquote>
+      <para><filename>/utils</filename> is a directory which contains various scripts to assist in creating and verifying test cases.</para>
+      <!--<itemizedlist>
+        <listitem>
+          <para><filename>xmlgenerator.py</filename>XML generator.</para>
+        </listitem>
+        <listitem>
+          <para><filename>xmlbuilder.py</filename> builds a virtual machine from an XML file.</para>
+        </listitem>
+        <listitem>
+          <para>Random MAC address generator. Useful when installing a guest machine.</para>
+        </listitem>
+        <listitem>
+          <para><filename>env_parser.py</filename> is the parser component of the environment INI file.</para>
+        </listitem>
+        <listitem>
+          <para><filename>check.py</filename> verifies if a hypervisor is running.</para>
+        </listitem>
+        <listitem>
+          <para><filename>log.py</filename> creates a log file in the <filename>/log</filename> directory for each test activity.</para>
+        </listitem>
+      </itemizedlist>-->
+    </blockquote>
+
+    
+    <bridgehead renderas="sect3">Function queue</bridgehead>
+    <blockquote>
+      <para>The function queue contains a list, created by the generator, of the test activities in the form of a callable subroutine.</para>
+    </blockquote>
+    
+    
+    <bridgehead renderas="sect3">Processor</bridgehead>
+    <blockquote>
+      <para>The processor handles multiprocessing, if multiprocessing is enabled in the configuration file, then the generator will call the processor to handle the function queue. The processor then generates multiple processes to run the multiple test activities simultaneously. If multiprocessing is disabled, the generator will handle the function queue itself and run the test activities individually.</para>
+    </blockquote>
+    
+  </section><!--End libvirt-test-API framework-->
+   
+   
+  <section id="Understanding_libvirt-test-API-libvirt-test-API_workflow">
+    <title>Libvirt-test-API workflow</title>
+    
+    <procedure>
+      <title>Libvirt-test-API workflow</title>
+      <para>To use libvirt-test-API:</para>
+      <step>
+        <para>Write a test case.</para>
+        <para>For information on writing a test case, see <xref linkend="libvirt-test-API-Writing_a_test_case" />.</para>
+      </step>
+      <step>
+        <para>Create a configuration file.</para>
+        <para>For information on creating a configuration file, see <xref linkend="libvirt-test-API-Creating_a_configuration_file" />.</para>
+      </step>
+      <step>
+        <para>Run the test.</para>
+        <para>For information on running a test, see <xref linkend="libvirt-test-API-Using_libvirt-test-API" />.</para>
+      </step>
+    </procedure>
+    
+  </section><!--End libvirt-test-API workflow-->
+  
+</chapter>

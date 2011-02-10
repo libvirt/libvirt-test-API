@@ -1,0 +1,475 @@
+﻿<?xml version='1.0'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+]>
+
+<chapter id="libvirt-test-API-Creating_a_configuration_file">
+  <title>Creating a configuration file</title>
+  
+  <para>The configuration file is a text file that specifies the test cases, their arguments and values that are to be used in a test run.</para>
+  
+  <section id="Creating_a_configuration_file-Configuration_file_structure">
+	  <title>Configuration file structure</title>
+	
+    <para>The configuration file uses indentation so that the parser can separate test case names, arguments, and values.</para>
+    
+    <important>
+      <title>Indentation</title>
+      <para>An indent level is four spaces, do not use tabs to indent.</para>
+    </important>
+    
+    <para>The configuration file has the following structure.</para>
+    <itemizedlist>
+      <listitem>
+        <para><application>Test case name</application></para>
+        <para>The first line contains the module name and the test case name separated by a colon and is not indented.</para>
+<programlisting>
+module:test_case
+</programlisting>
+      </listitem>
+      <listitem>
+        <para><application>Arguments</application></para>
+        <para>Indent Arguments by four spaces.</para>
+<programlisting>
+module:test_case
+    argument
+</programlisting>
+      </listitem>
+      <listitem>
+        <para><application>Values</application></para>
+        <para>Indent Values by eight spaces.</para>
+<programlisting>
+module:test_case
+    argument
+        value
+</programlisting>
+      </listitem>
+    </itemizedlist>
+    
+    <para><application>Keywords</application></para>
+    <para>Keywords are specified after values and allow you to include, exclude, and repeat individual test cases in a single test run.</para>
+    <para>Valid keywords are:</para>
+    <itemizedlist>
+      <listitem>
+        <para><application>no</application>: excludes activities containing the keyword, or all activities if no keyword is specified.</para>
+      </listitem>
+      <listitem>
+        <para><application>only</application>: includes only the activities containing the keyword.</para>
+      </listitem>
+      <listitem>
+        <para><application>include</application>: includes activities containing the keyword. It is useful for re-including activities after using the keyword 'no'.</para>
+      </listitem>
+      <listitem>
+        <para><application>times <emphasis>n</emphasis></application>: repeats the test case <emphasis>n</emphasis> times.</para>
+      </listitem>
+    </itemizedlist>
+    
+    <para><application>Options</application></para>
+    <para>Options are specified at the end of all the test cases and provide additional flexibility for designing test runs.</para>
+    <itemizedlist>
+      <listitem>
+        <para><application>options times <emphasis>n</emphasis></application>: repeats all the test activities <emphasis>n</emphasis> times.</para>
+      </listitem>
+      <listitem>
+        <para><application>options multiprocess=enable|disable</application>: when set to enable, the multiprocessing option allows the test run to be processed at the same time as other multiprocess test runs. If it is not specified it is disabled by default.</para>
+      </listitem>
+    </itemizedlist>
+    
+    <para>Based on the configuration file, the parser generates a data list of dictionary(key, value) pairs.</para>
+    
+  </section><!--End Configuration file structure-->
+  
+  
+  <section id="Creating_a_configuration_file-Configuration_file_examples">
+	  <title>Configuration file examples</title>
+	
+	  <para>The following section provides some simple configuration file examples and explains how the configuration file is parsed into the list data structure.</para>
+	
+	  <section id="Configuration_file_examples-Single_test_case_single_value">
+	    <title>Single test case with arguments that have single values</title>
+	    
+	    <example>
+	      <title>Configuration file</title>
+<programlisting>
+Domain:install_guest
+    guestname
+        rhel5u4
+    memory
+        1024
+    vcpu
+        1
+</programlisting>
+	      <para>Single values create a single activity.</para>
+	    </example>
+	    
+	    <example>
+	      <title>List data structure</title>
+<programlisting>
+[
+  [{'domain:install_guest': {'guestname': 'rhel5u4', 'memory': '1024', 'vcpu': '1'}}]
+]
+</programlisting>
+      </example>
+      
+    </section><!--End Single test case single value-->
+    
+    
+    <section id="Configuration_file_examples-Single_test_case_multiple_values">
+	    <title>Single test case with arguments that have multiple values</title>
+	    
+	    <example>
+	      <title>Configuration file</title>
+<programlisting>
+Domain:install_guest
+    guestname
+        rhel5u4
+        rhel5u3
+        rhel5u2
+    memory
+        1024
+    vcpu
+        1
+</programlisting>
+        <para>Multiple values create an activity for each combination of value.</para>
+      </example>
+      
+      <example>
+	      <title>List data structure</title>
+<programlisting>
+[
+  [{'domain:install_guest': {'guestname': 'rhel5u4', 'memory': '1024', 'vcpu': '1'}}], 
+  [{'domain:install_guest': {'guestname': 'rhel5u3', 'memory': '1024', 'vcpu': '1'}}], 
+  [{'domain:install_guest': {'guestname': 'rhel5u2', 'memory': '1024', 'vcpu': '1'}}]
+]
+</programlisting>
+      </example>
+      
+	  </section><!--End Single test case multiple values-->
+	
+	
+	  <section id="Configuration_file_examples-Multiple_test_cases_single_values">
+	    <title>Multiple test cases with arguments that have single values</title>
+	    
+	    <example>
+	      <title>Configuration file</title>
+<programlisting>
+domain:install_guest
+    guestname
+        rhel5u4
+    memory
+        1024
+    vcpu
+        1
+
+storage:initialize_storage
+    storagename
+        rhel5u4
+</programlisting>
+        <para>Multiple test cases with arguments that have single values create a single activity.</para>
+      </example>
+      
+      <example>
+	      <title>List data structure</title>
+<programlisting>
+[
+  [{'domain:install_guest': {'guestname': 'rhel5u4', 'memory': '1024', 'vcpu': '1'}}, {'storage:initialize_storage': {'storagename': 'rhel5u4'}}]
+]
+</programlisting>
+      </example>
+      
+	  </section><!--End Multiple test cases single values-->
+	
+	
+	  <section id="Configuration_file_examples-Multiple_test_cases_multiple_values">
+	    <title>Multiple test cases with arguments that have multiple values</title>
+	    
+	    <example>
+	      <title>Configuration file</title>
+<programlisting>
+domain:install_guest
+    guestname
+        rhel5u4
+        rhel5u3
+        rhel5u2
+    memory
+        1024
+    vcpu
+        1
+
+storage:initialize_storage
+    storagename
+         rhel5u4
+</programlisting>
+         <para>Multiple test cases with arguments that have multiple values create an activity for each combination of value.</para>
+      </example>
+      
+      <example>
+	      <title>List data structure</title>
+<programlisting>
+[
+  [{'domain:install_guest': {'guestname': 'rhel5u4', 'memory': '1024', 'vcpu': '1'}}, {'storage:initialize_storage': {'storagename': 'rhel5u4'}}],
+  [{'domain:install_guest': {'guestname': 'rhel5u3', 'memory': '1024', 'vcpu': '1'}}, {'storage:initialize_storage': {'storagename': 'rhel5u4'}}],
+  [{'domain:install_guest': {'guestname': 'rhel5u2', 'memory': '1024', 'vcpu': '1'}}, {'storage:initialize_storage': {'storagename': 'rhel5u4'}}]
+] 
+</programlisting>
+      </example>
+      
+	  </section><!--End Multiple test cases multiple values-->
+	
+	
+	  <section id="Configuration_file_examples-Keyword_only">
+	    <title>Keyword "only"</title>
+	    
+	    <example>
+	      <title>Configuration file</title>
+<programlisting>
+domain:install_guest
+    guestname
+        rhel5u4
+        rhel5u3
+        rhel5u2
+    memory
+        1024
+    vcpu
+        1
+
+domain:shutdown_guest
+    guestname
+         rhel5u4 only rhel5u4
+         rhel5u3 only rhel5u3
+         rhel5u2 only rhel5u2
+</programlisting>
+        <para>The keyword "only" creates a test case only for that keyword.</para>
+      </example>
+      
+      <example>
+	      <title>List data structure</title>
+<programlisting>
+[
+  [{'domain:install_guest': {'guestname': 'rhel5u4', 'memory': '1024', 'vcpu': '1'}}, {'domain:shutdown_guest': {'guestname': 'rhel5u4'}}],
+  [{'domain:install_guest': {'guestname': 'rhel5u3', 'memory': '1024', 'vcpu': '1'}}, {'domain:shutdown_guest': {'guestname': 'rhel5u3'}}],
+  [{'domain:install_guest': {'guestname': 'rhel5u2', 'memory': '1024', 'vcpu': '1'}}, {'domain:shutdown_guest': {'guestname': 'rhel5u2'}}]
+] 
+</programlisting>
+      </example>
+      
+	  </section><!--End Keyword only-->
+	
+	
+	  <section id="Configuration_file_examples-Keyword_no">
+	    <title>Keyword "no"</title>
+	    
+	    <example>
+	      <title>Configuration file</title>
+<programlisting>
+domain:install_guest
+    guestname
+        rhel5u4
+        rhel5u3
+        rhel5u2
+    memory
+        1024
+    vcpu
+        1
+
+domain:shutdown_guest
+    guestname
+         rhel5u4 no rhel5u2|rhel5u3
+         rhel5u3 no rhel5u2|rhel5u4
+         rhel5u2 no rhel5u3|rhel5u4
+</programlisting>
+        <para>The keyword "no" excludes test cases containing the keyword.</para>
+      </example>
+      
+      <example>
+	      <title>List data structure</title>
+<programlisting>
+[
+  [{'domain:install_guest': {'guestname': 'rhel5u4', 'memory': '1024', 'vcpu': '1'}}, {'domain:shutdown_guest': {'guestname': 'rhel5u4'}}],
+  [{'domain:install_guest': {'guestname': 'rhel5u3', 'memory': '1024', 'vcpu': '1'}}, {'domain:shutdown_guest': {'guestname': 'rhel5u3'}}],
+  [{'domain:install_guest': {'guestname': 'rhel5u2', 'memory': '1024', 'vcpu': '1'}}, {'domain:shutdown_guest': {'guestname': 'rhel5u2'}}]
+] 
+</programlisting>
+      </example>
+      
+	  </section><!--End Keyword no-->
+	
+	
+	  <section id="Configuration_file_examples-Keyword_without_value">
+	    <title>Keyword "no" without a value</title>
+	    
+	    <example>
+	      <title>Configuration file</title>
+<programlisting>
+domain:install_guest
+    guestname
+        rhel5u4
+        rhel5u3
+        rhel5u2
+    memory
+        1024
+    vcpu
+        1
+
+domain:shutdown_guest
+    guestname
+        rhel5u4 no
+        rhel5u3 only rhel5u3
+        rhel5u2 no
+</programlisting>
+        <para>The keyword "no" without a value means the activity excludes the test case for that value.</para>
+      </example>
+      
+      <example>
+	      <title>List data structure</title>
+<programlisting>
+[
+  [{'domain:install_guest': {'guestname': 'rhel5u4', 'memory': '1024', 'vcpu': '1'}}],
+  [{'domain:install_guest': {'guestname': 'rhel5u3', 'memory': '1024', 'vcpu': '1'}}, {'domain:shutdown_guest': {'guestname': 'rhel5u3'}}], 
+  [{'domain:install_guest': {'guestname': 'rhel5u2', 'memory': '1024', 'vcpu': '1'}}]
+]
+</programlisting>
+      </example>
+      
+	  </section><!--End Keyword no without value-->
+	
+	
+	  <section id="Configuration_file_examples-Keyword_include">
+	    <title>Keyword "include"</title>
+	    
+	    <example>
+	      <title>Configuration file</title>
+<programlisting>
+domain:install_guest
+    guestname
+        rhel5u4
+        rhel5u3
+        rhel5u2
+    memory
+        1024
+    vcpu
+        1
+        
+domain:shutdown_guest
+    guestname
+        rhel5u4 no
+        rhel5u3 only rhel5u3
+        rhel5u2 no
+shutdowndomain
+    domainname
+        rhel5u4 include
+        rhel5u3 only rhel5u3
+        rhel5u2 include
+</programlisting>
+        <para>The keyword "include" includes the test case for that value. This is used to re-include a test case after the keyword "no".</para>
+      </example>
+      
+      <example>
+	      <title>List data structure</title>
+<programlisting>
+[
+  [{'domain:install_guest': {'guestname': 'rhel5u4', 'memory': '1024', 'vcpu': '1'}}, {'shutdowndomain': {'domainname': 'rhel5u4'}}],
+  [{'domain:install_guest': {'guestname': 'rhel5u3', 'memory': '1024', 'vcpu': '1'}}, {'domain:shutdown_guest': {'guestname': 'rhel5u3'}}, {'shutdowndomain': {'domainname': 'rhel5u3'}}],
+  [{'domain:install_guest': {'guestname': 'rhel5u2', 'memory': '1024', 'vcpu': '1'}}, {'shutdowndomain': {'domainname': 'rhel5u2'}}]
+]
+</programlisting>
+      </example>
+      
+	  </section><!--End Keyword include-->
+	
+	
+	  <section id="Configuration_file_examples-Keyword_times">
+	    <title>Keyword "times"</title>
+	    
+	    <example>
+	      <title>Configuration file</title>
+<programlisting>
+domain:install_guest times 2
+    guestname
+        rhel5u4
+    memory
+        1024
+    vcpu
+        1
+</programlisting>
+        <para>The keyword "times <emphasis>n</emphasis>" after the Test Case repeats the test case <emphasis>n</emphasis> more times.</para>
+      </example>
+      
+      <example>
+	      <title>List data structure</title>
+<programlisting>
+[
+  [{'domain:install_guest': {'guestname': 'rhel5u4', 'memory': '1024', 'vcpu': '1'}}, {'domain:install_guest': {'guestname': 'rhel5u4', 'memory': '1024', 'vcpu': '1'}}, {'domain:install_guest': {'guestname': 'rhel5u4', 'memory': '1024', 'vcpu': '1'}}]
+]
+</programlisting>
+      </example>
+      
+	  </section><!--End Keyword times-->
+	
+	
+	  <section id="Configuration_file_examples-Keyword_options_times">
+	    <title>Keyword "options" with times</title>
+	    
+	    <example>
+	      <title>Configuration file</title>
+<programlisting>
+domain:install_guest
+    guestname
+        rhel5u4
+    memory
+        1024
+    vcpu
+        1
+
+domain:shutdown_guest
+    guestname
+        rhel5u4
+
+options times 2
+</programlisting>
+        <para>The keyword "options" with <application>times <emphasis>n</emphasis></application> after all test cases repeats all activities <emphasis>n</emphasis> more times.</para>
+      </example>
+      
+      <example>
+	      <title>List data structure</title>
+<programlisting>
+[
+  [{'domain:install_guest': {'guestname': 'rhel5u4', 'memory': '1024', 'vcpu': '1'}}, {'domain:shutdown_guest': {'guestname': 'rhel5u4'}}],
+  [{'domain:install_guest': {'guestname': 'rhel5u4', 'memory': '1024', 'vcpu': '1'}}, {'domain:shutdown_guest': {'guestname': 'rhel5u4'}}],
+  [{'domain:install_guest': {'guestname': 'rhel5u4', 'memory': '1024', 'vcpu': '1'}}, {'domain:shutdown_guest': {'guestname': 'rhel5u4'}}]
+] 
+</programlisting>
+      </example>
+      
+	  </section><!--End Keyword options times-->
+	
+	
+	  <section id="Configuration_file_examples-Keyword_options_multiprocess">
+	    <title>Keyword "options" with multiprocess</title>
+	    
+	    <example>
+	      <title>Configuration file</title>
+<programlisting>
+domain:install_guest
+    guestname
+        rhel5u4
+    memory
+        1024
+    vcpu
+        1
+
+domain:shutdown_guest
+    guestname
+        rhel5u4
+
+options multiprocess=enable|disable
+</programlisting>
+        <para>The keyword "options" with <command>multiprocess=enable</command> or <command>disable</command> turns on or off the multiprocessing feature. If this option is not specified it is disabled by default.</para>
+      </example>
+       
+       <para>Example not shown.</para>
+
+	  </section><!--End Keyword options multiprocess-->
+    
+  </section><!--End Configuration file examples-->
+  
+</chapter>

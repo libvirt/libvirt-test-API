@@ -1,0 +1,13 @@
+﻿<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+]>
+
+<book>
+  <xi:include href="Book_Info.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="Understanding_libvirt-test-API.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="Writing_a_test_case.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="Creating_a_configuration_file.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="Using_libvirt-test-API.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="Integrating_into_Autotest.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="Revision_History.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</book>

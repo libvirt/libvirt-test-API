@@ -1,0 +1,31 @@
+
+---------------   initialize_storage    ---------------
+[2009-09-18 15:38:50] 5141 INFO     (initialize_storage:31) prepare create storage pool 
+[2009-09-18 15:38:50] 5141 DEBUG    (initialize_storage:34) dump create storage pool xml: 
+<?xml version="1.0" ?> 
+<pool type="netfs"><name>nfspool</name><source><host name="10.66.70.85"/><dir path="/media/share"/></source><target><path>/var/lib/xen/images</path></target></pool> 
+[2009-09-18 15:38:50] 5141 INFO     (initialize_storage:39) list current storage pool: [] 
+[2009-09-18 15:38:50] 5141 INFO     (initialize_storage:40) define pool from xml description 
+[2009-09-18 15:38:50] 5141 INFO     (initialize_storage:43) active storage pool 
+[2009-09-18 15:38:50] 5141 INFO     (initialize_storage:45) list current storage pool: ['nfspool'] 
+[2009-09-18 15:38:50] 5141 DEBUG    (initialize_storage:48) dump create storage volume xml: 
+<?xml version="1.0" ?> 
+<volume><name>rhel5u4.img</name><capacity unit="G">10</capacity><allocation>0</allocation><target><path>/var/lib/xen/images</path><format type="raw"/></target></volume> 
+[2009-09-18 15:38:50] 5141 INFO     (initialize_storage:49) prepare create storage volume 
+[2009-09-18 15:38:50] 5141 INFO     (initialize_storage:51) list current storage volume: ['rhel5u4.img'] 
+-------------   initialize_storage pass   -------------
+
+
+------------------   install_guest   ------------------
+[2009-09-18 15:38:50] 5141 INFO     (install_guest:55) get system environment information 
+[2009-09-18 15:38:50] 5141 DEBUG    (install_guest:59) install source: 
+    http://download.redhat.com/pub/rhel/rel-eng/RHEL5.4-Server-latest/tree-x86_64 
+[2009-09-18 15:38:50] 5141 DEBUG    (install_guest:60) kisckstart file: 
+    http://10.00.00.01/ks-rhel-5.4-x86_64-noxen-smp-minimal.cfg 
+[2009-09-18 15:38:50] 5141 INFO     (install_guest:62) prepare installation booting cdrom 
+[2009-09-18 15:39:01] 5141 DEBUG    (install_guest:67) dump installation guest xml: 
+<?xml version="1.0" ?> 
+<domain type="xen"><name>rhel5u4</name><memory>1048576</memory><vcpu>1</vcpu><os><type>hvm</type><loader>/usr/lib/xen/boot/hvmloader</loader><boot dev="cdrom"/></os><features><acpi/><apic/><pae/></features><clock offset="utc"/><on_poweroff>destroy</on_poweroff><on_reboot>restart</on_reboot><on_crash>restart</on_crash><devices><emulator>/usr/lib64/xen/bin/qemu-dm</emulator><disk device="disk" type="file"><driver name="file"/><source file="/var/lib/xen/images/rhel5u4.img"/><target bus="ide" dev="hda"/></disk><disk device="cdrom" type="file"><driver name="file"/><source file="/tmp/rhel5u4/custom.iso"/><target bus="ide" dev="hdc"/><readonly/></disk><interface type="bridge"><source bridge="xenbr0"/><script path="vif-bridge"/></interface><console/><input bus="ps2" type="mouse"/><graphics keymap="en-us" port="-1" type="vnc"/></devices></domain> 
+[2009-09-18 15:39:01] 5141 INFO     (install_guest:71) define guest from xml description 
+[2009-09-18 15:39:01] 5141 INFO     (install_guest:74) start installation guest ... 
+[2009-09-18 15:39:02] 5141 DEBUG    (install_guest:78) current guest state: running 

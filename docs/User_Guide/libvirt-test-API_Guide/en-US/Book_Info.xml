@@ -1,0 +1,28 @@
+﻿<?xml version='1.0'?>
+<!DOCTYPE bookinfo PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+]>
+
+<bookinfo id="libvirt-test-API">
+	<title>libvirt-test-API</title>
+	<subtitle>Virtualization Library</subtitle>
+	<productname>Libvirt</productname>
+	<productnumber>0.7</productnumber>
+	<edition>1.4</edition>
+	<pubsnumber>0</pubsnumber>
+	<abstract>
+		<para>This document explains the components of libvirt-test-API and the workflow used to create test cases and test runs.</para>
+	</abstract>
+	<corpauthor>
+		<inlinemediaobject>
+			<imageobject>
+				<imagedata format='SVG' fileref="Common_Content/images/title_logo.svg" />
+			</imageobject>
+			<textobject><phrase>Red Hat</phrase></textobject>
+		</inlinemediaobject>
+	</corpauthor>
+	<copyright>
+		<year>&YEAR;</year>
+		<holder>&HOLDER;</holder>
+	</copyright>
+	<xi:include href="Common_Content/Legal_Notice.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</bookinfo>
