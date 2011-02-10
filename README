@@ -1,0 +1,5 @@
+Libvirt-test-API is designed to test the functionality of libvirt
+through Python bindings of libvirt API. It supports writing cases
+by using Python language. And also supports testing for KVM and
+Xen (for which only Fedora and Red Hat Enterprise Linux guests are
+currently supported) as well as fully virtualized guests.
