@@ -41,6 +41,42 @@ class SnapshotAPI(object):
     def __init__(self, connection):
         self.conn = connection     
 
+    def create(self, domname, xml_desc, flag = 0):
+	try:
+            dom_obj = self.conn.lookupByName(domname)
+            return dom_obj.snapshotCreateXML(xml_desc, flag)
+        except libvirt.libvirtError, e:
+            message = e.get_error_message()
+            code = e.get_error_code()
+            raise exception.LibvirtAPI(message, code)
+
+    def get_snapshot_current(self, domname, flag = 0):
+        try:
+            dom_obj = self.conn.lookupByName(domname)
+            return dom_obj.snapshotCurrent(flag).getXMLDesc(flag)
+        except libvirt.libvirtError, e:
+            message = e.get_error_message()
+            code = e.get_error_code()
+            raise exception.LibvirtAPI(message, code)        
+
+    def snapshot_name_list(self, domname, flag = 0):
+        try:
+            dom_obj = self.conn.lookupByName(domname)
+            return dom_obj.snapshotListNames(flag)
+        except libvirt.libvirtError, e:
+            message = e.get_error_message()
+            code = e.get_error_code()
+            raise exception.LibvirtAPI(message, code) 
+
+    def snapshot_nums(self, domname, flag = 0):
+        try:
+            dom_obj = self.conn.lookupByName(domname)
+            return dom_obj.snapshotNum()
+        except libvirt.libvirtError, e:
+            message = e.get_error_message()
+            code = e.get_error_code()
+            raise exception.LibvirtAPI(message, code)
+
     def snapshot_lookup_by_name(self, domname, snapname, flag = 0):
         try:
             dom_obj = self.conn.lookupByName(domname)
@@ -49,7 +85,16 @@ class SnapshotAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
-   
+
+    def revertToSnapshot(self, domname, snapname, flag = 0):
+        try:
+            snap = self.snapshot_lookup_by_name(domname, snapname, flag = 0)
+            return  snap.revertToSnapshot(flag)
+        except libvirt.libvirtError, e:
+            message = e.get_error_message()
+            code = e.get_error_code()
+            raise exception.LibvirtAPI(message, code)
+            
     def delete(self, domname, snapname, flag = 0):
         try:
             snap = self.snapshot_lookup_by_name(domname, snapname, flag = 0)
@@ -67,15 +112,6 @@ class SnapshotAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
-
-    def revertToSnapshot(self, domname, snapname, flag = 0):
-        try:
-            snap = self.snapshot_lookup_by_name(domname, snapname, flag = 0)
-            return  snap.revertToSnapshot(flag)
-        except libvirt.libvirtError, e:
-            message = e.get_error_message()
-            code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)           
 
     def domain(self, domname):
         try:
