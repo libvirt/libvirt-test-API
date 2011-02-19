@@ -24,6 +24,11 @@ pwd = os.getcwd()
 result = re.search('(.*)libvirt-test-API', pwd)
 append_path(result.group(0))
 
+from lib.Python import connectAPI
+from lib.Python import domainAPI
+from utils.Python import utils
+from exception import LibvirtAPI
+
 VIRSH_DOMID = "virsh domid"
 VIRSH_IDS = "virsh --quiet list |awk '{print $1}'"
 VIRSH_DOMS = "virsh --quiet list |awk '{print $2}'"
@@ -37,6 +42,16 @@ def get_output(logger, command):
         logger.error(ret)
     return status, ret
 
+def check_domain_exists(domobj, guestname, logger):
+    """ check if the domain exists, may or may not be active """
+    guest_names = domobj.get_list()
+
+    if guestname not in guest_names:
+        logger.error("%s is not running or does not exist" % guestname)
+        return False
+    else:
+        return True
+ 
 def domid(params):
     """check virsh domid command
     """
@@ -50,6 +65,22 @@ def domid(params):
         if not status:
             doms = doms_ret.split('\n')
         else:
+            return 1
+   
+    if not doms:
+        logger.info("no running guest available")
+        return 1
+
+    util = utils.Utils()
+    uri = util.get_uri('127.0.0.1')
+    conn = connectAPI.ConnectAPI()
+    virconn = conn.open(uri)
+
+    logger.info("the uri is %s" % uri)
+    domobj = domainAPI.DomainAPI(virconn)
+
+    for dom in doms:
+        if not check_domain_exists(domobj, dom, logger):
             return 1
 
     status, ids_ret = get_output(logger, VIRSH_IDS)
