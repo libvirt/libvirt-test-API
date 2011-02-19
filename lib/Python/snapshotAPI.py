@@ -88,8 +88,9 @@ class SnapshotAPI(object):
 
     def revertToSnapshot(self, domname, snapname, flag = 0):
         try:
-            snap = self.snapshot_lookup_by_name(domname, snapname, flag = 0)
-            return  snap.revertToSnapshot(flag)
+            dom_obj = self.conn.lookupByName(domname)
+            snap = self.snapshot_lookup_by_name(domname, snapname)
+            return  dom_obj.revertToSnapshot(snap, flag)
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
