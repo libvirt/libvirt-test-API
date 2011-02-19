@@ -1,13 +1,13 @@
 #!/usr/bin/env python
-""""virsh snapshot-create" testing
-   mandatory arguments: guestname
+""" create a flag file in the guest OS
+   mandatory arguments: guestname, username, password
 """
 
 __author__ = "Guannan Ren <gren@redhat.com>"
 __date__ = "Sat Feb 19, 2011"
 __version__ = "0.1.0"
 __credits__ = "Copyright (C) 2011 Red Hat, Inc."
-__all__ = ['internal_create', 'check_params', 'check_domain_image']
+__all__ = ['file_flag', 'check_params', 'check_domain_running']
 
 import os
 import sys
