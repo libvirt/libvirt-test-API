@@ -66,6 +66,11 @@ def flag_check(params):
     username = params['username']
     password = params['password']
 
+    if params.has_key('expectedret'):
+        expected_result = params['expectedret']
+    else:
+        expected_result = "exist"      
+
     util = utils.Utils()
     chk = check.Check()
     uri = util.get_uri('127.0.0.1')
@@ -102,12 +107,18 @@ def flag_check(params):
     if ret == "TIMEOUT!!!":
         logger.error("connecting to guest OS timeout")
         return 1
-    elif ret == FLAG_FILE:
+    elif ret == FLAG_FILE and expected_result == "exist":
         logger.info("checking flag %s in guest OS succeeded" % FLAG_FILE)
         return 0
-    else:
-        logger.error("failed to check flag in the guestOS %s" % ret)
+    elif ret == FLAG_FILE and expected_result == 'noexist':
+        logger.error("flag %s still exist, FAILED." % FLAG_FILE)
         return 1
+    elif ret != None and expected_result == "exist":
+        logger.error("no flag %s exists in the guest %s " % (FLAG_FILE,guestname))
+        return 1
+    elif ret != None and expected_result == 'noexist':
+        logger.info("flag %s is not present, checking succeeded" % FLAG_FILE)
+        return 0
  
     return 0
 
