@@ -838,7 +838,7 @@ def snapshot_xml(params):
     dom_snapshot_element = snapshot.createElement('domainsnapshot')
     # <name>
     name_element = snapshot.createElement('name')
-    name_node = snapshot.createTextNode(params['name'])
+    name_node = snapshot.createTextNode(params['snapshotname'])
     name_element.appendChild(name_node)
     dom_snapshot_element.appendChild(name_element)
     # <description> is optional

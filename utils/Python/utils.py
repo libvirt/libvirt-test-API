@@ -191,7 +191,6 @@ class Utils(object):
 
     def get_num_vcpus(self, domname):
         """Get mac address of a domain
-
            Return mac address on SUCCESS or None on FAILURE
         """
         cmd = "virsh dumpxml " + domname + \
@@ -205,7 +204,6 @@ class Utils(object):
 
     def get_size_mem(self, domname):
         """Get mem size of a domain
-
            Return mem size on SUCCESS or None on FAILURE
         """
         cmd = "virsh dumpxml " + domname + \
@@ -216,6 +214,17 @@ class Utils(object):
             return out
         else:
             return None
+
+    def get_disk_path(self, dom_xml):
+        """Get full path of bootable disk image of domain
+           Return mac address on SUCCESS or None on FAILURE
+        """
+        doc = minidom.parseString(dom_xml)
+        disk_list = doc.getElementsByTagName('disk') 
+        source = disk_list[0].getElementsByTagName('source')[0]
+        attribute = source.attributes.keys()[0]
+
+        return source.attributes[attribute].value
  
     def get_capacity_suffix_size(self, capacity):
         dicts = {}
