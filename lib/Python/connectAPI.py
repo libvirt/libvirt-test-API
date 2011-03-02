@@ -59,6 +59,15 @@ class ConnectAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)    
+
+    def openAuth(self, uri, auth, flags = 0):
+        try:
+            self.conn = libvirt.openAuth(uri, auth, flags)
+            return self.conn
+        except libvirt.libvirtError, e:
+            message = e.get_error_message()
+            code = e.get_error_code()
+            raise exception.LibvirtAPI(message, code)
              
     def close(self, name):
         try:
@@ -451,3 +460,6 @@ class ConnectAPI(object):
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
             
+VIR_CRED_AUTHNAME = libvirt.VIR_CRED_AUTHNAME
+VIR_CRED_PASSPHRASE = libvirt.VIR_CRED_PASSPHRASE
+

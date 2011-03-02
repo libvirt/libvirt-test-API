@@ -153,7 +153,6 @@ class DomainAPI(object):
     def create(self, dom_xml_desc, flags = 0):
         try:
             dom_obj = self.conn.createXML(dom_xml_desc, flags)
-            dom_obj.name()
             return dom_obj
         except libvirt.libvirtError, e:
             message = e.get_error_message()

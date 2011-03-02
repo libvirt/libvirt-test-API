@@ -19,7 +19,7 @@
 # Maintainer: Nan Zhang: nzhang@redhat.com 
 # Version: 0.1.0
 
-__DEBUG__ = True
+__DEBUG__ = False
 
 import os, sys
 import xml.dom.minidom
