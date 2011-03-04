@@ -6,8 +6,8 @@ __author__ = "Guannan Ren <gren@redhat.com>"
 __date__ = "Tue Mar 1, 2011"
 __version__ = "0.1.0"
 __credits__ = "Copyright (C) 2011 Red Hat, Inc."
-__all__ = ['domain_list', 'get_option_list','check_default_option',
-           'check_inactive_option', 'check_all_option']
+__all__ = ['multiple_thread_block_on_domain_create', 'guest_install',
+           'request_credentials', 'check_params']
 
 import os
 import sys
@@ -170,8 +170,10 @@ def multiple_thread_block_on_domain_create(params):
 
 
     name = "guest"
+    start_num = num.split('-')[0]
+    end_num = num.split('-')[1]
     thread_pid = []
-    for i in range(0, int(num)): 
+    for i in range(int(start_num), int(end_num)): 
         guestname =  name + str(i)
         thr = guest_install(guestname, guestos, arch, type, ks, domobj, util, logger)
         thread_pid.append(thr)
