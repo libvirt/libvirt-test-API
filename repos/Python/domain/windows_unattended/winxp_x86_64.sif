@@ -69,4 +69,4 @@
 
 [GuiRunOnce]
    Command1="cmd /c netsh interface ip set address local dhcp"
-   Command2="cmd /c ping 10.0.2.2 -n 20 && shutdown /s /t 0"
+   Command2="cmd /c shutdown /s /t 0"
