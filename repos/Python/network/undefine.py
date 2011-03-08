@@ -1,5 +1,5 @@
 #!/usr/bin/evn python
-"""this test case is used for testing undefine 
+"""this test case is used for testing undefine
    the network
 """
 
@@ -95,10 +95,11 @@ def undefine(params):
             return 1
     except LibvirtAPI, e:
         logger.error("API error message: %s, error code is %s" \
-% (e.response()['message'], e.response()['code']))
+                     % (e.response()['message'], e.response()['code']))
         logger.error("fail to undefine a network")
         test_result = False
         return 1
+
     time.sleep(3)
     if test_result:
         return 0

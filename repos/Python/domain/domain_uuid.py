@@ -7,7 +7,6 @@ __date__ = "Tue Jan 18, 2011"
 __version__ = "0.1.0"
 __credits__ = "Copyright (C) 2011 Red Hat, Inc."
 __all__ = ['domuuid']
-           
 
 import os
 import sys
@@ -42,7 +41,7 @@ def check_domain_exists(domobj, guestname, logger):
         return False
     else:
         return True
-    
+
 def check_domain_uuid(guestname, UUIDString, logger):
     """ check UUID String of guest """
     status, ret = commands.getstatusoutput(VIRSH_DOMUUID + ' %s' % guestname)
@@ -58,7 +57,7 @@ def check_domain_uuid(guestname, UUIDString, logger):
             return True
         else:
             return False
-            
+
 def domuuid(params):
     """check virsh domuuid command
     """
@@ -82,7 +81,7 @@ def domuuid(params):
     if not check_domain_exists(domobj, guestname, logger):
         logger.error("need a defined guest, may or may not be active")
         return 1
- 
+
     try:
         logger.info("get the UUID string of %s" % guestname)
         UUIDString = domobj.get_uuid_string(guestname)
@@ -91,15 +90,9 @@ def domuuid(params):
             logger.info("UUID String is %s" % UUIDString)
             return 0
         else:
-            logger.error("UUIDString from API is not the same as the one from virsh")        
+            logger.error("UUIDString from API is not the same as the one from virsh")
             return 1
     except LibvirtAPI, e:
         logger.error("API error message: %s, error code is %s" % \
-(e.response()['message'], e.response()['code']))
+                     (e.response()['message'], e.response()['code']))
         return 1
-         
-     
-
-    
-
-

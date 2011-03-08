@@ -1,13 +1,12 @@
 #!/usr/bin/env python
-"""testing "virsh domname" function
+"""testing "virsh domid" function
 """
 
 __author__ = "Guannan Ren <gren@redhat.com>"
 __date__ = "Tue Jan 18, 2011"
 __version__ = "0.1.0"
 __credits__ = "Copyright (C) 2011 Red Hat, Inc."
-__all__ = ['domname']
-           
+__all__ = ['domid']
 
 import os
 import sys
@@ -25,7 +24,7 @@ pwd = os.getcwd()
 result = re.search('(.*)libvirt-test-API', pwd)
 append_path(result.group(0))
 
-VIRSH_DOMNAME = "virsh domname"
+VIRSH_DOMID = "virsh domid"
 VIRSH_IDS = "virsh --quiet list |awk '{print $1}'"
 VIRSH_DOMS = "virsh --quiet list |awk '{print $2}'"
 
@@ -38,22 +37,22 @@ def get_output(logger, command):
         logger.error(ret)
     return status, ret
 
-def domname(params):
-    """check virsh domname command
+def domid(params):
+    """check virsh domid command
     """
     logger = params['logger']
 
-    ids = []
-    if 'domainid' in params:
-        ids.append(params['domainid'])
+    doms = []
+    if 'guestname' in params:
+        doms.append(params['guestname'])
     else:
-        status, id_ret = get_output(logger, VIRSH_IDS)
+        status, doms_ret = get_output(logger, VIRSH_DOMS)
         if not status:
-            ids = id_ret.split('\n')       
+            doms = doms_ret.split('\n')
         else:
             return 1
 
-    status, ids_ret = get_output(logger, VIRSH_IDS)        
+    status, ids_ret = get_output(logger, VIRSH_IDS)
     if not status:
         ids_list = ids_ret.split('\n')
     else:
@@ -64,27 +63,21 @@ def domname(params):
         doms_list = doms_ret.split('\n')
     else:
         return 1
-    
-    id_domname = {}
-    for id  in ids_list:
-        index = ids_list.index(id)
-        id_domname[id] = doms_list[index] 
 
-    for id in ids:
-        status, domname_ret = get_output(logger, VIRSH_DOMNAME + " %s" % id)
+    domname_id = {}
+    for dom  in doms_list:
+        index = doms_list.index(dom)
+        domname_id[dom] = ids_list[index]
+
+    for dom in doms:
+        status, domid_ret = get_output(logger, VIRSH_DOMID + " %s" % dom)
         if status:
-            return 1 
-        domname = domname_ret[:-1]
-        if id_domname[id] == domname:
-            logger.info("domid %s corresponds to guest %s" % (id, domname))
-        else:
-            logger.error("domid %s fails to match to guest %s" % (id, domname))
             return 1
-    
+        domid = domid_ret[:-1]
+        if domname_id[dom] == domid:
+            logger.info("domname %s corresponds to id %s" % (dom, domid))
+        else:
+            logger.error("domname %s fails to match id %s" % (dom, domid))
+            return 1
+
     return 0
-            
-
-        
-                  
- 
-

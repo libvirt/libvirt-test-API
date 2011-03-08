@@ -44,12 +44,12 @@ def check_params(params):
     return 0
 
 def check_network_autostart(*args):
-    """Check network start automatically result, if setting network is 
-       successful, networkname.xml will exist under 
+    """Check network start automatically result, if setting network is
+       successful, networkname.xml will exist under
        /etc/libvirt/{hypervisor}/networks/autostart/
     """
     (networkname, hypervisor, flag, logger) = args
-  
+
     netxml = "/etc/libvirt/%s/networks/autostart/%s.xml" % \
               (hypervisor, networkname)
     logger.debug("virtual network xml file is: %s" % netxml)
@@ -82,7 +82,7 @@ def autostart(params):
 
     networkname = params['networkname']
     autostart = params['autostart']
-    
+
     test_result = False
     flag = -1
 
@@ -114,9 +114,9 @@ def autostart(params):
 
     try:
         netobj.setnetAutostart(networkname, flag)
-        if check_network_autostart(networkname, 
-                                   "qemu", 
-                                   flag, 
+        if check_network_autostart(networkname,
+                                   "qemu",
+                                   flag,
                                    logger):
             logger.info("current virtual network %s autostart: %s" % \
                          (networkname, netobj.get_autostart(networkname)))

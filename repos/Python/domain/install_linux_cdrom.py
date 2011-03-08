@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 """The test script is for installing a new guest virtual machine
-   via calling libvirt python bindings API. 
-   mandatory arguments:guesttype 
+   via calling libvirt python bindings API.
+   mandatory arguments:guesttype
                        guestname
                        guestos
-                       guestarch   
-   optional arguments: memory 
+                       guestarch
+   optional arguments: memory
                        vcpu
                        disksize
                        imagepath
@@ -15,9 +15,8 @@
                        ifacetype
                        source
                        volumepath
-                       type 
-                           define|create
-""" 
+                       type: define|create
+"""
 
 import os
 import sys
@@ -34,7 +33,7 @@ def append_path(path):
         pass
     else:
         sys.path.append(path)
-    
+
 pwd = os.getcwd()
 result = re.search('(.*)libvirt-test-API', pwd)
 homepath = result.group(0)
@@ -51,31 +50,30 @@ __author__ = "Guannan Ren <gren@redhat.com>"
 __date__ = "Tue Mar 11 2010"
 __version__ = "0.1.0"
 __credits__ = "Copyright (C) 2010 Red Hat, Inc."
-__all__ = ['install_linux_cdrom', 'usage'] 
+__all__ = ['install_linux_cdrom', 'usage']
 
 def usage():
     print '''usage: mandatory arguments:guesttype
                            guestname
        optional arguments: memory
-                           vcpu       
+                           vcpu
                            disksize
-                           imagepath  
-                           hdmodel    
-                           nicmodel  
+                           imagepath
+                           hdmodel
+                           nicmodel
                            macaddr
                            ifacetype
-                           source   
+                           source
                            volumepath
-                           type
-                               define|create
+                           type: define|create
           '''
 
 def check_params(params):
     """Checking the arguments required"""
     params_given = copy.deepcopy(params)
     mandatory_args = ['guestname', 'guesttype', 'guestos', 'guestarch']
-    optional_args = ['memory', 'vcpu', 'disksize', 'imagepath', 'hdmodel', 
-                     'nicmodel', 'macaddr', 'ifacetype', 'source', 'type', 
+    optional_args = ['memory', 'vcpu', 'disksize', 'imagepath', 'hdmodel',
+                     'nicmodel', 'macaddr', 'ifacetype', 'source', 'type',
                      'volumepath']
 
     for arg in mandatory_args:
@@ -88,10 +86,10 @@ def check_params(params):
             usage()
             return 1
 
-        params_given.pop(arg)  
+        params_given.pop(arg)
 
     if len(params_given) == 0:
-        return 0    
+        return 0
 
     for arg in params_given.keys():
         if arg not in optional_args:
@@ -106,43 +104,43 @@ def prepare_cdrom(*args):
     """
     ostree, ks, guestname, logger = args
     ks_name = os.path.basename(ks)
-    
+
     new_dir = os.path.join(homepath, guestname)
-    logger.info("creating a new folder for customizing custom.iso file in it")  
+    logger.info("creating a new folder for customizing custom.iso file in it")
 
     if os.path.exists(new_dir):
         logger.info("the folder exists, remove it")
-        shutil.rmtree(new_dir) 
+        shutil.rmtree(new_dir)
 
     os.makedirs(new_dir)
     logger.info("the directory is %s" % new_dir)
 
     boot_path = os.path.join(ostree, 'images/boot.iso')
-    logger.info("the url of downloading boot.iso file is %s" % boot_path)    
+    logger.info("the url of downloading boot.iso file is %s" % boot_path)
 
     urllib.urlretrieve(boot_path, '%s/boot.iso' % new_dir)[0]
     time.sleep(10)
-    
+
     urllib.urlretrieve(ks, '%s/%s' % (new_dir, ks_name))[0]
     logger.info("the url of kickstart is %s" % ks)
-    
+
     shutil.copy('utils/ksiso.sh', new_dir)
     src_path = os.getcwd()
-    
+
     logger.info("enter into the workshop folder: %s" % new_dir)
-    os.chdir(new_dir) 
+    os.chdir(new_dir)
     shell_cmd = 'sh ksiso.sh %s' % ks_name
 
     logger.info("running command %s to making the custom.iso file" % shell_cmd)
     (status, text) = commands.getstatusoutput(shell_cmd)
 
     logger.debug(text)
-    logger.info("make custom.iso file, change to original directory: %s" % 
+    logger.info("make custom.iso file, change to original directory: %s" %
                 src_path)
     os.chdir(src_path)
 
 def prepare_boot_guest(domobj, dict, logger, installtype):
-    """ After guest installation is over, undefine the guest with 
+    """ After guest installation is over, undefine the guest with
         bootting off cdrom, to define the guest to boot off harddisk.
     """
     params = copy.deepcopy(dict)
@@ -166,13 +164,13 @@ def prepare_boot_guest(domobj, dict, logger, installtype):
     try:
         domobj.define(guestxml)
     except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % 
+        logger.error("API error message: %s, error code is %s" %
                      (e.response()['message'], e.response()['code']))
         logger.error("fail to define domain %s" % guestname)
         return 1
 
     logger.info("define guest %s " % guestname)
-    logger.debug("the xml description of guest booting off harddisk is %s" % 
+    logger.debug("the xml description of guest booting off harddisk is %s" %
                  guestxml)
 
     logger.info('boot guest up ...')
@@ -180,7 +178,7 @@ def prepare_boot_guest(domobj, dict, logger, installtype):
     try:
         domobj.start(guestname)
     except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % 
+        logger.error("API error message: %s, error code is %s" %
                      (e.response()['message'], e.response()['code']))
         logger.error("fail to start domain %s" % guestname)
         return 1
@@ -190,7 +188,7 @@ def prepare_boot_guest(domobj, dict, logger, installtype):
 def install_linux_cdrom(params):
     """ install a new virtual machine """
     global logger
-    logger = params['logger'] 
+    logger = params['logger']
 
     params.pop('logger')
 
@@ -200,7 +198,7 @@ def install_linux_cdrom(params):
     if params_check_result:
         return 1
 
-    logger.info("Arguments checkup finished.") 
+    logger.info("Arguments checkup finished.")
 
     guestname = params.get('guestname')
     guesttype = params.get('guesttype')
@@ -222,38 +220,37 @@ def install_linux_cdrom(params):
     logger.info("the macaddress is %s" % params['macaddr'])
     logger.info("the type of hypervisor is %s" % hypervisor)
     logger.debug("the uri to connect is %s" % uri)
-  
+
     if params.has_key('imagepath') and not params.has_key('volumepath'):
-        imgfullpath = os.join.path(params.get('imagepath'), guestname)  
-          
+        imgfullpath = os.join.path(params.get('imagepath'), guestname)
+
     elif not params.has_key('imagepath') and not params.has_key('volumepath'):
         if hypervisor == 'xen':
-            imgfullpath = os.path.join('/var/lib/xen/images', guestname) 
+            imgfullpath = os.path.join('/var/lib/xen/images', guestname)
         elif hypervisor == 'kvm':
-            imgfullpath = os.path.join('/var/lib/libvirt/images', guestname)    
+            imgfullpath = os.path.join('/var/lib/libvirt/images', guestname)
 
     elif not params.has_key('imagepath') and params.has_key('volumepath'):
         imgfullpath = params['volumepath']
 
     else:
         logger.error("we only choose one between imagepath and volumepath")
-        return 1    
-  
- 
+        return 1
+
     params['fullimagepath'] = imgfullpath
 
-    logger.info("the path of directory of disk images located on is %s" % 
-                imgfullpath)      
+    logger.info("the path of directory of disk images located on is %s" %
+                imgfullpath)
 
     if params.has_key('disksize'):
         seeksize = params.get('disksize')
     else:
         seeksize = '10'
-    
+
     logger.info("the size of disk image is %sG" % (seeksize))
     shell_disk_dd = "dd if=/dev/zero of=%s bs=1 count=1 seek=%sG" % \
-                    (imgfullpath, seeksize)                     
-    logger.debug("the commands line of creating disk images is '%s'" % 
+                    (imgfullpath, seeksize)
+    logger.debug("the commands line of creating disk images is '%s'" %
                  shell_disk_dd)
 
     (status, message) = commands.getstatusoutput(shell_disk_dd)
@@ -262,21 +259,20 @@ def install_linux_cdrom(params):
         logger.debug(message)
     else:
         logger.info("creating disk images file is successful.")
- 
 
     logger.info("get system environment information")
     envfile = os.path.join(homepath, 'env.cfg')
     logger.info("the environment file is %s" % envfile)
 
     envpaser = env_parser.Envpaser(envfile)
-    ostree = envpaser.get_value("guest", guestos + "_" +guestarch)  
+    ostree = envpaser.get_value("guest", guestos + "_" +guestarch)
     ks = envpaser.get_value("guest", guestos + "_" +guestarch + "_http_ks")
- 
+
     logger.debug('install source: \n    %s' % ostree)
     logger.debug('kisckstart file: \n    %s' % ks)
 
     logger.info('prepare installation...')
-   
+
     if guesttype == 'xenpv':
         params['kickstart'] = ks
         vmlinuzpath = os.path.join(ostree, 'isolinux/vmlinuz')
@@ -285,13 +281,13 @@ def install_linux_cdrom(params):
         logger.debug("the url of vmlinuz file is %s" % vmlinuzpath)
         logger.debug("the url of initrd file is %s" % initrdpath)
 
-        urllib.urlretrieve(vmlinuzpath, '/var/lib/libvirt/boot/vmlinuz') 
+        urllib.urlretrieve(vmlinuzpath, '/var/lib/libvirt/boot/vmlinuz')
         urllib.urlretrieve(initrdpath, '/var/lib/libvirt/boot/initrd.img')
 
         logger.debug("vmlinuz file is located in /var/lib/libvirt/boot")
         logger.debug("initrd file is located in /var/lib/libvirt/boot")
 
-    elif guesttype == 'xenfv' or guesttype == 'kvm': 
+    elif guesttype == 'xenfv' or guesttype == 'kvm':
         params['bootcd'] = '%s/custom.iso' % \
                            (os.path.join(homepath, guestname))
         logger.debug("the bootcd path is %s" % params['bootcd'])
@@ -299,25 +295,24 @@ def install_linux_cdrom(params):
         prepare_cdrom(ostree, ks, guestname, logger)
     else:
         logger.error("unknown guest type: %s" % guesttype)
-        return 1    
-      
-    
+        return 1
+
     xmlobj = xmlbuilder.XmlBuilder()
     guestxml = xmlobj.build_domain_install(params)
     logger.debug('dump installation guest xml:\n%s' % guestxml)
-  
+
     virconn = connectAPI.ConnectAPI().open(uri)
     domobj = domainAPI.DomainAPI(virconn)
 
 
     installtype = params.get('type')
 
-    if installtype == None or installtype == 'define': 
+    if installtype == None or installtype == 'define':
         logger.info('define guest from xml description')
         try:
             domobj.define(guestxml)
         except LibvirtAPI, e:
-            logger.error("API error message: %s, error code is %s" % 
+            logger.error("API error message: %s, error code is %s" %
                          (e.response()['message'], e.response()['code']))
             logger.error("fail to define domain %s" % guestname)
             return 1
@@ -326,8 +321,8 @@ def install_linux_cdrom(params):
 
         try:
             domobj.start(guestname)
-        except LibvirtAPI, e: 
-            logger.error("API error message: %s, error code is %s" % 
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s" %
                          (e.response()['message'], e.response()['code']))
             logger.error("fail to start domain %s" % guestname)
             return 1
@@ -336,11 +331,11 @@ def install_linux_cdrom(params):
         try:
             domobj.create(guestxml)
         except LibvirtAPI, e:
-            logger.error("API error message: %s, error code is %s" % 
+            logger.error("API error message: %s, error code is %s" %
                          (e.response()['message'], e.response()['code']))
             logger.error("fail to define domain %s" % guestname)
             return 1
-         
+
     interval = 0
     while(interval < 2400):
         time.sleep(10)
@@ -355,7 +350,7 @@ def install_linux_cdrom(params):
                     return 1
                 break
             else:
-                interval += 10 
+                interval += 10
                 logger.info('%s seconds passed away...' % interval)
         elif installtype == 'create':
             dom_name_list = domobj.get_list()
@@ -396,10 +391,10 @@ def install_linux_cdrom(params):
     while timeout:
         time.sleep(10)
         timeout -= 10
-     
+
         ip = util.mac_to_ip(mac, 180)
 
-        if not ip:  
+        if not ip:
             logger.info(str(timeout) + "s left")
         else:
             logger.info("vm %s power on successfully" % guestname)
@@ -413,4 +408,3 @@ def install_linux_cdrom(params):
     time.sleep(60)
 
     return 0
-

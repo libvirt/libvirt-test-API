@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""this test case is used for testing of building 
+"""this test case is used for testing of building
    a disk type storage pool
 """
 
@@ -10,7 +10,6 @@ __credits__ = 'Copyright (C) 2009 Red Hat, Inc.'
 __all__ = ['usage', 'check_pool_built', 'build_disk_pool', \
            'get_pool_devicename_type', 'check_pool_inactive',\
             'check_params']
-
 
 import os
 import re
@@ -43,7 +42,7 @@ def usage():
 def check_params(params):
     """Verify inputing parameter dictionary"""
     options = ['poolname']
-   
+
     for option in options:
         if option not in params:
             logger.error("%s is required" % option)
@@ -73,7 +72,7 @@ def check_pool_inactive(stgobj, poolname):
         return False
 
 def get_pool_devicename_type(stgobj, poolname):
-    """ get device name and partition table of the pool 
+    """ get device name and partition table of the pool
         from its xml description """
     poolxml = stgobj.dump_pool(poolname)
 
@@ -92,9 +91,9 @@ def check_pool_built(source_device, device_type):
     """using parted command tool to check the validation of final result"""
 
     cmd = "parted -s %s print" % source_device
-    ret, output = commands.getstatusoutput(cmd) 
+    ret, output = commands.getstatusoutput(cmd)
     partition_info = output.split("\n")[3]
- 
+
     logger.debug("the partition information is %s" % partition_info)
     partition_table = partition_info.split(": ")[1]
 
@@ -104,8 +103,8 @@ def check_pool_built(source_device, device_type):
         return 1
 
 def build_disk_pool(params):
-    """ build a defined and inactive pool"""    
-    
+    """ build a defined and inactive pool"""
+
     global logger
     logger = params['logger']
 
@@ -127,11 +126,11 @@ def build_disk_pool(params):
     virconn = conn.open(uri)
 
     stgobj = storageAPI.StorageAPI(virconn)
- 
+
     logger.info("checking the state of given storage pool")
     if not check_pool_inactive(stgobj, poolname):
         return 1
-    
+
     logger.info("checking storage pool state succeeded")
 
     source_device, device_type = get_pool_devicename_type(stgobj, poolname)
@@ -152,27 +151,5 @@ def build_disk_pool(params):
             return 1
     except LibvirtAPI, e:
         logger.error("API error message: %s, error code is %s" \
-% (e.response()['message'], e.response()['code']))
+                     % (e.response()['message'], e.response()['code']))
         return 1
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

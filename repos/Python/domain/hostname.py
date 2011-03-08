@@ -7,7 +7,6 @@ __date__ = "Tue Jan 18, 2011"
 __version__ = "0.1.0"
 __credits__ = "Copyright (C) 2011 Red Hat, Inc."
 __all__ = ['hostname']
-           
 
 import os
 import sys
@@ -31,12 +30,12 @@ def hostname(params):
     """check virsh hostname command
     """
     logger = params['logger']
-    
+
     status, virsh_ret = commands.getstatusoutput(VIRSH_HOSTNAME)
     if status:
         logger.error("executing " + "\"" + VIRSH_HOSTNAME + "\"" + " failed")
         return 1
-    logger.info("the output of " + "\"" +  VIRSH_HOSTNAME + "\"" + " is %s" % virsh_ret)   
+    logger.info("the output of " + "\"" +  VIRSH_HOSTNAME + "\"" + " is %s" % virsh_ret)
 
     status, host_ret = commands.getstatusoutput("hostname")
     if status:
@@ -50,7 +49,3 @@ def hostname(params):
         logger.info(VIRSH_HOSTNAME + " testing succeeded")
 
     return 0
-   
-     
-     
-

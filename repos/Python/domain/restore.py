@@ -9,7 +9,7 @@ __author__ = 'Alex Jia: ajia@redhat.com'
 __date__ = 'Wed Mar 24, 2010'
 __version__ = '0.1.0'
 __credits__ = 'Copyright (C) 2009 Red Hat, Inc.'
-__all__ = ['usage', 'get_guest_ipaddr', 'restore', 
+__all__ = ['usage', 'get_guest_ipaddr', 'restore',
            'check_guest_status', 'check_guest_restore']
 
 import os
@@ -113,7 +113,7 @@ def restore(params):
         logger.error("Error: current guest status is not shutoff or shutdown,\
                       can not do restore operation")
         return 1
-    
+
     try:
         domobj.restore(guestname, filepath)
         if check_guest_restore(guestname, domobj, util, logger):
@@ -123,7 +123,7 @@ def restore(params):
             logger.error("Error: fail to check restore domain")
             test_result = False
     except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % 
+        logger.error("API error message: %s, error code is %s" %
                       (e.response()['message'], e.response()['code']))
         logger.error("Error: fail to restore %s domain" % guestname)
         test_result = False
@@ -132,4 +132,3 @@ def restore(params):
         return 0
     else:
         return 1
-

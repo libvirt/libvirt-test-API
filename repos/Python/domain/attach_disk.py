@@ -68,9 +68,7 @@ def check_guest_status(guestname, domobj):
         return True
 
 def check_attach_disk(num1, num2):
-    """Check attach disk result via simple disk number 
-       comparison
-    """
+    """Check attach disk result via simple disk number comparison """
     if num2 > num1:
         return True
     else:
@@ -86,8 +84,8 @@ def attach_disk(params):
     imagesize = int(params['imagesize'])
     disktype = params['hdmodel']
     test_result = False
-    
-    # Connect to local hypervisor connection URI 
+
+    # Connect to local hypervisor connection URI
     util = utils.Utils()
     uri = util.get_uri('127.0.0.1')
     conn = connectAPI.ConnectAPI()
@@ -131,7 +129,7 @@ def attach_disk(params):
             logger.error("fail to attach a disk to guest: %s\n" %disk_num2)
             test_result = False
     except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % 
+        logger.error("API error message: %s, error code is %s" %
                      (e.response()['message'], e.response()['code']))
         logger.error("attach %s disk to guest %s" % (imagename, guestname))
         test_result = False
@@ -141,4 +139,3 @@ def attach_disk(params):
         return 0
     else:
         return 1
-

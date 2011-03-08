@@ -7,11 +7,11 @@ __author__ = "Osier Yang <jyang@redhat.com>"
 __date__ = "Tue Oct 27, 2009"
 __version__ = "0.1.0"
 __credits__ = "Copyright (C) 2009 Red Hat, Inc."
-__all__ = ['resume', 
-          'check_params',  
-          'parse_opts', 
-          'usage', 
-          'version', 
+__all__ = ['resume',
+          'check_params',
+          'parse_opts',
+          'usage',
+          'version',
           'append_path']
 
 import os
@@ -41,7 +41,7 @@ def check_params(params):
     """Verify the input parameter"""
     if 'logger' not in params:
         print "key 'logger' is required, and it's value should \
-               be an instance of logging.Logger" 
+               be an instance of logging.Logger"
         return 1
 
     logger = params['logger']
@@ -51,7 +51,7 @@ def check_params(params):
         if key not in params:
             logger.error("key '%s' is required" % key)
             usage()
- 
+
     if params['guestname'] == "":
         logger.error("value of guestname is empty")
         usage()
@@ -72,12 +72,12 @@ def resume(params):
     check_params(params)
     domname = params['guestname']
     logger = params['logger']
-   
-    # Connect to local hypervisor connection URI 
+
+    # Connect to local hypervisor connection URI
     util = utils.Utils()
     uri = util.get_uri('127.0.0.1')
 
-    # Resume domain 
+    # Resume domain
     virconn = connectAPI.ConnectAPI().open(uri)
     domobj = domainAPI.DomainAPI(virconn)
     logger.info('resume domain')

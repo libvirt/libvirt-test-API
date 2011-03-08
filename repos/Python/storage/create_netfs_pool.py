@@ -10,7 +10,7 @@ __version__  = '0.1.0'
 __credits__  = 'Copyright (C) 2010 Red Hat, Inc.'
 __all__      = ['usage', 'check_pool', 'create_dir_pool']
 
-import os 
+import os
 import re
 import sys
 
@@ -33,10 +33,10 @@ from utils.Python import XMLParser
 from exception import LibvirtAPI
 
 def usage(params):
-    """ 
+    """
        Verifies the params dictionary for the argument. Required arguments are
-       poolname, pooltype, sourcename and sourcepath. 
-  """
+       poolname, pooltype, sourcename and sourcepath.
+    """
 
     logger = params['logger']
 
@@ -50,7 +50,7 @@ def usage(params):
         elif len(params[key]) == 0:
             logger.error("%s key is empty, set it to a value" % key)
             return False
-   
+
     #optional keys:
     if "pooltype" not in params:
         params['pooltype'] = 'netfs'
@@ -101,8 +101,7 @@ def check_pool_create_OS(stgobj, poolname, logger):
         return True
     else:
         return False
-           
-     
+
 
 def display_pool_info(stg, logger):
     """Display current storage pool information"""
@@ -119,10 +118,10 @@ def create_netfs_pool(params):
         return 1
 
     poolname = params['poolname']
-    
+
     util = utils.Utils()
     uri  = util.get_uri('127.0.0.1')
-    
+
     conn = connectAPI.ConnectAPI()
     virconn = conn.open(uri)
     caps = conn.get_caps()
@@ -155,11 +154,7 @@ def create_netfs_pool(params):
             logger.info("creating %s storage pool is \
                          UNSUCCESSFUL in libvirt!!!" % poolname)
             return 1
-    except LibvirtAPI, e:  
+    except LibvirtAPI, e:
         logger.error("API error message: %s, error code is %s" % \
-(e.response()['message'], e.response()['code']))
+                     (e.response()['message'], e.response()['code']))
         return 1
-
-
-
-      

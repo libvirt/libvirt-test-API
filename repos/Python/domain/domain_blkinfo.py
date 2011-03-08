@@ -30,8 +30,8 @@ from lib.Python import domainAPI
 from utils.Python import utils
 from exception import LibvirtAPI
 
-GET_DOMBLKINFO_MAC = "virsh domblkinfo %s %s | awk '{print $2}'" 
-GET_CAPACITY = "du -b %s | awk '{print $1}'" 
+GET_DOMBLKINFO_MAC = "virsh domblkinfo %s %s | awk '{print $2}'"
+GET_CAPACITY = "du -b %s | awk '{print $1}'"
 GET_PHYSICAL_K = " du -B K %s | awk '{print $1}'"
 VIRSH_DOMBLKINFO = "virsh domblkinfo %s %s"
 
@@ -75,15 +75,15 @@ def check_block_data(blockdev, blkdata, logger):
         else:
             logger.error("apparent-size from 'du' is %s, \n\
                          but from 'domblkinfo' is %s, checking failed" % \
-                        (apparent_size, blkdata[0])) 
+                        (apparent_size, blkdata[0]))
             return 1
     else:
         return 1
 
     status, block_size_k = get_output(GET_PHYSICAL_K % blockdev, logger)
     if not status:
-        block_size_b = int(block_size_k[:-1]) * 1024     
-        # temporarily, we only test the default case, assuming
+        block_size_b = int(block_size_k[:-1]) * 1024
+        # Temporarily, we only test the default case, assuming
         # Allocation value is equal to Physical value
         if str(block_size_b) == blkdata[1] and str(block_size_b) == blkdata[2]:
             logger.info("the block size of '%s' is %s, same with \n\
@@ -96,7 +96,7 @@ def check_block_data(blockdev, blkdata, logger):
             return 1
 
     return 0
- 
+
 
 def domblkinfo(params):
     """ using du command to check the data
@@ -109,7 +109,7 @@ def domblkinfo(params):
 
     if params_check_result:
         return 1
-        
+
     logger.info("Arguments checkup completed.")
 
     guestname = params.get('guestname')
@@ -137,42 +137,17 @@ def domblkinfo(params):
     else:
         return 1
 
-    status, data_str = get_output(GET_DOMBLKINFO_MAC % (guestname, blockdev), logger)    
+    status, data_str = get_output(GET_DOMBLKINFO_MAC % (guestname, blockdev), logger)
     if not status:
         blkdata = data_str.rstrip().split('\n')
         logger.info("capacity,allocation,physical list: %s" % blkdata)
     else:
         return 1
-                
+
     if check_block_data(blockdev, blkdata, logger):
         logger.error("checking domblkinfo data FAILED")
         return 1
     else:
         logger.info("checking domblkinfo data SUCCEEDED")
-        
+
     return 0
-             
-     
- 
-     
-
-    
-  
-   
-     
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   

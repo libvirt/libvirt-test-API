@@ -41,8 +41,8 @@ def usage(params):
             return 1
 
 def check_guest_autostart(*args):
-    """Check domain start automatically result, if setting domain is 
-       successful, guestname.xml will exist under 
+    """Check domain start automatically result, if setting domain is
+       successful, guestname.xml will exist under
        /etc/libvirt/{hypervisor}/autostart/
     """
     (guestname, hypervisor, flag, logger) = args
@@ -67,7 +67,7 @@ def check_guest_autostart(*args):
 
 def autostart(params):
     """Set domain autostart capability"""
-    # Initiate and check parameters 
+    # Initiate and check parameters
     usage(params)
     logger = params['logger']
     guestname = params['guestname']
@@ -96,7 +96,7 @@ def autostart(params):
     try:
         domobj.set_auto_start(guestname, flag)
         if check_guest_autostart(guestname, uri.split(":")[0], flag, logger):
-            logger.info("current %s autostart: %s" % 
+            logger.info("current %s autostart: %s" %
                         (guestname, domobj.get_auto_start(guestname)))
             logger.info("executing autostart operation is successful")
             test_result = True
@@ -104,7 +104,7 @@ def autostart(params):
             logger.error("Error: fail to check autostart domain")
             test_result = False
     except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % 
+        logger.error("API error message: %s, error code is %s" %
                      (e.response()['message'], e.response()['code']))
         logger.error("Error: fail to autostart %s domain" %guestname)
         test_result = False

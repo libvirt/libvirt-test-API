@@ -46,14 +46,14 @@ def usage():
     print '''usage: mandatory arguments:guesttype
                            guestname
        optional arguments: memory
-                           vcpu       
+                           vcpu
                            disksize
-                           imagepath 
-                           imagetype 
-                           hdmodel    
-                           nicmodel  
+                           imagepath
+                           imagetype
+                           hdmodel
+                           nicmodel
                            ifacetype
-                           source   
+                           source
           '''
 
 def check_params(params):
@@ -100,7 +100,7 @@ def create(params):
     try:
         domobj.create(domxml)
     except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % 
+        logger.error("API error message: %s, error code is %s" %
                       (e.response()['message'], e.response()['code']))
         logger.error("fail to create domain %s" % guestname)
         return 1
@@ -128,10 +128,9 @@ def create(params):
         if timeout == 0:
             logger.info("fail to power on vm %s" % guestname)
             test_result = False
-            return 1            
+            return 1
 
     if test_result:
         return 0
     else:
         return 1
-

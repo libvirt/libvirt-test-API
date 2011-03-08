@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""this test case is used for testing delete 
+"""this test case is used for testing delete
    a volume from dir type storage pool
 """
 
@@ -10,7 +10,6 @@ __credits__ = 'Copyright (C) 2010 Red Hat, Inc.'
 __all__ = ['usage', 'check_volume_delete', 'check_pool_inactive', \
            'get_storage_volume_number', 'display_volume_info', \
            'delete_dir_volume']
-
 
 import os
 import re
@@ -74,7 +73,7 @@ def check_pool_active(stgobj, poolname):
         return False
 
 def check_volume_delete(volkey):
-    """Check storage volume result, volname {volkey} will don't exist 
+    """Check storage volume result, volname {volkey} will don't exist
        if deleting volume is successful
     """
     logger.debug("volume file path: %s" % volkey)
@@ -129,5 +128,5 @@ def delete_dir_volume(params):
             return 1
     except LibvirtAPI, e:
         logger.error("API error message: %s, error code is %s" \
-% (e.response()['message'], e.response()['code']))
+                     % (e.response()['message'], e.response()['code']))
         return 1

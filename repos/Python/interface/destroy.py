@@ -7,7 +7,7 @@ __author__ = 'Alex Jia: ajia@redhat.com'
 __date__ = 'Sat Apr 17, 2010'
 __version__ = '0.1.0'
 __credits__ = 'Copyright (C) 2009 Red Hat, Inc.'
-__all__ = ['usage', 'check_destroy_interface', 
+__all__ = ['usage', 'check_destroy_interface',
            'display_current_interface', 'destroy']
 
 
@@ -32,7 +32,6 @@ from lib.Python import interfaceAPI
 from utils.Python import utils
 from utils.Python import xmlbuilder
 from exception import LibvirtAPI
-
 
 def usage(params):
     """Verify inputing parameter dictionary"""
@@ -61,8 +60,8 @@ def display_current_interface(ifaceobj):
 
 
 def check_destroy_interface(hostip):
-    """Check destroying interface result, it will can't ping itself 
-       if destroy interface is successful.       
+    """Check destroying interface result, it will can't ping itself
+       if destroy interface is successful.
     """
     ping_cmd = "ping -c 4 -q %s" % hostip
     stat, ret = commands.getstatusoutput(ping_cmd)
@@ -78,7 +77,7 @@ def check_destroy_interface(hostip):
 
 def destroy(params):
     """Deactive specific interface, argument params is dictionary type, and
-       includes 'ifacename' key, which is a host interface name, e.g 'eth0' 
+       includes 'ifacename' key, which is a host interface name, e.g 'eth0'
     """
     test_result = False
     global logger
@@ -107,9 +106,9 @@ def destroy(params):
     ifaceobj = interfaceAPI.InterfaceAPI(virconn)
     display_current_interface(ifaceobj)
 
-#    xmlobj = xmlbuilder.XmlBuilder()
-#    iface_xml = xmlobj.build_host_interface(params)
-#    logger.debug("interface xml:\n%s" %iface_xml)
+    #xmlobj = xmlbuilder.XmlBuilder()
+    #iface_xml = xmlobj.build_host_interface(params)
+    #logger.debug("interface xml:\n%s" %iface_xml)
 
     try:
         ifaceobj.destroy(ifacename)
@@ -124,7 +123,7 @@ def destroy(params):
             return 1
     except LibvirtAPI, e:
         logger.error("API error message: %s, error code is %s" \
-% (e.response()['message'], e.response()['code']))
+                     % (e.response()['message'], e.response()['code']))
         logger.error("fail to destroy interface %s" %ifacename)
         test_result = False
         return 1

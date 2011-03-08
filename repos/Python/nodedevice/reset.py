@@ -9,7 +9,6 @@ __version__ = '0.1.0'
 __credits__ = 'Copyright (C) 2009 Red Hat, Inc.'
 __all__ = ['usage', 'check_node_reset', 'reset']
 
-
 import os
 import re
 import sys
@@ -30,7 +29,6 @@ from lib.Python import connectAPI
 from lib.Python import nodedevAPI
 from utils.Python import utils
 from exception import LibvirtAPI
-
 
 def usage(params):
     """Verify inputing parameter dictionary"""
@@ -54,7 +52,7 @@ def reset(dicts):
     usage(dicts)
 
     test_result = False
-    global logger 
+    global logger
 
     logger = dicts['logger']
     pciaddress = dicts['pciaddress']
@@ -71,16 +69,14 @@ def reset(dicts):
         if status != 0:
             logger.error("failed to get vendor product ID")
             return 1
-        else:       
+        else:
             vendor_ID = retval.split(":")[0]
             product_ID = retval.split(":")[1]
-            device_name = "pci_%s_%s" % (vendor_ID, product_ID)  
-            
+            device_name = "pci_%s_%s" % (vendor_ID, product_ID)
     elif 'el6' in kernel_version:
         (bus, slot_func) = pciaddress.split(":")
         (slot, func) = slot_func.split(".")
         device_name = "pci_0000_%s_%s_%s" % (bus, slot, func)
-
 
     conn = connectAPI.ConnectAPI()
     virconn = conn.open(uri)
@@ -97,7 +93,7 @@ def reset(dicts):
         test_result = True
     except LibvirtAPI, e:
         logger.error("API error message: %s, error code is %s" \
-% (e.response()['message'], e.response()['code']))
+                     % (e.response()['message'], e.response()['code']))
         logger.error("Error: fail to reset %s node device" % device_name)
         test_result = False
         return 1

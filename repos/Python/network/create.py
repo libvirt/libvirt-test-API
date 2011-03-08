@@ -1,5 +1,5 @@
 #!/usr/bin/evn python
-"""this test case is used for testing create 
+"""this test case is used for testing create
    a network from xml
 """
 
@@ -42,7 +42,7 @@ def usage(params):
             logger.error("%s is required" %key)
             return 1
 def check_network_status(*args):
-    """Check current network status, it will return True if 
+    """Check current network status, it will return True if
        current network is inactive, otherwise, return False
     """
     (networkname, netobj, logger) = args
@@ -61,7 +61,7 @@ def create(params):
 
     logger = params['logger']
     networkname = params['networkname']
-    
+
     test_result = False
 
     util = utils.Utils()
@@ -99,7 +99,7 @@ def create(params):
             test_result = False
     except LibvirtAPI, e:
         logger.error("API error message: %s, error code is %s" \
-% (e.response()['message'], e.response()['code'])) 
+                     % (e.response()['message'], e.response()['code']))
         logger.error("create a network from xml: \n%s" % netxml)
         test_result = False
         return 1

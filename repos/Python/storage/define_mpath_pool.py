@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""this test case is used for testing define 
+"""this test case is used for testing define
    a mpath type storage pool from xml
 """
 
@@ -34,11 +34,11 @@ from exception import LibvirtAPI
 
 def usage():
     "usage infomation"
-    print """mandatory options:                          
-              poolname: Name of the pool to be created 
-              pooltype: Type of the pool, which in this case must be 'disk' 
+    print """mandatory options:
+              poolname: Name of the pool to be created
+              pooltype: Type of the pool, which in this case must be 'disk'
               targetpath: the default is /dev/mapper"""
-                                                    
+
 def check_params(params):
     """Verify inputing parameter dictionary"""
     #targetpath and sourceformat are optional arguments
@@ -46,7 +46,7 @@ def check_params(params):
     #the sourceformat is 'dos'
     mandatory_params = ['poolname', 'pooltype']
     optional_params = ['targetpath']
-    
+
     for param in mandatory_params:
         if param not in params:
             logger.error("%s is required" % param)
@@ -65,9 +65,9 @@ def display_pool_info(stgobj):
     logger.debug("current active storage pool: %s" % stgobj.storage_pool_list())
 
 def check_pool_define(poolname):
-    """This function will check if the storage pool with 
-       the given poolname existed already.It first checks 
-       if the storagepool xml file exists in /etc/libvirt/storage 
+    """This function will check if the storage pool with
+       the given poolname existed already.It first checks
+       if the storagepool xml file exists in /etc/libvirt/storage
        directory
     """
     path = "/etc/libvirt/storage/%s.xml" % poolname
@@ -93,8 +93,8 @@ def define_mpath_pool(params):
 
     poolname = params['poolname']
     pooltype = params['pooltype']
- 
-    logger.info("the poolname is %s, pooltype is %s" % (poolname, pooltype)) 
+
+    logger.info("the poolname is %s, pooltype is %s" % (poolname, pooltype))
 
     util = utils.Utils()
     uri = util.get_uri('127.0.0.1')
@@ -131,7 +131,7 @@ def define_mpath_pool(params):
             return 1
     except LibvirtAPI, e:
         logger.error("API error message: %s, error code is %s" \
-% (e.response()['message'], e.response()['code']))
+                     % (e.response()['message'], e.response()['code']))
         return 1
 
     return 0

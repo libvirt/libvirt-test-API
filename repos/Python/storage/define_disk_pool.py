@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""this test case is used for testing define 
+"""this test case is used for testing define
    a disk type storage pool from xml
 """
 
@@ -9,7 +9,6 @@ __version__ = '0.1.0'
 __credits__ = 'Copyright (C) 2010 Red Hat, Inc.'
 __all__ = ['usage', 'check_pool_define', \
            'display_pool_info', 'define_disk_pool']
-
 
 import os
 import re
@@ -34,15 +33,15 @@ from exception import LibvirtAPI
 
 def usage():
     "usage infomation"
-    print """mandatory options:                          
-              poolname: Name of the pool to be created 
-              pooltype: Type of the pool, which in this case must be 'disk' 
-              sourcepath: Name of the harddisk like '/dev/sdb' 
-optional options: 
-              sourceformat: Pool format types of the pool, representing the common patition tables types 
-                            dos, dvh, gpt, mac, bsd, pc98, sun 
+    print """mandatory options:
+              poolname: Name of the pool to be created
+              pooltype: Type of the pool, which in this case must be 'disk'
+              sourcepath: Name of the harddisk like '/dev/sdb'
+optional options:
+              sourceformat: Pool format types of the pool, representing the common patition tables types
+                            dos, dvh, gpt, mac, bsd, pc98, sun
               targetpath: the default is /dev"""
-                                                    
+
 def check_params(params):
     """Verify inputing parameter dictionary"""
     #targetpath and sourceformat are optional arguments
@@ -50,7 +49,7 @@ def check_params(params):
     #the sourceformat is 'dos'
     mandatory_params = ['poolname', 'pooltype', 'sourcepath']
     optional_params = ['sourceformat', 'targetpath']
-    
+
     for param in mandatory_params:
         if param not in params:
             logger.error("%s is required" % param)
@@ -70,9 +69,9 @@ def display_pool_info(stgobj):
                   stgobj.storage_pool_list())
 
 def check_pool_define(poolname):
-    """This function will check if the storage pool with 
-       the given poolname existed already.It first checks 
-       if the storagepool xml file exists in /etc/libvirt/storage 
+    """This function will check if the storage pool with
+       the given poolname existed already.It first checks
+       if the storagepool xml file exists in /etc/libvirt/storage
        directory
     """
     path = "/etc/libvirt/storage/%s.xml" % poolname
@@ -99,9 +98,9 @@ def define_disk_pool(params):
     poolname = params['poolname']
     pooltype = params['pooltype']
     sourcepath = params['sourcepath']
- 
+
     logger.info("the poolname is %s, pooltype is %s, sourcepath is %s" % \
-                 (poolname, pooltype, sourcepath)) 
+                 (poolname, pooltype, sourcepath))
 
     util = utils.Utils()
     uri = util.get_uri('127.0.0.1')
@@ -138,7 +137,7 @@ def define_disk_pool(params):
             return 1
     except LibvirtAPI, e:
         logger.error("API error message: %s, error code is %s" \
-% (e.response()['message'], e.response()['code']))
+                     % (e.response()['message'], e.response()['code']))
         return 1
 
     return 0

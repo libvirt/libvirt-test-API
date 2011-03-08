@@ -1,5 +1,5 @@
 #!/usr/bin/evn python
-"""this test case is used for testing define 
+"""this test case is used for testing define
    a network from xml
 """
 
@@ -54,11 +54,11 @@ def check_network_define(networkname, logger):
     """
     path = "/etc/libvirt/qemu/networks/%s.xml" % networkname
     logger.debug("%s xml file path: %s" % (networkname, path))
-#    valid = "virt-xml-validate %s" % path
-#    stat, ret = commands.getstatusoutput(valid)
-#    logger.debug("virt-xml-validate exit status: %d" % stat)
-#    logger.debug("virt-xml-validate exit result: %s" % ret)
-#    if os.access(path, os.R_OK) and stat == 0:
+    #valid = "virt-xml-validate %s" % path
+    #stat, ret = commands.getstatusoutput(valid)
+    #logger.debug("virt-xml-validate exit status: %d" % stat)
+    #logger.debug("virt-xml-validate exit result: %s" % ret)
+    #if os.access(path, os.R_OK) and stat == 0:
     if os.access(path, os.R_OK):
         return True
     else:
@@ -107,7 +107,7 @@ def define(params):
             return 1
     except LibvirtAPI, e:
         logger.error("API error message: %s, error code is %s" \
-% (e.response()['message'], e.response()['code']))
+                     % (e.response()['message'], e.response()['code']))
         logger.error("define a network from xml: \n%s" % netxml)
         test_result = False
         return 1

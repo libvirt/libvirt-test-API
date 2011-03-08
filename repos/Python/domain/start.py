@@ -7,7 +7,7 @@ __author__ = "Osier Yang <jyang@redhat.com>"
 __date__ = "Tue Oct 27, 2009"
 __version__ = "0.1.0"
 __credits__ = "Copyright (C) 2009 Red Hat, Inc."
-__all__ = ['start', 'check_params', 'parse_opts', 
+__all__ = ['start', 'check_params', 'parse_opts',
            'usage', 'version', 'append_path']
 
 import os
@@ -39,7 +39,7 @@ def check_params(params):
     """Verify the input parameter"""
     if 'logger' not in params:
         print "key 'logger' is required, and it's value should \
-               be an instance of logging.Logger" 
+               be an instance of logging.Logger"
         return 1
 
     logger = params['logger']
@@ -49,7 +49,7 @@ def check_params(params):
         if key not in params:
             logger.error("key '%s' is required" % key)
             usage()
- 
+
     if params['guestname'] == "":
         logger.error("value of guestname is empty")
         usage()
@@ -70,17 +70,17 @@ def start(params):
     check_params(params)
     domname = params['guestname']
     logger = params['logger']
-   
-    # Connect to local hypervisor connection URI 
+
+    # Connect to local hypervisor connection URI
     util = utils.Utils()
     uri = util.get_uri('127.0.0.1')
     virconn = connectAPI.ConnectAPI().open(uri)
-   
-    # Start domain 
+
+    # Start domain
     dom_obj = domainAPI.DomainAPI(virconn)
     timeout = 600
     logger.info('start domain')
-    
+
     try:
         dom_obj.start(domname)
     except LibvirtAPI, e:
@@ -115,4 +115,3 @@ def start(params):
     is_fail = False
     logger.info("PASS")
     return is_fail
-

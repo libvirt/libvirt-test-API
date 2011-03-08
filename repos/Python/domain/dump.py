@@ -1,10 +1,10 @@
 #!/usr/bin/env python
-"""this test case is used for testing dumpping the core of 
+"""this test case is used for testing dumpping the core of
    a domain on a given file for analysis.
    mandatory arguments: guestname
-                        file 
+                        file
 """
- 
+
 __author__ = 'Alex Jia: ajia@redhat.com'
 __date__ = 'Fri Dec 25, 2009'
 __version__ = '0.1.2'
@@ -42,7 +42,7 @@ def usage(dicts):
     for key in keys:
         if key not in dicts:
             logger.error("%s is required" %key)
-            return 1  
+            return 1
 
 def check_guest_status(*args):
     """Check guest current status"""
@@ -55,7 +55,7 @@ def check_guest_status(*args):
         time.sleep(60)
         logger.debug("current guest status: %s" %state)
     # add check function
-        return True        
+        return True
     else:
         return True
 
@@ -73,7 +73,7 @@ def check_guest_kernel(*args):
     if ipaddr == None:
         logger.error("can't get guest ip")
         return None
-        
+
     logger.debug("guest ip address: %s" %ipaddr)
 
     kernel = chk.get_remote_kernel(ipaddr, "root", "redhat")
@@ -92,7 +92,7 @@ def check_core_dump(*args):
     (big, other) = kernel.split("-")
     small = other.split(".")
     arch = small[-1]
-    pkgs  = ["kernel-debuginfo-%s" % (kernel), 
+    pkgs  = ["kernel-debuginfo-%s" % (kernel),
              "kernel-debuginfo-common-%s-%s" % (arch, kernel)]
 
     req_pkgs = ""
@@ -110,7 +110,7 @@ def check_core_dump(*args):
             else:
                 logger.info(ret)
         else:
-            logger.debug(output)            
+            logger.debug(output)
 
     st, res = commands.getstatusoutput("rpm -ivh %s" % req_pkgs )
     if st != 0:
@@ -141,14 +141,14 @@ def check_core_dump1(*args):
         logger.info("core dump file path: %s is existing." % core_file_path)
         return 0
     else:
-        logger.info("core dump file path: %s is NOT existing!!!" % 
+        logger.info("core dump file path: %s is NOT existing!!!" %
                      core_file_path)
         return 1
 
 def core_dump(dicts):
     """This method will dump the core of a domain on a given file
        for analysis. Note that for remote Xen Daemon the file path
-       will be interpreted in the remote host.  
+       will be interpreted in the remote host.
     """
     # Initiate and check parameters
     usage(dicts)
@@ -175,7 +175,7 @@ def core_dump(dicts):
             logger.error("can't get guest kernel version")
             test_result = False
             return 1
-            
+
         logger.info("dump the core of %s to file %s\n" %(guestname, file))
 
         try:
@@ -185,7 +185,7 @@ def core_dump(dicts):
             if retval == 0:
                 test_result = True
                 logger.info("check core dump: %d\n" %retval)
-            else:           
+            else:
                 test_result = False
                 logger.error("check core dump: %d\n" %retval)
                 return 1
@@ -201,4 +201,3 @@ def core_dump(dicts):
         return 0
     else:
         return 1
-

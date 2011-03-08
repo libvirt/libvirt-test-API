@@ -51,7 +51,7 @@ def get_option_list(params):
     if value == 'all':
         option_list = [' ', '--all', '--inactive']
     elif value == '--all' or value == '--inactive':
-        option_list.append(value) 
+        option_list.append(value)
     else:
         logger.error("value %s is not supported" % value)
         return 1, option_list
@@ -66,14 +66,14 @@ def get_output(logger, command, flag):
         logger.error("executing "+ "\"" +  command  + "\"" + " failed")
         logger.error(ret)
     return status, ret
-    
+
 def check_all_option(netobj, util, logger):
     """check the output of virsh net-list with --all option
     """
     all_network = []
     entries = os.listdir(CONFIG_DIR)
     logger.debug("%s in %s" % (entries, CONFIG_DIR))
-    status, network_names = get_output(logger, VIRSH_QUIET_NETLIST % '--all', 0) 
+    status, network_names = get_output(logger, VIRSH_QUIET_NETLIST % '--all', 0)
     if not status:
         all_network = network_names.split('\n')
         logger.info("all network is %s" % all_network)
@@ -90,8 +90,8 @@ def check_all_option(netobj, util, logger):
             network = entry[:-4]
             if network not in all_network:
                 logger.error("network %s not in the output of virsh net-list" % network)
-                return 1    
-    return 0 
+                return 1
+    return 0
 
 def check_inactive_option(netobj, util, logger):
     """check the output of virsh net-list with --inactive option
@@ -103,7 +103,7 @@ def check_inactive_option(netobj, util, logger):
         logger.info("inactive network: %s" % inactive_network)
     else:
         return 1
-  
+
     if inactive_network == ['']:
         return 0
 
@@ -111,6 +111,7 @@ def check_inactive_option(netobj, util, logger):
         try:
             bridgename = netobj.get_bridge_name(network)
             status, ip = get_output(logger, GET_BRIDGE_IP % bridgename, 1)
+
             if not status:
                 logger.info("network %s is inactive as we expected" % network)
             else:
@@ -118,14 +119,13 @@ def check_inactive_option(netobj, util, logger):
                 return 1
         except LibvirtAPI, e:
             logger.error("API error message: %s, error code is %s" % \
-(e.response()['message'], e.response()['code']))
+                         (e.response()['message'], e.response()['code']))
             return 1
 
     return 0
-    
-    
+
 def check_default_option(netobj, util, logger):
-    """check the output of virsh net-list 
+    """check the output of virsh net-list
     """
     active_network = []
     status, network_names = get_output(logger, VIRSH_QUIET_NETLIST % '', 0)
@@ -141,7 +141,7 @@ def check_default_option(netobj, util, logger):
     for network in active_network:
         try:
             bridgename = netobj.get_bridge_name(network)
-            status, ip = get_output(logger, GET_BRIDGE_IP % bridgename, 0)            
+            status, ip = get_output(logger, GET_BRIDGE_IP % bridgename, 0)
             if not status and util.do_ping(ip, 0):
                 logger.info("network %s is active as we expected" % network)
                 logger.debug("%s has ip: %s" % (bridgename, ip))
@@ -150,18 +150,18 @@ def check_default_option(netobj, util, logger):
                 return 1
         except LibvirtAPI, e:
             logger.error("API error message: %s, error code is %s" % \
-(e.response()['message'], e.response()['code']))
+                         (e.response()['message'], e.response()['code']))
             return 1
-    
-    return 0  
+
+    return 0
 
 def execute_virsh_netlist(option, logger):
     """execute virsh net-list command with appropriate option given
     """
     status, ret = get_output(logger, VIRSH_NETLIST % option, 0)
-    if not status:    
-        logger.info(ret)    
-            
+    if not status:
+        logger.info(ret)
+
 def network_list(params):
     """test net-list command to virsh with default, --all, --inactive
     """
@@ -169,15 +169,15 @@ def network_list(params):
     ret, option_list = get_option_list(params)
 
     if ret:
-        return 1    
+        return 1
 
     util = utils.Utils()
     uri = util.get_uri('127.0.0.1')
     conn = connectAPI.ConnectAPI()
     virconn = conn.open(uri)
- 
+
     netobj = networkAPI.NetworkAPI(virconn)
-        
+
     for option in option_list:
         if option == ' ':
             logger.info("check the output of virsh net-list")
@@ -205,29 +205,3 @@ def network_list(params):
                 return 1
 
     return 0
-    
-        
-     
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

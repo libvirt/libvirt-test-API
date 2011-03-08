@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""this test case is used for testing attach 
+"""this test case is used for testing attach
    the interface to domain from xml
    mandatory arguments:guestname
                        ifacetype
@@ -55,9 +55,7 @@ def check_guest_status(guestname, domobj):
         return True
 
 def check_attach_interface(num1, num2):
-    """Check attach interface result via simple interface number 
-       comparison
-    """
+    """Check attach interface result via simple interface number comparison """
     if num2 > num1:
         return True
     else:
@@ -71,7 +69,7 @@ def attach_interface(params):
     guestname = params['guestname']
     test_result = False
 
-    # Connect to local hypervisor connection URI  
+    # Connect to local hypervisor connection URI
     util = utils.Utils()
     uri = util.get_uri('127.0.0.1')
     conn = connectAPI.ConnectAPI()
@@ -101,7 +99,7 @@ def attach_interface(params):
             logger.error("fail to attach a interface to guest: %s" %iface_num2)
             test_result = False
     except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s"  % 
+        logger.error("API error message: %s, error code is %s"  %
                      (e.response()['message'], e.response()['code']))
         logger.error("attach a interface to guest %s" % guestname)
         test_result = False
@@ -111,4 +109,3 @@ def attach_interface(params):
         return 0
     else:
         return -1
-

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""this test case is used for testing build 
+"""this test case is used for testing build
    a logical type storage pool
 """
 
@@ -9,7 +9,6 @@ __version__ = '0.1.0'
 __credits__ = 'Copyright (C) 2009 Red Hat, Inc.'
 __all__ = ['usage', 'check_build_pool', 'build_logical_pool', \
            'display_pool_info', 'display_physical_volume']
-
 
 import os
 import re
@@ -72,7 +71,7 @@ def display_physical_volume():
         logger.error("fail to execute pvdisplay command")
 
 def check_build_pool(poolname):
-    """Check build storage pool result, poolname will exist under 
+    """Check build storage pool result, poolname will exist under
        /etc/lvm/backup/ if pool build is successful
     """
     path = "/etc/lvm/backup/%s" % poolname
@@ -80,7 +79,7 @@ def check_build_pool(poolname):
     if os.access(path, os.R_OK):
         logger.debug("execute grep vgcreate %s command" % path)
         stat, ret = commands.getstatusoutput("grep vgcreate %s" % path)
-        if stat == 0:        
+        if stat == 0:
             logger.debug(ret)
             return True
         else:
@@ -92,7 +91,7 @@ def check_build_pool(poolname):
 
 def build_logical_pool(params):
     """Build a storage pool"""
-    global logger  
+    global logger
     logger = params['logger']
 
     if not usage(params):
@@ -132,5 +131,5 @@ def build_logical_pool(params):
             return 1
     except LibvirtAPI, e:
         logger.error("API error message: %s, error code is %s" \
-% (e.response()['message'], e.response()['code']))
+                     % (e.response()['message'], e.response()['code']))
         return 1

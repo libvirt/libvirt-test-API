@@ -10,7 +10,7 @@ __version__  = '0.1.0'
 __credits__  = 'Copyright (C) 2010 Red Hat, Inc.'
 __all__      = ['usage', 'check_pool_create', 'create_fs_pool']
 
-import os 
+import os
 import re
 import sys
 
@@ -45,7 +45,7 @@ def usage(params):
         elif len(params[key]) == 0:
             logger.error("%s key is empty, set it to a value" % key)
             return False
-   
+
     # inform the tester about the default format value...
     if "sourceformat" not in params:
         logger.info("The sourceformat parameter is not given. Default value of \
@@ -99,7 +99,6 @@ def check_pool_create_OS(stgobj, poolname, logger):
         return True
     else:
         return False
-        
 
 def display_pool_info(stg, logger):
     """Display current storage pool information"""
@@ -116,10 +115,10 @@ def create_fs_pool(params):
         return 1
 
     poolname = params['poolname']
-    
+
     util = utils.Utils()
     uri  = util.get_uri('127.0.0.1')
-    
+
     conn = connectAPI.ConnectAPI()
     virconn = conn.open(uri)
     caps = conn.get_caps()
@@ -151,11 +150,7 @@ def create_fs_pool(params):
             logger.info("creating %s storage pool is \
                          UNSUCCESSFUL in libvirt!!!" % poolname)
             return 1
-    except LibvirtAPI, e:  
+    except LibvirtAPI, e:
         logger.error("API error message: %s, error code is %s" % \
-(e.response()['message'], e.response()['code']))
+                     (e.response()['message'], e.response()['code']))
         return 1
-
-
-
-      

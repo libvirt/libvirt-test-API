@@ -1,5 +1,5 @@
 #!/usr/bin/evn python
-"""this test case is used for testing domain 
+"""this test case is used for testing domain
    scheduler parameters
    mandatory arguments for xen :guestname
                                 weight
@@ -37,12 +37,12 @@ def usage(params, hypervisor):
     elif 'kvm' in hypervisor:
         keys = ['guestname','cpushares']
     else:
-        logger.error("unsupported hypervisor type: %s" % hypervisor) 
+        logger.error("unsupported hypervisor type: %s" % hypervisor)
         return 1
     for key in keys:
         if key not in params:
             logger.error("%s is required" % key)
-            return 1  
+            return 1
 
 def check_guest_status(guestname, domobj):
     """Check guest current status"""
@@ -50,8 +50,8 @@ def check_guest_status(guestname, domobj):
     if state == "shutoff" or state == "shutdown":
         domobj.start(guestname)
         time.sleep(30)
-    # add check function
-        return True        
+    # Add check function
+        return True
     else:
         return True
 
@@ -61,7 +61,7 @@ def check_sched_params(*args):
     sched_dict = {}
     if hypervisor == "xen":
         sched_dict = eval(commands.getoutput('xm sched-credit -d %s'
-                          % guestname)) 
+                          % guestname))
         if sched_dict['weight'] == dicts['weight'] and \
           sched_dict['cap'] == dicts['cap']:
             return 0
@@ -69,7 +69,7 @@ def check_sched_params(*args):
             return 1
     if hypervisor == "kvm":
         sched_dict = domobj.get_sched_params(guestname)
-        if sched_dict['cpu_shares'] == dicts['cpu_shares']: 
+        if sched_dict['cpu_shares'] == dicts['cpu_shares']:
             return 0
         else:
             return 1
@@ -78,7 +78,7 @@ def sched_params(params):
     """Setting scheduler parameters, argument params is a
        dictionary data type.which includes 'weight' and 'cap'
        keys, by assigning different value to 'weight' and 'cap'
-       to verify validity of the result 
+       to verify validity of the result
     """
     util = utils.Utils()
     uri = util.get_uri('127.0.0.1')
@@ -99,8 +99,8 @@ def sched_params(params):
     if check_guest_status(guestname, domobj):
         sched_params = domobj.get_sched_params(guestname)
         logger.info("original scheduler parameters: %s\n" % sched_params)
-   
-    if 'xen' in hypervisor: 
+
+    if 'xen' in hypervisor:
         str_weight = params['weight']
         str_cap = params['cap']
         for wgt in eval(str_weight):
@@ -111,11 +111,11 @@ def sched_params(params):
                 sched_params = domobj.get_sched_params(guestname)
                 logger.info("current scheduler parameters: %s\n" % sched_params)
 
-                retval = check_sched_params(hypervisor, dicts, 
+                retval = check_sched_params(hypervisor, dicts,
                                             guestname, domobj)
                 if retval == 0:
                     test_result = True
-                else:           
+                else:
                     test_result = False
     elif 'kvm' in hypervisor:
         cpu_shares = int(params['cpushares'])
@@ -125,17 +125,16 @@ def sched_params(params):
         sched_params = domobj.get_sched_params(guestname)
         logger.info("current scheduler parameters: %s\n" % sched_params)
         retval = check_sched_params(hypervisor, dicts,
-                                    guestname, domobj)     
+                                    guestname, domobj)
         if retval == 0:
             test_result = True
         else:
             test_result = False
     else:
         logger.error("unsupported hypervisor type: %s" % hypervisor)
-        return 1  
+        return 1
 
     if test_result:
         return 0
     else:
         return 1
-

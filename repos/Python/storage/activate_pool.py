@@ -34,7 +34,7 @@ from exception import LibvirtAPI
 def usage(params):
     """Verify inputing parameter dictionary"""
     logger = params['logger']
-    
+
     if 'poolname' not in params:
         logger.error("poolname parameter is required")
         logger.info("Please provide poolname parameter")
@@ -89,7 +89,7 @@ def activate_pool(params):
 
     util = utils.Utils()
     uri = util.get_uri('127.0.0.1')
-	
+
     conn = connectAPI.ConnectAPI()
     virconn = conn.open(uri)
 
@@ -109,5 +109,5 @@ def activate_pool(params):
             return 1
     except LibvirtAPI, e:
         logger.error("API error message: %s, error code is %s" \
-% (e.response()['message'], e.response()['code']))
+                     % (e.response()['message'], e.response()['code']))
         return 1

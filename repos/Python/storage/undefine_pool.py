@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""this test case is used for testing undefine 
+"""this test case is used for testing undefine
    a specific name storage pool
 """
 
@@ -9,7 +9,6 @@ __version__ = '0.1.0'
 __credits__ = 'Copyright (C) 2009 Red Hat, Inc.'
 __all__ = ['usage', 'check_pool_undefine', 'check_pool_active', \
            'check_pool_inactive', 'display_pool_info', 'undefine_pool']
-
 
 import os
 import re
@@ -120,5 +119,5 @@ def undefine_pool(params):
             return 1
     except LibvirtAPI, e:
         logger.error("API error message: %s, error code is %s" \
-% (e.response()['message'], e.response()['code']))
+                     % (e.response()['message'], e.response()['code']))
         return 1

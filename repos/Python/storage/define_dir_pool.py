@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""this test case is used for testing define 
+"""this test case is used for testing define
    a dir type storage pool from xml
 """
 
@@ -62,11 +62,11 @@ def check_pool_define(poolname, logger):
     """
     path = "/etc/libvirt/storage/%s.xml" % poolname
     logger.debug("%s xml file path: %s" % (poolname, path))
-#    valid = "virt-xml-validate %s" % path
-#    stat, ret = commands.getstatusoutput(valid)
-#    logger.debug("virt-xml-validate exit status: %d" % stat)
-#    logger.debug("virt-xml-validate exit result: %s" % ret)
-#    if os.access(path, os.R_OK) and stat == 0:
+    #valid = "virt-xml-validate %s" % path
+    #stat, ret = commands.getstatusoutput(valid)
+    #logger.debug("virt-xml-validate exit status: %d" % stat)
+    #logger.debug("virt-xml-validate exit result: %s" % ret)
+    #if os.access(path, os.R_OK) and stat == 0:
     if os.access(path, os.R_OK):
         return True
     else:
@@ -116,5 +116,5 @@ def define_dir_pool(params):
             return 1
     except LibvirtAPI, e:
         logger.error("API error message: %s, error code is %s" \
-% (e.response()['message'], e.response()['code']))
+                     % (e.response()['message'], e.response()['code']))
         return 1

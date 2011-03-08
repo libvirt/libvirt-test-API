@@ -1,5 +1,5 @@
 #!/usr/bin/evn python
-"""this test case is used for testing domain interface 
+"""this test case is used for testing domain interface
    statistics
    mandatory arguments: guestname
 """
@@ -98,4 +98,3 @@ def interface_stats(params):
         return 0
     else:
         return -1
-

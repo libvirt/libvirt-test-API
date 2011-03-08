@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""this test case is used for deleting volume of  
+"""this test case is used for deleting volume of
    a partition type storage pool from xml
 """
 
@@ -35,9 +35,9 @@ from exception import LibvirtAPI
 
 def usage():
     """usage infomation"""
-    print """mandatory options:                          
+    print """mandatory options:
               poolname: The name of pool under which the volume to be created
-              volname: Name of the volume to be created""" 
+              volname: Name of the volume to be created"""
 
 def check_params(params):
     """Verify inputing parameter dictionary"""
@@ -56,30 +56,29 @@ def check_params(params):
             return 0
 
 def partition_volume_check(stgobj, poolname, volname, partition_name):
-    """check the newly deleted volume, the way of checking is to 
-       grep the partition name of the volume in /proc/partitions 
+    """check the newly deleted volume, the way of checking is to
+       grep the partition name of the volume in /proc/partitions
        to ensure its non-existence"""
-    
+
     shell_cmd = "grep %s /proc/partitions" % partition_name
     logger.debug("excute the shell command %s to \
                   check the newly created partition" % shell_cmd)
 
     stat, ret = commands.getstatusoutput(shell_cmd)
-    
+
     if stat != 0 and volname not in stgobj.get_volume_list(poolname):
         return 0
     else:
-        return 1     
-   
- 
+        return 1
+
 def virsh_vol_list(poolname):
     """using virsh command list the volume information"""
 
     shell_cmd = "virsh vol-list %s" % poolname
     (status, text) = commands.getstatusoutput(shell_cmd)
     logger.debug(text)
-  
-    
+
+
 def delete_partition_volume(params):
     """delete a volume in the disk type of pool"""
 
@@ -99,8 +98,8 @@ def delete_partition_volume(params):
     poolname = params.pop('poolname')
     volname = params['volname']
 
-    logger.info("the poolname is %s, volname is %s" % (poolname, volname)) 
-  
+    logger.info("the poolname is %s, volname is %s" % (poolname, volname))
+
     util = utils.Utils()
     uri = util.get_uri('127.0.0.1')
 
@@ -110,15 +109,15 @@ def delete_partition_volume(params):
     stgobj = storageAPI.StorageAPI(virconn)
 
     storage_pool_list = stgobj.storage_pool_list()
-   
+
     if poolname not in storage_pool_list:
         logger.error("pool %s doesn't exist or not running")
         return 1
 
     logger.info("before deleting a volume, \
                  current volume list in the pool %s is %s" % \
-                 (poolname, stgobj.get_volume_list(poolname))) 
-   
+                 (poolname, stgobj.get_volume_list(poolname)))
+
     logger.info("and using virsh command to \
                  ouput the volume information in the pool %s" % poolname)
     virsh_vol_list(poolname)
@@ -135,7 +134,7 @@ def delete_partition_volume(params):
         logger.error("API error message: %s, error code is %s" \
 % (e.response()['message'], e.response()['code']))
         return 1
- 
+
     logger.info("delete volume successfully, and output the volume information")
     logger.info("after deleting a volume, \
                  current volume list in the pool %s is %s" % \
@@ -152,32 +151,3 @@ def delete_partition_volume(params):
     else:
         logger.error("checking failed")
         return 1
-        
-    
-
-         
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

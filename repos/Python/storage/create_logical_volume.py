@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""this test case is used for testing create 
+"""this test case is used for testing create
    a logical type storage volume from xml
 """
 
@@ -33,7 +33,6 @@ from lib.Python import storageAPI
 from utils.Python import utils
 from utils.Python import xmlbuilder
 from exception import LibvirtAPI
-
 
 def usage(params):
     """Verify inputing parameter dictionary"""
@@ -94,8 +93,8 @@ def check_pool_active(stgobj, poolname):
         return False
 
 def check_volume_create(stg, poolname, volname, size):
-    """Check storage volume result, poolname will exist under 
-       /etc/lvm/backup/ and lvcreate command is called if 
+    """Check storage volume result, poolname will exist under
+       /etc/lvm/backup/ and lvcreate command is called if
        volume creation is successful
     """
     path = "/etc/lvm/backup/%s" % poolname
@@ -132,9 +131,8 @@ def create_logical_volume(params):
 
     params['capacity'] = dicts['capacity']
     params['suffix'] = dicts['suffix']
-    # default is KB in the /etc/lvm/backup/{poolname} 
+    # default is KB in the /etc/lvm/backup/{poolname}
     caps_kbyte = dicts['capacity_byte']/1024
-
 
     uri = util.get_uri('127.0.0.1')
     conn = connectAPI.ConnectAPI()
@@ -168,8 +166,8 @@ def create_logical_volume(params):
         display_physical_volume()
         vol_num2 = get_storage_volume_number(stgobj, poolname)
         display_volume_info(stgobj, poolname)
-        if check_volume_create(stgobj, poolname, volname, caps_kbyte)\
- and vol_num2 > vol_num1:
+        if check_volume_create(stgobj, poolname, volname, caps_kbyte) \
+            and vol_num2 > vol_num1:
             logger.info("create %s storage volume is successful" % volname)
             return 0
         else:
@@ -177,5 +175,5 @@ def create_logical_volume(params):
             return 1
     except LibvirtAPI, e:
         logger.error("API error message: %s, error code is %s" \
-% (e.response()['message'], e.response()['code']))
+                     % (e.response()['message'], e.response()['code']))
         return 1

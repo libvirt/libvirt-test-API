@@ -47,7 +47,7 @@ def usage(params):
 
 def check_node_dettach(pciaddress):
     """Check node device dettach result, if dettachment is successful, the
-       device host driver should be hided and the device should be bound 
+       device host driver should be hided and the device should be bound
        to pci-stub driver, argument 'address' is a address of the node device
     """
 
@@ -80,7 +80,7 @@ def dettach(dicts):
 
     original_driver = check_node_dettach(pciaddress)
     logger.info("original device driver: %s" % original_driver)
-   
+
     util = utils.Utils()
     uri = util.get_uri('127.0.0.1')
 
@@ -91,7 +91,7 @@ def dettach(dicts):
         pciback = 'pci-stub'
     if hypervisor == 'xen':
         pciback = 'pciback'
-    
+
     if 'el5' in kernel_version:
         vendor_product_get = "lspci -n |grep %s|awk '{print $3}'" % pciaddress
         logger.debug("the vendor:product is %s" % vendor_product_get)
@@ -99,18 +99,16 @@ def dettach(dicts):
         if status != 0:
             logger.error("failed to get vendor product ID")
             return 1
-        else:       
+        else:
             vendor_ID = retval.split(":")[0]
             product_ID = retval.split(":")[1]
-            device_name = "pci_%s_%s" % (vendor_ID, product_ID)  
-            
+            device_name = "pci_%s_%s" % (vendor_ID, product_ID)
     elif 'el6' in kernel_version:
         (bus, slot_func) = pciaddress.split(":")
         (slot, func) = slot_func.split(".")
         device_name = "pci_0000_%s_%s_%s" % (bus, slot, func)
 
     logger.debug("the name of the pci device is: %s" % device_name)
-    
 
     conn = connectAPI.ConnectAPI()
     virconn = conn.open(uri)
@@ -127,7 +125,7 @@ def dettach(dicts):
         logger.info("current device driver: %s" % current_driver)
         if current_driver != original_driver and current_driver == pciback:
             logger.info("the node %s device dettach is successful" \
-% device_name)
+                        % device_name)
             test_result = True
         else:
             logger.info("the node %s device dettach is failed" % device_name)
@@ -135,7 +133,7 @@ def dettach(dicts):
             return 1
     except LibvirtAPI, e:
         logger.error("API error message: %s, error code is %s" \
-% (e.response()['message'], e.response()['code']))
+                     % (e.response()['message'], e.response()['code']))
         logger.error("Error: fail to dettach %s node device" % device_name)
         test_result = False
         return 1

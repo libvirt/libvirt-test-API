@@ -6,7 +6,7 @@ __author__ = 'Neil Zhang: nzhang@redhat.com'
 __date__ = 'Thu May 27, 2010'
 __version__ = '0.1.0'
 __credits__ = 'Copyright (C) 2010 Red Hat, Inc.'
-__all__ = ['usage', 'check_nodedev_create', 'check_nodedev_parent', 
+__all__ = ['usage', 'check_nodedev_create', 'check_nodedev_parent',
            'create_virtual_hba']
 
 import os
@@ -48,12 +48,12 @@ def usage(params):
             return True
 
 def check_nodedev_create(wwpn, device_name):
-    """Check if the node device vHBA was created. Can search created 
+    """Check if the node device vHBA was created. Can search created
        vport name in all FC list, to see if it exists.
     """
 
     pname_list = commands.getoutput("ls -1 -d /sys/class/*_host/host*/* \
-| grep port_name")
+                                     | grep port_name")
     for pname in pname_list.split("\n"):
         portid = open(pname).read()[2:].strip('\n')
         if wwpn == portid:
@@ -70,11 +70,11 @@ def check_nodedev_parent(nodedev, device_parent, device_name):
     current_parent = nodedev.get_parent(device_name)
     if device_parent == current_parent:
         logger.info("The parent of node device '%s' is %s" \
-% (device_name, current_parent))
+                    % (device_name, current_parent))
         return True
     else:
         logger.info("Refer to bug 593995. The parent of node device \
-'%s' is '%s'" % (device_name, current_parent))
+                    '%s' is '%s'" % (device_name, current_parent))
         return False
 
 def create_virtual_hba(params):
@@ -106,8 +106,7 @@ def create_virtual_hba(params):
             params['parent'] = fc_name
             doc = xml.dom.minidom.parseString(fc_xml)
             wwnn_node = doc.getElementsByTagName('wwnn')[0]
-            params['wwnn'] = wwnn_node.childNodes[0].nodeValue.\
-encode('ascii', 'ignore')
+            params['wwnn'] = wwnn_node.childNodes[0].nodeValue.encode('ascii', 'ignore')
             logger.info("NPIV support on '%s'" % fc_name)
             break
         else:
@@ -123,17 +122,16 @@ encode('ascii', 'ignore')
         dev_name = nodedev.get_name(nodedev_obj)
 
         if check_nodedev_create(wwpn, dev_name) and \
-check_nodedev_parent(nodedev, params['parent'], dev_name):
+            check_nodedev_parent(nodedev, params['parent'], dev_name):
             logger.info("the virtual HBA '%s' was created successfully" \
-% dev_name)
+                        % dev_name)
             return 0
         else:
             logger.error("fail to create the virtual HBA '%s'" \
-% dev_name)
+                         % dev_name)
             return 1
     except LibvirtAPI, e:
         logger.error("API error message: %s, error code is %s" \
-% (e.response()['message'], e.response()['code']))
+                     % (e.response()['message'], e.response()['code']))
         logger.error("Error: fail to create %s virtual hba" % dev_name)
         return 1
-

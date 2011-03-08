@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 """The test script is for installing a new guest virtual machine
-   via calling libvirt python bindings API. 
-   mandatory arguments:guesttype 
-                       guestname   
+   via calling libvirt python bindings API.
+   mandatory arguments:guesttype
+                       guestname
                        netmethod
-   optional arguments: memory 
+   optional arguments: memory
                        vcpu
                        disksize
                        imagepath
@@ -12,15 +12,14 @@
                        nicmodel
                        ifacetype
                        source
-                       type 
-                           define|create
-""" 
+                       type: define|create
+"""
 
 __author__ = "Jianlin Liu <jialiu@redhat.com>"
 __date__ = "Wed Jul 05 2010"
 __version__ = "0.1.0"
 __credits__ = "Copyright (C) 2010 Red Hat, Inc."
-__all__ = ['installation_linux_check', 'usage'] 
+__all__ = ['installation_linux_check', 'usage']
 
 import os
 import sys
@@ -35,7 +34,7 @@ def append_path(path):
         pass
     else:
         sys.path.append(path)
-    
+
 pwd = os.getcwd()
 result = re.search('(.*)libvirt-test-API', pwd)
 homepath = result.group(0)
@@ -50,13 +49,13 @@ from utils.Python import env_parser
 def usage():
     print '''usage: mandatory arguments:guestname
                            guesttype
-                           hdmodel    
-                           nicmodel  
+                           hdmodel
+                           nicmodel
        optional arguments: disksize
                            memory
                            vcpu
                            guesttype
-                           imagepath  
+                           imagepath
                            ifacetype
                            netmethod
                            source
@@ -67,7 +66,7 @@ def check_params(params):
     """Checking the arguments required"""
     params_given = copy.deepcopy(params)
     mandatory_args = ['guestname', 'guesttype', 'hdmodel', 'nicmodel']
-    optional_args = ['disksize', 'memory', 'vcpu', 'guesttype', 
+    optional_args = ['disksize', 'memory', 'vcpu', 'guesttype',
                      'imagepath', 'ifacetype', 'netmethod', 'source', 'type']
 
     for arg in mandatory_args:
@@ -80,10 +79,10 @@ def check_params(params):
             usage()
             return 1
 
-        params_given.pop(arg)  
+        params_given.pop(arg)
 
     if len(params_given) == 0:
-        return 0    
+        return 0
 
     for arg in params_given.keys():
         if arg not in optional_args:
@@ -93,22 +92,22 @@ def check_params(params):
     return 0
 
 def installation_linux_check(params):
-    """check guest status after installation, including network ping, 
+    """check guest status after installation, including network ping,
        read/write option in guest. return value: 0 - ok; 1 - bad
     """
     # Initiate and check parameters
     global logger
-    logger = params['logger'] 
+    logger = params['logger']
     params.pop('logger')
     logger.info("Checking the validation of arguments provided.")
     params_check_result = check_params(params)
     if params_check_result:
         return 1
 
-    logger.info("Arguments checkup finished.") 
+    logger.info("Arguments checkup finished.")
 
     guestname = params.get('guestname')
-    guesttype = params.get('guesttype')    
+    guesttype = params.get('guesttype')
 
     logger.info("the name of guest is %s" % guestname)
 
@@ -119,11 +118,11 @@ def installation_linux_check(params):
 
     logger.info("the type of hypervisor is %s" % hypervisor)
     logger.debug("the uri to connect is %s" % uri)
-  
+
     virconn = connectAPI.ConnectAPI().open(uri)
     domobj = domainAPI.DomainAPI(virconn)
     state = domobj.get_state(guestname)
- 
+
     if(state == "shutoff"):
         logger.info("guest is shutoff, if u want to run this case, \
                      guest must be started")
@@ -147,7 +146,7 @@ def installation_linux_check(params):
     if timeout == 0:
         logger.info("vm %s fail to get ip address" % guestname)
         return 1
-    
+
     time.sleep(120)
 
     logger.info("Now checking guest health after installation")
@@ -189,7 +188,7 @@ def installation_linux_check(params):
     logger.info("vcpu number in domain config xml - %s is %s" % \
                  (domain_name, vcpunum_expect))
     vcpunum_actual = int(chk.get_remote_vcpus(ipaddr, "root", "redhat"))
-    logger.info("The actual vcpu number in guest - %s is %s" % 
+    logger.info("The actual vcpu number in guest - %s is %s" %
                  (domain_name, vcpunum_actual))
     if vcpunum_expect == vcpunum_actual:
         logger.info("The actual vcpu number in guest is \
@@ -199,15 +198,15 @@ def installation_linux_check(params):
                       NOT equal to the setting your domain config xml")
         Test_Result = 1
         return Test_Result
- 
+
     # Check whether mem in guest is equal to the value set in domain config xml
     logger.info("check point4: check whether mem in guest is equal to \
                  the value set in domain config xml")
     mem_expect = util.get_size_mem(domain_name)
-    logger.info("current mem size in domain config xml - %s is %s" % 
+    logger.info("current mem size in domain config xml - %s is %s" %
                  (domain_name, mem_expect))
     mem_actual = chk.get_remote_memory(ipaddr, "root", "redhat")
-    logger.info("The actual mem size in guest - %s is %s" % 
+    logger.info("The actual mem size in guest - %s is %s" %
                 (domain_name, mem_actual))
     diff_range = int(mem_expect) * 0.07
     diff = int(mem_expect) - int(mem_actual)
@@ -237,17 +236,17 @@ def installation_linux_check(params):
         return Test_Result
 
     # Check nic and blk driver in guest
-    if 'kvm' in guesttype or 'xenfv' in guesttype: 
+    if 'kvm' in guesttype or 'xenfv' in guesttype:
         logger.info("check point6: check nic and blk driver in guest is \
                      expected as your config:")
-        if chk.validate_remote_nic_type(ipaddr, "root", "redhat", 
+        if chk.validate_remote_nic_type(ipaddr, "root", "redhat",
            nic_type, logger) == 0 and \
-           chk.validate_remote_blk_type(ipaddr, "root", "redhat", 
+           chk.validate_remote_blk_type(ipaddr, "root", "redhat",
                                         blk_type, logger) == 0:
-            logger.info("nic type - %s and blk type - %s check successfully" % 
+            logger.info("nic type - %s and blk type - %s check successfully" %
                        (nic_type, blk_type))
         else:
-            logger.error("Error: nic type - %s or blk type - %s check failed" % 
+            logger.error("Error: nic type - %s or blk type - %s check failed" %
                         (nic_type, blk_type))
             Test_Result = 1
             return Test_Result
@@ -255,4 +254,3 @@ def installation_linux_check(params):
     util.clean_ssh()
 
     return Test_Result
-

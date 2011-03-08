@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""this test case is used for testing build 
+"""this test case is used for testing build
    a netfs type storage pool
 """
 
@@ -9,7 +9,6 @@ __version__ = '0.1.0'
 __credits__ = 'Copyright (C) 2009 Red Hat, Inc.'
 __all__ = ['usage', 'check_build_pool', 'build_netfs_pool', \
            'display_pool_info', 'check_pool_defined']
-
 
 import os
 import re
@@ -66,7 +65,7 @@ def check_pool_defined(stgobj, poolname):
         return False
 
 def check_build_pool(path):
-    """Check poolname directory if exist, it will exist 
+    """Check poolname directory if exist, it will exist
        directory if the directory has ever be created or
        pool building is successful
     """
@@ -79,7 +78,7 @@ def check_build_pool(path):
 
 def build_netfs_pool(params):
     """Build a storage pool"""
-    global logger  
+    global logger
     logger = params['logger']
 
     if not usage(params):
@@ -101,7 +100,7 @@ def build_netfs_pool(params):
     if not check_pool_defined(stgobj, poolname):
         logger.error("only have defined pool can be built")
         return 1
-   
+
     pool_xml = stgobj.dump_pool(poolname)
     doc = minidom.parseString(pool_xml)
     unicode_path_value = doc.getElementsByTagName("path")[0].firstChild.data
@@ -125,5 +124,5 @@ def build_netfs_pool(params):
             return 1
     except LibvirtAPI, e:
         logger.error("API error message: %s, error code is %s" \
-% (e.response()['message'], e.response()['code']))
+                     % (e.response()['message'], e.response()['code']))
         return 1

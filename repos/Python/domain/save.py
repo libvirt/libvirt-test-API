@@ -9,7 +9,7 @@ __author__ = 'Alex Jia: ajia@redhat.com'
 __date__ = 'Tue Mar 23, 2010'
 __version__ = '0.1.0'
 __credits__ = 'Copyright (C) 2009 Red Hat, Inc.'
-__all__ = ['usage', 'get_guest_ipaddr', 'check_guest_status', 
+__all__ = ['usage', 'get_guest_ipaddr', 'check_guest_status',
            'check_guest_save', 'save']
 
 import os

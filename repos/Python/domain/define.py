@@ -45,15 +45,15 @@ def usage():
     print '''usage: mandatory arguments:guesttype
                            guestname
        optional arguments: memory
-                           vcpu       
+                           vcpu
                            disksize
-                           fullimagepath 
-                           imagetype 
-                           hdmodel    
-                           nicmodel  
+                           fullimagepath
+                           imagetype
+                           hdmodel
+                           nicmode
                            macaddr
                            ifacetype
-                           source   
+                           source
           '''
 
 def check_params(params):
@@ -75,7 +75,7 @@ def check_define_domain(guestname, guesttype, logger):
     if "kvm" in guesttype:
         path = "/etc/libvirt/qemu/%s.xml" % guestname
     elif "xen" in guesttype:
-        path = "/etc/xen/%s" % guestname 
+        path = "/etc/xen/%s" % guestname
     else:
         logger.error("unknown guest type")
     if os.access(path, os.R_OK):
@@ -85,7 +85,7 @@ def check_define_domain(guestname, guesttype, logger):
 
 def define(params):
     """Define a domain from xml"""
-    # Initiate and check parameters    
+    # Initiate and check parameters
     params_check_result = check_params(params)
     if params_check_result:
         return 1
@@ -93,17 +93,17 @@ def define(params):
     guestname = params['guestname']
     guesttype = params['guesttype']
     test_result = False
-    
+
     # Connect to local hypervisor connection URI
     util = utils.Utils()
     uri = util.get_uri('127.0.0.1')
     conn = connectAPI.ConnectAPI()
     virconn = conn.open(uri)
-    
+
     # Get capabilities debug info
     caps = conn.get_caps()
     logger.debug(caps)
-    
+
     # Generate damain xml
     dom_obj = domainAPI.DomainAPI(virconn)
     xml_obj = xmlbuilder.XmlBuilder()
@@ -130,4 +130,3 @@ def define(params):
         return 0
     else:
         return 1
-

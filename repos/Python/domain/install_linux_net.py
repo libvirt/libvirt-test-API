@@ -1,12 +1,12 @@
 #! /usr/bin/env python
 """The test script is for installing a new guest virtual machine
-   via calling libvirt python bindings API. 
-   mandatory arguments:guesttype 
+   via calling libvirt python bindings API.
+   mandatory arguments:guesttype
                        guestname
-                       guestos 
-                       guestarch   
+                       guestos
+                       guestarch
                        netmethod
-   optional arguments: memory 
+   optional arguments: memory
                        vcpu
                        disksize
                        imagepath
@@ -14,15 +14,14 @@
                        nicmodel
                        ifacetype
                        source
-                       type 
-                           define|create
-""" 
+                       type: define|create
+"""
 
 __author__ = "Guannan Ren <gren@redhat.com>"
 __date__ = "Wed Apr 07 2010"
 __version__ = "0.1.0"
 __credits__ = "Copyright (C) 2010 Red Hat, Inc."
-__all__ = ['install_linux', 'usage'] 
+__all__ = ['install_linux', 'usage']
 
 import os
 import sys
@@ -39,7 +38,7 @@ def append_path(path):
         pass
     else:
         sys.path.append(path)
-    
+
 pwd = os.getcwd()
 result = re.search('(.*)libvirt-test-API', pwd)
 homepath = result.group(0)
@@ -59,15 +58,14 @@ def usage():
                            guestarch
                            netmethod
        optional arguments: memory
-                           vcpu       
+                           vcpu
                            disksize
-                           imagepath  
-                           hdmodel    
-                           nicmodel  
+                           imagepath
+                           hdmodel
+                           nicmodel
                            ifacetype
-                           source   
-                           type
-                               define|create
+                           source
+                           type: define|create
           '''
 
 def check_params(params):
@@ -77,7 +75,7 @@ def check_params(params):
     mandatory_args = ['guestname', 'guesttype', 'guestos',
                       'guestarch','netmethod']
 
-    optional_args = ['memory', 'vcpu', 'disksize', 'imagepath', 
+    optional_args = ['memory', 'vcpu', 'disksize', 'imagepath',
                      'hdmodel', 'nicmodel', 'ifacetype', 'source', 'type']
 
     for arg in mandatory_args:
@@ -90,10 +88,10 @@ def check_params(params):
             usage()
             return 1
 
-        params_given.pop(arg)  
+        params_given.pop(arg)
 
     if len(params_given) == 0:
-        return 0    
+        return 0
 
     for arg in params_given.keys():
         if arg not in optional_args:
@@ -103,7 +101,7 @@ def check_params(params):
     return 0
 
 def prepare_boot_guest(domobj, dict, logger, installtype):
-    """After guest installation is over, undefine the guest with 
+    """After guest installation is over, undefine the guest with
        bootting off cdrom, to define the guest to boot off harddisk.
     """
     params = copy.deepcopy(dict)
@@ -127,7 +125,7 @@ def prepare_boot_guest(domobj, dict, logger, installtype):
     try:
         domobj.define(guestxml)
     except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % 
+        logger.error("API error message: %s, error code is %s" %
                      (e.response()['message'], e.response()['code']))
         logger.error("fail to define domain %s" % guestname)
         return 1
@@ -141,7 +139,7 @@ def prepare_boot_guest(domobj, dict, logger, installtype):
     try:
         domobj.start(guestname)
     except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % 
+        logger.error("API error message: %s, error code is %s" %
                      (e.response()['message'], e.response()['code']))
         logger.error("fail to start domain %s" % guestname)
         return 1
@@ -193,7 +191,7 @@ def install_linux_net(params):
     """install a new virtual machine"""
     # Initiate and check parameters
     global logger
-    logger = params['logger'] 
+    logger = params['logger']
     params.pop('logger')
     logger.info("Checking the validation of arguments provided.")
     params_check_result = check_params(params)
@@ -201,14 +199,14 @@ def install_linux_net(params):
     if params_check_result:
         return 1
 
-    logger.info("Arguments checkup finished.") 
+    logger.info("Arguments checkup finished.")
 
     guestname = params.get('guestname')
     guesttype = params.get('guesttype')
     guestos = params.get('guestos')
     guestarch = params.get('guestarch')
     installmethod = params.get('netmethod')
-        
+
     logger.info("the name of guest is %s" % guestname)
     logger.info("the type of guest is %s" % guesttype)
     logger.info("the installation method is %s" % installmethod)
@@ -221,10 +219,10 @@ def install_linux_net(params):
     logger.info("the macaddress is %s" % macaddr)
     logger.info("the type of hypervisor is %s" % hypervisor)
     logger.debug("the uri to connect is %s" % uri)
-  
+
     if params.has_key('imagepath'):
         fullimagepath = os.join.path(params.get('imagepath'), guestname)
-    else: 
+    else:
         if hypervisor == 'xen':
             fullimagepath = os.path.join('/var/lib/xen/images', guestname)
         elif hypervisor == 'kvm':
@@ -232,15 +230,14 @@ def install_linux_net(params):
 
     params['fullimagepath'] = fullimagepath
 
-    logger.info("the path of directory of disk images located on is %s" % 
-                fullimagepath)      
+    logger.info("the path of directory of disk images located on is %s" %
+                fullimagepath)
 
     if params.has_key('disksize'):
-    
         logger.info("the size of disk image is %sG" % (params.get('disksize')))
         shell_disk_dd = "dd if=/dev/zero of=%s bs=1 count=1 seek=%sG" % \
                         (fullimagepath, params.get('disksize'))
-        logger.debug("the commands line of creating disk images is '%s'" % 
+        logger.debug("the commands line of creating disk images is '%s'" %
                      shell_disk_dd)
 
         (status, message) = commands.getstatusoutput(shell_disk_dd)
@@ -259,36 +256,35 @@ def install_linux_net(params):
         if status != 0:
             logger.debug(message)
         else:
-            logger.info("creating disk images file is successful.")    
- 
+            logger.info("creating disk images file is successful.")
 
     logger.info("get system environment information")
     envfile = os.path.join(homepath, 'env.cfg')
     logger.info("the environment file is %s" % envfile)
 
     envpaser = env_parser.Envpaser(envfile)
-    
-    # Get http, ftp or nfs url based on guest os, arch 
+
+    # Get http, ftp or nfs url based on guest os, arch
     # and installation method from env.cfg
-    if installmethod == 'http': 
-        ks = envpaser.get_value("guest", guestos + "_" + guestarch + 
-                                "_http_ks")  
+    if installmethod == 'http':
+        ks = envpaser.get_value("guest", guestos + "_" + guestarch +
+                                "_http_ks")
     elif installmethod == 'ftp':
         ks = envpaser.get_value("guest", guestos + "_" + guestarch + "_ftp_ks")
     elif installmethod == "nfs":
         ks = envpaser.get_value("guest", guestos + "_" + guestarch + "_nfs_ks")
 
     ostree = envpaser.get_value("guest", guestos + "_" + guestarch)
- 
+
     logger.debug('install source: \n    %s' % ostree)
     logger.debug('kisckstart file: \n    %s' % ks)
 
     logger.info('prepare installation...')
-   
+
     if guesttype == 'xenpv' or guesttype == 'kvm':
         params['kickstart'] = ks
         params['macaddr'] = macaddr
-        
+
         if guesttype == 'kvm':
             vmlinuzpath = os.path.join(ostree, 'isolinux/vmlinuz')
             initrdpath = os.path.join(ostree, 'isolinux/initrd.img')
@@ -299,7 +295,7 @@ def install_linux_net(params):
         logger.debug("the url of vmlinuz file is %s" % vmlinuzpath)
         logger.debug("the url of initrd file is %s" % initrdpath)
 
-        urllib.urlretrieve(vmlinuzpath, '/var/lib/libvirt/boot/vmlinuz') 
+        urllib.urlretrieve(vmlinuzpath, '/var/lib/libvirt/boot/vmlinuz')
         urllib.urlretrieve(initrdpath, '/var/lib/libvirt/boot/initrd.img')
 
         logger.debug("vmlinuz file is located in /var/lib/libvirt/boot")
@@ -312,8 +308,8 @@ def install_linux_net(params):
         prepare_cdrom(ostree, ks, guestname, logger)
     else:
         logger.error("unknown guest type %s" % guesttype)
-   
-    # Prepare guest installation xml 
+
+    # Prepare guest installation xml
     xmlobj = xmlbuilder.XmlBuilder()
     guestxml = xmlobj.build_domain_install(params)
     logger.debug('dump installation guest xml:\n%s' % guestxml)
@@ -322,12 +318,12 @@ def install_linux_net(params):
     virconn = connectAPI.ConnectAPI().open(uri)
     domobj = domainAPI.DomainAPI(virconn)
     installtype = params.get('type')
-    if installtype == None or installtype == 'define': 
+    if installtype == None or installtype == 'define':
         logger.info('define guest from xml description')
         try:
             domobj.define(guestxml)
         except LibvirtAPI, e:
-            logger.error("API error message: %s, error code is %s" % 
+            logger.error("API error message: %s, error code is %s" %
                          (e.response()['message'], e.response()['code']))
             logger.error("fail to define domain %s" % guestname)
             return 1
@@ -336,8 +332,8 @@ def install_linux_net(params):
 
         try:
             domobj.start(guestname)
-        except LibvirtAPI, e: 
-            logger.error("API error message: %s, error code is %s" % 
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s" %
                          (e.response()['message'], e.response()['code']))
             logger.error("fail to start domain %s" % guestname)
             return 1
@@ -350,12 +346,12 @@ def install_linux_net(params):
                          (e.response()['message'], e.response()['code']))
             logger.error("fail to define domain %s" % guestname)
             return 1
- 
+
     if 'rhel3u9' in guestos:
         interval = 0
         logger.info("waiting 1000 seconds for the installation to complete...")
         while(interval < 1000):
-            logger.info('%s seconds passed away...' % interval) 
+            logger.info('%s seconds passed away...' % interval)
             time.sleep(10)
             interval += 10
 
@@ -366,7 +362,7 @@ def install_linux_net(params):
             logger.info("booting guest vm off harddisk failed")
             return 1
         else:
-            logger.info("geust is booting up") 
+            logger.info("geust is booting up")
     else:
         interval = 0
         while(interval < 3600):
@@ -383,7 +379,7 @@ def install_linux_net(params):
                         return 1
                     break
                 else:
-                    interval += 10 
+                    interval += 10
                     logger.info('%s seconds passed away...' % interval)
             elif installtype == 'create':
                 dom_name_list = domobj.get_list()
@@ -415,10 +411,10 @@ def install_linux_net(params):
     while timeout:
         time.sleep(10)
         timeout -= 10
-     
+
         ip = util.mac_to_ip(mac, 180)
 
-        if not ip:  
+        if not ip:
             logger.info(str(timeout) + "s left")
         else:
             logger.info("vm %s power on successfully" % guestname)
@@ -430,4 +426,3 @@ def install_linux_net(params):
             return 1
 
     return 0
-

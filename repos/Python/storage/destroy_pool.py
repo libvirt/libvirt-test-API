@@ -10,9 +10,8 @@ __date__     = 'Fri May 07, 2010'
 __version__  = '0.1.0'
 __credits__  = 'Copyright (C) 2010 Red Hat, Inc.'
 __all__      = ['usage', 'check_pool_destroy', 'destroy_pool']
-   
 
-import os 
+import os
 import re
 import sys
 
@@ -50,8 +49,8 @@ def check_pool_existence(stgobj, poolname, logger):
     """
      Check to verify that there indeed is a pool named with the given poolname
     """
-    pool_names =  stgobj.storage_pool_list() 
-    pool_names += stgobj.defstorage_pool_list() 
+    pool_names =  stgobj.storage_pool_list()
+    pool_names += stgobj.defstorage_pool_list()
 
     if poolname not in pool_names:
         logger.error("%s doesn't seem to be a right poolname" % poolname)
@@ -63,7 +62,7 @@ def check_pool_destroy(stgobj, poolname, logger):
     """
      Check to verify that the pool is actually gone
     """
-    pool_names = stgobj.storage_pool_list() 
+    pool_names = stgobj.storage_pool_list()
 
     if poolname not in pool_names:
         logger.info("destroy pool %s SUCCESS , " % poolname)
@@ -92,24 +91,23 @@ def destroy_pool(params):
     stgobj = storageAPI.StorageAPI(virconn)
 
     if check_pool_existence(stgobj, poolname, logger):
-        ## make sure that the pool is active. 
+        # Make sure that the pool is active.
         if stgobj.isActive_pool(poolname):
             try:
-                # go ahead and try to destroy the pool..
+                # Go ahead and try to destroy the pool..
                 stgobj.destroy_pool(poolname)
-                # check in libvirt to make sure that it's really destroyed..
+                # Check in libvirt to make sure that it's really destroyed..
                 if not check_pool_destroy(stgobj, poolname, logger):
                     print("%s doesn't seem to be destroyed properly" % poolname)
                     return 1
                 else:
                     print("%s is destroyed!!!" % poolname)
                     return 0
-            except LibvirtAPI, e:  
+            except LibvirtAPI, e:
                 logger.error("API error message: %s, error code is %s" % \
-(e.response()['message'], e.response()['code']))
+                             (e.response()['message'], e.response()['code']))
                 return 1
         else:
             logger.error("%s is not active. \
                           It must be active to be destroyed." % poolname)
             return 1
-

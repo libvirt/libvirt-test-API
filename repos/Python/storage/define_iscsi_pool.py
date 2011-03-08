@@ -10,7 +10,6 @@ __credits__ = 'Copyright (C) 2010 Red Hat, Inc.'
 __all__ = ['usage', 'check_pool_define', \
            'display_pool_info', 'define_iscsi_pool']
 
-
 import os
 import re
 import sys
@@ -71,7 +70,7 @@ def check_pool_define(storageobj, poolname, logger):
     if os.access(path, os.R_OK):
         logger.debug("Check: %s does exist." % path)
         ## check thru libvirt that it's really defined..
-        try: 
+        try:
             pool_names.index(poolname)
         except ValueError:
             logger.info("define %s storage pool is UNSUCCESSFUL!!" % poolname)
@@ -79,7 +78,7 @@ def check_pool_define(storageobj, poolname, logger):
         return True
     else:
         return False
-    
+
 def define_iscsi_pool(params):
     """
     Defines a iscsi based storage pool from xml.
@@ -135,5 +134,5 @@ def define_iscsi_pool(params):
             return 1
     except LibvirtAPI, e:
         logger.error("API error message: %s, error code is %s" \
-% (e.response()['message'], e.response()['code']))
+                     % (e.response()['message'], e.response()['code']))
         return 1

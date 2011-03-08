@@ -1,5 +1,5 @@
 #!/usr/bin/evn python
-"""this test case is used for testing to activate 
+"""this test case is used for testing to activate
    a virtual network
 """
 
@@ -56,7 +56,7 @@ def start(params):
     networkname = params['networkname']
     logger.info("the name of virtual network to be activated is %s" % \
                  networkname)
-    
+
     util = utils.Utils()
     uri = util.get_uri('127.0.0.1')
 
@@ -91,7 +91,7 @@ def start(params):
         return 1
 
     net_activated_list = netobj.network_list()
-   
+
     if networkname not in net_activated_list:
         logger.error("virtual network %s failed to be activated." % networkname)
         return 1
@@ -99,7 +99,7 @@ def start(params):
         shell_cmd = "virsh net-list --all"
         (status, text) = commands.getstatusoutput(shell_cmd)
         logger.debug("the output of 'virsh net-list --all' is %s" % text)
- 
+
     logger.info("activate the virtual network successfully.")
     time.sleep(3)
     return 0

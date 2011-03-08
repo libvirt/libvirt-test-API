@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""this test case is used for creating volume of  
+"""this test case is used for creating volume of 
    a partition type storage pool from xml
 """
 
@@ -35,9 +35,9 @@ from exception import LibvirtAPI
 
 def usage():
     """usage infomation"""
-    print """mandatory options:                          
+    print """mandatory options:
               poolname: The name of pool under which the volume to be created
-              volname: Name of the volume to be created 
+              volname: Name of the volume to be created
               volformat:  the format types of volume like \
                           'none,linux,fat16,fat32,linux-lvm...'
               capacity: the size of the volume with optional k,M,G,T suffix, \
@@ -63,31 +63,31 @@ def partition_volume_check(stgobj, poolname, volname):
     """check the new created volume, the way of checking is to get
        the path of the newly created volume, then grep /proc/partitions
        to find out the new partition in that. """
-    
+
     volpath = stgobj.get_volume_path(poolname, volname)
     logger.debug("the path of volume is %s" % volpath)
 
-    partition_name = volpath.split("/")[-1] 
+    partition_name = volpath.split("/")[-1]
     shell_cmd = "grep %s /proc/partitions" % partition_name
     logger.debug("excute the shell command %s to \
                   check the newly created partition" % shell_cmd)
 
     stat, ret = commands.getstatusoutput(shell_cmd)
-    
+
     if stat == 0 and volname in stgobj.get_volume_list(poolname):
         return 0
     else:
-        return 1     
-   
- 
+        return 1
+
+
 def virsh_vol_list(poolname):
     """using virsh command list the volume information"""
 
     shell_cmd = "virsh vol-list %s" % poolname
     (status, text) = commands.getstatusoutput(shell_cmd)
     logger.debug(text)
-  
-    
+
+
 def create_partition_volume(params):
     """create a volume in the disk type of pool"""
 
@@ -111,8 +111,8 @@ def create_partition_volume(params):
 
     logger.info("the poolname is %s, volname is %s, \
                  volfomat is %s, capacity is %s" % \
-                 (poolname, volname, volformat, capacity)) 
-  
+                 (poolname, volname, volformat, capacity))
+
     util = utils.Utils()
     uri = util.get_uri('127.0.0.1')
 
@@ -122,7 +122,7 @@ def create_partition_volume(params):
     stgobj = storageAPI.StorageAPI(virconn)
 
     storage_pool_list = stgobj.storage_pool_list()
-   
+
     if poolname not in storage_pool_list:
         logger.error("pool %s doesn't exist or not running")
         return 1
@@ -130,11 +130,11 @@ def create_partition_volume(params):
     params['suffix'] = capacity[-1]
     params['capacity'] = capacity[:-1]
     params['pooltype'] = 'disk'
-   
+
     logger.info("before create the new volume, \
                  current volume list is %s" % \
-                 stgobj.get_volume_list(poolname)) 
-   
+                 stgobj.get_volume_list(poolname))
+
     logger.info("and using virsh command to \
                  ouput the volume information in the pool %s" % poolname)
     virsh_vol_list(poolname)
@@ -142,15 +142,15 @@ def create_partition_volume(params):
     xmlobj = xmlbuilder.XmlBuilder()
     volumexml = xmlobj.build_volume(params)
     logger.debug("volume xml:\n%s" % volumexml)
- 
+
     try:
         logger.info("create %s volume" % volname)
         stgobj.create_volume(poolname, volumexml)
     except LibvirtAPI, e:
         logger.error("API error message: %s, error code is %s" \
-% (e.response()['message'], e.response()['code']))
+                     % (e.response()['message'], e.response()['code']))
         return 1
- 
+
     logger.info("volume create successfully, and output the volume information")
     virsh_vol_list(poolname)
 
@@ -163,32 +163,3 @@ def create_partition_volume(params):
     else:
         logger.error("checking failed")
         return 1
-        
-    
-
-         
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

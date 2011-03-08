@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""this test case is used for testing detach 
+"""this test case is used for testing detach
    the interface to domain from xml
    mandatory arguments: guestname
                         ifacetype
@@ -55,7 +55,7 @@ def check_guest_status(guestname, domobj):
         return True
 
 def check_detach_interface(num1, num2):
-    """Check detach interface result via simple interface number 
+    """Check detach interface result via simple interface number
        comparison
     """
     if num2 < num1:
@@ -108,7 +108,7 @@ def detach_interface(params):
             logger.info("current interface number: %s" % iface_num2)
             test_result = True
         else:
-            logger.error("fail to detach a interface to guest: %s" % 
+            logger.error("fail to detach a interface to guest: %s" %
                           iface_num2)
             test_result = False
     except LibvirtAPI, e:
@@ -122,4 +122,3 @@ def detach_interface(params):
         return 0
     else:
         return -1
-

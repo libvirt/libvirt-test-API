@@ -10,7 +10,6 @@ __credits__ = 'Copyright (C) 2009 Red Hat, Inc.'
 __all__ = ['usage', 'check_delete_pool', 'delete_logical_pool', \
            'display_pool_info', 'display_physical_volume']
 
-
 import os
 import re
 import sys
@@ -51,9 +50,9 @@ def usage(params):
 def display_pool_info(stgobj):
     """Display current storage pool information"""
     logger.debug("current define storage pool: %s" \
-% stgobj.defstorage_pool_list())
+                 % stgobj.defstorage_pool_list())
     logger.debug("current active storage pool: %s" \
-% stgobj.storage_pool_list())
+                 % stgobj.storage_pool_list())
 
 def display_physical_volume():
     """Display volume group and physical volume information"""
@@ -71,9 +70,8 @@ def display_physical_volume():
     else:
         logger.error("fail to execute pvdisplay command")
 
-
 def check_delete_pool(poolname):
-    """Check delete storage pool result, 
+    """Check delete storage pool result,
        /etc/lvm/backup/pool_name will not exist if pool delete is successful
     """
     path = "/etc/lvm/backup/%s" % poolname
@@ -88,7 +86,7 @@ def check_delete_pool(poolname):
 
 def delete_logical_pool(params):
     """delete a storage pool"""
-    global logger  
+    global logger
     logger = params['logger']
 
     if not usage(params):
@@ -128,5 +126,5 @@ def delete_logical_pool(params):
             return 1
     except LibvirtAPI, e:
         logger.error("API error message: %s, error code is %s" \
-% (e.response()['message'], e.response()['code']))
+                     % (e.response()['message'], e.response()['code']))
         return 1

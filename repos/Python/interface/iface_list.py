@@ -79,7 +79,7 @@ def get_interface_list(option, logger):
         return interface_list
 
 def check_ifacename(names, option, logger):
-    """ verify the validity of output data """ 
+    """ verify the validity of output data """
     ifcfg_files = []
     for f in os.listdir(NETWORK_CONFIG):
         if f.startswith("ifcfg-"):
@@ -88,7 +88,7 @@ def check_ifacename(names, option, logger):
                 ifcfg_files.append(f_path)
             else:
                 logger.warn("%s is not a regular file" % f_path)
-      
+
     interface_active = get_interface_list('', logger)
     logger.debug("list of active host interface: %s" % interface_active)
     if interface_active == None:
@@ -113,12 +113,12 @@ def check_ifacename(names, option, logger):
                     nic_name = nic_string
                 break
 
-        fp.close()        
- 
+        fp.close()
+
         if option == ' ':
             if nic_name not in interface_active:
-                continue        
-            else: 
+                continue
+            else:
                 if nic_name in names:
                     logger.info("it contains interface %s in %s" % (nic_name, ifcfg_file))
                 else:
@@ -146,13 +146,13 @@ def check_ifacename(names, option, logger):
                               be in the output of virsh iface-list with option %s" % \
                               (nic_name, ifcfg_file, option))
                     return 1
-            
+
     return 0
-   
+
 def check_ifacestate(names, state, logger):
     """ check the state of give host interface """
-    
-    interface_active = get_interface_list('', logger) 
+
+    interface_active = get_interface_list('', logger)
     if interface_active == None:
         return 1
 
@@ -172,12 +172,12 @@ def check_ifacestate(names, state, logger):
         else:
             logger.error("interface %s is %s, but not we expected" % \
                         (names[index], state[index]))
-            return 1          
+            return 1
 
         index = index + 1
 
     return 0
-            
+
 def check_ifacemac(names, macs, logger):
     """ check if the mac corresponding to approriate name is correct """
     index = 0
@@ -194,7 +194,7 @@ def check_ifacemac(names, macs, logger):
                              (name[index], macs[indesx], mac_shell))
                 return 1
         index = index + 1
-    
+
     return 0
 
 def iface_list_output(option, logger):
@@ -208,14 +208,14 @@ def iface_list_output(option, logger):
 
     else:
         return 1
-    
+
     status, ret = get_output(VIRSH_QUIET_IFACE_LIST % (option, 2), logger)
     if not status:
         state = ret.split('\n')
         logger.info("interface state from option '%s' : %s" % (option, state))
     else:
         return 1
- 
+
     status, ret = get_output(VIRSH_QUIET_IFACE_LIST % (option, 3), logger)
     if not status:
         macs = ret.split('\n')
@@ -233,9 +233,9 @@ def iface_list(params):
     logger = params['logger']
     ret, option_list = get_option_list(params)
     global names, state, macs
-    
+
     if ret:
-        return 1   
+        return 1
 
     for option in option_list:
             logger.info("CHECK the output of virsh pool-list with option '%s'" % option)
@@ -265,9 +265,8 @@ def iface_list(params):
                 else:
                     logger.info("checking interface mac address SUCESSFULLY")
 
-                status, ret = get_output(VIRSH_IFACE_LIST % option, logger) 
+                status, ret = get_output(VIRSH_IFACE_LIST % option, logger)
                 if not status:
                     logger.info("\n" + ret)
-   
+
     return 0
-            

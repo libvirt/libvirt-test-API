@@ -64,8 +64,8 @@ def check_node_reattach(pciaddress):
     return driver
 
 def reattach(dicts):
-    """Reattach a specific node device and removed it 
-       from pci-stub driver, argument 'dicts' is a dictionary type 
+    """Reattach a specific node device and removed it
+       from pci-stub driver, argument 'dicts' is a dictionary type
        and includes 'pciaddress' key, whose value
        uniquely identify a pci address of the node device
     """
@@ -98,18 +98,16 @@ def reattach(dicts):
         if status != 0:
             logger.error("failed to get vendor product ID")
             return 1
-        else:       
+        else:
             vendor_ID = retval.split(":")[0]
             product_ID = retval.split(":")[1]
-            device_name = "pci_%s_%s" % (vendor_ID, product_ID)  
-            
+            device_name = "pci_%s_%s" % (vendor_ID, product_ID)
     elif 'el6' in kernel_version:
         (bus, slot_func) = pciaddress.split(":")
         (slot, func) = slot_func.split(".")
         device_name = "pci_0000_%s_%s_%s" % (bus, slot, func)
-    
-    logger.debug("the name of the pci device is: %s" % device_name)
 
+    logger.debug("the name of the pci device is: %s" % device_name)
 
     conn = connectAPI.ConnectAPI()
     virconn = conn.open(uri)
@@ -126,7 +124,7 @@ def reattach(dicts):
         logger.info("current device driver: %s" % current_driver)
         if original_driver == pciback and current_driver != pciback:
             logger.info("the node %s device reattach is successful" \
-% device_name)
+                        % device_name)
             test_result = True
         else:
             logger.info("the node %s device reattach is failed" % device_name)
@@ -134,7 +132,7 @@ def reattach(dicts):
             return 1
     except LibvirtAPI, e:
         logger.error("API error message: %s, error code is %s" \
-% (e.response()['message'], e.response()['code']))
+                     % (e.response()['message'], e.response()['code']))
         logger.error("Error: fail to reattach %s node device" % device_name)
         test_result = False
         return 1

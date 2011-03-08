@@ -10,7 +10,7 @@ __version__  = '0.1.0'
 __credits__  = 'Copyright (C) 2010 Red Hat, Inc.'
 __all__      = ['usage', 'check_pool_create', 'create_dir_pool']
 
-import os 
+import os
 import re
 import sys
 
@@ -34,7 +34,7 @@ from exception import LibvirtAPI
 def usage(params):
     """ Verifies the params dictionary for the required arguments """
     logger = params['logger']
-    # pooltype is optional, defaulted to "dir" 
+    # pooltype is optional, defaulted to "dir"
     # targetpath is optional, defaulted to /var/lib/libvirt/images
     keys = ['poolname']
     for key in keys:
@@ -45,7 +45,7 @@ def usage(params):
         elif len(params[key]) == 0:
             logger.error("%s key is empty, set it to a value" % key)
             return False
-   
+
     #optional keys:
     if "pooltype" not in params:
         params['pooltype'] = 'dir'
@@ -59,7 +59,7 @@ def usage(params):
 
 
 def check_pool_create(stgobj, poolname, logger):
-    """Check the result of create storage pool. 
+    """Check the result of create storage pool.
     """
     pool_names = stgobj.storage_pool_list()
     logger.info("poolnames is: %s " % pool_names)
@@ -88,10 +88,10 @@ def create_dir_pool(params):
 
     poolname = params['poolname']
     pooltype = params['pooltype']
-    
+
     util = utils.Utils()
     uri  = util.get_uri('127.0.0.1')
-    
+
     conn = connectAPI.ConnectAPI()
     virconn = conn.open(uri)
     caps = conn.get_caps()
@@ -116,11 +116,7 @@ def create_dir_pool(params):
         else:
             logger.info("aa creating %s storage pool is UNSUCCESSFUL!!!" % poolname)
             return 1
-    except LibvirtAPI, e:  
+    except LibvirtAPI, e:
         logger.error("API error message: %s, error code is %s" % \
-(e.response()['message'], e.response()['code']))
+                     (e.response()['message'], e.response()['code']))
         return 1
-
-
-
-      

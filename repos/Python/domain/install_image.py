@@ -1,23 +1,23 @@
 #!/usr/bin/env python
 """The test script is for installing a new windows guest virtual machine
-   via calling libvirt python bindings API. 
-   mandatory arguments:guesttype 
+   via calling libvirt python bindings API.
+   mandatory arguments:guesttype
                        guestname
                        guestos
-                       guestarch   
-   optional arguments: memory 
+                       guestarch
+   optional arguments: memory
                        vcpu
                        imagepath
                        imagetype
                        hdmodel
                        nicmodel
-""" 
+"""
 
 __author__ = "Guannan Ren <gren@redhat.com>"
 __date__ = "Tue Mar 15 2010"
 __version__ = "0.1.0"
 __credits__ = "Copyright (C) 2010 Red Hat, Inc."
-__all__ = ['install_windows', 'usage'] 
+__all__ = ['install_windows', 'usage']
 
 import os
 import sys
@@ -32,7 +32,7 @@ def append_path(path):
         pass
     else:
         sys.path.append(path)
-    
+
 pwd = os.getcwd()
 result = re.search('(.*)libvirt-test-API', pwd)
 homepath = result.group(0)
@@ -49,7 +49,7 @@ def check_params(params):
     """Checking the arguments required"""
     params_given = copy.deepcopy(params)
     mandatory_args = ['guestname', 'guesttype', 'guestos', 'guestarch']
-    optional_args = ['memory', 'vcpu', 'imagepath', 'imagetype', 
+    optional_args = ['memory', 'vcpu', 'imagepath', 'imagetype',
                      'hdmodel', 'nicmodel']
 
     for arg in mandatory_args:
@@ -60,10 +60,10 @@ def check_params(params):
             logger.error("value of argument %s is empty." % arg)
             return 1
 
-        params_given.pop(arg)  
+        params_given.pop(arg)
 
     if len(params_given) == 0:
-        return 0    
+        return 0
 
     for arg in params_given.keys():
         if arg not in optional_args:
@@ -76,7 +76,7 @@ def install_image(params):
     """ install a new virtual machine """
     # Initiate and check parameters
     global logger
-    logger = params['logger'] 
+    logger = params['logger']
     params.pop('logger')
     logger.info("Checking the validation of arguments provided.")
     params_check_result = check_params(params)
@@ -84,7 +84,7 @@ def install_image(params):
     if params_check_result:
         return 1
 
-    logger.info("Arguments checkup finished.") 
+    logger.info("Arguments checkup finished.")
 
     guestname = params.get('guestname')
     guesttype = params.get('guesttype')
@@ -103,15 +103,15 @@ def install_image(params):
 
     logger.info("the type of hypervisor is %s" % hypervisor)
     logger.debug("the uri to connect is %s" % uri)
-  
+
     if params.has_key('imagepath'):
         imgfullpath = os.join.path(params.get('imagepath'), guestname)
-    else: 
+    else:
         if hypervisor == 'xen':
             imgfullpath = os.path.join('/var/lib/xen/images', guestname)
         elif hypervisor == 'kvm':
-            imgfullpath = os.path.join('/var/lib/libvirt/images', 
-                                       guestname)    
+            imgfullpath = os.path.join('/var/lib/libvirt/images',
+                                       guestname)
 
     logger.info("the path of directory of disk images located on is %s" %
                  imgfullpath)
@@ -121,39 +121,39 @@ def install_image(params):
 
     envpaser = env_parser.Envpaser(envfile)
     image_url = envpaser.get_value("image", "%s_%s" % (guestos, guestarch))
-  
+
     logger.info("download images file from %s" % image_url)
     urllib.urlretrieve(image_url, imgfullpath)
     logger.info("the image is located in %s" % imgfullpath)
-    
+
     virconn = connectAPI.ConnectAPI().open(uri)
     domobj = domainAPI.DomainAPI(virconn)
 
     xmlobj = xmlbuilder.XmlBuilder()
     domain = xmlobj.add_domain(params)
-    
+
     xmlobj.add_disk(params, domain)
     xmlobj.add_interface(params, domain)
     guestxml = xmlobj.build_domain(domain)
-    
+
     try:
         domobj.define(guestxml)
     except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % 
+        logger.error("API error message: %s, error code is %s" %
                      (e.response()['message'], e.response()['code']))
         logger.error("fail to define domain %s" % guestname)
         return 1
 
     logger.info("define guest %s " % guestname)
-    logger.debug("the xml description of guest booting off harddisk is %s" % 
+    logger.debug("the xml description of guest booting off harddisk is %s" %
                   guestxml)
-    
+
     logger.info('boot guest up ...')
 
     try:
         domobj.start(guestname)
     except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % 
+        logger.error("API error message: %s, error code is %s" %
                      (e.response()['message'], e.response()['code']))
         logger.error("fail to start domain %s" % guestname)
         return 1
@@ -168,10 +168,10 @@ def install_image(params):
     while timeout:
         time.sleep(10)
         timeout -= 10
-     
+
         ip = util.mac_to_ip(mac, 180)
 
-        if not ip:  
+        if not ip:
             logger.info(str(timeout) + "s left")
         else:
             logger.info("vm %s power on successfully" % guestname)
@@ -182,4 +182,3 @@ def install_image(params):
             logger.info("fail to power on vm %s" % guestname)
             return 1
     return 0
-

@@ -1,5 +1,5 @@
 #!/usr/bin/evn python
-"""this test case is used for testing 
+"""this test case is used for testing
    undefine domain
    mandatory arguments: guestname
 """
@@ -85,4 +85,3 @@ def undefine(params):
         return 0
     else:
         return -1
-

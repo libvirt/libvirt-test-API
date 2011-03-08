@@ -6,9 +6,8 @@ __author__ = "Guannan Ren <gren@redhat.com>"
 __date__ = "Web Jan 19, 2011"
 __version__ = "0.1.0"
 __credits__ = "Copyright (C) 2011 Red Hat, Inc."
-__all__ = ['pool_uuid', 'check_pool_uuid', 
+__all__ = ['pool_uuid', 'check_pool_uuid',
            'check_pool_exists']
-           
 
 import os
 import sys
@@ -60,7 +59,6 @@ def check_pool_uuid(poolname, UUIDString, logger):
             return True
         else:
             return False
-    
 
 def pool_uuid(params):
     """ call appropriate API to generate the UUIDStirng
@@ -69,11 +67,11 @@ def pool_uuid(params):
     """
     logger = params['logger']
     if 'poolname' not in params:
-        logger.error("the option poolname is required") 
+        logger.error("the option poolname is required")
         return 1
     else:
         poolname = params['poolname']
-           
+
     util = utils.Utils()
     uri = util.get_uri('127.0.0.1')
     conn = connectAPI.ConnectAPI()
@@ -97,8 +95,5 @@ def pool_uuid(params):
             return 1
     except LibvirtAPI, e:
         logger.error("API error message: %s, error code is %s" % \
-(e.response()['message'], e.response()['code']))
+                     (e.response()['message'], e.response()['code']))
         return 1
-          
-        
- 

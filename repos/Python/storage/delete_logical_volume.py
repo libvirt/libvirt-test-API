@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""this test case is used for testing delete 
+"""this test case is used for testing delete
    a logical type storage volume
 """
 
@@ -10,7 +10,6 @@ __credits__ = 'Copyright (C) 2009 Red Hat, Inc.'
 __all__ = ['usage', 'check_volume_delete', 'check_pool_inactive', \
            'get_storage_volume_number', 'display_volume_info', \
            'delete_logical_volume']
-
 
 import os
 import re
@@ -83,8 +82,8 @@ def check_pool_active(stgobj, poolname):
         return False
 
 def check_volume_delete(poolname, volkey):
-    """Check storage volume result, poolname will exist under 
-       /etc/lvm/backup/ and lvdelete command is called if 
+    """Check storage volume result, poolname will exist under
+       /etc/lvm/backup/ and lvdelete command is called if
        volume creation is successful
     """
     path = "/etc/lvm/backup/%s" % poolname
@@ -149,5 +148,5 @@ def delete_logical_volume(params):
             return 1
     except LibvirtAPI, e:
         logger.error("API error message: %s, error code is %s" \
-% (e.response()['message'], e.response()['code']))
+                     % (e.response()['message'], e.response()['code']))
         return 1

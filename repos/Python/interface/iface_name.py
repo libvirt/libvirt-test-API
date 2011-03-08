@@ -58,12 +58,12 @@ def get_mac_list(params):
 
 def iface_name(params):
     """ test iface_name, if optional option 'macaddr' is given
-        test it, otherwise test all mac address from the output of 
-        iface-list 
+        test it, otherwise test all mac address from the output of
+        iface-list
     """
     logger = params['logger']
     status, mac_list = get_mac_list(params)
- 
+
     if status:
         return 1
 
@@ -74,7 +74,7 @@ def iface_name(params):
             logger.info("the interface name generate from " \
                         + VIRSH_IFACE_NAME % mac + " is: '%s'" % interface_name)
         else:
-            return 1    
+            return 1
 
         status, interface_mac = get_output(GET_MAC % interface_name, logger)
         logger.info("the interace '%s' has mac address: '%s'" % \
@@ -88,6 +88,5 @@ def iface_name(params):
                 logger.error("the mac '%s' we tested is not equal to it should be '%s'" % \
                             (mac, interface_mac))
                 return 1
-        
+
     return 0
-        

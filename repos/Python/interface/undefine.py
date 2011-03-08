@@ -7,7 +7,7 @@ __author__ = 'Alex Jia: ajia@redhat.com'
 __date__ = 'Tue Apr 13, 2010'
 __version__ = '0.1.0'
 __credits__ = 'Copyright (C) 2009 Red Hat, Inc.'
-__all__ = ['usage', 'check_undefine_interface', 
+__all__ = ['usage', 'check_undefine_interface',
            'display_current_interface', 'undefine']
 
 
@@ -106,7 +106,7 @@ def undefine(params):
             return 1
     except LibvirtAPI, e:
         logger.error("API error message: %s, error code is %s" \
-% (e.response()['message'], e.response()['code']))
+                     % (e.response()['message'], e.response()['code']))
         logger.error("fail to undefine a interface from xml")
         test_result = False
         return 1

@@ -60,8 +60,8 @@ def display_current_interface(ifaceobj):
 % ifaceobj.get_defined_list())
 
 def check_create_interface(ifacename, util):
-    """Check creating interface result, it will can ping itself 
-       if create interface is successful.       
+    """Check creating interface result, it will can ping itself
+       if create interface is successful.
     """
     hostip = util.get_ip_address(ifacename)
     logger.debug("interface %s ip address: %s" % (ifacename, hostip))
@@ -78,8 +78,8 @@ def check_create_interface(ifacename, util):
 
 
 def create(params):
-    """Activate specific interface, argument params is dictionary type, and 
-       includes 'ifacename' key, which is a host interface name, e.g 'eth0'  
+    """Activate specific interface, argument params is dictionary type, and
+       includes 'ifacename' key, which is a host interface name, e.g 'eth0'
     """
     test_result = False
     global logger
@@ -122,7 +122,7 @@ def create(params):
             return 1
     except LibvirtAPI, e:
         logger.error("API error message: %s, error code is %s" \
-% (e.response()['message'], e.response()['code']))
+                     % (e.response()['message'], e.response()['code']))
         logger.error("fail to create interface %s" %ifacename)
         test_result = False
         return 1

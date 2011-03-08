@@ -28,7 +28,6 @@ from lib.Python import networkAPI
 from utils.Python import utils
 from exception import LibvirtAPI
 
-
 def usage(params):
     """Verify inputing parameter dictionary"""
     logger = params['logger']
@@ -44,7 +43,7 @@ def usage(params):
             pass
 
 def check_network_status(*args):
-    """Check current network status, it will return True if 
+    """Check current network status, it will return True if
        current network is active, otherwise, return False
     """
     (networkname, netobj, logger) = args
@@ -63,7 +62,7 @@ def destroy(params):
 
     logger = params['logger']
     networkname = params['networkname']
-    
+
     test_result = False
 
     util = utils.Utils()
@@ -88,7 +87,7 @@ def destroy(params):
         netobj.destroy(networkname)
         net_num2 = netobj.get_number()
         if not check_network_status(networkname, netobj, logger) and \
-net_num1 > net_num2:
+            net_num1 > net_num2:
             logger.info("current network active number: %s\n" % net_num2)
             logger.info("destroy %s network successful" % networkname)
             test_result = True
@@ -98,10 +97,11 @@ net_num1 > net_num2:
             return 1
     except LibvirtAPI, e:
         logger.error("API error message: %s, error code is %s" \
-% (e.response()['message'], e.response()['code']))
+                     % (e.response()['message'], e.response()['code']))
         logger.error("fail to destroy %s network" % networkname)
         test_result = False
         return 1
+
     time.sleep(3)
     if test_result:
         return 0

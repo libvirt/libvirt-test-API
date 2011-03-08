@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-"""The test scripts will test the balloon memory feature of libvirt for 
-   virtual machine through calling libvirt python bindings API. 
+"""The test scripts will test the balloon memory feature of libvirt for
+   virtual machine through calling libvirt python bindings API.
    mandatory arguments: guestname
-                        memorypair                           
+                        memorypair
 """
 
 import os
@@ -33,7 +33,7 @@ __author__ = "Guannan Ren <gren@redhat.com>"
 __date__ = "Thu April 01 2010"
 __version__ = "0.1.0"
 __credits__ = "Copyright (C) 2010 Red Hat, Inc."
-__all__ = ['balloon_memory', 'usage'] 
+__all__ = ['balloon_memory', 'usage']
 
 def check_params(params_given):
     """Checking the arguments required"""
@@ -57,15 +57,15 @@ def get_mem_size(ip):
     password = 'redhat'
     checking = check.Check()
     current_memory = checking.get_remote_memory(ip, username, password)
-    return current_memory 
+    return current_memory
 
 def compare_memory(expect_memory, actual_memory):
     """ comparing expected memory size with actual memory size """
-    
+
     logger.info("expected memory size is %s" % expect_memory)
     logger.info("actual memory size is %s" % actual_memory)
     diff = int(expect_memory) - int(actual_memory)
-    
+
     if int(math.fabs(diff)) < 50000:
         return 0
     else:
@@ -103,7 +103,7 @@ def guest_power_on(domobj, domain_name, mac):
     try:
         domobj.start(domain_name)
     except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % 
+        logger.error("API error message: %s, error code is %s" %
                      (e.response()['message'], e.response()['code']))
         logger.error("fail to power on guest %" % domain_name)
         return 1
@@ -137,7 +137,7 @@ def guest_power_off(domobj, domain_name):
     try:
         domobj.destroy(domain_name)
     except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % 
+        logger.error("API error message: %s, error code is %s" %
                      (e.response()['message'], e.response()['code']))
         logger.error("fail to power off guest %" % domain_name)
         return 1
@@ -149,7 +149,7 @@ def guest_power_off(domobj, domain_name):
     else:
         logger.error("failed to power off the domain %s" % domain_name)
         return 1
-   
+
     return 0
 
 
@@ -158,12 +158,12 @@ def balloon_memory(params):
        Return 0 on SUCCESS or 1 on FAILURE
     """
     # Initiate and check parameters
-    global logger 
+    global logger
     logger = params['logger']
     params.pop('logger')
     params_check_result = check_params(params)
-    if params_check_result: 
-        return 1  
+    if params_check_result:
+        return 1
     domain_name = params['guestname']
     memorypair = params['memorypair']
     minmem = int(memorypair.split(',')[0]) * 1024
@@ -171,7 +171,7 @@ def balloon_memory(params):
     maxmem = int(memorypair.split(',')[1]) * 1024
     logger.info("the maximum memory is %s" % maxmem)
 
-    # Connect to local hypervisor connection URI 
+    # Connect to local hypervisor connection URI
     global util
     util = utils.Utils()
     uri = util.get_uri('127.0.0.1')
@@ -185,32 +185,32 @@ def balloon_memory(params):
 
     Defined_dom_list =  domobj.get_defined_list()
     Active_dom_list = domobj.get_list()
-    
+
     if domain_name not in Defined_dom_list and \
        domain_name not in Active_dom_list:
         logger.error("guest %s doesn't exist" % domain_name)
         return 1
-    elif domain_name in Defined_dom_list: 
+    elif domain_name in Defined_dom_list:
         logger.info("guest %s exists but not running , \
                      we begin to set memory to maximum memory" % domain_name)
-            
+
     elif domain_name in Active_dom_list:
         logger.info("guest %s is running now, \
-                     power off it to set memory to maximum memory" % 
+                     power off it to set memory to maximum memory" %
                      domain_name)
-        ret = guest_power_off(domobj, domain_name)    
+        ret = guest_power_off(domobj, domain_name)
         if ret:
             return 1
 
     # Redefine domain with specified memory size
     newguestxml = redefine_memory_size(domobj, domain_name, maxmem)
     logger.debug('''new guest %s xml :\n%s''' %(domain_name, newguestxml))
-    
+
     logger.info("undefine the original guest")
     try:
         domobj.undefine(domain_name)
     except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % 
+        logger.error("API error message: %s, error code is %s" %
                      (e.response()['message'], e.response()['code']))
         logger.error("fail to undefine guest %" % domain_name)
         return 1
@@ -219,7 +219,7 @@ def balloon_memory(params):
     try:
         domobj.define(newguestxml)
     except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % 
+        logger.error("API error message: %s, error code is %s" %
                      (e.response()['message'], e.response()['code']))
         logger.error("fail to define guest %s" % domain_name)
         return 1
@@ -231,7 +231,7 @@ def balloon_memory(params):
 
     time.sleep(10)
     ip = util.mac_to_ip(mac, 180)
-    current_memory = get_mem_size(ip) 
+    current_memory = get_mem_size(ip)
 
     logger.info("the current memory size is %s" % current_memory)
 
@@ -240,23 +240,23 @@ def balloon_memory(params):
     try:
         domobj.set_memory(domain_name, minmem)
     except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % 
+        logger.error("API error message: %s, error code is %s" %
                      (e.response()['message'], e.response()['code']))
         logger.error("fail to set memory size")
         return 1
 
-    logger.debug("dump the xml description of guest virtual machine %s" % 
+    logger.debug("dump the xml description of guest virtual machine %s" %
                   domain_name)
     dom_xml = domobj.get_xml_desc(domain_name)
     logger.debug("the xml definination is %s" % dom_xml)
-    
+
     count = 0
 
     current_memory = get_mem_size(ip)
 
     logger.info("comparing the actual memory size with \
                  expected memory size after balloon operation")
-    result = compare_memory(minmem, current_memory) 
+    result = compare_memory(minmem, current_memory)
     if result:
         logger.info("the actual size of memory is \
                      not rounded to the value %s we expected" % minmem)
@@ -271,7 +271,7 @@ def balloon_memory(params):
     try:
         domobj.set_memory(domain_name, maxmem)
     except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % 
+        logger.error("API error message: %s, error code is %s" %
                      (e.response()['message'], e.response()['code']))
         logger.error("fail to set memory size")
         return 1
@@ -280,11 +280,11 @@ def balloon_memory(params):
                   guest virtual machine %s" % domain_name)
     dom_xml = domobj.get_xml_desc(domain_name)
     logger.debug("the xml definination is %s" % dom_xml)
-    
+
     current_memory = get_mem_size(ip)
     logger.info("comparing the actual memory size with \
                  expected memory size after balloon operation")
-    result = compare_memory(maxmem, current_memory) 
+    result = compare_memory(maxmem, current_memory)
     if result:
         logger.info("the actual size of memory is \
                      not rounded to the value %s we expected" % maxmem)
@@ -292,9 +292,9 @@ def balloon_memory(params):
     else:
         logger.info("the actual size of memory is \
                      rounded to the value %s we expected" % maxmem)
-     
+
     if count:
         return 1
     else:
         return 0
- 
+

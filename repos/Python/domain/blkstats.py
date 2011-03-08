@@ -54,8 +54,8 @@ def block_stats(params):
     logger = params['logger']
     guestname = params['guestname']
     test_result = False
-    
-    # Connect to local hypervisor connection URI 
+
+    # Connect to local hypervisor connection URI
     util = utils.Utils()
     uri = util.get_uri('127.0.0.1')
     conn = connectAPI.ConnectAPI()
@@ -74,7 +74,7 @@ def block_stats(params):
     try:
         (blkstats, path) = domobj.get_block_stats(guestname)
     except exception.LibvirtAPI, e:
-        logger.error("libvirt error: error code - %s; error message - %s" %(e.code, e.message)) 
+        logger.error("libvirt error: error code - %s; error message - %s" %(e.code, e.message))
         return -1;
     if blkstats:
         # check_block_stats()

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""this test case is used for testing detach 
+"""this test case is used for testing detach
    the disk to domain from xml
    mandatory arguments: guestname
                         guesttype
@@ -55,7 +55,7 @@ def check_guest_status(guestname, domobj):
         return True
 
 def check_detach_disk(num1, num2):
-    """Check detach disk result via simple disk number 
+    """Check detach disk result via simple disk number
        comparison
     """
     if num2 < num1:
@@ -87,7 +87,7 @@ def detach_disk(params):
     xmlobj = xmlbuilder.XmlBuilder()
     diskxml = xmlobj.build_disk(params)
     logger.debug("disk xml:\n%s" %diskxml)
-   
+
     disk_num1 = util.dev_num(guestname, "disk")
     logger.debug("original disk number: %s" %disk_num1)
 
@@ -119,4 +119,3 @@ def detach_disk(params):
         return 0
     else:
         return -1
-
