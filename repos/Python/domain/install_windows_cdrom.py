@@ -434,7 +434,7 @@ def install_windows_cdrom(params):
         time.sleep(10)
         timeout -= 10
 
-        ip = util.mac_to_ip(mac, 180)
+        ip = util.mac_to_ip(mac, 0)
 
         if not ip:
             logger.info(str(timeout) + "s left")
