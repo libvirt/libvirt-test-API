@@ -185,6 +185,23 @@ def prepare_boot_guest(domobj, dict, logger, installtype):
 
     return 0
 
+def check_domain_state(domobj, guestname, logger):
+    """ if a guest with the same name exists, remove it """
+    running_guests = domobj.get_list()
+
+    if guestname in running_guests:
+        logger.info("A guest with the same name %s is running!" % guestname)
+        logger.info("destroy it...")
+        domobj.destroy(guestname)
+
+    defined_guests = domobj.get_defined_list()
+
+    if guestname in defined_guests:
+        logger.info("undefine the guest with the same name %s" % guestname)
+        domobj.undefine(guestname)
+        
+    return 0
+
 def install_linux_cdrom(params):
     """ install a new virtual machine """
     global logger
@@ -209,13 +226,16 @@ def install_linux_cdrom(params):
     logger.info("the type of guest is %s" % guesttype)
 
     util = utils.Utils()
+    uri = util.get_uri('127.0.0.1')
     hypervisor = util.get_hypervisor()
+    virconn = connectAPI.ConnectAPI().open(uri)
+    domobj = domainAPI.DomainAPI(virconn)
+
+    check_domain_state(domobj, guestname, logger)
 
     if not params.has_key('macaddr'):
         macaddr = util.get_rand_mac()
         params['macaddr'] = macaddr
-
-    uri = util.get_uri('127.0.0.1')
 
     logger.info("the macaddress is %s" % params['macaddr'])
     logger.info("the type of hypervisor is %s" % hypervisor)
@@ -300,10 +320,6 @@ def install_linux_cdrom(params):
     xmlobj = xmlbuilder.XmlBuilder()
     guestxml = xmlobj.build_domain_install(params)
     logger.debug('dump installation guest xml:\n%s' % guestxml)
-
-    virconn = connectAPI.ConnectAPI().open(uri)
-    domobj = domainAPI.DomainAPI(virconn)
-
 
     installtype = params.get('type')
 
