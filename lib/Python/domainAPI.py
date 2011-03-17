@@ -118,19 +118,15 @@ class DomainAPI(object):
             raise exception.LibvirtAPI(message, code)      
 
     def get_defined_list(self):
-        def_dom_list = []
         try:
             def_list = self.conn.listDefinedDomains()
-            for def_dom in def_list:
-                obj = self.conn.lookupByName(def_dom)  
-                def_dom_list.append(obj.name())
-            return def_dom_list
+            return def_list
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)      
     
-    def get_defined(self, domname):
+    def get_defined_obj(self, domname):
         try:
             def_dom_list = self.conn.listDefinedDomains()
             def_dom_obj = self.conn.lookupByName(domname)
@@ -169,7 +165,7 @@ class DomainAPI(object):
    
     def undefine(self, domname):
         try:
-            dom_obj = self.get_defined(domname)
+            dom_obj = self.get_defined_obj(domname)
             dom_obj.undefine()
         except libvirt.libvirtError, e:
             message = e.get_error_message()
@@ -178,7 +174,7 @@ class DomainAPI(object):
 
     def start(self, domname):
         try:
-            dom_obj = self.get_defined(domname)
+            dom_obj = self.get_defined_obj(domname)
             retval = dom_obj.create()
             return retval
         except libvirt.libvirtError, e:
