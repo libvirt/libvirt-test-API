@@ -1,0 +1,94 @@
+body{
+	font-size:0.8em;
+}
+
+h1 ,h2 {
+	text-align:center;margin:5px 0px;
+}
+
+h1{
+	color:#12413B; 
+}
+
+h2{
+	color:#624E00;
+}
+
+table{
+	table-layout:fixed;
+}
+
+table td{
+}
+
+.list{
+	border-top:1px solid #666;
+	border-right:1px solid #666;
+	width:90%;
+	margin-left:auto;
+	margin-right:auto;
+}
+
+.list th{
+	background:#888;
+	text-align:left;
+	color:#fff;
+}
+
+.list tbody td{
+	border-bottom:1px solid #666;
+	border-left:1px solid #666;
+	padding-left:5px;
+}
+
+.list .pass{
+	color:green;
+	font-weight:700;
+	background:#E8FFD7;
+}
+
+.list .fail{
+	color:red;
+	font-weight:700;
+	background:#FFCED2;
+}
+
+.list .other{
+	color:#C36E00;
+	font-weight:700;
+	background:#FFE0B6;
+}
+
+.pro{
+	border:0px;
+	width:100%;
+}
+
+.pro tr td{
+	border:0px;
+}
+
+.pro span{
+	margin-left:10px;
+	float:left;
+	clear:all;
+}
+
+.li-tit{
+	width:150px;
+}
+
+.statu-list{
+	margin:10px 0px;
+	width:90%;
+	margin-left:auto;
+	margin-right:auto;
+	background:#f1f1f1;
+	border:1px solid #666;
+}
+
+.statu-list th{
+	background:#ddd;
+	text-align:left;
+	color:#333;
+}
