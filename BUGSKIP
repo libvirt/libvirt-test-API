@@ -1,0 +1,4 @@
+# This is a file for skipping a testcase due to an already bug in bugzilla
+# example as follows
+# casename:domain:destroy id:12345 bugzilla:http://bugzilla.redhat.com/bugid description:"This is a bug"
+#
