@@ -112,6 +112,8 @@ def define_disk_pool(params):
 
     if check_pool_define(poolname):
         logger.error("%s storage pool is defined" % poolname)
+        conn.close()
+        logger.info("closed hypervisor connection")
         return 1
 
     xmlobj = xmlbuilder.XmlBuilder()
@@ -139,5 +141,8 @@ def define_disk_pool(params):
         logger.error("API error message: %s, error code is %s" \
                      % (e.response()['message'], e.response()['code']))
         return 1
+    finally:
+        conn.close()
+        logger.info("closed hypervisor connection")
 
     return 0

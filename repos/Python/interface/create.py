@@ -126,6 +126,9 @@ def create(params):
         logger.error("fail to create interface %s" %ifacename)
         test_result = False
         return 1
+    finally:
+        conn.close()
+        logger.info("closed hypervisor connection")
 
     if test_result:
         return 0

@@ -52,6 +52,11 @@ __version__ = "0.1.0"
 __credits__ = "Copyright (C) 2010 Red Hat, Inc."
 __all__ = ['install_linux_cdrom', 'usage']
 
+def return_close(conn, logger, ret):
+    conn.close()
+    logger.info("closed hypervisor connection")
+    return ret
+
 def usage():
     print '''usage: mandatory arguments:guesttype
                            guestname
@@ -228,7 +233,8 @@ def install_linux_cdrom(params):
     util = utils.Utils()
     uri = util.get_uri('127.0.0.1')
     hypervisor = util.get_hypervisor()
-    virconn = connectAPI.ConnectAPI().open(uri)
+    conn = connectAPI.ConnectAPI()
+    virconn = conn.open(uri)
     domobj = domainAPI.DomainAPI(virconn)
 
     check_domain_state(domobj, guestname, logger)
@@ -255,8 +261,14 @@ def install_linux_cdrom(params):
 
     else:
         logger.error("we only choose one between imagepath and volumepath")
+<<<<<<< HEAD
         return 1
 
+=======
+        return return_close(conn, logger, 1)   
+  
+ 
+>>>>>>> d2b1826... modify all of existing testcases to close the opened hypervisor connection
     params['fullimagepath'] = imgfullpath
 
     logger.info("the path of directory of disk images located on is %s" %
@@ -315,7 +327,7 @@ def install_linux_cdrom(params):
         prepare_cdrom(ostree, ks, guestname, logger)
     else:
         logger.error("unknown guest type: %s" % guesttype)
-        return 1
+        return return_close(conn, logger, 1)
 
     xmlobj = xmlbuilder.XmlBuilder()
     guestxml = xmlobj.build_domain_install(params)
@@ -331,7 +343,7 @@ def install_linux_cdrom(params):
             logger.error("API error message: %s, error code is %s" %
                          (e.response()['message'], e.response()['code']))
             logger.error("fail to define domain %s" % guestname)
-            return 1
+            return return_close(conn, logger, 1)
 
         logger.info('start installation guest ...')
 
@@ -341,7 +353,7 @@ def install_linux_cdrom(params):
             logger.error("API error message: %s, error code is %s" %
                          (e.response()['message'], e.response()['code']))
             logger.error("fail to start domain %s" % guestname)
-            return 1
+            return return_close(conn, logger, 1)
     elif installtype == 'create':
         logger.info('create guest from xml description')
         try:
@@ -350,7 +362,7 @@ def install_linux_cdrom(params):
             logger.error("API error message: %s, error code is %s" %
                          (e.response()['message'], e.response()['code']))
             logger.error("fail to define domain %s" % guestname)
-            return 1
+            return return_close(conn, logger, 1)
 
     interval = 0
     while(interval < 2400):
@@ -363,7 +375,7 @@ def install_linux_cdrom(params):
                 ret  = prepare_boot_guest(domobj, params, logger, installtype)
                 if ret:
                     logger.info("booting guest vm off harddisk failed")
-                    return 1
+                    return return_close(conn, logger, 1)
                 break
             else:
                 interval += 10
@@ -376,7 +388,7 @@ def install_linux_cdrom(params):
                 ret = prepare_boot_guest(domobj, params, logger, installtype)
                 if ret:
                     logger.info("booting guest vm off harddisk failed")
-                    return 1
+                    return return_close(conn, logger, 1)
                 break
             else:
                 interval += 10
@@ -391,10 +403,10 @@ def install_linux_cdrom(params):
             ret =  prepare_boot_guest(domobj, params, logger, installtype)
             if ret:
                 logger.info("booting guest vm off harddisk failed")
-                return 1
+                return return_close(conn, logger, 1)
         else:
             logger.info("guest installation timeout 2400s")
-            return 1
+            return return_close(conn, logger, 1)
     else:
         logger.info("guest is booting up")
 
@@ -419,8 +431,8 @@ def install_linux_cdrom(params):
 
     if timeout == 0:
         logger.info("fail to power on vm %s" % guestname)
-        return 1
+        return return_close(conn, logger, 1)
 
     time.sleep(60)
 
-    return 0
+    return return_close(conn, logger, 0)

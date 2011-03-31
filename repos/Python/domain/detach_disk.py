@@ -114,6 +114,9 @@ def detach_disk(params):
         logger.error("detach %s disk from guest %s" % (imagename, guestname))
         test_result = False
         return 1
+    finally:
+        conn.close()
+        logger.info("closed hypervisor connection")
 
     if test_result:
         return 0

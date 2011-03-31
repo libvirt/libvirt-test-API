@@ -133,6 +133,9 @@ def autostart(params):
                       networkname)
         test_result = False
         return 1
+    finally:
+        conn.close()
+        logger.info("closed hypervisor connection")
 
     logger.debug("After setting autostart to virtual network, check status:")
     shell_cmd = "virsh net-list --all"

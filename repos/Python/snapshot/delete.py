@@ -93,11 +93,15 @@ def delete(params):
     logger.info("checking if the guest is poweroff")
     if not check_domain_state(domobj, guestname, logger):
         logger.error("checking failed")
+        conn.close()
+        logger.info("closed hypervisor connection")
         return 1
 
     if not delete_check(guestname, snapshotname, "exist", logger):
         logger.error("no snapshot %s exists" % snapshotname)
         logger.debug("not corresponding xml file in %s" % SNAPSHOT_DIR)
+        conn.close()
+        logger.info("closed hypervisor connection")
         return 1
     
     try:
@@ -113,6 +117,9 @@ def delete(params):
         logger.error("API error message: %s, error code is %s" % \
 (e.response()['message'], e.response()['code']))
         return 1
+    finally:
+        conn.close()
+        logger.info("closed hypervisor connection")
 
     return 0
     

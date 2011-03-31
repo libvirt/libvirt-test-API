@@ -31,9 +31,10 @@ from lib.Python import domainAPI
 from utils.Python import utils
 from exception import LibvirtAPI
 
-def return_fail(logger):
-    logger.error("FAIL")
-    return 1
+def return_close(conn, logger, ret):
+    conn.close()
+    logger.info("closed hypervisor connection")
+    return ret
 
 def check_params(params):
     """Verify the input parameter"""
@@ -74,7 +75,8 @@ def start(params):
     # Connect to local hypervisor connection URI
     util = utils.Utils()
     uri = util.get_uri('127.0.0.1')
-    virconn = connectAPI.ConnectAPI().open(uri)
+    conn = connectAPI.ConnectAPI()
+    virconn = conn.open(uri)
 
     # Start domain
     dom_obj = domainAPI.DomainAPI(virconn)
@@ -85,7 +87,8 @@ def start(params):
         dom_obj.start(domname)
     except LibvirtAPI, e:
         logger.error(str(e))
-        return return_fail(logger)
+        logger.error("start failed")
+        return return_close(conn, logger, 1)
 
     while timeout:
         time.sleep(10)
@@ -100,7 +103,7 @@ def start(params):
 
     if timeout <= 0:
         logger.error('The domain state is not as expected, state: ' + state)
-        return return_fail(logger)
+        return return_close(conn, logger, 1)
 
     # Get domain ip and ping ip to check domain's status
     mac = util.get_dom_mac_addr(domname)
@@ -110,8 +113,7 @@ def start(params):
     logger.info('ping guest')
     if not util.do_ping(ip, 300):
         logger.error('Failed on ping guest, IP: ' + str(ip))
-        return return_fail(logger)
+        return return_close(conn, logger, 1)
 
-    is_fail = False
     logger.info("PASS")
-    return is_fail
+    return return_close(conn, logger, 0)

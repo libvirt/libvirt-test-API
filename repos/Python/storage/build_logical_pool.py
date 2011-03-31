@@ -112,6 +112,8 @@ def build_logical_pool(params):
 
     if check_build_pool(poolname):
         logger.debug("%s storage pool is built" % poolname)
+        conn.close()
+        logger.info("closed hypervisor connection")
         return 1
 
     display_pool_info(stgobj)
@@ -133,3 +135,8 @@ def build_logical_pool(params):
         logger.error("API error message: %s, error code is %s" \
                      % (e.response()['message'], e.response()['code']))
         return 1
+    finally:
+        conn.close()
+        logger.info("closed hypervisor connection")
+
+    return 0

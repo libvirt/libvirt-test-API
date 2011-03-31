@@ -92,6 +92,8 @@ def define(params):
 
     if check_define_interface(ifacename):
         logger.error("interface %s have been defined" % ifacename)
+        conn.close()
+        logger.info("closed hypervisor connection")
         return 1
 
     ifaceobj = interfaceAPI.InterfaceAPI(virconn)
@@ -115,6 +117,9 @@ def define(params):
         logger.error("fail to define a interface from xml")
         test_result = False
         return 1
+    finally:
+        conn.close()
+        logger.info("closed hypervisor connection")
 
     if test_result:
         return 0

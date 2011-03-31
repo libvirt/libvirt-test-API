@@ -32,6 +32,11 @@ from utils.Python import utils
 from utils.Python import xmlbuilder
 from exception import LibvirtAPI
 
+def return_close(conn, logger, ret):
+    conn.close()
+    logger.info("closed hypervisor connection")
+    return ret
+
 def usage(params):
     """Does a sanity check on the parameters given"""
     logger = params['logger']
@@ -98,16 +103,20 @@ def destroy_pool(params):
                 stgobj.destroy_pool(poolname)
                 # Check in libvirt to make sure that it's really destroyed..
                 if not check_pool_destroy(stgobj, poolname, logger):
-                    print("%s doesn't seem to be destroyed properly" % poolname)
-                    return 1
+                    logger.error("%s doesn't seem to be destroyed properly" % poolname)
+                    return return_close(conn, logger, 1)
                 else:
-                    print("%s is destroyed!!!" % poolname)
-                    return 0
+                    logger.info("%s is destroyed!!!" % poolname)
+                    return return_close(conn, logger, 0)
             except LibvirtAPI, e:
                 logger.error("API error message: %s, error code is %s" % \
-                             (e.response()['message'], e.response()['code']))
-                return 1
+                        (e.response()['message'], e.response()['code']))
+                return return_close(conn, logger, 1)
         else:
             logger.error("%s is not active. \
                           It must be active to be destroyed." % poolname)
-            return 1
+            return return_close(conn, logger, 1)
+    else:
+        logger.error("%s doesn't exist")
+        return return_close(conn, logger, 0)
+

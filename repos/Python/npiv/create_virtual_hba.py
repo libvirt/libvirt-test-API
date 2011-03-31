@@ -135,3 +135,8 @@ def create_virtual_hba(params):
                      % (e.response()['message'], e.response()['code']))
         logger.error("Error: fail to create %s virtual hba" % dev_name)
         return 1
+    finally:
+        conn.close()
+        logger.info("closed hypervisor connection")
+
+    return 0

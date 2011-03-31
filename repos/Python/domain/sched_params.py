@@ -29,6 +29,11 @@ from lib.Python import connectAPI
 from lib.Python import domainAPI
 from utils.Python import utils
 
+def return_close(conn, logger, ret):
+    conn.close()
+    logger.info("closed hypervisor connection")
+    return ret
+
 def usage(params, hypervisor):
     """Verify inputing parameter dictionary"""
     logger = params['logger']
@@ -132,9 +137,9 @@ def sched_params(params):
             test_result = False
     else:
         logger.error("unsupported hypervisor type: %s" % hypervisor)
-        return 1
+        return return_close(conn, logger, 1)
 
     if test_result:
-        return 0
+        return return_close(conn, logger, 0)
     else:
-        return 1
+        return return_close(conn, logger, 1)

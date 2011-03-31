@@ -36,6 +36,11 @@ from lib.Python import domainAPI
 from utils.Python import utils
 from exception import LibvirtAPI
 
+def return_close(conn, logger, ret):
+    conn.close()
+    logger.info("closed hypervisor connection")
+    return ret
+
 def check_params(params_given):
     """Checking the arguments required"""
     args_required = ['guestname', 'vcpu']
@@ -238,7 +243,8 @@ def cpu_affinity(params):
     # Connect to local hypervisor connection URI
     util = utils.Utils()
     uri = util.get_uri('127.0.0.1')
-    virconn = connectAPI.ConnectAPI().open(uri)
+    conn = connectAPI.ConnectAPI()
+    virconn = conn.open(uri)
     hypervisor = uri.split(':')[0]
 
     # Get cpu affinity
@@ -247,7 +253,7 @@ def cpu_affinity(params):
     if domain_name not in dom_name_list:
         logger.error("guest %s doesn't exist or not be running." %
                       domain_name)
-        return 1
+        return return_close(conn, logger, 1)
 
     vcpunum = util.get_num_vcpus(domain_name)
     logger.info("the current vcpu number of guest %s is %s" % \
@@ -257,7 +263,7 @@ def cpu_affinity(params):
         logger.info("set the vcpu of the guest to %s" % vcpu)
         ret = set_vcpus(util, domobj, domain_name, vcpu)
         if ret != 0:
-            return 1
+            return return_close(conn, logger, 1)
 
     vcpunum_after_set = util.get_num_vcpus(domain_name)
     logger.info("after setting, the current vcpu number the guest is %s" % \
@@ -299,7 +305,8 @@ def cpu_affinity(params):
                 logger.error("API error message: %s, error code is %s" % \
                              (e.response()['message'], e.response()['code']))
                 logger.error("fail to vcpupin domain")
-                return 1
+                return return_close(conn, logger, 1)
+
             ret = vcpu_affinity_check(domain_name, vcpu_pinned, i, hypervisor)
             retflag = retflag + ret
             if ret:
@@ -308,6 +315,7 @@ def cpu_affinity(params):
                 logger.info("vcpu affinity checking successed.")
 
     if retflag:
-        return 1
+        return return_close(conn, logger, 1)
     else:
-        return 0
+        return return_close(conn, logger, 0)
+

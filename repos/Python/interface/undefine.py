@@ -91,6 +91,8 @@ def undefine(params):
 
     if check_undefine_interface(ifacename):
         logger.error("interface %s have been undefined" % ifacename)
+        conn.close()
+        logger.info("closed hypervisor connection")
         return 1
 
     ifaceobj = interfaceAPI.InterfaceAPI(virconn)
@@ -110,6 +112,9 @@ def undefine(params):
         logger.error("fail to undefine a interface from xml")
         test_result = False
         return 1
+    finally:
+        conn.close()
+        logger.info("closed hypervisor connection")
 
     if test_result:
         return 0

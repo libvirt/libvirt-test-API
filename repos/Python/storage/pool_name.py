@@ -82,6 +82,8 @@ def pool_name(params):
 
     if not check_pool_exists(stgobj, poolname, logger):
         logger.error("need a defined pool, may or may not be active")
+        conn.close()
+        logger.info("closed hypervisor connection")
         return 1
 
     try:
@@ -97,3 +99,8 @@ def pool_name(params):
         logger.error("API error message: %s, error code is %s" % \
                      (e.response()['message'], e.response()['code']))
         return 1
+    finally:
+        conn.close()
+        logger.info("closed hypervisor connection")
+
+    return 0

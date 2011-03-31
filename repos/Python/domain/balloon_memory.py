@@ -35,6 +35,11 @@ __version__ = "0.1.0"
 __credits__ = "Copyright (C) 2010 Red Hat, Inc."
 __all__ = ['balloon_memory', 'usage']
 
+def return_close(conn, logger, ret):
+    conn.close()
+    logger.info("closed hypervisor connection")
+    return ret
+
 def check_params(params_given):
     """Checking the arguments required"""
 
@@ -180,7 +185,8 @@ def balloon_memory(params):
     mac = util.get_dom_mac_addr(domain_name)
     logger.info("the mac address of vm %s is %s" % (domain_name, mac))
 
-    virconn = connectAPI.ConnectAPI().open(uri)
+    conn = connectAPI.ConnectAPI()
+    virconn = conn.open(uri)
     domobj = domainAPI.DomainAPI(virconn)
 
     Defined_dom_list =  domobj.get_defined_list()
@@ -189,7 +195,7 @@ def balloon_memory(params):
     if domain_name not in Defined_dom_list and \
        domain_name not in Active_dom_list:
         logger.error("guest %s doesn't exist" % domain_name)
-        return 1
+        return return_close(conn, logger, 1)
     elif domain_name in Defined_dom_list:
         logger.info("guest %s exists but not running , \
                      we begin to set memory to maximum memory" % domain_name)
@@ -200,7 +206,7 @@ def balloon_memory(params):
                      domain_name)
         ret = guest_power_off(domobj, domain_name)
         if ret:
-            return 1
+            return return_close(conn, logger, 1)
 
     # Redefine domain with specified memory size
     newguestxml = redefine_memory_size(domobj, domain_name, maxmem)
@@ -213,7 +219,7 @@ def balloon_memory(params):
         logger.error("API error message: %s, error code is %s" %
                      (e.response()['message'], e.response()['code']))
         logger.error("fail to undefine guest %" % domain_name)
-        return 1
+        return return_close(conn, logger, 1)
 
     logger.info("define guest with new xml")
     try:
@@ -222,12 +228,12 @@ def balloon_memory(params):
         logger.error("API error message: %s, error code is %s" %
                      (e.response()['message'], e.response()['code']))
         logger.error("fail to define guest %s" % domain_name)
-        return 1
+        return return_close(conn, logger, 1)
 
     logger.info("memory set is finished, boot up the guest %s " % domain_name)
     ret = guest_power_on(domobj, domain_name, mac)
     if ret:
-        return 1
+        return return_close(conn, logger, 1)
 
     time.sleep(10)
     ip = util.mac_to_ip(mac, 180)
@@ -243,7 +249,7 @@ def balloon_memory(params):
         logger.error("API error message: %s, error code is %s" %
                      (e.response()['message'], e.response()['code']))
         logger.error("fail to set memory size")
-        return 1
+        return return_close(conn, logger, 1)
 
     logger.debug("dump the xml description of guest virtual machine %s" %
                   domain_name)
@@ -274,7 +280,7 @@ def balloon_memory(params):
         logger.error("API error message: %s, error code is %s" %
                      (e.response()['message'], e.response()['code']))
         logger.error("fail to set memory size")
-        return 1
+        return return_close(conn, logger, 1)
 
     logger.debug("dump the xml description of \
                   guest virtual machine %s" % domain_name)
@@ -294,7 +300,7 @@ def balloon_memory(params):
                      rounded to the value %s we expected" % maxmem)
 
     if count:
-        return 1
+        return return_close(conn, logger, 1)
     else:
-        return 0
+        return return_close(conn, logger, 0)
 

@@ -130,6 +130,8 @@ def create_netfs_pool(params):
 
     if check_pool_create_libvirt(stgobj, poolname, logger):
         logger.error("%s storage pool has already been created" % poolname)
+        conn.close()
+        logger.info("closed hypervisor connection")
         return 1
 
     xmlobj = xmlbuilder.XmlBuilder()
@@ -158,3 +160,8 @@ def create_netfs_pool(params):
         logger.error("API error message: %s, error code is %s" % \
                      (e.response()['message'], e.response()['code']))
         return 1
+    finally:
+        conn.close()
+        logger.info("closed hypervisor connection")
+
+    return 0

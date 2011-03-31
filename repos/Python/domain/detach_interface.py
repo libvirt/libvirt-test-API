@@ -117,6 +117,9 @@ def detach_interface(params):
         logger.error("detach the interface from guest %s" % guestname)
         test_result = False
         return 1
+    finally:
+        conn.close()
+        logger.info("closed hypervisor connection")
 
     if test_result:
         return 0

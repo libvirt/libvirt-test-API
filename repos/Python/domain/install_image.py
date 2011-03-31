@@ -45,6 +45,11 @@ from utils.Python import env_parser
 from utils.Python import xmlbuilder
 from exception import LibvirtAPI
 
+def return_close(conn, logger, ret):
+    conn.close()
+    logger.info("closed hypervisor connection")
+    return ret
+
 def check_params(params):
     """Checking the arguments required"""
     params_given = copy.deepcopy(params)
@@ -126,7 +131,8 @@ def install_image(params):
     urllib.urlretrieve(image_url, imgfullpath)
     logger.info("the image is located in %s" % imgfullpath)
 
-    virconn = connectAPI.ConnectAPI().open(uri)
+    conn = connectAPI.ConnectAPI()
+    virconn = conn.open(uri)
     domobj = domainAPI.DomainAPI(virconn)
 
     xmlobj = xmlbuilder.XmlBuilder()
@@ -142,7 +148,7 @@ def install_image(params):
         logger.error("API error message: %s, error code is %s" %
                      (e.response()['message'], e.response()['code']))
         logger.error("fail to define domain %s" % guestname)
-        return 1
+        return return_close(conn, logger, 1)
 
     logger.info("define guest %s " % guestname)
     logger.debug("the xml description of guest booting off harddisk is %s" %
@@ -156,7 +162,7 @@ def install_image(params):
         logger.error("API error message: %s, error code is %s" %
                      (e.response()['message'], e.response()['code']))
         logger.error("fail to start domain %s" % guestname)
-        return 1
+        return return_close(conn, logger, 1)
 
 
     logger.info("get the mac address of vm %s" % guestname)
@@ -180,5 +186,6 @@ def install_image(params):
 
         if timeout == 0:
             logger.info("fail to power on vm %s" % guestname)
-            return 1
-    return 0
+            return return_close(conn, logger, 1)
+
+    return return_close(conn, logger, 0)

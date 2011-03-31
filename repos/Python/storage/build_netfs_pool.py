@@ -99,6 +99,8 @@ def build_netfs_pool(params):
 
     if not check_pool_defined(stgobj, poolname):
         logger.error("only have defined pool can be built")
+        conn.close()
+        logger.info("closed hypervisor connection")
         return 1
 
     pool_xml = stgobj.dump_pool(poolname)
@@ -126,3 +128,9 @@ def build_netfs_pool(params):
         logger.error("API error message: %s, error code is %s" \
                      % (e.response()['message'], e.response()['code']))
         return 1
+    finally:
+        conn.close()
+        logger.info("closed hypervisor connection")
+
+    return 0
+

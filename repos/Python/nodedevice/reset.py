@@ -97,6 +97,9 @@ def reset(dicts):
         logger.error("Error: fail to reset %s node device" % device_name)
         test_result = False
         return 1
+    finally:
+        conn.close()
+        logger.info("closed hypervisor connection")
 
     if test_result:
         return 0

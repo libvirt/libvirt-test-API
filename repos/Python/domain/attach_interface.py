@@ -104,6 +104,9 @@ def attach_interface(params):
         logger.error("attach a interface to guest %s" % guestname)
         test_result = False
         return 1
+    finally:
+        conn.close()
+        logger.info("closed hypervisor connection") 
 
     if test_result:
         return 0

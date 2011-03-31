@@ -31,6 +31,11 @@ from lib.Python import networkAPI
 from utils.Python import utils
 from exception import LibvirtAPI
 
+def return_close(conn, logger, ret):
+    conn.close()
+    logger.info("closed hypervisor connection")
+    return ret
+
 def check_params(params):
     """Verify inputing parameter dictionary"""
 
@@ -75,7 +80,7 @@ def start(params):
     if networkname not in net_defined_list:
         logger.error("virtual network %s doesn't exist \
                       or is active already." % networkname)
-        return 1
+        return return_close(conn, logger, 1)
     else:
         netxmldesc = netobj.netxml_dump(networkname)
         logger.debug("the xml description of the virtual network is %s" % \
@@ -88,13 +93,13 @@ def start(params):
         logger.error("API error message: %s, error code is %s" % \
                       (e.response()['message'], e.response()['code']))
         logger.error("fail to destroy domain")
-        return 1
+        return return_close(conn, logger, 1)
 
     net_activated_list = netobj.network_list()
 
     if networkname not in net_activated_list:
         logger.error("virtual network %s failed to be activated." % networkname)
-        return 1
+        return return_close(conn, logger, 1)
     else:
         shell_cmd = "virsh net-list --all"
         (status, text) = commands.getstatusoutput(shell_cmd)
@@ -102,4 +107,5 @@ def start(params):
 
     logger.info("activate the virtual network successfully.")
     time.sleep(3)
-    return 0
+
+    return return_close(conn, logger, 0)

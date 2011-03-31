@@ -81,6 +81,8 @@ def netuuid(params):
 
     if not check_network_exists(netobj, networkname, logger):
         logger.error("need a defined network, may or may not be active")
+        conn.close()
+        logger.info("closed hypervisor connection")
         return 1
 
     try:
@@ -97,3 +99,8 @@ def netuuid(params):
         logger.error("API error message: %s, error code is %s" % \
                      (e.response()['message'], e.response()['code']))
         return 1
+    finally:
+        conn.close()
+        logger.info("closed hypervisor connection")
+
+    return 0

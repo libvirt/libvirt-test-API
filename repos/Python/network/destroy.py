@@ -78,6 +78,8 @@ def destroy(params):
 
     if not check_network_status(networkname, netobj, logger):
         logger.error("the %s network is inactive" % networkname)
+        conn.close()
+        logger.info("closed hypervisor connection")
         return 1
 
     net_num1 = netobj.get_number()
@@ -101,6 +103,9 @@ def destroy(params):
         logger.error("fail to destroy %s network" % networkname)
         test_result = False
         return 1
+    finally:
+        conn.close()
+        logger.info("closed hypervisor connection")
 
     time.sleep(3)
     if test_result:

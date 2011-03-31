@@ -30,9 +30,10 @@ from lib.Python import connectAPI
 from lib.Python import domainAPI
 from utils.Python import utils
 
-def return_fail(logger):
-    logger.error("FAIL")
-    return 1
+def return_close(conn, logger, ret):
+    conn.close()
+    logger.info("closed hypervisor connection")
+    return ret
 
 def check_params(params):
     """Verify the input parameter"""
@@ -73,7 +74,8 @@ def shutdown(params):
     # Connect to local hypervisor connection URI
     util = utils.Utils()
     uri = util.get_uri('127.0.0.1')
-    virconn = connectAPI.ConnectAPI().open(uri)
+    conn = connectAPI.ConnectAPI()
+    virconn = conn.open(uri)
 
     # Get domain ip
     dom_obj = domainAPI.DomainAPI(virconn)
@@ -89,7 +91,8 @@ def shutdown(params):
         dom_obj.shutdown(domname)
     except Exception, e:
         logger.error(str(e))
-        return return_fail(logger)
+        logger.error("shutdown failed")
+        return return_close(conn, logger, 1)
 
     # Check domain status by ping ip
     while timeout:
@@ -103,14 +106,13 @@ def shutdown(params):
 
     if timeout <= 0:
         logger.error('The domain state is not equal to "shutoff"')
-        return return_fail(logger)
+        return return_close(conn, logger, 1)
 
     logger.info('ping guest')
     if util.do_ping(ip, 300):
         logger.error('The guest is still active, IP: ' + str(ip))
-        return return_fail(logger)
+        return return_close(conn, logger, 1)
     else:
         logger.info("domain %s shutdown successfully" % domname)
 
-    is_fail = False
-    return is_fail
+    return return_close(conn, logger, 0)

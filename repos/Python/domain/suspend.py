@@ -34,9 +34,10 @@ __all__ = ['suspend',
           'version',
           'append_path']
 
-def return_fail(logger):
-    logger.error("FAIL")
-    return 1
+def return_close(conn, logger, ret):
+    conn.close()
+    logger.info("closed hypervisor connection")
+    return ret
 
 def check_params(params):
     """Verify the input parameter"""
@@ -76,7 +77,8 @@ def suspend(params):
     # Connect to local hypervisor connection URI
     util = utils.Utils()
     uri = util.get_uri('127.0.0.1')
-    virconn = connectAPI.ConnectAPI().open(uri)
+    conn = connectAPI.ConnectAPI()
+    virconn = conn.open(uri)
 
     # Suspend domain
     domobj = domainAPI.DomainAPI(virconn)
@@ -85,13 +87,14 @@ def suspend(params):
         domobj.suspend(domname)
     except Exception, e:
         logger.error(str(e))
-        return return_fail(logger)
+        logger.error("suspend failed")
+        return return_close(conn, logger, 1)
     time.sleep(1)
     state = domobj.get_state(domname)
 
     if state != "paused":
         logger.error('The domain state is not equal to "paused"')
-        return return_fail(logger)
+        return return_close(conn, logger, 1)
 
     mac = util.get_dom_mac_addr(domname)
 
@@ -104,8 +107,7 @@ def suspend(params):
     logger.info('ping guest')
     if util.do_ping(ip, 20):
         logger.error('The guest is still active, IP: ' + str(ip))
-        return return_fail(logger)
+        return return_close(conn, logger, 1)
 
-    is_fail = False
     logger.info('PASS')
-    return is_fail
+    return return_close(conn, logger, 0)

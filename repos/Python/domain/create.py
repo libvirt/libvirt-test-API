@@ -104,6 +104,9 @@ def create(params):
                       (e.response()['message'], e.response()['code']))
         logger.error("fail to create domain %s" % guestname)
         return 1
+    finally:
+        conn.close()
+        logger.info("closed hypervisor connection")
 
     logger.info("get the mac address of vm %s" % guestname)
     mac = util.get_dom_mac_addr(guestname)

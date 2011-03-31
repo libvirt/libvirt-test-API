@@ -69,6 +69,11 @@ def usage():
                            type: define|create
           '''
 
+def return_close(conn, logger, ret):
+    conn.close()
+    logger.info("closed hypervisor connection")
+    return ret
+
 def check_params(params):
     """Checking the arguments required"""
     params_given = copy.deepcopy(params)
@@ -356,7 +361,8 @@ def install_windows_cdrom(params):
     logger.debug('dump installation guest xml:\n%s' % guestxml)
 
     # Generate guest xml
-    virconn = connectAPI.ConnectAPI().open(uri)
+    conn = connectAPI.ConnectAPI()
+    virconn = conn.open(uri)
     domobj = domainAPI.DomainAPI(virconn)
     installtype = params.get('type')
     if installtype == None or installtype == 'define':
@@ -367,7 +373,7 @@ def install_windows_cdrom(params):
             logger.error("API error message: %s, error code is %s" %
                          (e.response()['message'], e.response()['code']))
             logger.error("fail to define domain %s" % guestname)
-            return 1
+            return return_close(conn, logger, 1)
 
         logger.info('start installation guest ...')
 
@@ -377,7 +383,7 @@ def install_windows_cdrom(params):
             logger.error("API error message: %s, error code is %s" %
                          (e.response()['message'], e.response()['code']))
             logger.error("fail to start domain %s" % guestname)
-            return 1
+            return return_close(conn, logger, 1)
     elif installtype == 'create':
         logger.info('create guest from xml description')
         try:
@@ -386,7 +392,7 @@ def install_windows_cdrom(params):
             logger.error("API error message: %s, error code is %s" %
                          (e.response()['message'], e.response()['code']))
             logger.error("fail to define domain %s" % guestname)
-            return 1
+            return return_close(conn, logger, 1)
 
     interval = 0
     while(interval < 7200):
@@ -399,7 +405,7 @@ def install_windows_cdrom(params):
                 ret  = prepare_boot_guest(domobj, params, installtype)
                 if ret:
                     logger.info("booting guest vm off harddisk failed")
-                    return 1
+                    return return_close(conn, logger, 1)
                 break
             else:
                 interval += 20
@@ -412,7 +418,7 @@ def install_windows_cdrom(params):
                 ret = prepare_boot_guest(domobj, params, installtype)
                 if ret:
                     logger.info("booting guest vm off harddisk failed")
-                    return 1
+                    return return_close(conn, logger, 1)
                 break
             else:
                 interval += 20
@@ -420,7 +426,7 @@ def install_windows_cdrom(params):
 
     if interval == 7200:
         logger.info("guest installation timeout 7200s")
-        return 1
+        return return_close(conn, logger, 1)
     else:
         logger.info("guest is booting up")
 
@@ -446,8 +452,9 @@ def install_windows_cdrom(params):
 
     if timeout == 0:
         logger.info("fail to power on vm %s" % guestname)
-        return 1
+        return return_close(conn, logger, 1)
 
     time.sleep(60)
 
-    return 0
+    return return_close(conn, logger, 0)
+

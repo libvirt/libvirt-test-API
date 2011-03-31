@@ -102,6 +102,8 @@ def internal_create(params):
     logger.info("checking domain and the format of its disk")
     if not check_domain_image(domobj, util, guestname, logger):
         logger.error("checking failed")
+        conn.close()
+        logger.info("closed hypervisor connection")
         return 1
     
     xmlobj = xmlbuilder.XmlBuilder()
@@ -116,6 +118,9 @@ def internal_create(params):
         logger.error("API error message: %s, error code is %s" % \
 (e.response()['message'], e.response()['code']))
         return 1
+    finally:
+        conn.close()
+        logger.info("closed hypervisor connection")
 
     return 0
 

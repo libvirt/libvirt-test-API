@@ -129,6 +129,8 @@ def build_disk_pool(params):
 
     logger.info("checking the state of given storage pool")
     if not check_pool_inactive(stgobj, poolname):
+        conn.close()
+        logger.info("closed hypervisor connection")
         return 1
 
     logger.info("checking storage pool state succeeded")
@@ -153,3 +155,8 @@ def build_disk_pool(params):
         logger.error("API error message: %s, error code is %s" \
                      % (e.response()['message'], e.response()['code']))
         return 1
+    finally:
+        conn.close()
+        logger.info("closed hypervisor connection")
+
+    return 0

@@ -99,6 +99,7 @@ def attach_disk(params):
         del params['imagesize']
     else:
         logger.error("fail to create a image file")
+        conn.close()
         return 1
 
     # Generate disk xml
@@ -134,6 +135,9 @@ def attach_disk(params):
         logger.error("attach %s disk to guest %s" % (imagename, guestname))
         test_result = False
         return 1
+    finally:
+        conn.close()
+        logger.info("closed hypervisor connection")
 
     if test_result:
         return 0

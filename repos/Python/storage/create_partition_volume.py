@@ -43,6 +43,11 @@ def usage():
               capacity: the size of the volume with optional k,M,G,T suffix, \
                         for example '10G' """
 
+def return_close(conn, logger, ret):
+    conn.close()
+    logger.info("closed hypervisor connection")
+    return ret
+
 def check_params(params):
     """Verify inputing parameter dictionary"""
 
@@ -125,7 +130,7 @@ def create_partition_volume(params):
 
     if poolname not in storage_pool_list:
         logger.error("pool %s doesn't exist or not running")
-        return 1
+        return return_close(conn, logger, 1)
 
     params['suffix'] = capacity[-1]
     params['capacity'] = capacity[:-1]
@@ -148,8 +153,8 @@ def create_partition_volume(params):
         stgobj.create_volume(poolname, volumexml)
     except LibvirtAPI, e:
         logger.error("API error message: %s, error code is %s" \
-                     % (e.response()['message'], e.response()['code']))
-        return 1
+                   % (e.response()['message'], e.response()['code']))
+        return return_close(conn, logger, 1)
 
     logger.info("volume create successfully, and output the volume information")
     virsh_vol_list(poolname)
@@ -159,7 +164,32 @@ def create_partition_volume(params):
 
     if not check_res:
         logger.info("checking succeed")
-        return 0
+        return return_close(conn, logger, 0)
     else:
         logger.error("checking failed")
-        return 1
+        return return_close(conn, logger, 1)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+>>>>>>> d2b1826... modify all of existing testcases to close the opened hypervisor connection

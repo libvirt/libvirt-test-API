@@ -80,6 +80,9 @@ def undefine(params):
     except:
         logger.error("fail to undefine the domain")
         test_result = False
+    finally:
+        conn.close()
+        logger.info("closed hypervisor connection")
 
     if test_result:
         return 0

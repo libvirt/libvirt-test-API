@@ -69,7 +69,7 @@ class ConnectAPI(object):
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
              
-    def close(self, name):
+    def close(self):
         try:
             self.conn.close()
         except libvirt.libvirtError, e:

@@ -149,6 +149,8 @@ def create_dir_volume(params):
 
     if poolname not in storage_pool_list:
         logger.error("pool %s doesn't exist or not running")
+        conn.close()
+        logger.info("closed hypervisor connection")
         return 1
 
     path_value = get_pool_path(stgobj, poolname)
@@ -178,6 +180,9 @@ def create_dir_volume(params):
         logger.error("API error message: %s, error code is %s" \
                      % (e.response()['message'], e.response()['code']))
         return 1
+    finally:
+        conn.close()
+        logger.info("closed hypervisor connection")
 
     logger.info("volume create successfully, and output the volume information")
     virsh_vol_list(poolname)

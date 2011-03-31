@@ -64,7 +64,9 @@ def reboot(params):
     if hypervisor == "kvm":
         logger.info("kvm hypervisor doesn't support the funtion now")
         return 0
-    virconn = connectAPI.ConnectAPI().open(uri)
+
+    conn = connectAPI.ConnectAPI()
+    virconn = conn.open(uri)
 
     # Get domain ip
     dom_obj = domainAPI.DomainAPI(virconn)
@@ -85,6 +87,10 @@ def reboot(params):
                      (e.response()['message'], e.response()['code']))
         logger.error("fail to reboot domain")
         return 1
+    finally:
+        conn.close()
+        logger.info("closed hypervisor connection")
+
     logger.info("the vm %s is power off" % domain_name)
 
     # Check domain status by ping ip

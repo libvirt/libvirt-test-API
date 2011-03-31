@@ -33,9 +33,10 @@ from lib.Python import connectAPI
 from lib.Python import domainAPI
 from utils.Python import utils
 
-def return_fail(logger):
-    logger.error("FAIL")
-    return 1
+def return_close(conn, logger, ret):
+    conn.close()
+    logger.info("closed hypervisor connection")
+    return ret
 
 def check_params(params):
     """Verify the input parameter"""
@@ -78,21 +79,23 @@ def resume(params):
     uri = util.get_uri('127.0.0.1')
 
     # Resume domain
-    virconn = connectAPI.ConnectAPI().open(uri)
+    conn = connectAPI.ConnectAPI()
+    virconn = conn.open(uri)
     domobj = domainAPI.DomainAPI(virconn)
     logger.info('resume domain')
     try:
         domobj.resume(domname)
     except Exception, e:
         logger.error(str(e))
-        return return_fail(logger)
+        logger.error("resume failed")
+        return return_close(conn, logger, 1)
 
     state = domobj.get_state(domname)
     expect_states = ['running', 'no state', 'blocked']
 
     if state not in expect_states:
         logger.error('The domain state is not equal to "paused"')
-        return return_fail(logger)
+        return return_close(conn, logger, 1)
 
     mac = util.get_dom_mac_addr(domname)
     logger.info("get ip by mac address")
@@ -101,9 +104,8 @@ def resume(params):
     logger.info('ping guest')
     if not util.do_ping(ip, 300):
         logger.error('Failed on ping guest, IP: ' + str(ip))
-        return return_fail(logger)
+        return return_close(conn, logger, 1)
 
-    is_fail = False
     logger.info("PASS")
-    return is_fail
+    return return_close(conn, logger, 0)
 

@@ -125,6 +125,8 @@ def delete_logical_volume(params):
 
     stgobj = storageAPI.StorageAPI(virconn)
     if not check_pool_active(stgobj, poolname):
+        conn.close()
+        logger.info("closed hypervisor connection")
         return 1
 
     volkey = stgobj.get_volume_key(poolname, volname)
@@ -150,3 +152,8 @@ def delete_logical_volume(params):
         logger.error("API error message: %s, error code is %s" \
                      % (e.response()['message'], e.response()['code']))
         return 1
+    finally:
+        conn.close()
+        logger.info("closed hypervisor connection")
+
+    return 0

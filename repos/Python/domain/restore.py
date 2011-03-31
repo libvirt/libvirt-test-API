@@ -32,6 +32,11 @@ from lib.Python import domainAPI
 from utils.Python import utils
 from exception import LibvirtAPI
 
+def return_close(conn, logger, ret):
+    conn.close()
+    logger.info("closed hypervisor connection")
+    return ret
+
 def usage(params):
     """Verify inputing parameter dictionary"""
     logger = params['logger']
@@ -112,7 +117,7 @@ def restore(params):
     if check_guest_status(guestname, domobj, logger):
         logger.error("Error: current guest status is not shutoff or shutdown,\
                       can not do restore operation")
-        return 1
+        return return_close(conn, logger, 1)
 
     try:
         domobj.restore(guestname, filepath)
@@ -129,6 +134,6 @@ def restore(params):
         test_result = False
 
     if test_result:
-        return 0
+        return return_close(conn, logger, 0)
     else:
-        return 1
+        return return_close(conn, logger, 1)

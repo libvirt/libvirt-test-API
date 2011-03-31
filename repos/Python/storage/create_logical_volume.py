@@ -145,6 +145,8 @@ def create_logical_volume(params):
 
     # active pool can create volume
     if not check_pool_active(stgobj, poolname):
+        conn.close()
+        logger.info("closed hypervisor connection")
         return 1
 
     poolpath = get_pool_path(stgobj, poolname)
@@ -177,3 +179,8 @@ def create_logical_volume(params):
         logger.error("API error message: %s, error code is %s" \
                      % (e.response()['message'], e.response()['code']))
         return 1
+    finally:
+        conn.close()
+        logger.info("closed hypervisor connection")
+ 
+    return 0

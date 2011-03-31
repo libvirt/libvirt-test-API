@@ -34,6 +34,11 @@ from exception import LibvirtAPI
 FLAG_FILE = "snapshot_flag"
 MAKE_FLAG = "rm -f /tmp/%s; touch /tmp/%s " % (FLAG_FILE, FLAG_FILE)
 
+def return_close(conn, logger, ret):
+    conn.close()
+    logger.info("closed hypervisor connection")
+    return ret
+
 def check_params(params):
     """Verify the input parameter"""
     logger = params['logger']
@@ -92,7 +97,7 @@ def file_flag(params):
 
     if not check_domain_running(domobj, guestname, logger):
         logger.error("need a running guest")
-        return 1
+        return return_close(conn, logger, 1)
 
     logger.info("get the mac address of vm %s" % guestname)
     mac = util.get_dom_mac_addr(guestname)
@@ -111,15 +116,15 @@ def file_flag(params):
 
     if timeout == 0:
         logger.info("vm %s failed to get ip address" % guestname)
-        return 1
+        return return_close(conn, logger, 1)
 
     if not make_flag(chk, ipaddr, username, password, logger):
         logger.error("making flag in guest %s failed" % guestname)
-        return 1
+        return return_close(conn, logger, 1)
     else:
         logger.info("making flag in guest %s succeeded" % guestname)
        
-    return 0 
+    return return_close(conn, logger, 0)
     
         
 

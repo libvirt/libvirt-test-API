@@ -51,6 +51,11 @@ from utils.Python import env_parser
 from utils.Python import xmlbuilder
 from exception import LibvirtAPI
 
+def return_close(conn, logger, ret):
+    conn.close()
+    logger.info("closed hypervisor connection")
+    return ret
+
 def usage():
     print '''usage: mandatory arguments:guesttype
                            guestname
@@ -315,7 +320,8 @@ def install_linux_net(params):
     logger.debug('dump installation guest xml:\n%s' % guestxml)
 
     #start installation
-    virconn = connectAPI.ConnectAPI().open(uri)
+    conn = connectAPI.ConnectAPI()
+    virconn = conn.open(uri)
     domobj = domainAPI.DomainAPI(virconn)
     installtype = params.get('type')
     if installtype == None or installtype == 'define':
@@ -326,7 +332,7 @@ def install_linux_net(params):
             logger.error("API error message: %s, error code is %s" %
                          (e.response()['message'], e.response()['code']))
             logger.error("fail to define domain %s" % guestname)
-            return 1
+            return return_close(conn, logger, 1)
 
         logger.info('start installation guest ...')
 
@@ -336,7 +342,7 @@ def install_linux_net(params):
             logger.error("API error message: %s, error code is %s" %
                          (e.response()['message'], e.response()['code']))
             logger.error("fail to start domain %s" % guestname)
-            return 1
+            return return_close(conn, logger, 1)
     elif installtype == 'create':
         logger.info('create guest from xml description')
         try:
@@ -345,7 +351,7 @@ def install_linux_net(params):
             logger.error("API error message: %s, error code is %s" %
                          (e.response()['message'], e.response()['code']))
             logger.error("fail to define domain %s" % guestname)
-            return 1
+            return return_close(conn, logger, 1)
 
     if 'rhel3u9' in guestos:
         interval = 0
@@ -360,7 +366,7 @@ def install_linux_net(params):
 
         if ret:
             logger.info("booting guest vm off harddisk failed")
-            return 1
+            return return_close(conn, logger, 1)
         else:
             logger.info("geust is booting up")
     else:
@@ -376,7 +382,7 @@ def install_linux_net(params):
                                               installtype)
                     if ret:
                         logger.info("booting guest vm off harddisk failed")
-                        return 1
+                        return return_close(conn, logger, 1)
                     break
                 else:
                     interval += 10
@@ -391,7 +397,7 @@ def install_linux_net(params):
                                              installtype)
                     if ret:
                         logger.info("booting guest vm off harddisk failed")
-                        return 1
+                        return return_close(conn, logger, 1)
                     break
                 else:
                     interval += 10
@@ -399,7 +405,7 @@ def install_linux_net(params):
 
         if interval == 3600:
             logger.info("guest installation timeout 3600s")
-            return 1
+            return return_close(conn, logger, 1)
         else:
             logger.info("guest is booting up")
 
@@ -423,6 +429,6 @@ def install_linux_net(params):
 
         if timeout == 0:
             logger.info("fail to power on vm %s" % guestname)
-            return 1
+            return return_close(conn, logger, 1)
 
-    return 0
+    return return_close(conn, logger, 0)

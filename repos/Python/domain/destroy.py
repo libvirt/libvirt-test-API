@@ -66,13 +66,16 @@ def destroy(params):
     # Connect to local hypervisor connection URI
     util = utils.Utils()
     uri = util.get_uri('127.0.0.1')
-    virconn = connectAPI.ConnectAPI().open(uri)
+    conn = connectAPI.ConnectAPI()
+    virconn = conn.open(uri)
 
     # Get running domain by name
     dom_obj = domainAPI.DomainAPI(virconn)
     dom_name_list = dom_obj.get_list()
     if guestname not in dom_name_list:
         logger.error("guest %s doesn't exist or not be running." % guestname)
+        conn.close()
+        logger.info("closed hypervisor connection")
         return 1
     timeout = 60
     logger.info('destroy domain')
@@ -91,6 +94,9 @@ def destroy(params):
                      (e.response()['message'], e.response()['code']))
         logger.error("fail to destroy domain")
         return 1
+    finally:
+        conn.close()
+        logger.info("closed hypervisor connection")
 
     # Check domain status by ping ip
     while timeout:

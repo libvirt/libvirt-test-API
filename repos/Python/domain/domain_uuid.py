@@ -80,6 +80,8 @@ def domuuid(params):
 
     if not check_domain_exists(domobj, guestname, logger):
         logger.error("need a defined guest, may or may not be active")
+        conn.close()
+        logger.info("closed hypervisor connection")
         return 1
 
     try:
@@ -96,3 +98,6 @@ def domuuid(params):
         logger.error("API error message: %s, error code is %s" % \
                      (e.response()['message'], e.response()['code']))
         return 1
+    finally:
+        conn.close()
+        logger.info("closed hypervisor connection")

@@ -77,6 +77,8 @@ def undefine(params):
 
     if check_network_undefine(networkname):
         logger.error("the network %s is undefine" % networkname)
+        conn.close()
+        logger.info("closed hypervisor connection")
         return 1
 
     net_num1 = netobj.get_define_number()
@@ -99,6 +101,9 @@ def undefine(params):
         logger.error("fail to undefine a network")
         test_result = False
         return 1
+    finally:
+        conn.close()
+        logger.info("closed hypervisor connection")
 
     time.sleep(3)
     if test_result:

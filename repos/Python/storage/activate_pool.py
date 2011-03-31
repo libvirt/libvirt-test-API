@@ -97,6 +97,8 @@ def activate_pool(params):
 
     if not check_pool_inactive(stgobj, poolname, logger):
         logger.error("%s storage pool isn't defined or inactive" % poolname)
+        conn.close()
+        logger.info("closed hypervisor connection")
         return 1
     try:
         stgobj.active_pool(poolname)
@@ -111,3 +113,8 @@ def activate_pool(params):
         logger.error("API error message: %s, error code is %s" \
                      % (e.response()['message'], e.response()['code']))
         return 1
+    finally:
+        conn.close()
+        logger.info("closed hypervisor connection")
+
+    return 0

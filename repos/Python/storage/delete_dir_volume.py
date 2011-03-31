@@ -107,6 +107,8 @@ def delete_dir_volume(params):
 
     if not check_pool_active(stgobj, poolname):
         logger.error("can't delete volume from inactive %s pool" % poolname)
+        conn.close()
+        logger.info("closed hypervisor connection")
         return 1
 
     volkey = stgobj.get_volume_key(poolname, volname)
@@ -130,3 +132,8 @@ def delete_dir_volume(params):
         logger.error("API error message: %s, error code is %s" \
                      % (e.response()['message'], e.response()['code']))
         return 1
+    finally:
+        conn.close()
+        logger.info("closed hypervisor connection")
+   
+    return 0

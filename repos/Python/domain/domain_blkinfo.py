@@ -35,6 +35,10 @@ GET_CAPACITY = "du -b %s | awk '{print $1}'"
 GET_PHYSICAL_K = " du -B K %s | awk '{print $1}'"
 VIRSH_DOMBLKINFO = "virsh domblkinfo %s %s"
 
+def return_close(conn, logger, ret):
+    conn.close()
+    logger.info("closed hypervisor connection")
+    return ret
 
 def check_params(params):
     """Verify inputing parameter dictionary"""
@@ -128,26 +132,25 @@ def domblkinfo(params):
 
     if not check_domain_exists(domobj, guestname, logger):
         logger.error("need a defined guest, may or may not be active")
-        return 1
+        return return_close(conn, logger, 1)
 
     logger.info("the output of virsh domblkinfo is:")
     status, output = get_output(VIRSH_DOMBLKINFO % (guestname, blockdev), logger)
     if not status:
         logger.info("\n" + output)
     else:
-        return 1
+        return return_close(conn, logger, 1)
 
     status, data_str = get_output(GET_DOMBLKINFO_MAC % (guestname, blockdev), logger)
     if not status:
         blkdata = data_str.rstrip().split('\n')
         logger.info("capacity,allocation,physical list: %s" % blkdata)
     else:
-        return 1
+        return return_close(conn, logger, 1)
 
     if check_block_data(blockdev, blkdata, logger):
         logger.error("checking domblkinfo data FAILED")
-        return 1
+        return return_close(conn, logger, 1)
     else:
         logger.info("checking domblkinfo data SUCCEEDED")
-
-    return 0
+    return return_close(conn, logger, 0)

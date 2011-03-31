@@ -35,6 +35,11 @@ from utils.Python import utils
 from utils.Python import check
 from exception import LibvirtAPI
 
+def return_close(conn, logger, ret):
+    conn.close()
+    logger.info("closed hypervisor connection")
+    return ret
+
 def usage(dicts):
     """Verify inputing parameter dictsionary"""
     logger = dicts['logger']
@@ -174,7 +179,7 @@ def core_dump(dicts):
         if kernel == None:
             logger.error("can't get guest kernel version")
             test_result = False
-            return 1
+            return return_close(conn, logger, 1)
 
         logger.info("dump the core of %s to file %s\n" %(guestname, file))
 
@@ -188,16 +193,17 @@ def core_dump(dicts):
             else:
                 test_result = False
                 logger.error("check core dump: %d\n" %retval)
-                return 1
+                return return_close(conn, logger, 1)
 
         except LibvirtAPI, e:
             logger.error("API error message: %s, error code is %s" % \
                          (e.response()['message'], e.response()['code']))
             logger.error("Error: fail to core dump %s domain" %guestname)
             test_result = False
-            return 1
+            return return_close(conn, logger, 1)
 
     if test_result:
-        return 0
+        return return_close(conn, logger, 0)
     else:
-        return 1
+        return return_close(conn, logger, 1)
+

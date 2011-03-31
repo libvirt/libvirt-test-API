@@ -114,9 +114,14 @@ def save(params):
 
     if not check_guest_status(guestname, domobj, logger):
         logger.error("Error: current guest status is shutoff")
+        conn.close()
+        logger.info("closed hypervisor connection")
         return 1
+
     if not ipaddr:
         logger.error("Error: can't get guest ip address")
+        conn.close()
+        logger.info("closed hypervisor connection")
         return 1
     try:
         domobj.save(guestname, filepath)
@@ -133,6 +138,9 @@ def save(params):
         logger.error("Error: fail to save %s domain" %guestname)
         test_result = False
         return 1
+    finally:
+        conn.close()
+        logger.info("closed hypervisor connection")
 
     if test_result:
         return 0

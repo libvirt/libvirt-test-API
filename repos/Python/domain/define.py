@@ -125,6 +125,9 @@ def define(params):
     except:
         logger.error("fail to define a domain from xml")
         test_result = False
+    finally:
+        conn.close()
+        logger.info("closed hypervisor connection")
 
     if test_result:
         return 0

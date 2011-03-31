@@ -119,9 +119,11 @@ def installation_linux_check(params):
     logger.info("the type of hypervisor is %s" % hypervisor)
     logger.debug("the uri to connect is %s" % uri)
 
-    virconn = connectAPI.ConnectAPI().open(uri)
+    conn = connectAPI.ConnectAPI()
+    virconn = conn.open(uri)
     domobj = domainAPI.DomainAPI(virconn)
     state = domobj.get_state(guestname)
+    conn.close()
 
     if(state == "shutoff"):
         logger.info("guest is shutoff, if u want to run this case, \

@@ -35,6 +35,10 @@ VIRSH_NETLIST = "virsh net-list %s"
 GET_BRIDGE_IP = "/sbin/ifconfig %s | grep 'inet addr:' | cut -d: -f2 | awk '{print $1}'"
 CONFIG_DIR = "/etc/libvirt/qemu/networks/"
 
+def return_close(conn, logger, ret):
+    conn.close()
+    logger.info("closed hypervisor connection")
+    return ret
 
 def get_option_list(params):
     """return options we need to test
@@ -186,7 +190,7 @@ def network_list(params):
                 execute_virsh_netlist(option, logger)
             else:
                 logger.error("virsh net-list checking failed")
-                return 1
+                return return_close(conn, logger, 1)
         elif option == '--inactive':
             logger.info("check the output of virsh net-list --inactive")
             if not check_inactive_option(netobj, util, logger):
@@ -194,7 +198,7 @@ def network_list(params):
                 execute_virsh_netlist(option, logger)
             else:
                 logger.error("virsh net-list --inactive checking failed")
-                return 1
+                return return_close(conn, logger, 1)
         elif option == '--all':
             logger.info("check the output of virsh net-list --all")
             if not check_all_option(netobj, util, logger):
@@ -202,6 +206,30 @@ def network_list(params):
                 execute_virsh_netlist(option, logger)
             else:
                 logger.error("virsh net-list --all checking failed")
-                return 1
+                return return_close(conn, logger, 1)
 
-    return 0
+    return return_close(conn, logger, 0)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+>>>>>>> d2b1826... modify all of existing testcases to close the opened hypervisor connection

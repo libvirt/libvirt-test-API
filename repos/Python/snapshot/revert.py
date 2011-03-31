@@ -76,6 +76,8 @@ def revert(params):
     logger.info("checking if the guest is poweroff")
     if not check_domain_state(domobj, guestname, logger):
         logger.error("checking failed")
+        conn.close()
+        logger.info("closed hypervisor connection")
         return 1
      
     try:
@@ -86,6 +88,9 @@ def revert(params):
         logger.error("API error message: %s, error code is %s" % \
 (e.response()['message'], e.response()['code']))
         return 1
+    finally:
+        conn.close()
+        logger.info("closed hypervisor connection")
 
     return 0
 

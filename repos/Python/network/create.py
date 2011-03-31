@@ -77,6 +77,8 @@ def create(params):
 
     if not check_network_status(networkname, netobj, logger):
         logger.error("the %s network is running" % networkname)
+        conn.close()
+        logger.info("closed hypervisor connection")
         return 1
 
     xmlobj = xmlbuilder.XmlBuilder()
@@ -103,6 +105,10 @@ def create(params):
         logger.error("create a network from xml: \n%s" % netxml)
         test_result = False
         return 1
+    finally:
+        conn.close()
+        logger.info("closed hypervisor connection")
+
     time.sleep(3)
     if test_result:
         return 0

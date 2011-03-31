@@ -34,6 +34,11 @@ from exception import LibvirtAPI
 FLAG_FILE = "/tmp/snapshot_flag"
 FLAG_CHECK = "ls %s" % FLAG_FILE
 
+def return_close(conn, logger, ret):
+    conn.close()
+    logger.info("closed hypervisor connection")
+    return ret
+
 def check_params(params):
     """Verify the input parameter"""
     logger = params['logger']
@@ -82,7 +87,7 @@ def flag_check(params):
 
     if not check_domain_running(domobj, guestname, logger):
         logger.error("need a running guest")
-        return 1
+        return return_close(conn, logger, 1)
 
     logger.info("get the mac address of vm %s" % guestname)
     mac = util.get_dom_mac_addr(guestname)
@@ -101,25 +106,25 @@ def flag_check(params):
 
     if timeout == 0:
         logger.info("vm %s failed to get ip address" % guestname)
-        return 1
+        return return_close(conn, logger, 1)
     
     ret = chk.remote_exec_pexpect(ipaddr, username, password, FLAG_CHECK)
     if ret == "TIMEOUT!!!":
         logger.error("connecting to guest OS timeout")
-        return 1
+        return return_close(conn, logger, 1)
     elif ret == FLAG_FILE and expected_result == "exist":
         logger.info("checking flag %s in guest OS succeeded" % FLAG_FILE)
-        return 0
+        return return_close(conn, logger, 0)
     elif ret == FLAG_FILE and expected_result == 'noexist':
         logger.error("flag %s still exist, FAILED." % FLAG_FILE)
-        return 1
+        return return_close(conn, logger, 1)
     elif ret != None and expected_result == "exist":
         logger.error("no flag %s exists in the guest %s " % (FLAG_FILE,guestname))
-        return 1
+        return return_close(conn, logger, 1)
     elif ret != None and expected_result == 'noexist':
         logger.info("flag %s is not present, checking succeeded" % FLAG_FILE)
-        return 0
+        return return_close(conn, logger, 0)
  
-    return 0
+    return return_close(conn, logger, 0)
 
 

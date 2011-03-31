@@ -39,6 +39,11 @@ def usage():
               poolname: The name of pool under which the volume to be created
               volname: Name of the volume to be created"""
 
+def return_close(conn, logger, ret):
+    conn.close()
+    logger.info("closed hypervisor connection")
+    return ret
+
 def check_params(params):
     """Verify inputing parameter dictionary"""
 
@@ -112,7 +117,7 @@ def delete_partition_volume(params):
 
     if poolname not in storage_pool_list:
         logger.error("pool %s doesn't exist or not running")
-        return 1
+        return return_close(conn, logger, 1)
 
     logger.info("before deleting a volume, \
                  current volume list in the pool %s is %s" % \
@@ -133,7 +138,7 @@ def delete_partition_volume(params):
     except LibvirtAPI, e:
         logger.error("API error message: %s, error code is %s" \
 % (e.response()['message'], e.response()['code']))
-        return 1
+        return return_close(conn, logger, 1)
 
     logger.info("delete volume successfully, and output the volume information")
     logger.info("after deleting a volume, \
@@ -147,7 +152,7 @@ def delete_partition_volume(params):
 
     if not check_res:
         logger.info("checking succeed")
-        return 0
+        return return_close(conn, logger, 0)
     else:
         logger.error("checking failed")
-        return 1
+        return return_close(conn, logger, 1)

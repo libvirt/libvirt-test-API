@@ -93,6 +93,9 @@ def interface_stats(params):
     else:
         logger.error("fail to get domain interface statistics\n")
         test_result = False
+   
+    conn.close()
+    logger.info("closed hypervisor connection")
 
     if test_result:
         return 0

@@ -85,6 +85,8 @@ def define(params):
 
     if check_network_define(networkname, logger):
         logger.error("%s network is defined" % networkname)
+        conn.close()
+        logger.info("closed hypervisor connection")
         return 1
 
     xmlobj = xmlbuilder.XmlBuilder()
@@ -111,6 +113,10 @@ def define(params):
         logger.error("define a network from xml: \n%s" % netxml)
         test_result = False
         return 1
+    finally:
+        conn.close()
+        logger.info("closed hypervisor connection")
+
     time.sleep(3)
     if test_result:
         return 0
