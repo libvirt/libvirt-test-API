@@ -29,6 +29,8 @@ import exception
 
 from utils.Python import env_parser
 
+import exception
+
 class CaseFileParser(object):
     """ Parser the case configuration file to generate a data list.
     """
@@ -50,11 +52,11 @@ class CaseFileParser(object):
     def parse_file(self, casefile):
         """ Open casefile for parsering. """
         if not os.path.exists(casefile):
-            raise Exception, "File %s not found" % casefile
+            raise exception.FileDoesNotExist("Config file: %s not found" % casefile)
         self.casefile = casefile
-        file = open(casefile, "r")
-        self.list = self.parse(file, self.list)
-        file.close()
+        fh = open(casefile, "r")
+        self.list = self.parse(fh, self.list)
+        fh.close()
         return self.list
 
     def get_list(self):
@@ -62,33 +64,62 @@ class CaseFileParser(object):
         """
         return self.list
 
-    def get_next_line(self, file):
+    def get_next_line(self, fh):
         """ Get the next non-empty, non-comment line in file.
             If no line is available, return None.
         """
+        comflag = 0
         while True:
-            line = file.readline()
-            if line == "": return None
+            line = fh.readline()
+            if line == "" and comflag == 1:
+                raise exception.CaseConfigfileError("comments delimiter error!")
+            elif line == "" and comflag == 0:
+                return None
+
             stripped_line = line.strip()
+            if len(stripped_line) > 0 and stripped_line.startswith('/*'): 
+                if comflag == 0:
+                    comflag += 1
+                    continue
+                else:
+                    raise exception.CaseConfigfileError("comments delimiter mismatch!")
+            if len(stripped_line) > 0 and not stripped_line.endswith('*/'): 
+                if comflag == 1:
+                    if stripped_line.startswith('*/'):
+                        exception.CaseConfigfileError("comments delimiter mismatch!")
+                    else:
+                        continue 
+                elif stripped_line.startswith('*/'):
+                    raise exception.CaseConfigfileError("comments delimiter error!")
+                else:
+                    pass
+            elif len(stripped_line) > 0 and stripped_line.endswith('*/'):
+                if comflag == 1:
+                    comflag -= 1
+                    line = fh.readline()
+                    stripped_line = line.strip()
+                else:
+                    raise exception.CaseConfigfileError("comments delimiter mismatch!")
+
             if len(stripped_line) > 0 \
                     and not stripped_line.startswith('#') \
                     and not stripped_line.startswith('//'):
                 return line
 
-    def get_next_line_indent(self, file):
+    def get_next_line_indent(self, fh):
         """ Return the indent level of the next non-empty,
             non-comment line in file.If no line is available, return -1.
         """
-        pos = file.tell()
-        line = self.get_next_line(file)
+        pos = fh.tell()
+        line = self.get_next_line(fh)
         if not line:
-            file.seek(pos)
+            fh.seek(pos)
             return -1
         line = line.expandtabs()
         indent = 0
         while line[indent] == ' ':
             indent += 1
-        file.seek(pos)
+        fh.seek(pos)
         return indent
 
     def add_option_value(self, caselist, casename, option, value):
@@ -136,16 +167,16 @@ class CaseFileParser(object):
                 res.append(val)
         return res
 
-    def option_parse(self, file, list, casename):
+    def option_parse(self, fh, list, casename):
         """ For options of a case parsing. """
         new_list = []
 
-        indent = self.get_next_line_indent(file)
+        indent = self.get_next_line_indent(fh)
         if indent != 4:
             print "wrong format"
             sys.exit(1)
         else:
-            optionname = self.get_next_line(file)
+            optionname = self.get_next_line(fh)
             if optionname:
                 tripped_optionname = optionname.strip()
 
@@ -155,7 +186,7 @@ class CaseFileParser(object):
             while True:
                 temp_list = []
 
-                indent = self.get_next_line_indent(file)
+                indent = self.get_next_line_indent(fh)
                 if indent == -1:
                     break
 
@@ -164,13 +195,13 @@ class CaseFileParser(object):
                     temp_list.append(new_dict)
 
                 if indent == 4:
-                    new_list = self.option_parse(file, new_list, casename)
+                    new_list = self.option_parse(fh, new_list, casename)
                     return new_list
                 elif indent == 0:
-                    new_list = self.parse(file, new_list)
+                    new_list = self.parse(fh, new_list)
                     return new_list
                 else:
-                    valuestring = self.get_next_line(file)
+                    valuestring = self.get_next_line(fh)
 
                     tripped_valuelist = valuestring.strip().split()
                     tripped_valuename = tripped_valuelist[0]
@@ -267,21 +298,21 @@ class CaseFileParser(object):
 
         return new_list
 
-    def parse(self, file, list):
-        """ For the testcase name parsering. """
+    def parse(self, fh, list):
+        """ For the testcase name parsing. """
         while True:
             if self.debug:
                 self.debug_print("the list is",  list)
 
-            indent = self.get_next_line_indent(file)
+            indent = self.get_next_line_indent(fh)
             if indent < 0:
                 break
             elif indent > 0 and indent == 4:
                 if self.debug:
                     self.debug_print("we begin to parse the option line")
-                list = self.option_parse(file, list, tripped_casename)
+                list = self.option_parse(fh, list, tripped_casename)
             else:
-                casestring = self.get_next_line(file)
+                casestring = self.get_next_line(fh)
 
                 tripped_caselist = casestring.strip().split()
                 tripped_casename = tripped_caselist[0]
@@ -327,9 +358,11 @@ class CaseFileParser(object):
         return list
 
 if __name__ == "__main__":
+
     if len(sys.argv) >= 2:
         casefile = sys.argv[1]
     else:
+        print "No config file is given, use the default case.conf\n"
         casefile = os.path.join(os.path.dirname(sys.argv[0]), "case.conf")
     try:
         list = CaseFileParser(casefile, debug=True).get_list()
@@ -337,6 +370,5 @@ if __name__ == "__main__":
         print list
     except Exception, e:
         print e
-
 
 
