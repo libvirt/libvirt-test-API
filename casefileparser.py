@@ -181,7 +181,7 @@ class CaseFileParser(object):
                 tripped_optionname = optionname.strip()
 
             if self.debug:
-                self.debug_print("the option name is %s" % tripped_optionname)
+                self.debug_print("the option name is", tripped_optionname)
 
             while True:
                 temp_list = []
@@ -211,16 +211,16 @@ class CaseFileParser(object):
 
                     if self.debug:
                         self.debug_print(
-                            "the option_value we are parsing is %s" %
+                            "the option_value we are parsing is", 
                              tripped_valuename)
-                        self.debug_print("the temp_list is %s" % temp_list)
+                        self.debug_print("the temp_list is", temp_list)
 
                     filterter_list = []
 
                     for caselist in temp_list:
                         if self.debug:
                             self.debug_print(
-                                "before parsing, the caselist is %s" %
+                                "before parsing, the caselist is",
                                 caselist)
 
                         if len(tripped_valuelist) > 1:
@@ -228,7 +228,7 @@ class CaseFileParser(object):
                                 len(tripped_valuelist) == 3:
                                 if self.debug:
                                     self.debug_print(
-                                    "the value with a keywords which is %s" %
+                                    "the value with a keywords which is",
                                     tripped_valuelist[1])
 
                                 filterters = tripped_valuelist[2].split("|")
@@ -236,7 +236,7 @@ class CaseFileParser(object):
                                     if self.debug:
                                         self.debug_print(
                                         "the filterter we will filt the \
-                                        temp_list is %s" % filterter)
+                                        temp_list is", filterter)
 
                                     if re.findall(filterter, str(caselist)):
                                         self.add_option_value(
@@ -252,7 +252,7 @@ class CaseFileParser(object):
                                 if self.debug:
                                     self.debug_print(
                                         "the value with a keywords \
-                                         which is %s" % tripped_valuelist[1])
+                                         which is", tripped_valuelist[1])
 
                                 if re.findall(tripped_valuename, str(caselist)):
                                     f = lambda s: s.has_key(casename) == False
@@ -284,14 +284,14 @@ class CaseFileParser(object):
 
                         if self.debug:
                             self.debug_print(
-                                "after parsing the caselist is %s" %
+                                "after parsing the caselist is",
                                  caselist)
 
                     trash = [temp_list.remove(i) for i in filterter_list]
 
                     if self.debug:
                         self.debug_print(
-                            "after handling the temp_list is %s" %
+                            "after handling the temp_list is",
                             temp_list)
 
                     new_list += temp_list
@@ -302,23 +302,26 @@ class CaseFileParser(object):
         """ For the testcase name parsing. """
         while True:
             if self.debug:
-                self.debug_print("the list is",  list)
+                self.debug_print("the list is", list)
 
             indent = self.get_next_line_indent(fh)
             if indent < 0:
                 break
-            elif indent > 0 and indent == 4:
-                if self.debug:
-                    self.debug_print("we begin to parse the option line")
-                list = self.option_parse(fh, list, tripped_casename)
-            else:
+            elif indent > 0:
+                if  indent == 4:
+                    if self.debug:
+                        self.debug_print("we begin to parse the option line")
+                    list = self.option_parse(fh, list, tripped_casename)
+                else:
+                    raise exception.CaseConfigfileError("option indentation error!")
+            elif indent == 0:
                 casestring = self.get_next_line(fh)
 
                 tripped_caselist = casestring.strip().split()
                 tripped_casename = tripped_caselist[0]
 
                 if self.debug:
-                    self.debug_print("we begin to handle the case", 
+                    self.debug_print("we begin to handle the case",
                                      tripped_casename)
 
                 if len(tripped_caselist) == 3 and \
