@@ -119,10 +119,16 @@ class FuncGen(object):
 
             if self.language == 'Python':
 
-                case_params['logger'] = self.logger
+                if case_ref_name != 'sleep':
+                    case_params['logger'] = self.logger
                 existed_bug_list = self.bug_check(case_ref_name)
                 if len(existed_bug_list) == 0: 
-                    ret = self.cases_func_ref_dict[case_ref_name](case_params)
+                    if case_ref_name == 'sleep':
+                        sleepsecs = case_params['sleep']
+                        time.sleep(int(sleepsecs))
+                        ret = 0
+                    else:
+                        ret = self.cases_func_ref_dict[case_ref_name](case_params)
                 else:
                     self.logger.info("about the testcase , bug existed:")
                     for existed_bug in existed_bug_list:

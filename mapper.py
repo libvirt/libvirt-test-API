@@ -36,6 +36,10 @@ class Mapper(object):
             tripped_case = {}
             testcases_names = testcase.keys()[0]
 
+            if testcases_names == 'sleep':
+                tripped_cases_list.append(testcase)
+                continue
+
             names = testcases_names.split(":")
             package_casename = names[1] +":"+ names[2]
 
@@ -54,6 +58,10 @@ class Mapper(object):
             tripped_case = {}
             testcases_names = testcase.keys()[0]
 
+            if testcases_names == 'sleep':
+                tripped_cases_list.append(testcase)
+                continue
+            
             language = testcases_names.split(":")[0]
             casename = testcases_names.split(":")[2]
 

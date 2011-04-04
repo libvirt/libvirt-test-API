@@ -108,10 +108,12 @@ class LibvirtTestAPI(object):
         for activity in activities_list:
             for testcase in activity:
                 testcases_names = testcase.keys()
+                if 'sleep' in testcases_names:
+                    testcases_names.remove('sleep')
                 all_testcases_names += testcases_names
 
         unique_testcases_names = list(set(all_testcases_names))
-        
+    
         # call and initilize proxy component to 
         # get a list of reference of testcases
         proxy_obj = proxy.Proxy(unique_testcases_names)

@@ -77,18 +77,18 @@ class CaseFileParser(object):
                 return None
 
             stripped_line = line.strip()
-            if len(stripped_line) > 0 and stripped_line.startswith('/*'): 
+            if len(stripped_line) > 0 and stripped_line.startswith('/*'):
                 if comflag == 0:
                     comflag += 1
                     continue
                 else:
                     raise exception.CaseConfigfileError("comments delimiter mismatch!")
-            if len(stripped_line) > 0 and not stripped_line.endswith('*/'): 
+            if len(stripped_line) > 0 and not stripped_line.endswith('*/'):
                 if comflag == 1:
                     if stripped_line.startswith('*/'):
                         exception.CaseConfigfileError("comments delimiter mismatch!")
                     else:
-                        continue 
+                        continue
                 elif stripped_line.startswith('*/'):
                     raise exception.CaseConfigfileError("comments delimiter error!")
                 else:
@@ -171,130 +171,136 @@ class CaseFileParser(object):
         """ For options of a case parsing. """
         new_list = []
 
+        optionname = self.get_next_line(fh)
+        tripped_optionname = optionname.strip()
+
         indent = self.get_next_line_indent(fh)
-        if indent != 4:
-            print "wrong format"
-            sys.exit(1)
+        if indent == 0:
+            raise exception.CaseConfigfileError("case indentation error!")
+        elif indent == 4:
+            raise exception.CaseConfigfileError("case indentation error!")
+        elif indent == -1:
+            raise  exception.CaseConfigfileError("option without value error!")
         else:
-            optionname = self.get_next_line(fh)
-            if optionname:
-                tripped_optionname = optionname.strip()
+            pass
 
-            if self.debug:
-                self.debug_print("the option name is", tripped_optionname)
+        if self.debug:
+            self.debug_print("the option name is", tripped_optionname)
 
-            while True:
-                temp_list = []
+        while True:
+            temp_list = []
 
-                indent = self.get_next_line_indent(fh)
-                if indent == -1:
-                    break
+            indent = self.get_next_line_indent(fh)
+            if indent == -1:
+                break
 
-                for caselist in list:
-                    new_dict = copy.deepcopy(caselist)
-                    temp_list.append(new_dict)
+            for caselist in list:
+                new_dict = copy.deepcopy(caselist)
+                temp_list.append(new_dict)
 
-                if indent == 4:
-                    new_list = self.option_parse(fh, new_list, casename)
-                    return new_list
-                elif indent == 0:
-                    new_list = self.parse(fh, new_list)
-                    return new_list
-                else:
-                    valuestring = self.get_next_line(fh)
+            if indent == 0:
+                new_list = self.parse(fh, new_list)
+                return new_list
+            elif indent == 4:
+                new_list = self.option_parse(fh, new_list, casename)
+                return new_list
+            elif indent == 8:
+                valuestring = self.get_next_line(fh)
 
-                    tripped_valuelist = valuestring.strip().split()
-                    tripped_valuename = tripped_valuelist[0]
+                tripped_valuelist = valuestring.strip().split()
+                tripped_valuename = tripped_valuelist[0]
 
-                    # look for variable and try to substitute them
-                    tripped_valuelist = self.variables_lookup(tripped_valuelist)
+                # look for variable and try to substitute them
+                tripped_valuelist = self.variables_lookup(tripped_valuelist)
 
+                if self.debug:
+                    self.debug_print(
+                        "the option_value we are parsing is",
+                         tripped_valuename)
+                    self.debug_print("the temp_list is", temp_list)
+
+                filterter_list = []
+
+                for caselist in temp_list:
                     if self.debug:
                         self.debug_print(
-                            "the option_value we are parsing is", 
-                             tripped_valuename)
-                        self.debug_print("the temp_list is", temp_list)
+                            "before parsing, the caselist is",
+                            caselist)
 
-                    filterter_list = []
+                    if len(tripped_valuelist) > 1:
+                        if tripped_valuelist[1] == "only" and \
+                            len(tripped_valuelist) == 3:
+                            if self.debug:
+                                self.debug_print(
+                                "the value with a keywords which is",
+                                tripped_valuelist[1])
 
-                    for caselist in temp_list:
-                        if self.debug:
-                            self.debug_print(
-                                "before parsing, the caselist is",
-                                caselist)
-
-                        if len(tripped_valuelist) > 1:
-                            if tripped_valuelist[1] == "only" and \
-                                len(tripped_valuelist) == 3:
+                            filterters = tripped_valuelist[2].split("|")
+                            for filterter in filterters:
                                 if self.debug:
                                     self.debug_print(
-                                    "the value with a keywords which is",
-                                    tripped_valuelist[1])
+                                    "the filterter we will filt the \
+                                    temp_list is", filterter)
 
-                                filterters = tripped_valuelist[2].split("|")
-                                for filterter in filterters:
-                                    if self.debug:
-                                        self.debug_print(
-                                        "the filterter we will filt the \
-                                        temp_list is", filterter)
+                                if re.findall(filterter, str(caselist)):
+                                    self.add_option_value(
+                                        caselist,
+                                        casename,
+                                        tripped_optionname,
+                                        tripped_valuename)
+                                    break
+                            else:
+                                filterter_list.append(caselist)
+                        elif tripped_valuelist[1] == "no" and \
+                            len(tripped_valuelist) == 2:
+                            if self.debug:
+                                self.debug_print(
+                                    "the value with a keywords \
+                                     which is", tripped_valuelist[1])
 
-                                    if re.findall(filterter, str(caselist)):
-                                        self.add_option_value(
-                                            caselist,
-                                            casename,
-                                            tripped_optionname,
-                                            tripped_valuename)
-                                        break
-                                else:
+                            if re.findall(tripped_valuename, str(caselist)):
+                                f = lambda s: s.has_key(casename) == False
+                                temp_list = [filter(f, caselist)]
+                        elif tripped_valuelist[1] == "no" and \
+                            len(tripped_valuelist) == 3:
+                            filterters = tripped_valuelist[2].split("|")
+                            for filterter in filterters:
+                                if re.findall(filterter, str(caselist)):
                                     filterter_list.append(caselist)
-                            elif tripped_valuelist[1] == "no" and \
-                                len(tripped_valuelist) == 2:
-                                if self.debug:
-                                    self.debug_print(
-                                        "the value with a keywords \
-                                         which is", tripped_valuelist[1])
-
-                                if re.findall(tripped_valuename, str(caselist)):
-                                    f = lambda s: s.has_key(casename) == False
-                                    temp_list = [filter(f, caselist)]
-                            elif tripped_valuelist[1] == "no" and \
-                                len(tripped_valuelist) == 3:
-                                filterters = tripped_valuelist[2].split("|")
-                                for filterter in filterters:
-                                    if re.findall(filterter, str(caselist)):
-                                        filterter_list.append(caselist)
-                                        break
-                                else:
-                                    self.add_option_value(caselist, casename,
-                                                          tripped_optionname,
-                                                          tripped_valuename)
-                            elif tripped_valuelist[1] == "include" and \
-                                len(tripped_valuelist) == 2:
-                                if re.findall(tripped_valuename, str(caselist)):
-                                    self.add_option_value(caselist,
-                                                          casename,
-                                                          tripped_optionname,
-                                                          tripped_valuename)
-                                    temp_list = [caselist]
-                        else:
-                            self.add_option_value(caselist,
-                                                  casename,
-                                                  tripped_optionname,
-                                                  tripped_valuename)
-
-                        if self.debug:
-                            self.debug_print(
-                                "after parsing the caselist is",
-                                 caselist)
-
-                    trash = [temp_list.remove(i) for i in filterter_list]
+                                    break
+                            else:
+                                self.add_option_value(caselist, casename,
+                                                      tripped_optionname,
+                                                      tripped_valuename)
+                        elif tripped_valuelist[1] == "include" and \
+                            len(tripped_valuelist) == 2:
+                            if re.findall(tripped_valuename, str(caselist)):
+                                self.add_option_value(caselist,
+                                                      casename,
+                                                      tripped_optionname,
+                                                      tripped_valuename)
+                                temp_list = [caselist]
+                    else:
+                        self.add_option_value(caselist,
+                                              casename,
+                                              tripped_optionname,
+                                              tripped_valuename)
 
                     if self.debug:
                         self.debug_print(
-                            "after handling the temp_list is",
-                            temp_list)
+                            "after parsing the caselist is",
+                             caselist)
 
-                    new_list += temp_list
+                trash = [temp_list.remove(i) for i in filterter_list]
+
+                if self.debug:
+                    self.debug_print(
+                        "after handling the temp_list is",
+                        temp_list)
+
+                new_list += temp_list
+            else:
+                raise exception.CaseConfigfileError("value indentation error!")
 
         return new_list
 
@@ -340,6 +346,15 @@ class CaseFileParser(object):
                             newdict[tripped_casename] = {}
                             caselist.append(newdict)
 
+                if len(tripped_caselist) == 2 and \
+                        tripped_casename == "sleep":
+                   sleepsecs = tripped_caselist[1]
+                   for caselist in list:
+                       newdict = {}
+                       newdict[tripped_casename] = {'sleep':sleepsecs}
+                       caselist.append(newdict)
+                   continue
+
                 if tripped_casename == "options":
                     option_case = [{'options':{}}]
                     option_list = tripped_caselist[1:]
@@ -347,11 +362,11 @@ class CaseFileParser(object):
                         (optionkey, optionvalue) = option.split("=")
                         option_case[0]['options'][optionkey] = optionvalue
                     list.append(option_case)
-                else:
-                    for caselist in list:
-                        newdict = {}
-                        newdict[tripped_casename] = {}
-                        caselist.append(newdict)
+
+                for caselist in list:
+                    newdict = {}
+                    newdict[tripped_casename] = {}
+                    caselist.append(newdict)
 
         if len(self.missing_variables) != 0:
             raise exception.MissingVariable(
