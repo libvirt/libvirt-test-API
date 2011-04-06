@@ -33,6 +33,7 @@ import tempfile
 import casefileparser
 import proxy
 import generator
+import envclear
 import process
 from utils.Python import log
 from logxmlparser import LogXMLParser 
@@ -76,8 +77,8 @@ class LibvirtTestAPI(object):
                 casefileparser.CaseFileParser(self.casefile).get_list()
 
         if activities_options_list[-1][0].has_key("options"):
-            activities_list = activites_list[:-1]
-            options_list = activities_list[-1]
+            activities_list = activities_options_list[:-1]
+            options_list = activities_options_list[-1]
         else:
             activities_list = activities_options_list
             options_list = [{'options':{}}]
@@ -149,8 +150,8 @@ class LibvirtTestAPI(object):
        
         # if the value of option multiprocess is enable, 
         # will call the module process to run the testcases
-        # which stored in the list of procs, if disable,
-        # will call them one by one
+	# which stored in the list of procs, if disable,
+	# will call them one by one
         if options_list[0]['options'].has_key("multiprocess"):
             if  options_list[0]['options']["multiprocess"] == "enable":
                 proc = process.Process(procs)
@@ -185,7 +186,17 @@ class LibvirtTestAPI(object):
                                            testrunend_time)
 
         lockfile.close()
-    
+
+        if options_list[0]['options'].has_key("cleanup"):
+            if options_list[0]['options']["cleanup"] == "enable":
+                cases_clearfunc_ref_dict = proxy_obj.get_clearfunc_call_dict()
+                for activity in activities_list:
+                    envclear.EnvClear(cases_clearfunc_ref_dict, activity, logfile)()     
+            elif options_list[0]['options']["cleanup"] == "disable":
+                pass
+            else:
+                pass 
+             
     def remove_log(self, testrunid, testid = None):
         """  to remove log item in the log xmlfile """
         log_xml_parser = LogXMLParser(self.logxml)

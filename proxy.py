@@ -45,8 +45,9 @@ class Proxy(object):
             # according to language kind to dispatch function
             funcs = getattr(self, "get_%s_call_dict" % language.lower())
             func_ref = None
+            func = casename
             if language == 'Python':
-                func_ref = funcs(language, package, casename)
+                func_ref = funcs(language, package, casename, func)
             if language == 'Java':
                 func_ref = funcs(language, package)
             if language == 'Ruby':
@@ -56,12 +57,34 @@ class Proxy(object):
             self.func_dict[key] = func_ref
         return self.func_dict
 
+    def get_clearfunc_call_dict(self):
+        """ return a clearing function reference dictionary
+        """
+        for testcase_name in self.testcases_names:
+            # get programming language, package, casename
+            language = testcase_name.split(":")[0]
+            package = testcase_name.split(":")[1]
+            casename = testcase_name.split(":")[2]
+            # according to language kind to dispatch function
+            funcs = getattr(self, "get_%s_call_dict" % language.lower())
+            func_ref = None
+            func = casename + "_clean"
+            if language == 'Python':
+                func_ref = funcs(language, package, casename, func)
+            if language == 'Java':
+                func_ref = funcs(language, package)
+            if language == 'Ruby':
+                func_ref = funcs(language, package)
+            # construct function call dictionary
+            key = package + ":" + casename
+            self.func_dict[key] = func_ref
+        return self.func_dict
+         
     def get_python_call_dict(self, *args):
         """ Return python testing function reference dictionary """
-        (language, package, casename) = args
+        (language, package, casename, func) = args
         case_abs_path = '%s.%s.%s.%s' % ('repos', language, package, casename)
         # main function name is the same as casename here
-        func = casename
         case_mod = __import__(case_abs_path)
         components = case_abs_path.split('.')
         # import recursively module

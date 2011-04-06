@@ -125,6 +125,7 @@ class FuncGen(object):
                 if len(existed_bug_list) == 0: 
                     if case_ref_name == 'sleep':
                         sleepsecs = case_params['sleep']
+                        self.logger.info("sleep %s seconds" % sleepsecs)
                         time.sleep(int(sleepsecs))
                         ret = 0
                     else:

@@ -362,6 +362,7 @@ class CaseFileParser(object):
                         (optionkey, optionvalue) = option.split("=")
                         option_case[0]['options'][optionkey] = optionvalue
                     list.append(option_case)
+                    continue
 
                 for caselist in list:
                     newdict = {}
