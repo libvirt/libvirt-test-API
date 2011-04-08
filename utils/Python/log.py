@@ -27,15 +27,8 @@ import logging
 class Log(object):
     """Log file operation"""
     counter = 0
-    number = 0
-    log_list = list()
-    fat_dict = {'file_formatter': 
-                '[%(asctime)s] %(process)d %(levelname)-8s \
-                 (%(module)s:%(lineno)d) %(message)s',
-                'console_formatter': 
-                '%(name)-8s | %(levelname)-8s | %(message)s'}
+
     @staticmethod
-    
     def get_log_name():
         """Get log file name"""
         Log.counter += 1
@@ -55,28 +48,37 @@ class Log(object):
  
     def __init__(self, logname):
         self.name = logname
+    
+    def __del__(self):
+        self.logger.removeHandler(self.filehd)
+        self.logger.removeHandler(self.console)
+        del self.logger 
 
-    def init_log(self, flag = 0):
+    def init_log(self):
         """Initialize log file"""
-        file_formatter = console_formatter = ''
-        if flag == 0:
-            file_formatter = Log.fat_dict['file_formatter']
-            console_formatter = Log.fat_dict['console_formatter']
-        else:
-            file_formatter = '' 
-            console_formatter = ''
-        reload(logging)
-        logging.basicConfig(level = logging.DEBUG,
-                            format = file_formatter,
-                            datefmt = '%Y-%m-%d %H:%M:%S',
-                            filename = self.name,
-                            filemode = 'a+')
-        logger = logging.getLogger(self.name)
-        console = logging.StreamHandler()
-        console.setLevel(logging.INFO)
+        fmt = {'file_formatter':
+               '[%(asctime)s] %(process)d %(levelname)-8s \
+                (%(module)s:%(lineno)d) %(message)s',
+               'console_formatter':
+               '%(name)-8s | %(levelname)-8s | %(message)s'}
+
+        self.logger = logging.getLogger(self.name)
+        self.logger.setLevel(logging.DEBUG)
+ 
+        datefmt = '%Y-%m-%d %H:%M:%S'
+        self.filehd = logging.FileHandler(self.name, 'a+')
+        self.filehd.setLevel(logging.DEBUG)
+        file_formatter = logging.Formatter(fmt['file_formatter'], datefmt) 
         
-        formatter = logging.Formatter(console_formatter)
-        console.setFormatter(formatter)
-        logger.addHandler(console)
-        return logger
+        self.filehd.setFormatter(file_formatter)
+        self.logger.addHandler(self.filehd)
+
+        self.console = logging.StreamHandler()
+        self.console.setLevel(logging.INFO)
+        
+        console_formatter = logging.Formatter(fmt['console_formatter'])
+        self.console.setFormatter(console_formatter)
+        self.logger.addHandler(self.console)
+        return self.logger
+
 

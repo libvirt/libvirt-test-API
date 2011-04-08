@@ -58,10 +58,6 @@ class FuncGen(object):
                                                  testid, 
                                                  test_procedure)
         
-        if self.language == "Python":
-            logs = log.Log(logfile)
-            self.logger = logs.init_log()
-             
         self.cases_ref_names = []
         for lan_tripped_case in lan_tripped_cases:
             case_ref_name = lan_tripped_case.keys()[0]
@@ -73,6 +69,10 @@ class FuncGen(object):
             self.cases_params_list.append(case_params)
 
     def __call__(self):
+        if self.language == "Python":
+            logs = log.Log(self.logfile)
+            self.logger = logs.init_log()
+
         retflag = self.generator()
         return retflag
 

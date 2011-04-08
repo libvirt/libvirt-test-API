@@ -22,10 +22,12 @@
 # Updated: Oct 19 2009
 # Version: 0.1.0
 
+import copy
+
 class Mapper(object):
 
     def __init__(self, testcases_list):
-        self.testcases_list = testcases_list
+        self.testcases_list = copy.deepcopy(testcases_list)
   
     def get_language_tripped(self):
         """ remove the language information from
