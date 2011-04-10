@@ -49,16 +49,16 @@ class EnvClear(object):
             self.cases_params_list.append(case_params)
 
     def __call__(self):
-        if self.language == "Python":
-            logs = log.Log(self.logfile)
-            self.logger = logs.init_log()
-
         retflag = self.envclear()
         return retflag
 
     def envclear(self):
         """ run each clearing function with the corresponding arguments 
         """
+ 
+        envlog = log.EnvLog(self.logfile)
+        logger = envlog.env_log()
+        
         testcase_number = len(self.cases_ref_names)
 
         for i in range(testcase_number):
@@ -70,10 +70,12 @@ class EnvClear(object):
                 if case_ref_name == 'sleep':
                     continue
                 else:
-                    case_params['logger'] = self.logger
+                    case_params['logger'] = logger
                     self.cases_clearfunc_ref_dict[case_ref_name](case_params)
             else:
                 pass
+
+        del envlog
 
         return 0 
 

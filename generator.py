@@ -24,8 +24,10 @@
 
 import time
 import fcntl
+import sys
 
 import mapper
+import envinspect
 from utils.Python import log
 from utils.Python import format
 
@@ -69,10 +71,6 @@ class FuncGen(object):
             self.cases_params_list.append(case_params)
 
     def __call__(self):
-        if self.language == "Python":
-            logs = log.Log(self.logfile)
-            self.logger = logs.init_log()
-
         retflag = self.generator()
         return retflag
 
@@ -105,10 +103,27 @@ class FuncGen(object):
         """ run each test case with the corresponding arguments and
             add log object into the dictionary of arguments
         """
+
+        envlog = log.EnvLog(self.logfile)
+        logger = envlog.env_log()
         testcase_number = len(self.cases_ref_names)
         start_time = time.strftime("%Y-%m-%d %H:%M:%S")
-        retflag = 0
 
+        logger.info("Checking Testing Environment... \n")
+        envck = envinspect.EnvInspect(logger)
+
+        if envck.env_checking() == 1:
+            sys.exit(1)  
+        else:
+            logger.info("Total Case Number   : %s" % testcase_number)
+            logger.info("Log File            : %s" % self.logfile)
+            logger.info("Testing Begin Time  : %s\n" % start_time)    
+            del envlog
+
+        caselog = log.CaseLog(self.logfile)
+        logger = caselog.case_log()
+       
+        retflag = 0
         for i in range(testcase_number):
 
             case_ref_name = self.cases_ref_names[i]
@@ -120,20 +135,20 @@ class FuncGen(object):
             if self.language == 'Python':
 
                 if case_ref_name != 'sleep':
-                    case_params['logger'] = self.logger
+                    case_params['logger'] = logger
                 existed_bug_list = self.bug_check(case_ref_name)
                 if len(existed_bug_list) == 0: 
                     if case_ref_name == 'sleep':
                         sleepsecs = case_params['sleep']
-                        self.logger.info("sleep %s seconds" % sleepsecs)
+                        logger.info("sleep %s seconds" % sleepsecs)
                         time.sleep(int(sleepsecs))
                         ret = 0
                     else:
                         ret = self.cases_func_ref_dict[case_ref_name](case_params)
                 else:
-                    self.logger.info("about the testcase , bug existed:")
+                    logger.info("about the testcase , bug existed:")
                     for existed_bug in existed_bug_list:
-                        self.logger.info("%s" % existed_bug)
+                        logger.info("%s" % existed_bug)
 
                     ret = 100
                     self.fmt.printf('end', case_ref_name, ret)
@@ -147,6 +162,7 @@ class FuncGen(object):
         end_time = time.strftime("%Y-%m-%d %H:%M:%S")
         result = (retflag and "FAIL") or "PASS"
 
+        del caselog 
         fcntl.lockf(self.lockfile.fileno(), fcntl.LOCK_EX)
         self.log_xml_parser.add_test_summary(self.testrunid, 
                                              self.testid, 
