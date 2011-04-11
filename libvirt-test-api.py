@@ -189,7 +189,7 @@ class LibvirtTestAPI(object):
 
         if options_list[0]['options'].has_key("cleanup"):
             if options_list[0]['options']["cleanup"] == "enable":
-                print "clean up testing environment..."
+                print "Clean up Testing Environment..."
                 cases_clearfunc_ref_dict = proxy_obj.get_clearfunc_call_dict()
                 log.Log.counter = 0
                 for activity in activities_list:

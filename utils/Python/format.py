@@ -67,7 +67,7 @@ class Format(object):
 
     def print_start(self, msg):
         """When test case starting,this function is called"""
-        console = "----%s" % msg
+        console = "    %s" % msg
         num = (128 - len(msg))/2 - 2
         tpl = Template("\n$sep   $str  $sep\n")
         msgs = tpl.substitute(sep = '-'*num, str = msg) 
@@ -79,17 +79,20 @@ class Format(object):
         result = ''
         if flag == 0:
             result = 'PASS'
+            console_result = '\033[1;36mOK\033[1;m'
         if flag == 1:
             result = 'FAIL'
+            console_result = '\033[1;31mFAIL\033[1;m' 
         if flag == 100:
             result = 'Skip'
+            console_result = '\033[1;38mSkip\033[1;m' 
 
-        console = "%s\n" % result
+        console = "        Result: %s\n" % console_result
         msg = msg + ' ' + result
         num = (128 - len(msg))/2 - 2
         tpl = Template("$sep   $str  $sep")
         msgs = tpl.substitute(sep = '-'*num, str = msg) 
-        print console
+        print console,
         self.write_log(msgs)
         separator = '\n' + '-' * 128 + '\n'
         self.write_log(separator)

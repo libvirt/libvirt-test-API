@@ -66,7 +66,7 @@ class CaseLog(Log):
                '[%(asctime)s] %(process)d %(levelname)-8s \
                 (%(module)s:%(lineno)d) %(message)s',
                'console_formatter':
-               '        %(asctime)s | %(levelname)-6s | %(message)s'}
+               '        %(asctime)s|%(levelname)-6s|%(message)s'}
 
  
         datefmt = '%H:%M:%S'

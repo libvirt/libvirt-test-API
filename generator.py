@@ -109,15 +109,14 @@ class FuncGen(object):
         testcase_number = len(self.cases_ref_names)
         start_time = time.strftime("%Y-%m-%d %H:%M:%S")
 
-        logger.info("Checking Testing Environment... \n")
+        logger.info("Checking Testing Environment... ")
         envck = envinspect.EnvInspect(logger)
 
         if envck.env_checking() == 1:
             sys.exit(1)  
         else:
-            logger.info("Total Case Number   : %s" % testcase_number)
-            logger.info("Log File            : %s" % self.logfile)
-            logger.info("Testing Begin Time  : %s\n" % start_time)    
+            logger.info("\nStart Testing:")
+            logger.info("    Case Count: %s" % testcase_number)
             del envlog
 
         caselog = log.CaseLog(self.logfile)
@@ -160,9 +159,17 @@ class FuncGen(object):
             self.fmt.printf('end', case_ref_name, ret)
 
         end_time = time.strftime("%Y-%m-%d %H:%M:%S")
-        result = (retflag and "FAIL") or "PASS"
+        del caselog
 
-        del caselog 
+        envlog = log.EnvLog(self.logfile)
+        logger = envlog.env_log()
+        logger.info("\nSummary:")
+        logger.info("    Total:%s [Pass:%s Fail:%s]" % \
+                     (testcase_number, (testcase_number - retflag), retflag))
+        logger.info("    Log File: %s\n" % self.logfile)
+        del envlog 
+
+        result = (retflag and "FAIL") or "PASS"
         fcntl.lockf(self.lockfile.fileno(), fcntl.LOCK_EX)
         self.log_xml_parser.add_test_summary(self.testrunid, 
                                              self.testid, 

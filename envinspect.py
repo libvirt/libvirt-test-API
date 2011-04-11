@@ -38,35 +38,35 @@ def childprocess(pcmd, acmd):
 def get_libvirt_ver():
     ver = childprocess(['rpm', '-qa'], ['egrep', "^libvirt-[0-9]"])
     if ver == "":
-        return 100, "No libvirt installed, necessary"
+        return 100, "No libvirt installed"
     else:
         return 0, ver
 
 def get_libvirt_pyth_ver():
     ver = childprocess(['rpm', '-qa'], ['egrep', "^libvirt-python-[0-9]"])
     if ver == "":
-        return 100, "No libvirt-python installed, necessary"
+        return 100, "No libvirt-python installed"
     else:
         return 0, ver
 
 def get_libvirt_cli_ver():
     ver = childprocess(['rpm', '-qa'], ['egrep', "^libvirt-client-[0-9]"])
     if ver == "":
-        return 100, "No libvirt-client installed, necessary"
+        return 100, "No libvirt-client installed"
     else:
         return 0, ver
 
 def get_qemu_kvm_ver():
     ver = childprocess(['rpm', '-qa'], ['egrep', "qemu-kvmd-[0-9]"])
     if ver == "":
-        return 150, "No qemu-kvm installed, optional"
+        return 150, "No qemu-kvm installed"
     else:
         return 0, ver
 
 def get_kernel_ver():
     ver = childprocess(['rpm', '-qa'], ['egrep', "^kernel-[0-9]"])
     if ver == "":
-        return 100, "No kernel installed, necessary"
+        return 100, "No kernel installed"
     else:
         return 0, ver
 
@@ -81,21 +81,47 @@ class EnvInspect(object):
 
     def env_checking(self):
         flag = 0
-        self.logger.info(get_libvirt_ver()[1])
-        if get_libvirt_ver()[0] == 100: flag = 1
-        self.logger.info(get_libvirt_pyth_ver()[1])
-        if get_libvirt_pyth_ver()[0] == 100: flag = 1
-        self.logger.info(get_libvirt_cli_ver()[1])
-        if get_libvirt_cli_ver()[0] == 100: flag = 1
-        self.logger.info(get_qemu_kvm_ver()[1])
+        result = ""
+        if get_libvirt_ver()[0] == 100:
+            result = NOTOK
+            flag = 1
+        else:
+            result = OK
+        self.logger.info("    %-36s%-6s" % (get_libvirt_ver()[1], result))
+
+        if get_libvirt_pyth_ver()[0] == 100:
+            result = NOTOK 
+            flag = 1
+        else:
+            result = OK
+        self.logger.info("    %-36s%-6s" % (get_libvirt_pyth_ver()[1], result))
+
+        if get_libvirt_cli_ver()[0] == 100:
+            result = NOTOK
+            flag = 1
+        else:
+            result = OK
+        self.logger.info("    %-36s%-6s" % (get_libvirt_cli_ver()[1], result))
+
         if get_qemu_kvm_ver()[0] == 150 and flag == 0: 
             flag = 0
         elif get_qemu_kvm_ver()[0] == 150 and flag == 1:
             flag = 1
         else:
             pass
-        self.logger.info(get_kernel_ver()[1])
-        if get_kernel_ver()[0] == 100: flag = 1
+        self.logger.info("    %-36s%-6s" % (get_qemu_kvm_ver()[1], OK))
+
+        if get_kernel_ver()[0] == 100:
+            result = NOTOK
+            flag = 1
+        else:
+            result = OK
+        self.logger.info("    %-36s%-6s" % (get_kernel_ver()[1], result))
+
         return flag 
         
+
+OK = "ok"
+NOTOK = "not ok"
+
 
