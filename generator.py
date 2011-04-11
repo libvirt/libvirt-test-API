@@ -25,6 +25,7 @@
 import time
 import fcntl
 import sys
+import traceback
 
 import mapper
 import envinspect
@@ -131,32 +132,41 @@ class FuncGen(object):
 
             case_start_time = time.strftime("%Y-%m-%d %H:%M:%S")
 
-            if self.language == 'Python':
+            try:
+                if self.language == 'Python':
 
-                if case_ref_name != 'sleep':
-                    case_params['logger'] = logger
-                existed_bug_list = self.bug_check(case_ref_name)
-                if len(existed_bug_list) == 0: 
-                    if case_ref_name == 'sleep':
-                        sleepsecs = case_params['sleep']
-                        logger.info("sleep %s seconds" % sleepsecs)
-                        time.sleep(int(sleepsecs))
-                        ret = 0
+                    if case_ref_name != 'sleep':
+                        case_params['logger'] = logger
+                    existed_bug_list = self.bug_check(case_ref_name)
+                    ret = -1
+                    if len(existed_bug_list) == 0: 
+                        if case_ref_name == 'sleep':
+                            sleepsecs = case_params['sleep']
+                            logger.info("sleep %s seconds" % sleepsecs)
+                            time.sleep(int(sleepsecs))
+                            ret = 0
+                        else:
+                            ret = self.cases_func_ref_dict[case_ref_name](case_params)
                     else:
-                        ret = self.cases_func_ref_dict[case_ref_name](case_params)
+                        logger.info("about the testcase , bug existed:")
+                        for existed_bug in existed_bug_list:
+                            logger.info("%s" % existed_bug)
+
+                        ret = 100
+                        self.fmt.printf('end', case_ref_name, ret)
+                        continue
+            except: 
+                logger.error(traceback.format_exc())
+                continue
+            finally:
+                case_end_time = time.strftime("%Y-%m-%d %H:%M:%S")
+                if ret == -1: 
+                    ret = 1
+                elif ret == 100            
+                    retflag += 0 
                 else:
-                    logger.info("about the testcase , bug existed:")
-                    for existed_bug in existed_bug_list:
-                        logger.info("%s" % existed_bug)
-
-                    ret = 100
-                    self.fmt.printf('end', case_ref_name, ret)
-                    continue
-
-            case_end_time = time.strftime("%Y-%m-%d %H:%M:%S")
-            
-            retflag += ret
-            self.fmt.printf('end', case_ref_name, ret)
+                    retflag += ret
+                self.fmt.printf('end', case_ref_name, ret)
 
         end_time = time.strftime("%Y-%m-%d %H:%M:%S")
         del caselog
