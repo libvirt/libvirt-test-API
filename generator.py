@@ -162,7 +162,7 @@ class FuncGen(object):
                 case_end_time = time.strftime("%Y-%m-%d %H:%M:%S")
                 if ret == -1: 
                     ret = 1
-                elif ret == 100            
+                elif ret == 100:            
                     retflag += 0 
                 else:
                     retflag += ret

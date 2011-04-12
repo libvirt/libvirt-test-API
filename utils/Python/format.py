@@ -87,7 +87,7 @@ class Format(object):
             result = 'Skip'
             console_result = '\033[1;38mSkip\033[1;m' 
 
-        console = "        Result: %s\n" % console_result
+        console = "            Result: %s\n" % console_result
         msg = msg + ' ' + result
         num = (128 - len(msg))/2 - 2
         tpl = Template("$sep   $str  $sep")
