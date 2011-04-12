@@ -46,8 +46,9 @@ class Log(object):
             logname = base_str + str(Log.counter)
         return logname
  
-    def __init__(self, logname):
+    def __init__(self, logname, loglevel):
         self.name = logname
+        self.loglevel = loglevel
         self.logger = logging.getLogger(self.name)
         self.logger.setLevel(logging.DEBUG)        
         self.filehd = logging.FileHandler(self.name, 'a+')
@@ -75,12 +76,13 @@ class CaseLog(Log):
         
         self.filehd.setFormatter(file_formatter)
         self.logger.addHandler(self.filehd)
-
-        self.console.setLevel(logging.INFO)
+         
+        if int(self.loglevel) != 1: 
+            self.console.setLevel(logging.INFO)
         
-        console_formatter = logging.Formatter(fmt['console_formatter'], datefmt)
-        self.console.setFormatter(console_formatter)
-        self.logger.addHandler(self.console)
+            console_formatter = logging.Formatter(fmt['console_formatter'], datefmt)
+            self.console.setFormatter(console_formatter)
+            self.logger.addHandler(self.console)
         return self.logger
 
 

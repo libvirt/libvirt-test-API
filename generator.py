@@ -38,13 +38,15 @@ class FuncGen(object):
                  activity, logfile,
                  testrunid, testid, 
                  log_xml_parser, lockfile, 
-                 bugstxt):
+                 bugstxt, loglevel):
         self.cases_func_ref_dict = cases_func_ref_dict
         self.logfile = logfile
         self.testrunid = testrunid
         self.testid = testid
         self.lockfile = lockfile
         self.bugstxt = bugstxt
+        self.loglevel = loglevel
+
         self.fmt = format.Format(logfile)
         self.log_xml_parser = log_xml_parser
 
@@ -105,7 +107,7 @@ class FuncGen(object):
             add log object into the dictionary of arguments
         """
 
-        envlog = log.EnvLog(self.logfile)
+        envlog = log.EnvLog(self.logfile, self.loglevel)
         logger = envlog.env_log()
         testcase_number = len(self.cases_ref_names)
         start_time = time.strftime("%Y-%m-%d %H:%M:%S")
@@ -120,7 +122,7 @@ class FuncGen(object):
             logger.info("    Case Count: %s" % testcase_number)
             del envlog
 
-        caselog = log.CaseLog(self.logfile)
+        caselog = log.CaseLog(self.logfile, self.loglevel)
         logger = caselog.case_log()
        
         retflag = 0
@@ -171,7 +173,7 @@ class FuncGen(object):
         end_time = time.strftime("%Y-%m-%d %H:%M:%S")
         del caselog
 
-        envlog = log.EnvLog(self.logfile)
+        envlog = log.EnvLog(self.logfile, self.loglevel)
         logger = envlog.env_log()
         logger.info("\nSummary:")
         logger.info("    Total:%s [Pass:%s Fail:%s]" % \

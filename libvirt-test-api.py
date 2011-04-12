@@ -42,19 +42,21 @@ def usage():
     print "Usage: libvirt_test_api.py <OPTIONS> <ARGUS>"
     print "\noptions: -h, --help : Display usage information \
            \n         -c, --casefile: Specify configuration file \
-           \n         -l, --logxml: Specify log file with type xml \
+           \n         -f, --logxml: Specify log file with type xml \
+           \n         -l, --log-level: 0 or 1 currently \
            \n         -d, --delete-log: Delete log items \
            \n         -m, --merge: Merge two log xmlfiles \
            \n         -r, --rerun: Rerun one or more test" 
 
                    
     print "example: \
-           \n         python libvirt-test-api.py -c TEST.CONF -l TEST.XML \
+           \n         python libvirt-test-api.py -l 0|1 -c TEST.CONF    \
+           \n         python libvirt-test-api.py -c TEST.CONF -f TEST.XML \
            \n         python libvirt-test-api.py -m TESTONE.XML TESTTWO.XML \
            \n         python libvirt-test-api.py -d TEST.XML TESTRUNID TESTID \
            \n         python libvirt-test-api.py -d TEST.XML TESTRUNID \
            \n         python libvirt-test-api.py -d TEST.XML all \
-           \n         python libvirt-test-api.py -l TEST.XML \
+           \n         python libvirt-test-api.py -f TEST.XML \
 -r TESTRUNID TESTID ..."
 
 
@@ -62,9 +64,10 @@ class LibvirtTestAPI(object):
     """ The class provides methods to run a new test and manage
         testing log and records
     """ 
-    def __init__(self, casefile, logxml, bugstxt):
+    def __init__(self, casefile, logxml, loglevel, bugstxt):
         self.casefile = casefile
         self.logxml = logxml
+        self.loglevel = loglevel
         self.bugstxt = bugstxt
 
     def run(self, activities_options_list=None): 
@@ -140,7 +143,8 @@ class LibvirtTestAPI(object):
                                            testid, 
                                            log_xml_parser, 
                                            lockfile, 
-                                           self.bugstxt)
+                                           self.bugstxt,
+                                           self.loglevel)
                         )
 
         totalnum = len(procs)
@@ -195,7 +199,7 @@ class LibvirtTestAPI(object):
                 for activity in activities_list:
                     logname = log.Log.get_log_name()
                     logfile = os.path.join('log/%s' % testrunid, logname)
-                    envclear.EnvClear(cases_clearfunc_ref_dict, activity, logfile)()     
+                    envclear.EnvClear(cases_clearfunc_ref_dict, activity, logfile, self.loglevel)()     
             elif options_list[0]['options']["cleanup"] == "disable":
                 pass
             else:
@@ -257,6 +261,7 @@ if __name__ == "__main__":
     casefile = "./case.conf"
     logxml = "./log.xml"
     bugstxt = "./BUGSKIP"
+    loglevel = 0
 
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hc:l:dmr", 
@@ -273,8 +278,10 @@ if __name__ == "__main__":
             sys.exit(0)
         if o == "-c" or o == "--casefile":
             casefile = v
-        if o == "-l" or o == "--logxml":
+        if o == "-f" or o == "--logxml":
             logxml = v
+        if o == "-l" or o == "--log-level":
+            loglevel = v
         if o == "-d" or o == "--delete-log":
             if len(args) == 1:
                 usage()   
@@ -289,7 +296,7 @@ if __name__ == "__main__":
                 usage()                
                 sys.exit(1)
 
-            libvirt_test_api = LibvirtTestAPI(casefile, logxml, bugstxt)
+            libvirt_test_api = LibvirtTestAPI(casefile, logxml, loglevel, bugstxt)
             libvirt_test_api.remove_log(testrunid, testid)
             sys.exit(0)
         if o == "-m" or o == "--merge":
@@ -297,7 +304,7 @@ if __name__ == "__main__":
                 logxml_one = args[0]
                 logxml_two = args[1] 
 
-                libvirt_test_api = LibvirtTestAPI(casefile, logxml_one, bugstxt)
+                libvirt_test_api = LibvirtTestAPI(casefile, logxml_one, loglevel, bugstxt)
                 libvirt_test_api.merge_logxmls(logxml_two)
                 sys.exit(0)
             else:
@@ -313,10 +320,10 @@ if __name__ == "__main__":
                 for testid in args[1:]:
                     testid = int(testid) 
                     testid_list.append(testid)
-                libvirt_test_api = LibvirtTestAPI(casefile, logxml, bugstxt) 
+                libvirt_test_api = LibvirtTestAPI(casefile, logxml, loglevel, bugstxt) 
                 libvirt_test_api.rerun(testrunid, testid_list)             
                 sys.exit(0)  
 
-    libvirt_test_api = LibvirtTestAPI(casefile, logxml, bugstxt)
+    libvirt_test_api = LibvirtTestAPI(casefile, logxml, loglevel, bugstxt)
     libvirt_test_api.run()
 

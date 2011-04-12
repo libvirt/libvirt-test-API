@@ -29,9 +29,10 @@ class EnvClear(object):
     """ generate a callable class of executing 
         clearing function in each testcase
     """
-    def __init__(self, cases_clearfunc_ref_dict, activity, logfile):
+    def __init__(self, cases_clearfunc_ref_dict, activity, logfile, loglevel):
         self.cases_clearfunc_ref_dict = cases_clearfunc_ref_dict
         self.logfile = logfile
+        self.loglevel = loglevel
   
         mapper_obj = mapper.Mapper(activity)
         lan_pkg_tripped_cases, self.language = \
@@ -56,7 +57,7 @@ class EnvClear(object):
         """ run each clearing function with the corresponding arguments 
         """
  
-        envlog = log.EnvLog(self.logfile)
+        envlog = log.EnvLog(self.logfile, self.loglevel)
         logger = envlog.env_log()
         
         testcase_number = len(self.cases_ref_names)
