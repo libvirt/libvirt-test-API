@@ -14,6 +14,7 @@ __all__ = ['usage', 'check_pool_define', \
 import os
 import re
 import sys
+import commands
 
 def append_path(path):
     """Append root path of package"""
@@ -32,6 +33,10 @@ from utils.Python import utils
 from utils.Python import xmlbuilder
 from exception import LibvirtAPI
 
+VIRSH_POOLLIST = "virsh --quiet pool-list --all|awk '{print $1}'|grep \"^%s$\""
+POOL_STAT = "virsh --quiet pool-list --all|grep \"^%s\\b\" |grep \"inactive\""
+POOL_DESTROY = "virsh pool-destroy %s" 
+POOL_UNDEFINE = "virsh pool-undefine %s"
 
 def usage(params):
     """Verify inputing parameter dictionary"""
@@ -125,3 +130,31 @@ def define_dir_pool(params):
         logger.info("closed hypervisor connection")
 
     return 0
+
+def define_dir_pool_clean(params):
+    logger = params['logger']
+    poolname = params['poolname'] 
+    (status, output) = commands.getstatusoutput(VIRSH_POOLLIST % poolname)
+    if status:
+        pass
+    else:
+       logger.info("remove storage pool %s" % poolname)
+       (status, output) = commands.getstatusoutput(POOL_STAT % poolname)
+       if status:
+           (status, output) = commands.getstatusoutput(POOL_DESTROY % poolname)
+           if status:
+               logger.error("failed to destroy storage pool %s" % poolname)
+               logger.error("%s" % output)
+           else:
+               (status, output) = commands.getstatusoutput(POOL_UNDEFINE % poolname)   
+               if status:
+                   logger.error("failed to undefine storage pool %s" % poolname)
+                   logger.error("%s" % output)
+       else:
+            (status, output) = commands.getstatusoutput(POOL_UNDEFINE % poolname)
+            if status:
+                logger.error("failed to undefine storage pool %s" % poolname)
+                logger.error("%s" % output)
+
+                       
+

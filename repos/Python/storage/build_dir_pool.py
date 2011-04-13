@@ -14,6 +14,7 @@ __all__ = ['usage', 'check_build_pool', 'build_dir_pool', \
 import os
 import re
 import sys
+import commands
 from xml.dom import minidom
 
 def append_path(path):
@@ -133,3 +134,6 @@ def build_dir_pool(params):
         logger.info("closed hypervisor connection")
 
     return 0
+
+def build_dir_pool_clean(params):
+    pass
