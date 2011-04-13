@@ -57,7 +57,7 @@ def get_libvirt_cli_ver():
         return 0, ver
 
 def get_qemu_kvm_ver():
-    ver = childprocess(['rpm', '-qa'], ['egrep', "qemu-kvmd-[0-9]"])
+    ver = childprocess(['rpm', '-qa'], ['egrep', "qemu-kvm-[0-9]"])
     if ver == "":
         return 150, "No qemu-kvm installed"
     else:
