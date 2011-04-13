@@ -256,3 +256,8 @@ def installation_linux_check(params):
     util.clean_ssh()
 
     return Test_Result
+
+def installation_linux_check_clean(params):
+    """ clean testing environment """
+    pass
+

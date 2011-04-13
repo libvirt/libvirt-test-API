@@ -207,3 +207,11 @@ def core_dump(dicts):
     else:
         return return_close(conn, logger, 1)
 
+def core_dump_clean(params):
+    """ clean testing environment """
+    logger = params['logger']
+    filepath = params['file']
+    if os.path.exists(filepath):
+        logger.info("remove dump file from core dump %s" % filepath)
+        os.remove(filepath)
+

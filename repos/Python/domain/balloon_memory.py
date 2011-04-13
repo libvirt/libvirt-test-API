@@ -304,3 +304,6 @@ def balloon_memory(params):
     else:
         return return_close(conn, logger, 0)
 
+def balloon_memory_clean(params):
+    """ clean testing environment """
+    pass

@@ -52,6 +52,13 @@ __version__ = "0.1.0"
 __credits__ = "Copyright (C) 2010 Red Hat, Inc."
 __all__ = ['install_linux_cdrom', 'usage']
 
+VIRSH_QUIET_LIST = "virsh --quiet list --all|awk '{print $2}'|grep \"^%s$\""
+VM_STAT = "virsh --quiet list --all| grep \"\\b%s\\b\"|grep off"
+VM_DESTROY = "virsh destroy %s" 
+VM_UNDEFINE = "virsh undefine %s"
+
+BOOT_DIR = "/var/lib/libvirt/boot/"
+
 def return_close(conn, logger, ret):
     conn.close()
     logger.info("closed hypervisor connection")
@@ -261,14 +268,8 @@ def install_linux_cdrom(params):
 
     else:
         logger.error("we only choose one between imagepath and volumepath")
-<<<<<<< HEAD
-        return 1
+        return return_close(conn, logger, 1)
 
-=======
-        return return_close(conn, logger, 1)   
-  
- 
->>>>>>> d2b1826... modify all of existing testcases to close the opened hypervisor connection
     params['fullimagepath'] = imgfullpath
 
     logger.info("the path of directory of disk images located on is %s" %
@@ -313,11 +314,10 @@ def install_linux_cdrom(params):
         logger.debug("the url of vmlinuz file is %s" % vmlinuzpath)
         logger.debug("the url of initrd file is %s" % initrdpath)
 
-        urllib.urlretrieve(vmlinuzpath, '/var/lib/libvirt/boot/vmlinuz')
-        urllib.urlretrieve(initrdpath, '/var/lib/libvirt/boot/initrd.img')
+        urllib.urlretrieve(vmlinuzpath, os.path.join(BOOT_DIR, 'vmlinuz')) 
+        urllib.urlretrieve(initrdpath, os.path.join(BOOT_DIR, 'initrd.img'))
 
-        logger.debug("vmlinuz file is located in /var/lib/libvirt/boot")
-        logger.debug("initrd file is located in /var/lib/libvirt/boot")
+        logger.debug("vmlinuz and initrd.img is located in %s" % BOOT_DIR)
 
     elif guesttype == 'xenfv' or guesttype == 'kvm':
         params['bootcd'] = '%s/custom.iso' % \
@@ -436,3 +436,53 @@ def install_linux_cdrom(params):
     time.sleep(60)
 
     return return_close(conn, logger, 0)
+
+def install_linux_cdrom_clean(params):
+    """ clean testing environment """
+    logger = params['logger']
+    guestname = params.get('guestname')
+    guesttype = params.get('guesttype')
+
+    util = utils.Utils()
+    hypervisor = util.get_hypervisor()
+    if hypervisor == 'xen':
+        imgfullpath = os.path.join('/var/lib/xen/images', guestname)
+    elif hypervisor == 'kvm':
+        imgfullpath = os.path.join('/var/lib/libvirt/images', guestname)
+
+    (status, output) = commands.getstatusoutput(VIRSH_QUIET_LIST % guestname) 
+    if status:
+        pass
+    else:
+        logger.info("remove guest %s, and its disk image file" % guestname)
+        (status, output) = commands.getstatusoutput(VM_STAT % guestname)
+        if status:
+            (status, output) = commands.getstatusoutput(VM_DESTROY % guestname)            
+            if status:
+                logger.error("failed to destroy guest %s" % guestname) 
+                logger.error("%s" % output)
+            else:
+                (status, output) = commands.getstatusoutput(VM_UNDEFINE % guestname)
+                if status:
+                    logger.error("failed to undefine guest %s" % guestname)
+                    logger.error("%s" % output)
+        else:
+            (status, output) = commands.getstatusoutput(VM_UNDEFINE % guestname)
+            if status:
+                logger.error("failed to undefine guest %s" % guestname)
+                logger.error("%s" % output)
+    
+    if os.path.exists(imgfullpath):
+        os.remove(imgfullpath)   
+ 
+    if guesttype == 'xenpv':
+        vmlinuz = os.path.join(BOOT_DIR, 'vmlinuz')
+        initrd = os.path.join(BOOT_DIR, 'initrd.img')
+        if os.path.exists(vmlinuz):
+            os.remove(vmlinuz)
+        if os.path.exists(initrd):
+            os.remove(initrd)               
+    elif guesttype == 'xenfv' or guesttype == 'kvm':
+        guest_dir = os.path.join(homepath, guestname)
+        if os.path.exists(guest_dir):     
+            shutil.rmtree(guest_dir) 

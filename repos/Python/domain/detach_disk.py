@@ -122,3 +122,7 @@ def detach_disk(params):
         return 0
     else:
         return -1
+
+def detach_disk_clean(params):
+    """ clean testing environment """
+    pass

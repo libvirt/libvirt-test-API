@@ -137,3 +137,7 @@ def restore(params):
         return return_close(conn, logger, 0)
     else:
         return return_close(conn, logger, 1)
+
+def restore_clean(params):
+    """ clean the testing environment """
+    pass

@@ -109,3 +109,6 @@ def resume(params):
     logger.info("PASS")
     return return_close(conn, logger, 0)
 
+def resume_clean(params):
+    """ clean testing environment """
+    pass

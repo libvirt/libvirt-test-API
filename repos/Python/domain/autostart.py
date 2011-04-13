@@ -118,3 +118,6 @@ def autostart(params):
     else:
         return 1
 
+def autostart_clean(params):
+    """ clean testing environment """
+    pass

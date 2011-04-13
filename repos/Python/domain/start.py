@@ -117,3 +117,7 @@ def start(params):
 
     logger.info("PASS")
     return return_close(conn, logger, 0)
+
+def start_clean(params):
+    """ clean testing environment """
+    pass

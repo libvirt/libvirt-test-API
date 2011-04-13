@@ -143,3 +143,7 @@ def attach_disk(params):
         return 0
     else:
         return 1
+
+def attach_disk_clean(params):
+    """ clean testing environment """
+    pass

@@ -147,3 +147,10 @@ def save(params):
     else:
         return 1
 
+def save_clean(params):
+    """ clean testing environment """
+    logger = params['logger']
+    filepath = params['filepath']
+    if os.path.exists(filepath):
+        logger.info("remove dump file from save %s" % filepath)
+        os.remove(filepath) 

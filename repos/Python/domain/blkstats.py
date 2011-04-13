@@ -97,3 +97,6 @@ def block_stats(params):
     else:
         return 1
 
+def block_stats_clean(params):
+    """ clean testing environment """
+    pass

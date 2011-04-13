@@ -133,3 +133,7 @@ def define(params):
         return 0
     else:
         return 1
+
+def define_clean(params):
+    """ clean testing environment """
+    pass

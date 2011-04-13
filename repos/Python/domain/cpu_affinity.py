@@ -319,3 +319,6 @@ def cpu_affinity(params):
     else:
         return return_close(conn, logger, 0)
 
+def cpu_affinity_clean(params):
+    """ clean testing environment """
+    pass

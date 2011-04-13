@@ -101,3 +101,7 @@ def interface_stats(params):
         return 0
     else:
         return -1
+
+def interface_stats_clean(params):
+    """ clean testing environment """
+    pass
