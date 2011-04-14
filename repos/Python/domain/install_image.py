@@ -119,7 +119,7 @@ def install_image(params):
     envfile = os.path.join(homepath, 'env.cfg')
     logger.info("the environment file is %s" % envfile)
 
-    envpaser = env_parser.Envpaser(envfile)
+    envpaser = env_parser.Envparser(envfile)
     image_url = envpaser.get_value("image", "%s_%s" % (guestos, guestarch))
 
     logger.info("download images file from %s" % image_url)

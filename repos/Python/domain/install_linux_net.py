@@ -262,7 +262,7 @@ def install_linux_net(params):
     envfile = os.path.join(homepath, 'env.cfg')
     logger.info("the environment file is %s" % envfile)
 
-    envpaser = env_parser.Envpaser(envfile)
+    envpaser = env_parser.Envparser(envfile)
 
     # Get http, ftp or nfs url based on guest os, arch
     # and installation method from env.cfg

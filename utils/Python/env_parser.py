@@ -29,7 +29,7 @@ sys.path.append(os.path.split(absdir)[0])
 
 import exception
 
-class Envpaser(object):
+class Envparser(object):
     def __init__(self, configfile):
         self.cfg = ConfigParser.ConfigParser()
         if os.path.isfile(configfile):

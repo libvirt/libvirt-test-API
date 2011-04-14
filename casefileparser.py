@@ -13,10 +13,10 @@
 # The GPL text is available in the file COPYING that accompanies this
 # distribution and at <http://www.gnu.org/licenses>.
 #
-# Filename: generator.py 
-# Summary: parse case configuration file  
-# Description: the module is for configuration file parsing to 
-#              generate a case list   
+# Filename: generator.py
+# Summary: parse case configuration file
+# Description: the module is for configuration file parsing to
+#              generate a case list
 # Maintainer: gren@redhat.com
 # Updated: Oct 19 2009
 # Version: 0.1.0
@@ -25,6 +25,9 @@ import re
 import os
 import sys
 import copy
+import exception
+
+from utils.Python import env_parser
 
 class CaseFileParser(object):
     """ Parser the case configuration file to generate a data list.
@@ -32,8 +35,11 @@ class CaseFileParser(object):
     def __init__(self, casefile=None, debug=False):
         """ Initialize the list and optionally parse case file. """
         self.list = [[]]
+        self.variables = {}
+        self.missing_variables = []
         self.debug = debug
         self.casefile = casefile
+        self.env = env_parser.Envparser("env.cfg")
         if casefile:
             self.parse_file(casefile)
 
@@ -41,8 +47,8 @@ class CaseFileParser(object):
         """ Enable or disable debugging support. """
         self.debug = debug
 
-    def parse_file(self, casefile):        
-        """ Open casefile for parsering. """ 
+    def parse_file(self, casefile):
+        """ Open casefile for parsering. """
         if not os.path.exists(casefile):
             raise Exception, "File %s not found" % casefile
         self.casefile = casefile
@@ -70,7 +76,7 @@ class CaseFileParser(object):
                 return line
 
     def get_next_line_indent(self, file):
-        """ Return the indent level of the next non-empty, 
+        """ Return the indent level of the next non-empty,
             non-comment line in file.If no line is available, return -1.
         """
         pos = file.tell()
@@ -86,14 +92,14 @@ class CaseFileParser(object):
         return indent
 
     def add_option_value(self, caselist, casename, option, value):
-        """ Add option to the data list. """ 
+        """ Add option to the data list. """
         for dictionary in caselist:
             testkey = dictionary.keys()[0]
             if casename == testkey:
                 if not dictionary[testkey].has_key(option):
-                    dictionary[testkey][option] = value      
+                    dictionary[testkey][option] = value
             else:
-                continue    
+                continue
 
     def debug_print(self, str1, str2=""):
         """Nicely print two strings and an arrow.  For internal use."""
@@ -102,7 +108,34 @@ class CaseFileParser(object):
         else:
             str = str1
         print str
-            
+
+    def variables_lookup(self, values):
+        res = []
+        for val in values:
+            if val[0] == '$':
+                varname = val[1:]
+                if self.debug:
+                    self.debug_print("found variable %s" % varname)
+                try:
+                    value = self.env.get_value("variables", varname)
+                    value = string.strip(value)
+                    self.variables[varname] = value
+                    if value == "":
+                        if self.debug:
+                            self.debug_print("variable %s is empty" % varname)
+                        self.missing_variables.append(varname)
+                    else:
+                        res.append(value)
+                except exception.OptionDoesNotExist, e:
+                    self.missing_variables.append(varname)
+                except exception.SectionDoesNotExist, e:
+                    self.missing_variables.append(varname)
+                except:
+                    self.missing_variables.append(varname)
+            else:
+                res.append(val)
+        return res
+
     def option_parse(self, file, list, casename):
         """ For options of a case parsing. """
         new_list = []
@@ -125,12 +158,12 @@ class CaseFileParser(object):
                 indent = self.get_next_line_indent(file)
                 if indent == -1:
                     break
-               
+
                 for caselist in list:
                     new_dict = copy.deepcopy(caselist)
                     temp_list.append(new_dict)
 
-                if indent != 8 and indent == 4:
+                if indent == 4:
                     new_list = self.option_parse(file, new_list, casename)
                     return new_list
                 elif indent == 0:
@@ -141,7 +174,10 @@ class CaseFileParser(object):
 
                     tripped_valuelist = valuestring.strip().split()
                     tripped_valuename = tripped_valuelist[0]
-                     
+
+                    # look for variable and try to substitute them
+                    tripped_valuelist = self.variables_lookup(tripped_valuelist)
+
                     if self.debug:
                         self.debug_print(
                             "the option_value we are parsing is %s" %
@@ -153,7 +189,7 @@ class CaseFileParser(object):
                     for caselist in temp_list:
                         if self.debug:
                             self.debug_print(
-                                "before parsing, the caselist is %s" % 
+                                "before parsing, the caselist is %s" %
                                 caselist)
 
                         if len(tripped_valuelist) > 1:
@@ -161,7 +197,7 @@ class CaseFileParser(object):
                                 len(tripped_valuelist) == 3:
                                 if self.debug:
                                     self.debug_print(
-                                    "the value with a keywords which is %s" % 
+                                    "the value with a keywords which is %s" %
                                     tripped_valuelist[1])
 
                                 filterters = tripped_valuelist[2].split("|")
@@ -177,8 +213,8 @@ class CaseFileParser(object):
                                             casename,
                                             tripped_optionname,
                                             tripped_valuename)
-                                        break 
-                                else:         
+                                        break
+                                else:
                                     filterter_list.append(caselist)
                             elif tripped_valuelist[1] == "no" and \
                                 len(tripped_valuelist) == 2:
@@ -211,31 +247,31 @@ class CaseFileParser(object):
                                     temp_list = [caselist]
                         else:
                             self.add_option_value(caselist,
-                                                  casename, 
-                                                  tripped_optionname, 
+                                                  casename,
+                                                  tripped_optionname,
                                                   tripped_valuename)
 
                         if self.debug:
                             self.debug_print(
-                                "after parsing the caselist is %s" % 
-                                 caselist)    
-  
+                                "after parsing the caselist is %s" %
+                                 caselist)
+
                     trash = [temp_list.remove(i) for i in filterter_list]
 
                     if self.debug:
                         self.debug_print(
-                            "after handling the temp_list is %s" % 
-                            temp_list) 
+                            "after handling the temp_list is %s" %
+                            temp_list)
 
                     new_list += temp_list
 
         return new_list
 
     def parse(self, file, list):
-        """ For the testcase name parsering. """ 
+        """ For the testcase name parsering. """
         while True:
             if self.debug:
-                self.debug_print("the list is %s" % list)
+                self.debug_print("the list is",  list)
 
             indent = self.get_next_line_indent(file)
             if indent < 0:
@@ -251,7 +287,7 @@ class CaseFileParser(object):
                 tripped_casename = tripped_caselist[0]
 
                 if self.debug:
-                    self.debug_print("we begin to handle the case : %s" %
+                    self.debug_print("we begin to handle the case", 
                                      tripped_casename)
 
                 if len(tripped_caselist) == 3 and \
@@ -261,10 +297,10 @@ class CaseFileParser(object):
                     if self.debug:
                         self.debug_print(
                             "the case with a keywords which is %s \
-                             keywords_value is %s" %  
+                             keywords_value is %s" %
                             (tripped_caselist[1], times))
 
-                    for i in range(int(times)):        
+                    for i in range(int(times)):
                         for caselist in list:
                             newdict = {}
                             newdict[tripped_casename] = {}
@@ -283,6 +319,11 @@ class CaseFileParser(object):
                         newdict[tripped_casename] = {}
                         caselist.append(newdict)
 
+        if len(self.missing_variables) != 0:
+            raise exception.MissingVariable(
+          "The variables %s referenced in %s could not be found in env.cfg" %
+                      (self.missing_variables, self.casefile))
+
         return list
 
 if __name__ == "__main__":
@@ -290,8 +331,12 @@ if __name__ == "__main__":
         casefile = sys.argv[1]
     else:
         casefile = os.path.join(os.path.dirname(sys.argv[0]), "case.conf")
-    list = config(casefile, debug=True).get_list()
+    try:
+        list = CaseFileParser(casefile, debug=True).get_list()
+        print "The number of generated list is %s" % len(list)
+        print list
+    except Exception, e:
+        print e
 
-    print "The number of generated list is %s" % len(list)
-    print list
+
 

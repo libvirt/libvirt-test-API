@@ -75,3 +75,7 @@ class FileExist(LibvirtException):
     code = 209
     message = "File exist"
 
+class MissingVariable(LibvirtException):
+    code = 210
+    message = "Variables missing from env.cfg [variables] section"
+

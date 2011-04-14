@@ -264,7 +264,7 @@ def install_linux_cdrom(params):
     envfile = os.path.join(homepath, 'env.cfg')
     logger.info("the environment file is %s" % envfile)
 
-    envpaser = env_parser.Envpaser(envfile)
+    envpaser = env_parser.Envparser(envfile)
     ostree = envpaser.get_value("guest", guestos + "_" +guestarch)
     ks = envpaser.get_value("guest", guestos + "_" +guestarch + "_http_ks")
 

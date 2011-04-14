@@ -322,7 +322,7 @@ def install_windows_cdrom(params):
     logger.info("the environment file is %s" % envfile)
 
     # Get iso file based on guest os and arch from env.cfg
-    envpaser = env_parser.Envpaser(envfile)
+    envpaser = env_parser.Envparser(envfile)
     iso_file = envpaser.get_value("guest", guestos + '_' + guestarch)
     cdkey = envpaser.get_value("guest", "%s_%s_key" % (guestos, guestarch))
 
