@@ -87,7 +87,7 @@ def undefine(params):
     if test_result:
         return 0
     else:
-        return -1
+        return 1
 
 def undefine_clean(params):
     """ clean testing environment """
