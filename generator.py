@@ -120,6 +120,7 @@ class FuncGen(object):
         else:
             logger.info("\nStart Testing:")
             logger.info("    Case Count: %s" % testcase_number)
+            logger.info("    Log File: %s\n" % self.logfile)
             del envlog
 
         caselog = log.CaseLog(self.logfile, self.loglevel)
@@ -134,13 +135,13 @@ class FuncGen(object):
 
             case_start_time = time.strftime("%Y-%m-%d %H:%M:%S")
 
+            ret = -1
             try:
                 if self.language == 'Python':
 
                     if case_ref_name != 'sleep':
                         case_params['logger'] = logger
                     existed_bug_list = self.bug_check(case_ref_name)
-                    ret = -1
                     if len(existed_bug_list) == 0: 
                         if case_ref_name == 'sleep':
                             sleepsecs = case_params['sleep']
@@ -157,7 +158,7 @@ class FuncGen(object):
                         ret = 100
                         self.fmt.printf('end', case_ref_name, ret)
                         continue
-            except: 
+            except Exception, e: 
                 logger.error(traceback.format_exc())
                 continue
             finally:
@@ -167,7 +168,8 @@ class FuncGen(object):
                 elif ret == 100:            
                     retflag += 0 
                 else:
-                    retflag += ret
+                    pass
+                retflag += ret
                 self.fmt.printf('end', case_ref_name, ret)
 
         end_time = time.strftime("%Y-%m-%d %H:%M:%S")
@@ -178,7 +180,6 @@ class FuncGen(object):
         logger.info("\nSummary:")
         logger.info("    Total:%s [Pass:%s Fail:%s]" % \
                      (testcase_number, (testcase_number - retflag), retflag))
-        logger.info("    Log File: %s\n" % self.logfile)
         del envlog 
 
         result = (retflag and "FAIL") or "PASS"
