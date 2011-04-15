@@ -30,6 +30,7 @@ append_path(result.group(0))
 from lib.Python import connectAPI
 from lib.Python import domainAPI
 from utils.Python import utils
+from exception import LibvirtAPI
 
 def usage(params):
     """Verify inputing parameter dictionary"""
@@ -75,8 +76,27 @@ def interface_stats(params):
     if check_guest_status(guestname, domobj):
         pass
     else:
-        domobj.start(guestname)
-        time.sleep(90)
+        try:
+            logger.info("%s is not running , power on it" % guestname)
+            domobj.start(guestname)
+        except LibvirtAPI, e:
+            logger.error(str(e))
+            logger.error("start failed")
+            conn.close()
+            logger.info("closed hypervisor connection")       
+            return 1
+        
+    mac = util.get_dom_mac_addr(guestname)
+    logger.info("get ip by mac address")
+    ip = util.mac_to_ip(mac, 180)
+
+    logger.info('ping guest')
+    if not util.do_ping(ip, 300):
+        logger.error('Failed on ping guest, IP: ' + str(ip))
+        conn.close()
+        logger.info("closed hypervisor connection")
+        return 1
+
     (ifstats, path) = domobj.get_interface_stats(guestname)
     if ifstats:
     # check_interface_stats()
