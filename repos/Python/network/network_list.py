@@ -209,27 +209,3 @@ def network_list(params):
                 return return_close(conn, logger, 1)
 
     return return_close(conn, logger, 0)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
->>>>>>> d2b1826... modify all of existing testcases to close the opened hypervisor connection

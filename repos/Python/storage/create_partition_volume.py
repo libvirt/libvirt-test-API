@@ -168,28 +168,3 @@ def create_partition_volume(params):
     else:
         logger.error("checking failed")
         return return_close(conn, logger, 1)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
->>>>>>> d2b1826... modify all of existing testcases to close the opened hypervisor connection
