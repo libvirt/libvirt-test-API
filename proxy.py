@@ -39,9 +39,14 @@ class Proxy(object):
         """
         for testcase_name in self.testcases_names:
             # get programming language, package, casename
-            language = testcase_name.split(":")[0]
-            package = testcase_name.split(":")[1]
-            casename = testcase_name.split(":")[2]
+            # FIXME: We changed the intention to only support Python,
+            # which means there will be no language prefix specified in
+            # cases like "Python:", this is an temproy solution, need to
+            # delete all the codes related with other language support.
+            # language = testcase_name.split(":")[0]
+            language = "Python"
+            package = testcase_name.split(":")[0]
+            casename = testcase_name.split(":")[1]
             # according to language kind to dispatch function
             funcs = getattr(self, "get_%s_call_dict" % language.lower())
             func_ref = None
@@ -62,9 +67,14 @@ class Proxy(object):
         """
         for testcase_name in self.testcases_names:
             # get programming language, package, casename
-            language = testcase_name.split(":")[0]
-            package = testcase_name.split(":")[1]
-            casename = testcase_name.split(":")[2]
+            # FIXME: We changed the intention to only support Python,
+            # which means there will be no language prefix specified in
+            # cases like "Python:", this is an temproy solution, need to
+            # improve.
+            #language = testcase_name.split(":")[0]
+            language = "Python"
+            package = testcase_name.split(":")[0]
+            casename = testcase_name.split(":")[1]
             # according to language kind to dispatch function
             funcs = getattr(self, "get_%s_call_dict" % language.lower())
             func_ref = None
@@ -79,11 +89,11 @@ class Proxy(object):
             key = package + ":" + casename
             self.func_dict[key] = func_ref
         return self.func_dict
-         
+
     def get_python_call_dict(self, *args):
         """ Return python testing function reference dictionary """
         (language, package, casename, func) = args
-        case_abs_path = '%s.%s.%s.%s' % ('repos', language, package, casename)
+        case_abs_path = '%s.%s.%s' % ('repos', package, casename)
         # main function name is the same as casename here
         case_mod = __import__(case_abs_path)
         components = case_abs_path.split('.')
@@ -92,7 +102,7 @@ class Proxy(object):
             case_mod = getattr(case_mod, component)
         main_function_ref = getattr(case_mod, func)
         return main_function_ref
-    
+
     def get_java_call_dict(self, *args):
         """ Return java testing function reference dictionary """
         pass

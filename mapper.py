@@ -43,7 +43,7 @@ class Mapper(object):
                 continue
 
             names = testcases_names.split(":")
-            package_casename = names[1] +":"+ names[2]
+            package_casename = names[0] +":"+ names[1]
 
             testcases_params = testcase.values()[0]
             tripped_case[package_casename] = testcases_params
@@ -63,9 +63,12 @@ class Mapper(object):
             if testcases_names == 'sleep':
                 tripped_cases_list.append(testcase)
                 continue
-            
-            language = testcases_names.split(":")[0]
-            casename = testcases_names.split(":")[2]
+            # FIXME: We changed the intention to only support Python language,
+            # which means we won't define the language type in cases with prefix
+            # like "Python:", this is a tempory solution, need to improve.
+            #language = testcases_names.split(":")[0]
+            language = "Python"
+            casename = testcases_names.split(":")[1]
 
             testcases_params = testcase.values()[0]
             tripped_case[casename] = testcases_params

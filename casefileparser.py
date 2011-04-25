@@ -26,6 +26,7 @@ import os
 import sys
 import copy
 import exception
+import string
 
 from utils.Python import env_parser
 
