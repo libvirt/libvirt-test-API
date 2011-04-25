@@ -29,8 +29,8 @@ pwd = os.getcwd()
 result = re.search('(.*)libvirt-test-API', pwd)
 append_path(result.group(0))
 
-from lib.Python import connectAPI
-from lib.Python import domainAPI
+from lib import connectAPI
+from lib import domainAPI
 from utils.Python import utils
 
 def return_close(conn, logger, ret):

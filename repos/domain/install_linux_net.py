@@ -44,8 +44,8 @@ result = re.search('(.*)libvirt-test-API', pwd)
 homepath = result.group(0)
 append_path(homepath)
 
-from lib.Python import connectAPI
-from lib.Python import domainAPI
+from lib import connectAPI
+from lib import domainAPI
 from utils.Python import utils
 from utils.Python import env_parser
 from utils.Python import xmlbuilder

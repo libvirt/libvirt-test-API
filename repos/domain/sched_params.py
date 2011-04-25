@@ -25,8 +25,8 @@ absdir = os.path.abspath(dir)
 rootdir = os.path.split(os.path.split(absdir)[0])[0]
 sys.path.append(rootdir)
 
-from lib.Python import connectAPI
-from lib.Python import domainAPI
+from lib import connectAPI
+from lib import domainAPI
 from utils.Python import utils
 
 def return_close(conn, logger, ret):
