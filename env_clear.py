@@ -44,10 +44,10 @@ class EnvClear(object):
             self.cases_params_list.append(case_params)
 
     def __call__(self):
-        retflag = self.envclear()
+        retflag = self.env_clear()
         return retflag
 
-    def envclear(self):
+    def env_clear(self):
         """ Run each clearing function with the corresponding arguments """
  
         envlog = log.EnvLog(self.logfile, self.loglevel)

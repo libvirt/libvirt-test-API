@@ -24,7 +24,7 @@ import sys
 import traceback
 
 import mapper
-import envinspect
+import env_inspect
 from utils.Python import log
 from utils.Python import format
 
@@ -108,7 +108,7 @@ class FuncGen(object):
         start_time = time.strftime("%Y-%m-%d %H:%M:%S")
 
         logger.info("Checking Testing Environment... ")
-        envck = envinspect.EnvInspect(logger)
+        envck = env_inspect.EnvInspect(logger)
 
         if envck.env_checking() == 1:
             sys.exit(1)
