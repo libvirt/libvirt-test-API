@@ -56,8 +56,6 @@ class FuncGen(object):
             log_xml_parser.add_testprocedure_xml(testrunid,
                                                  testid,
                                                  test_procedure)
-        print pkg_tripped_cases
-
         self.cases_ref_names = []
         for case in pkg_tripped_cases:
             case_ref_name = case.keys()[0]

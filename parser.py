@@ -139,7 +139,6 @@ class CaseFileParser(object):
 
     def variables_lookup(self, values):
         res = []
-        print "values=", values
         for val in values:
             if val[0] == '$':
                 varname = val[1:]
@@ -163,7 +162,6 @@ class CaseFileParser(object):
                     self.missing_variables.append(varname)
             else:
                 res.append(val)
-        print "res=", res
         return res
 
     def option_parse(self, fh, list, casename):
