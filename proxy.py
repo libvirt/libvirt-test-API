@@ -13,101 +13,69 @@
 # The GPL text is available in the file COPYING that accompanies this
 # distribution and at <http://www.gnu.org/licenses>.
 #
-# Filename: proxy.py
-# Summary: Libvirt-test-API use it to generate a list of callable 
-#          function reference.
-# Description: The proxy examines the list of unique test cases, 
-#              received from the generator and import each test case
-#              from appropriate module directory.
-# Maintainer: ajia@redhat.com
-# Update: Oct 23, 2009
-# Version: 0.1.0
+# Generate a list of callable function references.
+
+# The proxy examines the list of unique test cases, received from the
+# generator and import each test case from appropriate module directory.
+
+# Author: Alex Jia <ajia@redhat.com>
 
 class Proxy(object):
-    """ The Proxy class is used for getting real function 
-        call reference
-    """
+    """ The Proxy class is used for getting real function call reference """
+
     def __init__(self, testcases_names):
         """ Argument case_list is test case list """
         self.testcases_names = testcases_names
         self.func_dict = dict()
 
     def get_func_call_dict(self):
-        """ Provides multiple programming language support. In fact, 
-            it is a dispather, and will return real function reference
-            dictionary
-        """
         for testcase_name in self.testcases_names:
-            # get programming language, package, casename
-            # FIXME: We changed the intention to only support Python,
-            # which means there will be no language prefix specified in
-            # cases like "Python:", this is an temproy solution, need to
-            # delete all the codes related with other language support.
-            # language = testcase_name.split(":")[0]
-            language = "Python"
+            # Get programming package, casename
             package = testcase_name.split(":")[0]
             casename = testcase_name.split(":")[1]
-            # according to language kind to dispatch function
-            funcs = getattr(self, "get_%s_call_dict" % language.lower())
+
+            # Dispatch functions
+            funcs = getattr(self, "get_call_dict")
             func_ref = None
             func = casename
-            if language == 'Python':
-                func_ref = funcs(language, package, casename, func)
-            if language == 'Java':
-                func_ref = funcs(language, package)
-            if language == 'Ruby':
-                func_ref = funcs(language, package)
-            # construct function call dictionary
+            func_ref = funcs(package, casename, func)
+
+            # Construct function call dictionary
             key = package + ":" + casename
             self.func_dict[key] = func_ref
         return self.func_dict
 
     def get_clearfunc_call_dict(self):
-        """ return a clearing function reference dictionary
-        """
+        """ Return a clearing function reference dictionary. """
         for testcase_name in self.testcases_names:
-            # get programming language, package, casename
-            # FIXME: We changed the intention to only support Python,
-            # which means there will be no language prefix specified in
-            # cases like "Python:", this is an temproy solution, need to
-            # improve.
-            #language = testcase_name.split(":")[0]
-            language = "Python"
+            # Get programming package, casename
             package = testcase_name.split(":")[0]
             casename = testcase_name.split(":")[1]
-            # according to language kind to dispatch function
-            funcs = getattr(self, "get_%s_call_dict" % language.lower())
+
+            # According to language kind to dispatch function
+            funcs = getattr(self, "get_call_dict")
             func_ref = None
             func = casename + "_clean"
-            if language == 'Python':
-                func_ref = funcs(language, package, casename, func)
-            if language == 'Java':
-                func_ref = funcs(language, package)
-            if language == 'Ruby':
-                func_ref = funcs(language, package)
-            # construct function call dictionary
+
+            func_ref = funcs(package, casename, func)
+
+            # Construct function call dictionary
             key = package + ":" + casename
             self.func_dict[key] = func_ref
         return self.func_dict
 
-    def get_python_call_dict(self, *args):
-        """ Return python testing function reference dictionary """
-        (language, package, casename, func) = args
+    def get_call_dict(self, *args):
+        """ Return testing function reference dictionary """
+        (package, casename, func) = args
         case_abs_path = '%s.%s.%s' % ('repos', package, casename)
-        # main function name is the same as casename here
+
+        # Main function name is the same as casename here
         case_mod = __import__(case_abs_path)
         components = case_abs_path.split('.')
-        # import recursively module
+
+        # Import recursively module
         for component in components[1:]:
             case_mod = getattr(case_mod, component)
         main_function_ref = getattr(case_mod, func)
         return main_function_ref
-
-    def get_java_call_dict(self, *args):
-        """ Return java testing function reference dictionary """
-        pass
-
-    def get_ruby_call_dict(self, *args):
-        """ Return ruby testing function reference dictionary """
-        pass
 

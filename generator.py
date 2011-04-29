@@ -13,14 +13,10 @@
 # The GPL text is available in the file COPYING that accompanies this
 # distribution and at <http://www.gnu.org/licenses>.
 #
-# Filename: generator.py 
-# Summary: To generate a callable testcase function  
-# Description: The module to initilize log module and match 
-#              testcase function from proxy with corresponding 
-#              argument to form a callable function.
-# Maintainer: gren@redhat.com, ajia@redhat.com
-# Updated: Oct 19 2009
-# Version: 0.1.0
+# This module to initilize log module and match testcase function from
+# proxy with corresponding argument to form a callable function.
+#
+# Author: Guannan Ren <gren@redhat.com>, Alex Jia <ajia@redhat.com>
 
 import time
 import fcntl
@@ -33,11 +29,11 @@ from utils.Python import log
 from utils.Python import format
 
 class FuncGen(object):
-    """ to generate a callable testcase"""
+    """ To generate a callable testcase"""
     def __init__(self, cases_func_ref_dict,
                  activity, logfile,
-                 testrunid, testid, 
-                 log_xml_parser, lockfile, 
+                 testrunid, testid,
+                 log_xml_parser, lockfile,
                  bugstxt, loglevel):
         self.cases_func_ref_dict = cases_func_ref_dict
         self.logfile = logfile
@@ -50,27 +46,26 @@ class FuncGen(object):
         self.fmt = format.Format(logfile)
         self.log_xml_parser = log_xml_parser
 
-        # save case information to a file in a format
+        # Save case information to a file in a format
         self.__case_info_save(activity, testrunid)
 
         mapper_obj = mapper.Mapper(activity)
-        lan_pkg_tripped_cases, self.language = \
-            mapper_obj.get_language_package_tripped()
-        lan_tripped_cases = mapper_obj.get_language_tripped()
+        pkg_tripped_cases = mapper_obj.get_package_tripped()
 
-        for test_procedure in lan_tripped_cases:
-            log_xml_parser.add_testprocedure_xml(testrunid, 
-                                                 testid, 
+        for test_procedure in pkg_tripped_cases:
+            log_xml_parser.add_testprocedure_xml(testrunid,
+                                                 testid,
                                                  test_procedure)
-        
+        print pkg_tripped_cases
+
         self.cases_ref_names = []
-        for lan_tripped_case in lan_tripped_cases:
-            case_ref_name = lan_tripped_case.keys()[0]
-            self.cases_ref_names.append(case_ref_name)   
-       
+        for case in pkg_tripped_cases:
+            case_ref_name = case.keys()[0]
+            self.cases_ref_names.append(case_ref_name)
+
         self.cases_params_list = []
-        for lan_tripped_case in lan_tripped_cases:
-            case_params = lan_tripped_case.values()[0]
+        for case in pkg_tripped_cases:
+            case_params = case.values()[0]
             self.cases_params_list.append(case_params)
 
     def __call__(self):
@@ -78,17 +73,17 @@ class FuncGen(object):
         return retflag
 
     def bug_check(self, mod_func_name):
-        """ check if there was already a bug in bugzilla assocaited with 
+        """ Check if there was already a bug in bugzilla assocaited with
             specific testcase
         """
         exsited_bug = []
-        bugstxt = open(self.bugstxt, "r")  
+        bugstxt = open(self.bugstxt, "r")
         linelist = bugstxt.readlines()
 
         if len(linelist) == 0:
             bugstxt.close()
             return exsited_bug
-    
+
         for line in linelist:
             if line.startswith('#'):
                 continue
@@ -100,10 +95,10 @@ class FuncGen(object):
                     pass
 
         bugstxt.close()
-        return exsited_bug   
+        return exsited_bug
 
     def generator(self):
-        """ run each test case with the corresponding arguments and
+        """ Run each test case with the corresponding arguments and
             add log object into the dictionary of arguments
         """
 
@@ -116,7 +111,7 @@ class FuncGen(object):
         envck = envinspect.EnvInspect(logger)
 
         if envck.env_checking() == 1:
-            sys.exit(1)  
+            sys.exit(1)
         else:
             logger.info("\nStart Testing:")
             logger.info("    Case Count: %s" % testcase_number)
@@ -125,7 +120,7 @@ class FuncGen(object):
 
         caselog = log.CaseLog(self.logfile, self.loglevel)
         logger = caselog.case_log()
-       
+
         retflag = 0
         for i in range(testcase_number):
 
@@ -137,36 +132,36 @@ class FuncGen(object):
 
             ret = -1
             try:
-                if self.language == 'Python':
+                if case_ref_name != 'sleep':
+                    case_params['logger'] = logger
 
-                    if case_ref_name != 'sleep':
-                        case_params['logger'] = logger
-                    existed_bug_list = self.bug_check(case_ref_name)
-                    if len(existed_bug_list) == 0: 
-                        if case_ref_name == 'sleep':
-                            sleepsecs = case_params['sleep']
-                            logger.info("sleep %s seconds" % sleepsecs)
-                            time.sleep(int(sleepsecs))
-                            ret = 0
-                        else:
-                            ret = self.cases_func_ref_dict[case_ref_name](case_params)
+                existed_bug_list = self.bug_check(case_ref_name)
+
+                if len(existed_bug_list) == 0:
+                    if case_ref_name == 'sleep':
+                        sleepsecs = case_params['sleep']
+                        logger.info("sleep %s seconds" % sleepsecs)
+                        time.sleep(int(sleepsecs))
+                        ret = 0
                     else:
-                        logger.info("about the testcase , bug existed:")
-                        for existed_bug in existed_bug_list:
-                            logger.info("%s" % existed_bug)
+                        ret = self.cases_func_ref_dict[case_ref_name](case_params)
+                else:
+                    logger.info("about the testcase , bug existed:")
+                    for existed_bug in existed_bug_list:
+                        logger.info("%s" % existed_bug)
 
-                        ret = 100
-                        self.fmt.printf('end', case_ref_name, ret)
-                        continue
-            except Exception, e: 
+                    ret = 100
+                    self.fmt.printf('end', case_ref_name, ret)
+                    continue
+            except Exception, e:
                 logger.error(traceback.format_exc())
                 continue
             finally:
                 case_end_time = time.strftime("%Y-%m-%d %H:%M:%S")
-                if ret == -1: 
+                if ret == -1:
                     ret = 1
-                elif ret == 100:            
-                    retflag += 0 
+                elif ret == 100:
+                    retflag += 0
                 else:
                     pass
                 retflag += ret
@@ -180,25 +175,24 @@ class FuncGen(object):
         logger.info("\nSummary:")
         logger.info("    Total:%s [Pass:%s Fail:%s]" % \
                      (testcase_number, (testcase_number - retflag), retflag))
-        del envlog 
+        del envlog
 
         result = (retflag and "FAIL") or "PASS"
         fcntl.lockf(self.lockfile.fileno(), fcntl.LOCK_EX)
-        self.log_xml_parser.add_test_summary(self.testrunid, 
-                                             self.testid, 
-                                             result, 
-                                             start_time, 
-                                             end_time, 
+        self.log_xml_parser.add_test_summary(self.testrunid,
+                                             self.testid,
+                                             result,
+                                             start_time,
+                                             end_time,
                                              self.logfile)
         fcntl.lockf(self.lockfile.fileno(), fcntl.LOCK_UN)
         return retflag
 
     def __case_info_save(self, case, testrunid):
-        """ save data of each test into a file under the testrunid directory 
-            which the test belongs to
+        """ Save data of each test into a file under the testrunid directory
+            which the test belongs to.
         """
         caseinfo_file = "log" + "/" + str(testrunid) + "/" + "caseinfo"
         CASEINFO = open(caseinfo_file, "a")
         CASEINFO.write(str(case) + "\n")
         CASEINFO.close()
-
