@@ -207,6 +207,10 @@ class CaseFileParser(object):
                 tripped_valuelist = valuestring.strip().split()
                 # look for variable and try to substitute them
                 tripped_valuelist = self.variables_lookup(tripped_valuelist)
+                if len(self.missing_variables) != 0:
+                    raise exception.MissingVariable(
+                    "The variables %s referenced in %s could not be found in env.cfg" %
+                        (self.missing_variables, self.casefile))
 
                 tripped_valuename = tripped_valuelist[0]
 
@@ -365,11 +369,6 @@ class CaseFileParser(object):
                     newdict = {}
                     newdict[tripped_casename] = {}
                     caselist.append(newdict)
-
-        if len(self.missing_variables) != 0:
-            raise exception.MissingVariable(
-          "The variables %s referenced in %s could not be found in env.cfg" %
-                      (self.missing_variables, self.casefile))
 
         return list
 
