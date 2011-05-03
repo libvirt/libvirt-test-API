@@ -129,30 +129,31 @@ class FuncGen(object):
 
             ret = -1
             try:
-                if case_ref_name != 'sleep':
-                    case_params['logger'] = logger
+                try:
+                    if case_ref_name != 'sleep':
+                        case_params['logger'] = logger
 
-                existed_bug_list = self.bug_check(case_ref_name)
+                    existed_bug_list = self.bug_check(case_ref_name)
 
-                if len(existed_bug_list) == 0:
-                    if case_ref_name == 'sleep':
-                        sleepsecs = case_params['sleep']
-                        logger.info("sleep %s seconds" % sleepsecs)
-                        time.sleep(int(sleepsecs))
-                        ret = 0
+                    if len(existed_bug_list) == 0:
+                        if case_ref_name == 'sleep':
+                            sleepsecs = case_params['sleep']
+                            logger.info("sleep %s seconds" % sleepsecs)
+                            time.sleep(int(sleepsecs))
+                            ret = 0
+                        else:
+                            ret = self.cases_func_ref_dict[case_ref_name](case_params)
                     else:
-                        ret = self.cases_func_ref_dict[case_ref_name](case_params)
-                else:
-                    logger.info("about the testcase , bug existed:")
-                    for existed_bug in existed_bug_list:
-                        logger.info("%s" % existed_bug)
+                        logger.info("about the testcase , bug existed:")
+                        for existed_bug in existed_bug_list:
+                            logger.info("%s" % existed_bug)
 
-                    ret = 100
-                    self.fmt.printf('end', case_ref_name, ret)
+                        ret = 100
+                        self.fmt.printf('end', case_ref_name, ret)
+                        continue
+                except Exception, e:
+                    logger.error(traceback.format_exc())
                     continue
-            except Exception, e:
-                logger.error(traceback.format_exc())
-                continue
             finally:
                 case_end_time = time.strftime("%Y-%m-%d %H:%M:%S")
                 if ret == -1:
