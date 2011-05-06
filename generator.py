@@ -16,7 +16,6 @@
 # This module to initilize log module and match testcase function from
 # proxy with corresponding argument to form a callable function.
 #
-# Author: Guannan Ren <gren@redhat.com>, Alex Jia <ajia@redhat.com>
 
 import time
 import fcntl

@@ -18,7 +18,6 @@
 # The proxy examines the list of unique test cases, received from the
 # generator and import each test case from appropriate module directory.
 
-# Author: Alex Jia <ajia@redhat.com>
 
 class Proxy(object):
     """ The Proxy class is used for getting real function call reference """

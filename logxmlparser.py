@@ -17,9 +17,6 @@
 # Summary: generate xmlfile for log management  
 # Description: The module gives methods to write xml block 
 #              during a testrun running 
-# Maintainer: gren@redhat.com
-# Updated: Oct 19 2009
-# Version: 0.1.0
 
 import os
 import copy

@@ -17,9 +17,6 @@
 # Summary: the exception class  
 # Description: The module defines the exceptions the framework could use  
 #              when fatal error occurred. 
-# Maintainer: gren@redhat.com
-# Updated: Oct 19 2009
-# Version: 0.1.0
 
 import libvirt
 

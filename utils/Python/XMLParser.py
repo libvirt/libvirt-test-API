@@ -17,7 +17,6 @@
 # Summary: parse and xml document into a python dictionary 
 # Description: The module is a tool to parses 
 # and xml document into a python dictionary 
-# Version: 0.1.0
 
 import os
 from xml.dom import minidom

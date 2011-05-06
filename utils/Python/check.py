@@ -17,8 +17,6 @@
 # Summary: basic check operation needed by test 
 # Description: The module is a tool to help conduct basic 
 #              check operation on specified host 
-# Maintainer: gren@redhat.com
-# Version: 0.1.0
 
 import os
 import re

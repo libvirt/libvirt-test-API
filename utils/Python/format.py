@@ -16,8 +16,6 @@
 # Filename: format.py 
 # Summary: generate specified kind of format string 
 # Description: The module is a tool to generate specified kind of format string
-# Maintainer: Alex Jia: ajia@redhat.com 
-# Version: 0.1.0
 
 from string import Template
 

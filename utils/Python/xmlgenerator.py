@@ -16,8 +16,6 @@
 # Filename: xmlgenerator.py 
 # Summary: generate domain xml 
 # Description: The module is a tool to generate domain xml 
-# Maintainer: Nan Zhang: nzhang@redhat.com 
-# Version: 0.1.0
 
 import os
 import sys

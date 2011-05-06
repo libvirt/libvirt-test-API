@@ -17,9 +17,6 @@
 # Summary: multiprocessing module 
 # Description: If the switch of multiprocessing is on,
 #              the module will be called to fork subprocess 
-# Maintainer: jyang@redhat.com
-# Updated: Oct 19 2009
-# Version: 0.1.0
 
 import os
 import sys

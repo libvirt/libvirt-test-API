@@ -16,8 +16,6 @@
 # Filename: xmlbuilder.py 
 # Summary: operation for building domain xml 
 # Description: The module is to provide operation for building domain xml
-# Maintainer: Nan Zhang: nzhang@redhat.com 
-# Version: 0.1.0
 
 __DEBUG__ = False
 

@@ -16,9 +16,6 @@
 # Filename: log.py 
 # Summary: log file operation 
 # Description: The module is a tool to provide basic log file operation 
-# Maintainer: ajia@redhat.com
-# Update: Oct 23 2009
-# Version: 0.1.0
 
 import time
 import os

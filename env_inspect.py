@@ -18,9 +18,6 @@
 # Description: The module match the reference of clearing function 
 #              from each testcase to the corresponding testcase's 
 #              argument in the order of testcase running 
-# Maintainer: gren@redhat.com
-# Updated: Apr 10 2011
-# Version: 0.1.0
 
 import subprocess
 

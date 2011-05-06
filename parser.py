@@ -15,7 +15,6 @@
 #
 # This module is for configuration file parsing, to generate a case list.
 #
-# Author: Guannan Ren <gren@redhat.com>
 
 import re
 import os

@@ -16,7 +16,6 @@
 # This module matches the reference of clearing function from each testcase
 # to the corresponding testcase's argument in the order of testcase running 
 #
-# Author: GuannanRen <gren@redhat.com>
 
 import mapper
 from utils.Python import log

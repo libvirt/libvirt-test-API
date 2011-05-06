@@ -16,8 +16,6 @@
 # Filename: env_parser.py 
 # Summary: parse the env configuration file 
 # Description: The module is a tool to parse the env configuration file 
-# Maintainer: gren@redhat.com
-# Version: 0.1.0
 
 import ConfigParser
 import os

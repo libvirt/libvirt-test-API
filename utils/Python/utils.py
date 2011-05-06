@@ -16,7 +16,6 @@
 # Filename: utils.py 
 # Summary: basic operation on host 
 # Description: The module is a tool to provide basic operation on host 
-# Version: 0.1.0
 
 import os
 import re
