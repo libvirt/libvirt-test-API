@@ -13,9 +13,9 @@
 # The GPL text is available in the file COPYING that accompanies this
 # distribution and at <http://www.gnu.org/licenses>.
 #
-# Filename: env_parser.py 
-# Summary: parse the env configuration file 
-# Description: The module is a tool to parse the env configuration file 
+# Filename: env_parser.py
+# Summary: parse the env configuration file
+# Description: The module is a tool to parse the env configuration file
 
 import ConfigParser
 import os
@@ -34,7 +34,7 @@ class Envparser(object):
             self.cfg.read(configfile)
         else:
             raise exception.FileDoesNotExist(
-            "env.conf is not a regular file or nonexist")     
+            "env.conf is not a regular file or nonexist")
 
     def has_section(self, section):
         if self.cfg.has_section(section):
@@ -50,18 +50,18 @@ class Envparser(object):
                 return False
         else:
             raise exception.SectionDoesNotExist(
-            "In env.conf, the section %s is nonexist" % section) 
+            "In env.conf, the section %s is nonexist" % section)
 
     def sections_list(self):
         return self.cfg.sections()
 
     def options_list(self, section):
         if self.has_section:
-            return self.cfg.options(section)        
+            return self.cfg.options(section)
         else:
             raise exception.SectionDoesNotExist(
-            "In env.conf, the section %s is nonexist" % section) 
-         
+            "In env.conf, the section %s is nonexist" % section)
+
     def get_value(self, section, option):
         if self.has_section:
             if self.has_option:
@@ -85,9 +85,9 @@ class Envparser(object):
             raise exception.SectionExist(
             "Section %s exists already" % section)
         else:
-            self.cfg.add_section(section) 
+            self.cfg.add_section(section)
             return True
- 
+
     def remove_option(self, section, option):
         if self.has_section:
             if self.has_option:
@@ -99,7 +99,7 @@ class Envparser(object):
         else:
             raise exception.SectionDoesNotExist(
             "In env.conf, the section %s is nonexist" % section)
-      
+
     def remove_section(self, section):
         if self.has_section:
             self.cfg.remove_section(section)
@@ -107,7 +107,7 @@ class Envparser(object):
         else:
             raise exception.SectionDoesNotExist(
             "In env.conf, the section %s is nonexist" % section)
-  
+
     def set_value(self, section, option, value):
         if self.has_section:
             if self.has_option:

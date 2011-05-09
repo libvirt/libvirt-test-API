@@ -267,19 +267,20 @@ def install_linux_net(params):
     envfile = os.path.join(homepath, 'env.cfg')
     logger.info("the environment file is %s" % envfile)
 
-    envpaser = env_parser.Envparser(envfile)
+    envparser = env_parser.Envparser(envfile)
 
     # Get http, ftp or nfs url based on guest os, arch
     # and installation method from env.cfg
+
     if installmethod == 'http':
-        ks = envpaser.get_value("guest", guestos + "_" + guestarch +
+        ks = envparser.get_value("guest", guestos + "_" + guestarch +
                                 "_http_ks")
     elif installmethod == 'ftp':
-        ks = envpaser.get_value("guest", guestos + "_" + guestarch + "_ftp_ks")
+        ks = envparser.get_value("guest", guestos + "_" + guestarch + "_ftp_ks")
     elif installmethod == "nfs":
-        ks = envpaser.get_value("guest", guestos + "_" + guestarch + "_nfs_ks")
+        ks = envparser.get_value("guest", guestos + "_" + guestarch + "_nfs_ks")
 
-    ostree = envpaser.get_value("guest", guestos + "_" + guestarch)
+    ostree = envparser.get_value("guest", guestos + "_" + guestarch)
 
     logger.debug('install source: \n    %s' % ostree)
     logger.debug('kisckstart file: \n    %s' % ks)

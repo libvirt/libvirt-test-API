@@ -7,7 +7,7 @@ __author__ = "Guannan Ren <gren@redhat.com>"
 __date__ = "Sat Feb 19, 2011"
 __version__ = "0.1.0"
 __credits__ = "Copyright (C) 2011 Red Hat, Inc."
-__all__ = ['delete', 'check_params', 
+__all__ = ['delete', 'check_params',
            'check_domain_state', 'delete_check']
 
 import os
@@ -56,7 +56,7 @@ def check_domain_state(domobj, guestname, logger):
 
 def delete_check(guestname, snapshotname, expected_flag, logger):
     """ after deleting, check if appropriate xml file exists or not"""
-    guest_snapshot_dir = os.path.join(SNAPSHOT_DIR, guestname)    
+    guest_snapshot_dir = os.path.join(SNAPSHOT_DIR, guestname)
     snapshot_entries = os.listdir(guest_snapshot_dir)
     if snapshotname + ".xml" in snapshot_entries and expected_flag == "exist":
         return True
@@ -66,11 +66,11 @@ def delete_check(guestname, snapshotname, expected_flag, logger):
         return False
     elif snapshotname + ".xml" not in snapshot_entries and expected_flag == "noexist":
         return True
- 
+
 
 def delete(params):
-    """ snapshot revert a snapshot for a given guest, 
-        this case could be with other cases togerther to 
+    """ snapshot revert a snapshot for a given guest,
+        this case could be with other cases togerther to
         check the functionality of snapshot
     """
     logger = params['logger']
@@ -103,13 +103,13 @@ def delete(params):
         conn.close()
         logger.info("closed hypervisor connection")
         return 1
-    
+
     try:
         logger.info("delete a snapshot for %s" % guestname)
         snap_obj.delete(guestname, snapshotname)
         if not delete_check(guestname, snapshotname, "noexist", logger):
             logger.error("after deleting, the corresponding \
-                         xmlfile still exists in %s" % SNAPSHOT_DIR)          
+                         xmlfile still exists in %s" % SNAPSHOT_DIR)
             return 1
         else:
             logger.info("delete snapshot %s succeeded" % snapshotname)
@@ -122,7 +122,7 @@ def delete(params):
         logger.info("closed hypervisor connection")
 
     return 0
-    
+
 
 
 

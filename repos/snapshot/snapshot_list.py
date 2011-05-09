@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """"virsh snapshot-list" testing
-   mandatory arguments: guestname 
+   mandatory arguments: guestname
 """
 
 __author__ = "Guannan Ren <gren@redhat.com>"
@@ -26,7 +26,7 @@ result = re.search('(.*)libvirt-test-API', pwd)
 append_path(result.group(0))
 
 SNAPSHOT_DIR = "/var/lib/libvirt/qemu/snapshot"
-SNAPSHOT_LIST = "virsh snapshot-list %s |sed -n '3,$'p|awk '{print $1}'" 
+SNAPSHOT_LIST = "virsh snapshot-list %s |sed -n '3,$'p|awk '{print $1}'"
 
 def check_params(params):
     """Verify the input parameter"""
@@ -40,7 +40,7 @@ def check_params(params):
     return 0
 
 def snapshot_list(params):
-    """check the output of snapshot_list through examining 
+    """check the output of snapshot_list through examining
        the files under /var/lib/libvirt/qemu/snapshot folder
     """
     logger = params['logger']
@@ -60,7 +60,7 @@ def snapshot_list(params):
         snapshot_list = ret.split('\n')
         logger.info("snapshot list is %s" % snapshot_list)
 
-    guest_snapshot_dir = os.path.join(SNAPSHOT_DIR, guestname) 
+    guest_snapshot_dir = os.path.join(SNAPSHOT_DIR, guestname)
     if (not os.path.isdir(guest_snapshot_dir) or not os.listdir(guest_snapshot_dir)) \
         and snapshot_list == ['']:
         logger.info("guest %s has no snapshot records" % guestname)
@@ -69,7 +69,7 @@ def snapshot_list(params):
         and snapshot_list != ['']:
         logger.error("snapshot_list output contains snapshot names: %s" % snapshot_list)
         logger.error("but the folder %s doesn't exist or is empty" % SNAPSHOT_DIR)
-        return 1  
+        return 1
     elif os.listdir(guest_snapshot_dir) and snapshot_list == ['']:
         logger.error("snapshot_list output contains no records")
         logger.error("but the folder contains snapshot xml files: %s" % \
@@ -92,9 +92,9 @@ def snapshot_list(params):
                               virsh snapshot_list" % snapshot_name)
                 return 1
     return 0
- 
-    
-    
+
+
+
 
 
 

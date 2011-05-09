@@ -153,4 +153,4 @@ def save_clean(params):
     filepath = params['filepath']
     if os.path.exists(filepath):
         logger.info("remove dump file from save %s" % filepath)
-        os.remove(filepath) 
+        os.remove(filepath)

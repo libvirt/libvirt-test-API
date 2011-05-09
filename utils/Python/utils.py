@@ -13,14 +13,14 @@
 # The GPL text is available in the file COPYING that accompanies this
 # distribution and at <http://www.gnu.org/licenses>.
 #
-# Filename: utils.py 
-# Summary: basic operation on host 
-# Description: The module is a tool to provide basic operation on host 
+# Filename: utils.py
+# Summary: basic operation on host
+# Description: The module is a tool to provide basic operation on host
 
 import os
 import re
 import sys
-import time 
+import time
 import random
 import commands
 import socket
@@ -68,7 +68,7 @@ class Utils(object):
 
     def get_hypervisor_version(self, ver = ''):
         hypervisor = self.get_hypervisor()
-        
+
         if 'kvm' in hypervisor:
             kernel_ver = self.get_host_kernel_version()
             if 'el5' in kernel_ver:
@@ -77,7 +77,7 @@ class Utils(object):
                 ver = commands.getoutput("rpm -q qemu-kvm")
             else:
                 print "Unsupported kernel type!"
-                sys.exit(1)           
+                sys.exit(1)
         elif 'xen' in hypervisor:
             ver = commands.getoutput("rpm -q xen")
         else:
@@ -94,7 +94,7 @@ class Utils(object):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         return socket.inet_ntoa(fcntl.ioctl(s.fileno(),0x8915, # SIOCGIFADDR
                                 struct.pack('256s', ifname[:15]))[20:24])
- 
+
 
     def get_host_cpus(self):
         if not os.access("/proc/cpuinfo", os.R_OK):
@@ -116,11 +116,11 @@ class Utils(object):
             cmd = "cat /proc/cpuinfo | grep 'cpu MHz'|uniq"
             cpufreq = commands.getoutput(cmd)
             if cpufreq:
-                freq = cpufreq.split(":")[1].split(" ")[1]    
+                freq = cpufreq.split(":")[1].split(" ")[1]
                 return freq
             else:
                 print "warnning:don't get system cpu frequency"
-        
+
     def get_host_memory(self):
         if not os.access("/proc/meminfo", os.R_OK):
             print "please check os."
@@ -135,7 +135,7 @@ class Utils(object):
                 return mem_size
             else:
                 print "warnning:don't get os memory"
-    
+
     def get_vcpus_list(self):
         host_cpus = self.get_host_cpus()
         max_vcpus = host_cpus * 4
@@ -154,7 +154,7 @@ class Utils(object):
             mem_list.append(2**i)
             i += 1
         return mem_list
-      
+
     def get_curr_time(self):
         curr_time = time.strftime('%Y-%m-%d %H:%M:%S')
         return curr_time
@@ -219,15 +219,15 @@ class Utils(object):
            Return mac address on SUCCESS or None on FAILURE
         """
         doc = minidom.parseString(dom_xml)
-        disk_list = doc.getElementsByTagName('disk') 
+        disk_list = doc.getElementsByTagName('disk')
         source = disk_list[0].getElementsByTagName('source')[0]
         attribute = source.attributes.keys()[0]
 
         return source.attributes[attribute].value
- 
+
     def get_capacity_suffix_size(self, capacity):
         dicts = {}
-        change_to_byte = {'K':pow(2, 10), 'M':pow(2, 20), 'G':pow(2, 30), 
+        change_to_byte = {'K':pow(2, 10), 'M':pow(2, 20), 'G':pow(2, 30),
                           'T':pow(2, 40)}
         for suffix in change_to_byte.keys():
             if capacity.endswith(suffix):
@@ -292,7 +292,7 @@ class Utils(object):
         print delimiter * num
         print "%s%s\t%s" % (blank, info, curr_time)
         print delimiter * num
-   
+
     def file_read(self, file):
         if os.path.exists(file):
             fh = open(file, 'r')
@@ -301,10 +301,10 @@ class Utils(object):
             return theData
         else:
             print "The FILE %s doesn't exist." % file
-    
+
     def parse_xml(file, element):
         xmldoc = minidom.parse(file)
-        elementlist = xmldoc.getElementsByTagName(element)    
+        elementlist = xmldoc.getElementsByTagName(element)
         return elementlist
 
     def locate_utils(self):
@@ -336,11 +336,11 @@ class Utils(object):
         return timeout and out or None
 
     def do_ping(self, ip, timeout):
-        """Ping some host 
+        """Ping some host
 
            return True on success or False on Failure
            timeout should be greater or equal to 10
-        """ 
+        """
         if not ip:
             return False
 
@@ -363,4 +363,4 @@ class Utils(object):
         cmd = 'rm -rf ' + ssh_dir
         (ret, out) = commands.getstatusoutput(cmd)
         return ret
- 
+

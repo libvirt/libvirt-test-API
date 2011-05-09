@@ -56,7 +56,7 @@ def create_image(name, size, logger):
         logger.debug("create image result:\n%s" % ret)
         return True
     else:
-        return False 
+        return False
 
 def check_guest_status(guestname, domobj):
     """Check guest current status"""

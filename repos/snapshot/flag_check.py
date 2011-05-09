@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""check the flag file in the guest OS 
+"""check the flag file in the guest OS
    mandatory arguments: guestname, username, password
 """
 
@@ -74,7 +74,7 @@ def flag_check(params):
     if params.has_key('expectedret'):
         expected_result = params['expectedret']
     else:
-        expected_result = "exist"      
+        expected_result = "exist"
 
     util = utils.Utils()
     chk = check.Check()
@@ -107,7 +107,7 @@ def flag_check(params):
     if timeout == 0:
         logger.info("vm %s failed to get ip address" % guestname)
         return return_close(conn, logger, 1)
-    
+
     ret = chk.remote_exec_pexpect(ipaddr, username, password, FLAG_CHECK)
     if ret == "TIMEOUT!!!":
         logger.error("connecting to guest OS timeout")
@@ -124,7 +124,7 @@ def flag_check(params):
     elif ret != None and expected_result == 'noexist':
         logger.info("flag %s is not present, checking succeeded" % FLAG_FILE)
         return return_close(conn, logger, 0)
- 
+
     return return_close(conn, logger, 0)
 
 

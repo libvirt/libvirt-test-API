@@ -56,7 +56,7 @@ def check_domain_exists(domobj, guestname, logger):
         return False
     else:
         return True
- 
+
 def domid(params):
     """check virsh domid command
     """
@@ -71,7 +71,7 @@ def domid(params):
             doms = doms_ret.split('\n')
         else:
             return 1
-   
+
     if not doms:
         logger.info("no running guest available")
         return 1
@@ -108,7 +108,7 @@ def domid(params):
     for dom in doms:
         status, domid_ret = get_output(logger, VIRSH_DOMID + " %s" % dom)
         if status:
-            return return_close(conn, logger, 1) 
+            return return_close(conn, logger, 1)
         domid = domid_ret[:-1]
         if domname_id[dom] == domid:
             logger.info("domname %s corresponds to id %s" % (dom, domid))

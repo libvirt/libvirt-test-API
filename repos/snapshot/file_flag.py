@@ -62,7 +62,7 @@ def check_domain_running(domobj, guestname, logger):
 
 def make_flag(chk, ipaddr, username, password, logger):
     """ enter guest OS, create a file in /tmp folder """
-    ret = chk.remote_exec_pexpect(ipaddr, username, password, MAKE_FLAG) 
+    ret = chk.remote_exec_pexpect(ipaddr, username, password, MAKE_FLAG)
     if ret == "TIMEOUT!!!":
         logger.error("connecting to guest OS timeout")
         return False
@@ -71,21 +71,21 @@ def make_flag(chk, ipaddr, username, password, logger):
         return False
     else:
         logger.info("flag %s is created in /tmp folder" % FLAG_FILE)
-        return True 
-              
+        return True
+
 def file_flag(params):
     """ create a new file in the /tmp folder of the guest
-        as a flag 
+        as a flag
     """
     logger = params['logger']
     params_check_result = check_params(params)
     if params_check_result:
         return 1
 
-    guestname = params['guestname']        
+    guestname = params['guestname']
     username = params['username']
     password = params['password']
- 
+
     util = utils.Utils()
     chk = check.Check()
     uri = util.get_uri('127.0.0.1')
@@ -123,14 +123,14 @@ def file_flag(params):
         return return_close(conn, logger, 1)
     else:
         logger.info("making flag in guest %s succeeded" % guestname)
-       
+
     return return_close(conn, logger, 0)
-    
-        
 
-    
 
-    
+
+
+
+
 
 
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""this test case is used for creating volume of 
+"""this test case is used for creating volume of
    a partition type storage pool from xml
 """
 

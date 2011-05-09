@@ -4,28 +4,28 @@
 
 <chapter id="libvirt-test-API-Writing_a_test_case">
 	<title>Writing a test case</title>
-	
+
 	<para>Test cases form the foundation of the test tool. They are the building blocks from which test runs can be created. Test cases are written as Python scripts and define the functions that can be tested. Separating test cases by function allows test cases to be re-used and combined in the configuration file to create the desired test run.</para>
-	
+
 	<para>The following section provides details on the test case file structure that must be used in order to be correctly accepted by the test tool.</para>
-	
-	
+
+
 	<section id="Writing_a_test_case-Test_case_file_structure">
 	  <title>Test case file structure</title>
-	  
+
 	  <para><application>Filename</application></para>
 	  <blockquote>
 	    <para>The name of the test case file must be the same as the name of the main function inside it.</para>
 	    <para>For example, if the main function is <application>install_guest()</application>, then test case file must be named <filename>install_guest.py</filename>.</para>
 	    <para>Save the test case to its corresponding directory in <filename>/repos</filename>. For example, if the test case is related to domain then save the file in the <filename>/repos/domain</filename> directory.</para>
 	  </blockquote>
-    
+
     <para><application>Function</application></para>
     <blockquote>
       <para>The function requires a dictionary (dict) as the argument. The dict uses the function arguments defined in the configuration file.</para>
       <para>To write log information to a file, the function also requires a key value pair with the keyname 'logger' and the value is a log object.</para>
     </blockquote>
-    
+
     <para><application>Return code</application></para>
     <blockquote>
       <para>The test case uses the following return codes:</para>
@@ -38,37 +38,37 @@
         </listitem>
       </itemizedlist>
     </blockquote>
-    
+
     <example>
       <title>Test case file</title>
 <programlisting>
 #  install_guest.py
-import time 
-import sys 
-import os 
+import time
+import sys
+import os
 
-def install_guest(dict): 
-    logger = dict['logger'] 
-    print "this is from testcase_repos:domain" 
-    for eachvargs in dict.keys(): 
-        logger.info("the argu is %s" % eachvargs) 
-        time.sleep(1) 
-        logger.info("the corresponding value is %s" % dict[eachvargs]) 
-    logger.info("I am from install_guest log info") 
-    logger.debug("I am from install_guest log debug") 
-    logger.warning("I am from install_guest log warning") 
-    logger.error("I am from install_guest log error") 
-    logger.critical("I am from install_guest log critical") 
-    return 0 
+def install_guest(dict):
+    logger = dict['logger']
+    print "this is from testcase_repos:domain"
+    for eachvargs in dict.keys():
+        logger.info("the argu is %s" % eachvargs)
+        time.sleep(1)
+        logger.info("the corresponding value is %s" % dict[eachvargs])
+    logger.info("I am from install_guest log info")
+    logger.debug("I am from install_guest log debug")
+    logger.warning("I am from install_guest log warning")
+    logger.error("I am from install_guest log error")
+    logger.critical("I am from install_guest log critical")
+    return 0
 </programlisting>
     </example>
-    
+
   </section><!--End Test case file structure-->
-  
-  
+
+
   <section id="Writing_a_test_case-Test_case_example">
     <title>Test case example</title>
-    
+
     <para>In this example, the test objective is to:</para>
     <orderedlist>
       <listitem>
@@ -90,7 +90,7 @@ def install_guest(dict):
       </listitem>
     </orderedlist>
     <para>The two test case are independent of each other, which allows the test cases to be re-used and combined with other test cases to create different test runs.</para>
-    
+
     <para>Below is the configuration file, which includes the two test cases.</para>
     <example>
       <title>Configuration file <filename>case.conf</filename></title>
@@ -115,10 +115,10 @@ domain:install_guest
     vcpu
         1
 
-options multiprocess=disable times=1 
+options multiprocess=disable times=1
 </programlisting>
     </example>
-    
+
     <para>Below are the two test case scripts.</para>
     <example>
       <title>Initialize storage test case <filename>/repos/storage/initialize_storage.py</filename></title>
@@ -149,9 +149,9 @@ envfile = 'env.ini'
 def initialize_storage(dict):
     logger = dict['logger']
     dict['hypertype'] = 'xen'
-    envpaser = env_parser.Envpaser(envfile)
-    dict['sourcename'] = envpaser.get_value('storage', 'sourcename')
-    dict['sourcepath'] = envpaser.get_value('storage', 'sourcepath')
+    envparser = env_parser.Envpaser(envfile)
+    dict['sourcename'] = envparser.get_value('storage', 'sourcename')
+    dict['sourcepath'] = envparser.get_value('storage', 'sourcepath')
 
     logger.info('prepare create storage pool')
     xmlobj = xmlbuilder.XmlBuilder()
@@ -160,7 +160,7 @@ def initialize_storage(dict):
 
     conn = connectAPI.ConnectAPI.open("xen:///")
     stgobj = storageAPI.StorageAPI(conn)
-    
+
     logger.info('list current storage pool: %s' %stgobj.storage_pool_list())
     logger.info('define pool from xml description')
     stgobj.define_storage_pool(poolxml)
@@ -169,16 +169,16 @@ def initialize_storage(dict):
     stgobj.active_storage_pool(dict['poolname'])
     logger.info('list current storage pool: %s' %stgobj.storage_pool_list())
 
-    volxml = xmlobj.build_volume(dict)   
+    volxml = xmlobj.build_volume(dict)
     logger.debug('dump create storage volume xml:\n%s' %volxml)
     logger.info('prepare create storage volume')
     stgobj.create_storage_volume(dict['poolname'], volxml)
     logger.info('list current storage volume: %s' %stgobj.get_volume_list(dict['poolname']))
-  
+
     return 0
 </programlisting>
     </example>
-    
+
     <example>
       <title>Install guest test case <filename>/repos/domain/install_guest.py</filename></title>
 <programlisting>
@@ -203,7 +203,7 @@ from lib import domainAPI
 from utils import env_parser
 from utils import xmlbuilder
 
-envfile = 'env.ini' 
+envfile = 'env.ini'
 
 def prepare_cdrom(*args):
     url, ks, gname, logger = args
@@ -222,24 +222,24 @@ def prepare_cdrom(*args):
 
     shutil.copy('utils/ksiso.sh', new_dir)
     src_path = os.getcwd()
-    os.chdir(new_dir) 
+    os.chdir(new_dir)
     shell_cmd = 'sh ksiso.sh %s' %ks_file
     (status, text) = commands.getstatusoutput(shell_cmd)
     if status != 0:
         logger.debug(text)
     os.chdir(src_path)
-    
+
 def install_guest(dict):
     logger = dict['logger']
     gname = dict['guestname']
     dict['ifacetype'] = 'bridge'
     dict['bridge'] = 'xenbr0'
-    dict['bootcd'] = '/tmp/%s/custom.iso' %gname   
-    
+    dict['bootcd'] = '/tmp/%s/custom.iso' %gname
+
     logger.info('get system environment information')
-    envpaser = env_parser.Envpaser(envfile)    
-    url = envpaser.get_value("guest", gname + "src")
-    dict['kickstart'] = envpaser.get_value("guest", gname + "ks")
+    envparser = env_parser.Envpaser(envfile)
+    url = envparser.get_value("guest", gname + "src")
+    dict['kickstart'] = envparser.get_value("guest", gname + "ks")
     logger.debug('install source: \n    %s' %url)
     logger.debug('kisckstart file: \n    %s' %dict['kickstart'])
 
@@ -262,7 +262,7 @@ def install_guest(dict):
     logger.debug('current guest state: %s' %state)
 </programlisting>
     </example>
-    
+
     <para>Below is the environment configuration file.</para>
     <example>
       <title>Environment configuration file <filename>env.ini</filename></title>
@@ -276,7 +276,7 @@ sourcename = 10.00.00.02
 sourcepath = /media/share
 </programlisting>
     </example>
-    
+
     <para>Below is the log file that is generated. It is stored in <filename>/log</filename>.</para>
     <example>
       <title>Test case log file</title>
@@ -284,9 +284,9 @@ sourcepath = /media/share
         <xi:include parse="text" href="extras/log.txt" xmlns:xi="http://www.w3.org/2001/XInclude" />
       </programlisting>
     </example>
-    
+
     <para>This example shows how simple it is to create two test cases to achieve a complex test. The advantage of combining test cases to produce a complex test is that the test cases can be used repeatedly across other tests.</para>
-    
+
   </section><!-- End Test case example-->
-    
+
 </chapter>

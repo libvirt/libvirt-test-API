@@ -83,9 +83,9 @@ def interface_stats(params):
             logger.error(str(e))
             logger.error("start failed")
             conn.close()
-            logger.info("closed hypervisor connection")       
+            logger.info("closed hypervisor connection")
             return 1
-        
+
     mac = util.get_dom_mac_addr(guestname)
     logger.info("get ip by mac address")
     ip = util.mac_to_ip(mac, 180)
@@ -113,7 +113,7 @@ def interface_stats(params):
     else:
         logger.error("fail to get domain interface statistics\n")
         test_result = False
-   
+
     conn.close()
     logger.info("closed hypervisor connection")
 

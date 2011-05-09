@@ -33,7 +33,7 @@ from utils.Python import utils
 from utils.Python import xmlbuilder
 from exception import LibvirtAPI
 
-QEMU_IMAGE_FORMAT = "qemu-img info %s |grep format |awk -F': ' '{print $2}'" 
+QEMU_IMAGE_FORMAT = "qemu-img info %s |grep format |awk -F': ' '{print $2}'"
 
 def check_params(params):
     """Verify the input parameter"""
@@ -60,8 +60,8 @@ def check_domain_image(domobj, util, guestname, logger):
         return False
     else:
         dom_xml = domobj.get_xml_desc(guestname)
-        disk_path = util.get_disk_path(dom_xml) 
-        status, ret = commands.getstatusoutput(QEMU_IMAGE_FORMAT % disk_path)        
+        disk_path = util.get_disk_path(dom_xml)
+        status, ret = commands.getstatusoutput(QEMU_IMAGE_FORMAT % disk_path)
         if status:
             logger.error("executing "+ "\"" + QEMU_IMAGE_FORMAT % guestname + "\"" + " failed")
             logger.error(ret)
@@ -77,8 +77,8 @@ def check_domain_image(domobj, util, guestname, logger):
                 return False
 
 def internal_create(params):
-    """ create an internal snapshot for a given guest, 
-        this case could be with other cases togerther to 
+    """ create an internal snapshot for a given guest,
+        this case could be with other cases togerther to
         check the functionality of snapshot
     """
     logger = params['logger']
@@ -105,7 +105,7 @@ def internal_create(params):
         conn.close()
         logger.info("closed hypervisor connection")
         return 1
-    
+
     xmlobj = xmlbuilder.XmlBuilder()
     snapshot_xml = xmlobj.build_domain_snapshot(params)
     logger.debug("%s snapshot xml:\n%s" % (guestname, snapshot_xml))

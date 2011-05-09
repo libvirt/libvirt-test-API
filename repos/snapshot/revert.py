@@ -43,7 +43,7 @@ def check_params(params):
 
 def check_domain_state(domobj, guestname, logger):
     """ check if the domain exists and in shutdown state as well """
-    guest_names = domobj.get_defined_list() 
+    guest_names = domobj.get_defined_list()
 
     if guestname not in guest_names:
         logger.error("%s is running or does not exist" % guestname)
@@ -52,8 +52,8 @@ def check_domain_state(domobj, guestname, logger):
         return True
 
 def revert(params):
-    """ snapshot revert a snapshot for a given guest, 
-        this case could be with other cases togerther to 
+    """ snapshot revert a snapshot for a given guest,
+        this case could be with other cases togerther to
         check the functionality of snapshot
     """
     logger = params['logger']
@@ -79,7 +79,7 @@ def revert(params):
         conn.close()
         logger.info("closed hypervisor connection")
         return 1
-     
+
     try:
         logger.info("revert a snapshot for %s" % guestname)
         snap_obj.revertToSnapshot(guestname, snapshotname)

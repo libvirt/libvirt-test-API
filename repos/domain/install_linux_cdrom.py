@@ -54,7 +54,7 @@ __all__ = ['install_linux_cdrom', 'usage']
 
 VIRSH_QUIET_LIST = "virsh --quiet list --all|awk '{print $2}'|grep \"^%s$\""
 VM_STAT = "virsh --quiet list --all| grep \"\\b%s\\b\"|grep off"
-VM_DESTROY = "virsh destroy %s" 
+VM_DESTROY = "virsh destroy %s"
 VM_UNDEFINE = "virsh undefine %s"
 
 BOOT_DIR = "/var/lib/libvirt/boot/"
@@ -211,7 +211,7 @@ def check_domain_state(domobj, guestname, logger):
     if guestname in defined_guests:
         logger.info("undefine the guest with the same name %s" % guestname)
         domobj.undefine(guestname)
-        
+
     return 0
 
 def install_linux_cdrom(params):
@@ -297,9 +297,9 @@ def install_linux_cdrom(params):
     envfile = os.path.join(homepath, 'env.cfg')
     logger.info("the environment file is %s" % envfile)
 
-    envpaser = env_parser.Envparser(envfile)
-    ostree = envpaser.get_value("guest", guestos + "_" +guestarch)
-    ks = envpaser.get_value("guest", guestos + "_" +guestarch + "_http_ks")
+    envparser = env_parser.Envparser(envfile)
+    ostree = envparser.get_value("guest", guestos + "_" +guestarch)
+    ks = envparser.get_value("guest", guestos + "_" +guestarch + "_http_ks")
 
     logger.debug('install source: \n    %s' % ostree)
     logger.debug('kisckstart file: \n    %s' % ks)
@@ -314,7 +314,7 @@ def install_linux_cdrom(params):
         logger.debug("the url of vmlinuz file is %s" % vmlinuzpath)
         logger.debug("the url of initrd file is %s" % initrdpath)
 
-        urllib.urlretrieve(vmlinuzpath, os.path.join(BOOT_DIR, 'vmlinuz')) 
+        urllib.urlretrieve(vmlinuzpath, os.path.join(BOOT_DIR, 'vmlinuz'))
         urllib.urlretrieve(initrdpath, os.path.join(BOOT_DIR, 'initrd.img'))
 
         logger.debug("vmlinuz and initrd.img is located in %s" % BOOT_DIR)
@@ -450,16 +450,16 @@ def install_linux_cdrom_clean(params):
     elif hypervisor == 'kvm':
         imgfullpath = os.path.join('/var/lib/libvirt/images', guestname)
 
-    (status, output) = commands.getstatusoutput(VIRSH_QUIET_LIST % guestname) 
+    (status, output) = commands.getstatusoutput(VIRSH_QUIET_LIST % guestname)
     if status:
         pass
     else:
         logger.info("remove guest %s, and its disk image file" % guestname)
         (status, output) = commands.getstatusoutput(VM_STAT % guestname)
         if status:
-            (status, output) = commands.getstatusoutput(VM_DESTROY % guestname)            
+            (status, output) = commands.getstatusoutput(VM_DESTROY % guestname)
             if status:
-                logger.error("failed to destroy guest %s" % guestname) 
+                logger.error("failed to destroy guest %s" % guestname)
                 logger.error("%s" % output)
             else:
                 (status, output) = commands.getstatusoutput(VM_UNDEFINE % guestname)
@@ -471,18 +471,18 @@ def install_linux_cdrom_clean(params):
             if status:
                 logger.error("failed to undefine guest %s" % guestname)
                 logger.error("%s" % output)
-    
+
     if os.path.exists(imgfullpath):
-        os.remove(imgfullpath)   
- 
+        os.remove(imgfullpath)
+
     if guesttype == 'xenpv':
         vmlinuz = os.path.join(BOOT_DIR, 'vmlinuz')
         initrd = os.path.join(BOOT_DIR, 'initrd.img')
         if os.path.exists(vmlinuz):
             os.remove(vmlinuz)
         if os.path.exists(initrd):
-            os.remove(initrd)               
+            os.remove(initrd)
     elif guesttype == 'xenfv' or guesttype == 'kvm':
         guest_dir = os.path.join(homepath, guestname)
-        if os.path.exists(guest_dir):     
-            shutil.rmtree(guest_dir) 
+        if os.path.exists(guest_dir):
+            shutil.rmtree(guest_dir)

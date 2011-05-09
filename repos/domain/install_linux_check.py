@@ -227,8 +227,8 @@ def installation_linux_check(params):
     envfile = os.path.join(homepath, 'env.cfg')
     logger.info("the environment file is %s" % envfile)
 
-    envpaser = env_parser.Envparser(envfile)
-    file_url = envpaser.get_value("other", "wget_url")
+    envparser = env_parser.Envparser(envfile)
+    file_url = envparser.get_value("other", "wget_url")
 
     if chk.run_wget_app(ipaddr, "root", "redhat", file_url, logger) == 0:
         logger.info("run wget successfully in guest.")

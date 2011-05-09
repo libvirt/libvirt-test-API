@@ -182,5 +182,5 @@ def create_logical_volume(params):
     finally:
         conn.close()
         logger.info("closed hypervisor connection")
- 
+
     return 0

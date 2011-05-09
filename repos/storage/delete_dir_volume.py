@@ -135,5 +135,5 @@ def delete_dir_volume(params):
     finally:
         conn.close()
         logger.info("closed hypervisor connection")
-   
+
     return 0

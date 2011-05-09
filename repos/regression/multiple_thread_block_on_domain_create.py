@@ -92,11 +92,11 @@ class guest_install(Thread):
     def run(self):
         guest_params = {};
         guest_params['guesttype'] = self.type
-        guest_params['guestname'] = self.name  
+        guest_params['guestname'] = self.name
         guest_params['kickstart'] = self.ks
         macaddr = self.util.get_rand_mac()
-        guest_params['macaddr'] = macaddr 
-                     
+        guest_params['macaddr'] = macaddr
+
 	# prepare disk image file
         imagepath = IMAG_PATH + self.name
         (status, message) = commands.getstatusoutput(DISK_DD % imagepath)
@@ -105,9 +105,9 @@ class guest_install(Thread):
         else:
             self.logger.info("creating disk images file is successful.")
 
-        xmlobj = xmlbuilder.XmlBuilder() 
+        xmlobj = xmlbuilder.XmlBuilder()
         guestxml = xmlobj.build_domain_install(guest_params)
-        self.logger.debug("guestxml is %s" % guestxml)  
+        self.logger.debug("guestxml is %s" % guestxml)
         self.logger.info('create guest %sfrom xml description' % self.name)
         try:
             guestobj = self.domobj.create(guestxml)
@@ -119,7 +119,7 @@ class guest_install(Thread):
             return 1
 
         return 0
-        
+
 def multiple_thread_block_on_domain_create(params):
     """ spawn multiple threads to create guest simultaneously
         check the return status of calling create API
@@ -156,10 +156,10 @@ def multiple_thread_block_on_domain_create(params):
     logger.info("the type of hypervisor is %s" % hypervisor)
     logger.debug("the uri to connect is %s" % uri)
 
-    envfile = os.path.join(homepath, 'env.cfg') 
-    envpaser = env_parser.Envpaser(envfile)
-    ostree = envpaser.get_value("guest", guestos + "_" + arch)
-    ks = envpaser.get_value("guest", guestos + "_" + arch +
+    envfile = os.path.join(homepath, 'env.cfg')
+    envparser = env_parser.Envpaser(envfile)
+    ostree = envparser.get_value("guest", guestos + "_" + arch)
+    ks = envparser.get_value("guest", guestos + "_" + arch +
                                 "_http_ks")
 
     # download vmlinuz and initrd.img
@@ -174,14 +174,14 @@ def multiple_thread_block_on_domain_create(params):
     start_num = num.split('-')[0]
     end_num = num.split('-')[1]
     thread_pid = []
-    for i in range(int(start_num), int(end_num)): 
+    for i in range(int(start_num), int(end_num)):
         guestname =  name + str(i)
         thr = guest_install(guestname, guestos, arch, type, ks, domobj, util, logger)
         thread_pid.append(thr)
 
     for id in thread_pid:
         id.start()
- 
+
     for id in thread_pid:
         id.join()
 
