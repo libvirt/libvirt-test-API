@@ -29,7 +29,7 @@ function delimiter()
 
 echo
 echo "Generate Libvirt API Statistics Report under the "
-echo "$(pwd)/coverage" 
+echo "$(pwd)/coverage"
 echo
 delimiter '=' 50
 echo -e "|	Libvirt API statistics of coverage\t   |" | tee -a $SUMMARY
@@ -53,7 +53,7 @@ do
     delimiter '-' 50
   else
     continue
-  fi 
+  fi
 done
 
 delimiter '=' 50

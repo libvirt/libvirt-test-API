@@ -67,7 +67,7 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def get_domain_by_name(self, name):
         try:
@@ -76,8 +76,8 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-            
+            raise exception.LibvirtAPI(message, code)
+
     def get_domain_by_id(self, id):
         try:
             id_list = self.conn.listDomainsID()
@@ -86,8 +86,8 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-        
+            raise exception.LibvirtAPI(message, code)
+
     def get_domain_by_uuid_string(self, uuidstr):
         try:
             dom_obj = self.conn.lookupByUUIDString(uuidstr)
@@ -95,7 +95,7 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def get_id(self, domname):
         try:
@@ -105,8 +105,8 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-           
+            raise exception.LibvirtAPI(message, code)
+
     def get_name(self, id):
         try:
             dom_obj = self.get_domain_by_id(id)
@@ -115,7 +115,7 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def get_defined_list(self):
         try:
@@ -124,8 +124,8 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-    
+            raise exception.LibvirtAPI(message, code)
+
     def get_defined_obj(self, domname):
         try:
             def_dom_list = self.conn.listDefinedDomains()
@@ -134,8 +134,8 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-    
+            raise exception.LibvirtAPI(message, code)
+
     def get_xml_desc(self, domname):
         try:
             dom_obj = self.get_domain_by_name(domname)
@@ -144,8 +144,8 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-    
+            raise exception.LibvirtAPI(message, code)
+
     def create(self, dom_xml_desc, flags = 0):
         try:
             dom_obj = self.conn.createXML(dom_xml_desc, flags)
@@ -153,7 +153,7 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def define(self, dom_xml_desc):
         try:
@@ -161,8 +161,8 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-   
+            raise exception.LibvirtAPI(message, code)
+
     def undefine(self, domname):
         try:
             dom_obj = self.get_defined_obj(domname)
@@ -170,7 +170,7 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def start(self, domname):
         try:
@@ -180,8 +180,8 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-           
+            raise exception.LibvirtAPI(message, code)
+
     def suspend(self, domname):
         try:
             dom_obj = self.get_domain_by_name(domname)
@@ -190,7 +190,7 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def resume(self, domname):
         try:
@@ -200,8 +200,8 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-           
+            raise exception.LibvirtAPI(message, code)
+
     def save(self, domname, to):
         try:
             dom_obj = self.get_domain_by_name(domname)
@@ -210,7 +210,7 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
 
     def restore(self, domname, frm):
@@ -221,8 +221,8 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-           
+            raise exception.LibvirtAPI(message, code)
+
     def migrate(self, domname, dconn, flags = VIR_MIGRATE_LIVE):
         try:
             dom_obj = self.get_domain_by_name(domname)
@@ -231,8 +231,8 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-           
+            raise exception.LibvirtAPI(message, code)
+
     def reboot(self, domname):
         try:
             dom_obj = self.get_domain_by_name(domname)
@@ -241,8 +241,8 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-           
+            raise exception.LibvirtAPI(message, code)
+
     def destroy(self, domname):
         try:
             dom_obj = self.get_domain_by_name(domname)
@@ -251,7 +251,7 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def shutdown(self, domname):
         try:
@@ -261,18 +261,18 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def get_info(self, domname):
         try:
-            dom_obj = self.get_domain_by_name(domname)        
+            dom_obj = self.get_domain_by_name(domname)
             info = dom_obj.info()
             return info
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-    
+            raise exception.LibvirtAPI(message, code)
+
     def get_auto_start(self, domname):
         try:
             dom_obj = self.conn.lookupByName(domname)
@@ -285,8 +285,8 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-           
+            raise exception.LibvirtAPI(message, code)
+
     def set_auto_start(self, domname, flag = 0):
         try:
             dom_obj = self.conn.lookupByName(domname)
@@ -295,8 +295,8 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-             
+            raise exception.LibvirtAPI(message, code)
+
     def get_os_type(self, domname):
         try:
             dom_obj = self.get_domain_by_name(domname)
@@ -305,8 +305,8 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-           
+            raise exception.LibvirtAPI(message, code)
+
     def attach_device(self, domname, xml_desc):
         try:
             dom_obj = self.get_domain_by_name(domname)
@@ -315,8 +315,8 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-           
+            raise exception.LibvirtAPI(message, code)
+
     def detach_device(self, domname, xml_desc):
         try:
             dom_obj = self.get_domain_by_name(domname)
@@ -325,18 +325,18 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-           
+            raise exception.LibvirtAPI(message, code)
+
     def get_connect(self, domname):
         try:
             dom_obj = self.get_domain_by_name(domname)
             conn = dom_obj.connect()
-            return conn 
+            return conn
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-           
+            raise exception.LibvirtAPI(message, code)
+
     def get_ref(self, domname):
         try:
             dom_obj = self.get_domain_by_name(domname)
@@ -345,7 +345,7 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def get_vcpus(self, domname):
         try:
@@ -355,8 +355,8 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-           
+            raise exception.LibvirtAPI(message, code)
+
     def set_pin_vcpu(self, domname, vcpu, cpumap):
         try:
             dom_obj = self.get_domain_by_name(domname)
@@ -365,8 +365,8 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-           
+            raise exception.LibvirtAPI(message, code)
+
     def get_uuid(self, domname):
         try:
             dom_obj = self.get_domain_by_name(domname)
@@ -375,8 +375,8 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-           
+            raise exception.LibvirtAPI(message, code)
+
     def get_uuid_string(self, domname):
         try:
             dom_obj = self.get_domain_by_name(domname)
@@ -385,8 +385,8 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-           
+            raise exception.LibvirtAPI(message, code)
+
     def get_max_memory(self, domname):
         try:
             dom_obj = self.get_domain_by_name(domname)
@@ -395,18 +395,18 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def get_max_vcpus(self, domname):
         try:
             dom_obj = self.get_domain_by_name(domname)
             max_vcpus = dom_obj.maxVcpus()
-            return max_vcpus           
+            return max_vcpus
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-             
+            raise exception.LibvirtAPI(message, code)
+
     def set_max_memory(self, domname, memory):
         try:
             dom_obj = self.get_domain_by_name(domname)
@@ -415,8 +415,8 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-           
+            raise exception.LibvirtAPI(message, code)
+
     def get_block_stats(self, domname):
         try:
             dom = self.get_domain_by_name(domname)
@@ -430,8 +430,8 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-           
+            raise exception.LibvirtAPI(message, code)
+
     def get_interface_stats(self, domname):
         try:
             dom_obj = self.get_domain_by_name(domname)
@@ -445,8 +445,8 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-           
+            raise exception.LibvirtAPI(message, code)
+
     def set_memory(self, domname, memory):
         try:
             dom_obj = self.get_domain_by_name(domname)
@@ -455,7 +455,7 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def set_vcpus(self, domname, nvcpus):
         try:
@@ -465,18 +465,18 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-           
+            raise exception.LibvirtAPI(message, code)
+
     def get_memory(self, domname):
         try:
             dom_obj = self.get_domain_by_name(domname)
-            strs = commands.getoutput('virsh dominfo %s' %domname)       
+            strs = commands.getoutput('virsh dominfo %s' %domname)
             memory = strs.split('\n')[9]
             return memory
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def get_state(self, domname):
         dom_state = ''
@@ -499,12 +499,12 @@ class DomainAPI(object):
                 dom_state = 'crashed'
             else:
                 dom_state = 'dying'
-            return dom_state 
+            return dom_state
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-           
+            raise exception.LibvirtAPI(message, code)
+
     def get_sched_type(self, domname):
         try:
             dom_obj = self.get_domain_by_name(domname)
@@ -513,8 +513,8 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-           
+            raise exception.LibvirtAPI(message, code)
+
     def get_sched_params(self, domname):
         try:
             dom_obj = self.get_domain_by_name(domname)
@@ -523,8 +523,8 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-           
+            raise exception.LibvirtAPI(message, code)
+
     def set_sched_params(self, domname, params):
         try:
             dom_obj = self.get_domain_by_name(domname)
@@ -533,8 +533,8 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-           
+            raise exception.LibvirtAPI(message, code)
+
     def core_dump(self, domname, to, flags = 0):
         try:
             dom_obj = self.get_domain_by_name(domname)
@@ -543,8 +543,8 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-      
+            raise exception.LibvirtAPI(message, code)
+
     def block_info(self, domname, path, flag = 0):
         try:
             dom_obj = self.get_domain_by_name(domname)
@@ -552,7 +552,7 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def block_peek(self, domname, path, offset, size, buffer, flag = 0):
         try:
@@ -561,7 +561,7 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def memory_stats(self, domname):
         try:
@@ -570,7 +570,7 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def memory_peek(self, domname, start, size, buffer, flag = 0):
         try:
@@ -579,7 +579,7 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def isActive(self, domname):
         try:
@@ -588,7 +588,7 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def isPersistent(self, domname):
         try:
@@ -597,7 +597,7 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def job_info(self, domname):
         try:
@@ -606,7 +606,7 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def abort_job(self, domname):
         try:
@@ -615,7 +615,7 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def get_snapshot_list(self, domname, flag = 0):
         try:
@@ -624,7 +624,7 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def get_snapshot_number(self, domname, flag = 0):
         try:
@@ -633,7 +633,7 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def get_current_snapshot(self, domname, flag = 0):
         try:
@@ -642,7 +642,7 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def create_snapshot(self, xmldesc, flag = 0):
         try:
@@ -651,7 +651,7 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def set_max_migrate_downtime(self, domname, downtime, flag = 0):
         try:
@@ -660,7 +660,7 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def migrate_to_uri(self, domname, duri, dname, bandwidth, flag = 0):
         try:
@@ -669,7 +669,7 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def attach_device_flag(self, domname, xml, flag = 0):
         try:
@@ -678,7 +678,7 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def dettach_device_flag(self, domname, xml, flag = 0):
         try:
@@ -687,7 +687,7 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def update_device_flag(self, domname, xml, flag = 0):
         try:
@@ -696,7 +696,7 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def managed_save(self, domname, flag = 0):
         try:
@@ -705,7 +705,7 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def managedSaveRemove(self, domname, flag = 0):
         try:
@@ -714,8 +714,8 @@ class DomainAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-   
+            raise exception.LibvirtAPI(message, code)
+
     def blockStats(self, domname, path):
         try:
             dom_obj = self.get_domain_by_name(domname)
@@ -751,7 +751,7 @@ class DomainAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
- 
+
     def revertToSnapshot(self, domname, snap, flag):
         try:
             dom_obj = self.get_domain_by_name(domname)

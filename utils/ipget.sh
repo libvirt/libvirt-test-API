@@ -10,7 +10,7 @@ if ! rpm -qa |grep -q nmap ;then
    echo "need nmap rpmball installed."
    exit 1
 fi
- 
+
 ipaddr=`ip route |grep virbr0 |sed -n 1p|awk {'print $1'}`
 
 #if lsmod | grep kvm > /dev/null ;then

@@ -92,14 +92,14 @@ def domain_xml(params, install = False):
             sys.exit(1)
         type_element.appendChild(type_node)
         os_element.appendChild(type_element)
-    
+
         # <loader>
         if params['guesttype'] == 'xenfv':
             loader_element = domain.createElement('loader')
             loader_node = domain.createTextNode('/usr/lib/xen/boot/hvmloader')
             loader_element.appendChild(loader_node)
             os_element.appendChild(loader_element)
-    
+
         # <boot>
         if params['guesttype'] != 'xenpv':
             boot_element = domain.createElement('boot')
@@ -373,7 +373,7 @@ def floppy_xml(params):
 
     # Source element
     source_element = floppy.createElement('source')
-    source_element.setAttribute('file', params['floppysource']) 
+    source_element.setAttribute('file', params['floppysource'])
     disk_element.appendChild(source_element)
 
     # Target element
@@ -382,14 +382,14 @@ def floppy_xml(params):
         target_element.setAttribute('dev', params['floppytarget'])
     else:
         target_element.setAttribute('dev', 'fda')
-    
+
     target_element.setAttribute('bus', 'fdc')
-    disk_element.appendChild(target_element) 
-     
+    disk_element.appendChild(target_element)
+
     # Readonly
     readonly = floppy.createElement('readonly')
     disk_element.appendChild(readonly)
- 
+
     return floppy
 
 
@@ -406,7 +406,7 @@ def interface_xml(params):
     interface.appendChild(interface_element)
 
     # <source>
-    if params['ifacetype'] != 'user' and params['ifacetype'] != 'ethernet': 
+    if params['ifacetype'] != 'user' and params['ifacetype'] != 'ethernet':
         source_element = interface.createElement('source')
         interface_element.appendChild(source_element)
     if params['ifacetype'] == 'network':
@@ -421,7 +421,7 @@ def interface_xml(params):
         source_element.setAttribute('port', params['port'])
 
     # <model>
-    # Network device model: ne2k_isa i82551 i82557b i82559er ne2k_pci 
+    # Network device model: ne2k_isa i82551 i82557b i82559er ne2k_pci
     # pcnet rtl8139 e1000 virtio
     host_release = utils.Utils().get_host_kernel_version()
     if 'el6' in host_release:
@@ -452,7 +452,7 @@ def interface_xml(params):
 
 
 def pool_xml(params):
-    pool = xml.dom.minidom.Document() 
+    pool = xml.dom.minidom.Document()
     # <pool> -- START
     pool_element = pool.createElement('pool')
     pool_element.setAttribute('type', params['pooltype'])
@@ -521,7 +521,7 @@ def pool_xml(params):
             device_element = pool.createElement('device')
             device_element.setAttribute('path', params['sourcepath'])
             source_element.appendChild(device_element)
-       
+
         # <auth>
         if params['pooltype'] == 'iscsi' and params.has_key('loginid') \
             and params.has_key('password'):
@@ -636,11 +636,11 @@ def volume_xml(params):
 
 
 def network_xml(params):
-    network = xml.dom.minidom.Document()          
+    network = xml.dom.minidom.Document()
     # <network> -- START
     network_element = network.createElement('network')
     network.appendChild(network_element)
-                
+
     # <name>
     name_element = network.createElement('name')
     name_node = network.createTextNode(params['networkname'])
@@ -658,7 +658,7 @@ def network_xml(params):
     bridge_element = network.createElement('bridge')
     bridge_element.setAttribute('name', params['bridgename'])
     bridge_element.setAttribute('stp', 'on')
-    bridge_element.setAttribute('forwardDelay', '0') 
+    bridge_element.setAttribute('forwardDelay', '0')
     network_element.appendChild(bridge_element)
 
     # <ip>
@@ -681,7 +681,7 @@ def network_xml(params):
     return network
 
 def hostdev_xml(params):
-    hostdev = xml.dom.minidom.Document()          
+    hostdev = xml.dom.minidom.Document()
     # <hostdev> -- START
     hostdev_element = hostdev.createElement('hostdev')
     hostdev_element.setAttribute('mode', params['devmode'])
@@ -752,24 +752,24 @@ def host_iface_xml(params):
 
         ip_element.setAttribute('address', params['ipaddress'])
         ip_element.setAttribute('prefix', params['prefix'])
-   
+
     if params.has_key('route'):
         route_element = interface.createElement('route')
         if params.has_key('gateway'):
-            route_element.setAttribute('gateway', params['gateway']) 
+            route_element.setAttribute('gateway', params['gateway'])
         protocol_element.appendChild(route_element)
 
     if params.has_key('dhcp'):
         dhcp_element = interface.createElement('dhcp')
         if params['ifacetype'] != 'bridge' \
         and params.get('family', None) != 'ipv6':
-            dhcp_element.setAttribute('peerdns', 'no')            
+            dhcp_element.setAttribute('peerdns', 'no')
         protocol_element.appendChild(dhcp_element)
-            
+
         if params.get('family', None) != 'ipv6' \
                 and params.has_key('mtu'):
             mtu_element = interface.createElement('mtu')
-            mtu_element.setAttribute('size', params['mtu'])            
+            mtu_element.setAttribute('size', params['mtu'])
             interface_element.appendChild(mtu_element)
 
     if params['ifacetype'] == 'bond':
@@ -782,7 +782,7 @@ def host_iface_xml(params):
         miimon_element.setAttribute('updelay', params['updelay'])
         miimon_element.setAttribute('carrier', params['carrier'])
         bond_element.appendChild(miimon_element)
-        
+
     if params['ifacetype'] == 'bridge':
         bridge_element = interface.createElement('bridge')
         bridge_element.setAttribute('stp', params['stp'])
@@ -796,7 +796,7 @@ def host_iface_xml(params):
             common1_iface_element.setAttribute('type', 'ethernet')
         else:
             common1_iface_element.setAttribute('type', params['ifacetype'])
-        common1_iface_element.setAttribute('name', 
+        common1_iface_element.setAttribute('name',
         params['%sname1' %params['ifacetype']])
 
         if params['ifacetype'] == 'bond':
@@ -810,7 +810,7 @@ def host_iface_xml(params):
             common2_iface_element.setAttribute('type', 'ethernet')
         else:
             common2_iface_element.setAttribute('type', params['ifacetype'])
-        common2_iface_element.setAttribute('name', 
+        common2_iface_element.setAttribute('name',
         params['%sname2' %params['ifacetype']])
 
         if params['ifacetype'] == 'bond':
@@ -827,7 +827,7 @@ def host_iface_xml(params):
         # Host network interfaces type: ethernet
         vlan_iface_element.setAttribute('name', params['vlanname'])
         vlan_element.appendChild(vlan_iface_element)
-    
+
     return interface
 
 def snapshot_xml(params):
@@ -910,6 +910,6 @@ def nodedev_xml(params):
     wwpn_node = nodedev.createTextNode(params['wwpn'])
     wwpn_element.appendChild(wwpn_node)
     capability1_element.appendChild(wwpn_element)
-    
+
     return nodedev
 

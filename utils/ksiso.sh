@@ -20,8 +20,8 @@ mount -t iso9660 -o loop $boot_iso $boot_iso_dir
 
 echo "- copy original iso files to custom work directory"
 cp -rf ${boot_iso_dir}/* $custom_iso_dir
-chmod -R 777 ${custom_iso_dir}/* 
-umount $boot_iso_dir    
+chmod -R 777 ${custom_iso_dir}/*
+umount $boot_iso_dir
 
 echo "- copy kickstart to custom work directory"
 cp $kscfg $custom_iso_dir

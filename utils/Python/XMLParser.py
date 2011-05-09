@@ -13,10 +13,10 @@
 # The GPL text is available in the file COPYING that accompanies this
 # distribution and at <http://www.gnu.org/licenses>.
 #
-# Filename: XMLParser.py 
-# Summary: parse and xml document into a python dictionary 
-# Description: The module is a tool to parses 
-# and xml document into a python dictionary 
+# Filename: XMLParser.py
+# Summary: parse and xml document into a python dictionary
+# Description: The module is a tool to parses
+# and xml document into a python dictionary
 
 import os
 from xml.dom import minidom
@@ -36,7 +36,7 @@ class XMLParser(object):
        out = XMLParser.XMLParser().parse(xml)
        out["firstel"] (this will be firstdata )
        out["secondel"]["subinsecond"] (this will be seconddata)
-  
+
        attributes will be put into attr hash, so say the xml document is:
        <source>
          <device path = '/dev/mapper/vg_hpdl120g501-lv_home'/>
@@ -46,7 +46,7 @@ class XMLParser(object):
        out["source"]["device"]["attr"]["path"]
        which will be set to:
          "/dev/mapper/vg_hpdl120g501-lv_home"
-    """ 
+    """
     def __init__(self):
         pass
 

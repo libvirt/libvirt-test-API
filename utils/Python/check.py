@@ -13,10 +13,10 @@
 # The GPL text is available in the file COPYING that accompanies this
 # distribution and at <http://www.gnu.org/licenses>.
 #
-# Filename: check.py 
-# Summary: basic check operation needed by test 
-# Description: The module is a tool to help conduct basic 
-#              check operation on specified host 
+# Filename: check.py
+# Summary: basic check operation needed by test
+# Description: The module is a tool to help conduct basic
+#              check operation on specified host
 
 import os
 import re
@@ -42,13 +42,13 @@ class Check(object):
 
     def subproc(self, a, b):
         self.subproc_flag = 1
-    
+
     def remote_exec(self, hostname, username, password, cmd):
         """Remote execution on specified host"""
         pid, fd = pty.fork()
         if pid == 0:
             try:
-                os.execv("/usr/bin/ssh", ["/usr/bin/ssh", "-l", 
+                os.execv("/usr/bin/ssh", ["/usr/bin/ssh", "-l",
                          username, hostname, cmd])
             except OSError, e:
                 print "OSError: " + str(e)
@@ -62,10 +62,10 @@ class Check(object):
 
                     time.sleep(1)
                     str = os.read(fd, 10240)
-                        
+
                     if re.search('(yes\/no)', str):
                         os.write(fd, "yes\r")
-                                
+
                     elif re.search('password:', str):
                         os.write(fd, password + "\r")
 
@@ -75,7 +75,7 @@ class Check(object):
                     elif i == timeout:
                         print "TIMEOUT!!!!"
                         return -1
-                        
+
                     i = i+1
 
                 self.subproc_flag = 0
@@ -87,11 +87,11 @@ class Check(object):
     def remote_exec_pexpect(self, hostname, username, password, cmd):
         """Remote exec function via pexpect"""
         user_hostname = "%s@%s" % (username, hostname)
-        child = pexpect.spawn("/usr/bin/ssh", [user_hostname, cmd], 
+        child = pexpect.spawn("/usr/bin/ssh", [user_hostname, cmd],
                               timeout = 60, maxread = 2000, logfile = None)
         #child.logfile = sys.stdout
         while True:
-            index = child.expect(['(yes\/no)', 'password:', pexpect.EOF, 
+            index = child.expect(['(yes\/no)', 'password:', pexpect.EOF,
                                  pexpect.TIMEOUT])
             if index == 0:
                 child.sendline("yes")
@@ -115,7 +115,7 @@ class Check(object):
             else:
                 break
         return cpunum
-    
+
     def get_remote_memory(self, hostname, username, password):
         """Get memory statics of specified host"""
         cmd = "free -m | grep -i mem | awk '{print $2}'"
@@ -190,7 +190,7 @@ class Check(object):
         mkdir_ret = self.remote_exec_pexpect(hostname, username, password, cmd)
         if mkdir_ret == '':
             cmd = "ls -d /tmp/test"
-            check_str = self.remote_exec_pexpect(hostname, username, 
+            check_str = self.remote_exec_pexpect(hostname, username,
                                                  password, cmd)
             if check_str == "/tmp/test":
                 return 0
@@ -205,11 +205,11 @@ class Check(object):
         """Simple test for writting file on specified host"""
         test_string = 'hello word testing'
         cmd = """echo '%s'>/tmp/test/test.log""" % (test_string)
-        write_file_ret = self.remote_exec_pexpect(hostname, username, 
+        write_file_ret = self.remote_exec_pexpect(hostname, username,
                                                   password, cmd)
         if write_file_ret == '':
             cmd = """grep '%s' /tmp/test/test.log""" % ("hello")
-            check_str = self.remote_exec_pexpect(hostname, username, 
+            check_str = self.remote_exec_pexpect(hostname, username,
                                                  password, cmd)
             if check_str == test_string:
                 return 0
@@ -220,7 +220,7 @@ class Check(object):
             print "write_file_ret = ", write_file_ret
             return 1
 
-    def run_mount_app(self, hostname, username, password, 
+    def run_mount_app(self, hostname, username, password,
                       target_mount, mount_point):
         """Simple test for mount operation on specified host"""
         cmd = """mount %s %s""" % (target_mount, mount_point)
@@ -241,10 +241,10 @@ class Check(object):
         """Simple test for wget app on specified host"""
         cmd_line = "wget -P /tmp %s -o /tmp/wget.log" % (file_url)
         logger.info("Command: %s" % (cmd_line))
-        wget_ret = self.remote_exec_pexpect(hostname, username, 
+        wget_ret = self.remote_exec_pexpect(hostname, username,
                                             password, cmd_line)
         cmd_line = "grep %s %s" % ('100%', '/tmp/wget.log')
-        check_ret = self.remote_exec_pexpect(hostname, username, 
+        check_ret = self.remote_exec_pexpect(hostname, username,
                                              password, cmd_line)
         if check_ret == "":
             logger.info("grep output is nothing")
@@ -259,15 +259,15 @@ class Check(object):
                 logger.info("check_retrun: %s" % (check_ret))
                 return 1
 
-    def validate_remote_nic_type(self, hostname, username, 
+    def validate_remote_nic_type(self, hostname, username,
                                  password, nic_type, logger):
         """Validate network interface type on specified host"""
         nic_type_to_name_dict = {'e1000':
                                  'Intel Corporation \
-                                  82540EM Gigabit Ethernet Controller', 
+                                  82540EM Gigabit Ethernet Controller',
                                  'rtl8139':
                                  'Realtek Semiconductor Co., Ltd. \
-                                  RTL-8139/8139C/8139C+', 
+                                  RTL-8139/8139C/8139C+',
                                  'virtio':'Virtio network device'}
         nic_type_to_driver_dict = {'e1000':'e1000', 'rtl8139':'8139cp',
                                   'virtio':'virtio_net'}
@@ -277,9 +277,9 @@ class Check(object):
         logger.info("nic_driver = %s" % (nic_driver))
         lspci_cmd = "lspci"
         lsmod_cmd = "lsmod"
-        lspci_cmd_ret = self.remote_exec_pexpect(hostname, username, 
+        lspci_cmd_ret = self.remote_exec_pexpect(hostname, username,
                                                  password, lspci_cmd)
-        lsmod_cmd_ret = self.remote_exec_pexpect(hostname, username, 
+        lsmod_cmd_ret = self.remote_exec_pexpect(hostname, username,
                                                  password, lsmod_cmd)
         logger.info("------------")
         logger.info("lspci_cmd_ret:\n %s" % (lspci_cmd_ret))
@@ -287,7 +287,7 @@ class Check(object):
         logger.info("lsmod_cmd_ret:\n %s" % (lsmod_cmd_ret))
         logger.info("------------")
         if lspci_cmd_ret != "" and lsmod_cmd_ret != "":
-            cmd1 = """echo "%s" | grep '%s'""" % (lspci_cmd_ret, nic_name) 
+            cmd1 = """echo "%s" | grep '%s'""" % (lspci_cmd_ret, nic_name)
             cmd2 = """echo "%s" | grep '%s'""" % (lsmod_cmd_ret, nic_driver)
             status1, output1 = commands.getstatusoutput(cmd1)
             status2, output2 = commands.getstatusoutput(cmd2)
@@ -310,26 +310,26 @@ class Check(object):
                     logger.info("now try to grep other nic type \
                               in lsmod output: %s" % key)
                     other_driver_cmd = """echo '%s' | grep '%s'""" % \
-                                   (lsmod_cmd_ret, 
+                                   (lsmod_cmd_ret,
                                     nic_type_to_driver_dict[key])
                     ret1, out1 = commands.getstatusoutput(other_driver_cmd)
                     if ret1 == 0:
                         logger.info("unspecified nic driver is seen \
                                    in guest's lsmod command: %s" % out)
                         return 1
-             
+
                 logger.info("lspci ouput about nic is: \n %s; \n \
                             lsmod output about nic is \n %s \n" %
                             (output1,output2))
                 return 0
             else:
                 logger.info("lspci and lsmod and grep fail")
-                return 1 
+                return 1
         else:
             logger.info("lspci and lsmod return nothing")
             return 1
 
-    def validate_remote_blk_type(self, hostname, username, password, 
+    def validate_remote_blk_type(self, hostname, username, password,
                                  blk_type, logger):
         """Validate block device type on specified host"""
         blk_type_to_name_dict = {'ide':'Intel Corporation 82371SB PIIX3 IDE',
@@ -337,12 +337,12 @@ class Check(object):
         blk_type_to_driver_dict = {'ide':'unknow', 'virtio':'virtio_blk'}
         lspci_cmd = "lspci"
         lsmod_cmd = "lsmod"
-        lspci_cmd_ret = self.remote_exec_pexpect(hostname, username, 
+        lspci_cmd_ret = self.remote_exec_pexpect(hostname, username,
                                                  password, lspci_cmd)
-        lsmod_cmd_ret = self.remote_exec_pexpect(hostname, username, 
+        lsmod_cmd_ret = self.remote_exec_pexpect(hostname, username,
                                                 password, lsmod_cmd)
         logger.info("------------")
-        logger.info("lspci_cmd_ret:\n %s" % (lspci_cmd_ret)) 
+        logger.info("lspci_cmd_ret:\n %s" % (lspci_cmd_ret))
         logger.info("------------")
         logger.info("lsmod_cmd_ret: \n %s" % (lsmod_cmd_ret))
         logger.info("------------")

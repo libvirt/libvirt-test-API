@@ -24,14 +24,14 @@ import libvirt
 import re
 import os
 
-def append_path(path): 
+def append_path(path):
     """Append root path of package"""
     if path in sys.path:
         pass
     else:
         sys.path.append(path)
-        
-pwd = os.getcwd() 
+
+pwd = os.getcwd()
 result = re.search('(.*)libvirt-test-API', pwd)
 append_path(result.group(0))
 
@@ -45,7 +45,7 @@ VIR_STORAGE_POOL_DEGRADED = 3
 
 class StorageAPI(object):
     def __init__(self, connection):
-        self.conn = connection 
+        self.conn = connection
 
     def define_pool(self, storage_xml):
         try:
@@ -92,7 +92,7 @@ class StorageAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
-    
+
     def storage_pool_list(self):
         pool_list = []
         try:
@@ -102,7 +102,7 @@ class StorageAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
- 
+
     def pool_lookupby_uuid(self, pooluuid):
         poolname = None
         try:
@@ -146,7 +146,7 @@ class StorageAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
-           
+
     def get_pool_obj(self, poolname):
         poolobj = None
         try:
@@ -162,7 +162,7 @@ class StorageAPI(object):
         try:
             poolobj = self.get_pool_obj(poolname)
             uuidstr = poolobj.UUID()
-            return repr(uuidstr) 
+            return repr(uuidstr)
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
@@ -187,18 +187,18 @@ class StorageAPI(object):
             if state == VIR_STORAGE_POOL_INACTIVE:
                 state = 'inactive'
             elif state == VIR_STORAGE_POOL_BUILDING:
-                state = 'building' 
+                state = 'building'
             elif state == VIR_STORAGE_POOL_RUNNING:
-                state = 'running' 
+                state = 'running'
             elif state == VIR_STORAGE_POOL_DEGRADED:
-                state = 'degraded' 
+                state = 'degraded'
             else :
                 state = 'unknown'
             return state
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)       
+            raise exception.LibvirtAPI(message, code)
 
     def get_pool_info(self, poolname):
         pool_info = []
@@ -209,28 +209,28 @@ class StorageAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)       
- 
+            raise exception.LibvirtAPI(message, code)
+
     def dump_pool(self, poolname, flags = 0):
         xmldump = None
         try:
             poolobj = self.get_pool_obj(poolname)
             xmldump = poolobj.XMLDesc(flags)
-            return xmldump 
+            return xmldump
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
 
     def active_pool(self, poolname, flags = 0):
-        try: 
+        try:
             poolobj = self.get_pool_obj(poolname)
             return poolobj.create(flags)
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
-               
+
     def delete_pool(self, poolname, flags = 1):
         try:
             pool_obj = self.get_pool_obj(poolname)
@@ -239,7 +239,7 @@ class StorageAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
-            
+
     def set_pool_autostart(self, poolname, switch):
         try:
             poolobj = self.get_pool_obj(poolname)
@@ -267,7 +267,7 @@ class StorageAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
-            
+
     def refresh_pool(self, poolname, flags = 0):
         try:
             poolobj = self.get_pool_obj(poolname)
@@ -285,7 +285,7 @@ class StorageAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
-    
+
     def destroy_pool(self, poolname):
         try:
             poolobj = self.get_pool_obj(poolname)
@@ -294,7 +294,7 @@ class StorageAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
-                     
+
     def undefine_pool(self, poolname):
         try:
             poolobj = self.get_pool_obj(poolname)
@@ -303,7 +303,7 @@ class StorageAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
- 
+
     def vol_create_from(self, poolname, volname, xmldesc, flags = 0):
         try:
             poolobj = self.get_pool_obj(poolname)
@@ -313,7 +313,7 @@ class StorageAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
- 
+
     def isActive_pool(self, poolname):
         try:
             poolobj = self.get_pool_obj(poolname)
@@ -331,7 +331,7 @@ class StorageAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
- 
+
     def volume_wipe(self, poolname, volname, flags = 0):
         try:
             volobj = self.get_volume_obj(poolname, volname)
@@ -355,7 +355,7 @@ class StorageAPI(object):
         try:
             poolobj = self.get_pool_obj(poolname)
             vollist = poolobj.listVolumes()
-            return vollist 
+            return vollist
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
@@ -363,7 +363,7 @@ class StorageAPI(object):
 
     def get_volume_number(self, poolname):
         volum = None
-        try:    
+        try:
             poolobj = self.get_pool_obj(poolname)
             volnum = poolobj.numOfVolumes()
             return volnum
@@ -371,7 +371,7 @@ class StorageAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
-                
+
     def get_volume_obj(self, poolname, volname):
         volobj = None
         try:
@@ -393,7 +393,7 @@ class StorageAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
- 
+
     def get_volume_key(self, poolname, volname):
         vol_key = None
         try:
@@ -457,7 +457,7 @@ class StorageAPI(object):
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
 
-    def get_vol_connect(self, poolname, volname):  
+    def get_vol_connect(self, poolname, volname):
         try:
             volobj = self.get_volume_obj(poolname, volname)
             return volobj.connect()

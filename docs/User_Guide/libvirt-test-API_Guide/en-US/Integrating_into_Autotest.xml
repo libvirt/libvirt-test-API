@@ -4,9 +4,9 @@
 
 <chapter id="libvirt-test-API-Integrating_into_Autotest">
   <title>Integrating libvirt-test-API into Autotest</title>
-  
+
   <para>In libvirt-test-API test cases are designed as individual components which can be grouped together in a test run via a configuration file. Because test cases are stored individually, it is easy to integrate libvirt-test-API into other test harnesses such as Autotest.</para>
-  
+
   <para>Integrating libvirt-test-API into Autotest requires:</para>
   <itemizedlist>
     <listitem>
@@ -19,12 +19,12 @@
       <para>The source code for the test.</para>
     </listitem>
   </itemizedlist>
-  
+
   <note>
     <title>Naming convention</title>
     <para>The name of the sub-directory <filename>/tests/libivrt</filename>, the test wrapper <filename>libvirt.py</filename>, and the name of the class inside the test wrapper <filename>libvirt</filename> must all match.</para>
   </note>
-  
+
   <procedure>
     <title>Integrating libvirt-test-API into Autotest</title>
     <para>To integrate libvirt-test-API into Autotest:</para>
@@ -39,7 +39,7 @@
 <screen>
 AUTHOR = """
 Author Name
-"""       
+"""
 DOC = """
 Libvirt-test-API is a powerful test tool that provides a set of simple testing procedures specifically targeting libvirt API functionality.
 """
@@ -73,11 +73,11 @@ job.run_test('libvirt')
           <para><command>postprocess()</command> - [DEPRECATED] This is called once to do post processing of test iterations after all iterations are complete. The recommended option is to use postprocess_iteration instead.</para>
         </listitem>
       </itemizedlist>
-      
+
       <para>You can customize a wrapper to meet your testing target based on libvirt-test-API rules.</para>
     </step>
   </procedure>
-  
+
   <para>Most of the information in this chapter is taken from the Autotest wiki. For more information on adding a test to Autotest, visit <ulink url ="http://autotest.kernel.org/wiki/AddingTest">Autotest - Adding a test</ulink>.</para>
-  
+
 </chapter>

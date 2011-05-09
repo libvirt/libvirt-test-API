@@ -1,5 +1,5 @@
 #!/bin/sh
-# counting disk and interface numbers 
+# counting disk and interface numbers
 
 guestname=$1
 device=$2
@@ -14,15 +14,15 @@ if [ -f guestdump.xml ]; then
    if [[ -z $num ]]; then
        echo "no disk in the domain, can you image that? "
        rm -f guestdump.xml
-   else 
+   else
        echo $num
        rm -f guestdump.xml
-   fi    
+   fi
 else
    echo "failed to dump the xml description of the domain $guestname."
    rm -f guestdump.xml
    exit 1
 fi
-    
-  
+
+
 

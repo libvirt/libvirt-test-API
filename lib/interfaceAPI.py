@@ -53,7 +53,7 @@ class InterfaceAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def get_defined_list(self):
         try:
@@ -62,8 +62,8 @@ class InterfaceAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-    
+            raise exception.LibvirtAPI(message, code)
+
     def get_active_number(self):
         try:
             active_number = self.conn.numOfInterfaces()
@@ -71,8 +71,8 @@ class InterfaceAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-    
+            raise exception.LibvirtAPI(message, code)
+
     def get_defined_number(self):
         try:
             defined_number = self.conn.numOfDefinedInterfaces()
@@ -80,8 +80,8 @@ class InterfaceAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-    
+            raise exception.LibvirtAPI(message, code)
+
     def get_iface_by_name(self, name):
         try:
             iface_obj = self.conn.interfaceLookupByName(name)
@@ -89,8 +89,8 @@ class InterfaceAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-        
+            raise exception.LibvirtAPI(message, code)
+
     def get_iface_by_mac_string(self, macstr):
         try:
             iface_obj = self.conn.interfaceLookupByMACString(macstr)
@@ -98,7 +98,7 @@ class InterfaceAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def get_name(self, macstr):
         try:
@@ -108,7 +108,7 @@ class InterfaceAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def get_mac_string(self, name):
         try:
@@ -118,7 +118,7 @@ class InterfaceAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def get_xml_desc(self, name):
         try:
@@ -128,8 +128,8 @@ class InterfaceAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-    
+            raise exception.LibvirtAPI(message, code)
+
     def get_state(self, name):
         try:
             iface_obj = self.get_iface_by_name(name)
@@ -138,8 +138,8 @@ class InterfaceAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-    
+            raise exception.LibvirtAPI(message, code)
+
     def define(self, xml_desc):
         try:
             retval = self.conn.interfaceDefineXML(xml_desc, 0)
@@ -147,8 +147,8 @@ class InterfaceAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-           
+            raise exception.LibvirtAPI(message, code)
+
     def undefine(self, name):
         try:
             def_list = self.get_defined_list()
@@ -159,7 +159,7 @@ class InterfaceAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def create(self, name, flags = 0):
         try:
@@ -169,7 +169,7 @@ class InterfaceAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def destroy(self, name, flags = 0):
         try:
@@ -179,7 +179,7 @@ class InterfaceAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def connect(self, name):
         try:
@@ -189,5 +189,5 @@ class InterfaceAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)     
- 
+            raise exception.LibvirtAPI(message, code)
+

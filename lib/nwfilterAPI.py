@@ -24,14 +24,14 @@ import libvirt
 import re
 import os
 
-def append_path(path): 
+def append_path(path):
     """Append root path of package"""
     if path in sys.path:
         pass
     else:
         sys.path.append(path)
-        
-pwd = os.getcwd() 
+
+pwd = os.getcwd()
 result = re.search('(.*)libvirt-test-API', pwd)
 append_path(result.group(0))
 
@@ -56,7 +56,7 @@ class nwfilterAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
-    
+
     def define(self, nwfilterxmldesc):
         try:
             return self.conn.nwfilterDefineXML(nwfilterxmldesc)
@@ -80,7 +80,7 @@ class nwfilterAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code) 
+            raise exception.LibvirtAPI(message, code)
 
     def get_uuid(self, name):
         try:
@@ -119,7 +119,7 @@ class nwfilterAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
-       
+
     def undefine(self, name):
         try:
             obj = self.get_nwfilter_obj(name)

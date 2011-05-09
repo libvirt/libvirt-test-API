@@ -32,7 +32,7 @@ def append_path(path):
     else:
         sys.path.append(path)
 
-pwd = os.getcwd() 
+pwd = os.getcwd()
 result = re.search('(.*)libvirt-test-API', pwd)
 append_path(result.group(0))
 

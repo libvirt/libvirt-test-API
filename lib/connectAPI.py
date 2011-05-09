@@ -50,7 +50,7 @@ class ConnectAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
-    
+
     def open_read_only(self, uri):
         try:
             self.conn = libvirt.openReadOnly(uri)
@@ -58,7 +58,7 @@ class ConnectAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)    
+            raise exception.LibvirtAPI(message, code)
 
     def openAuth(self, uri, auth, flags = 0):
         try:
@@ -68,7 +68,7 @@ class ConnectAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
-             
+
     def close(self):
         try:
             self.conn.close()
@@ -76,7 +76,7 @@ class ConnectAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
-    
+
     def get_caps(self):
         try:
             caps = self.conn.getCapabilities()
@@ -85,7 +85,7 @@ class ConnectAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
-    
+
     def get_free_memory(self):
         try:
             freemem = self.conn.getFreeMemory()
@@ -94,7 +94,7 @@ class ConnectAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
-    
+
     def get_host_name(self):
         try:
             hostname = self.conn.getHostname()
@@ -103,7 +103,7 @@ class ConnectAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
-    
+
     def get_max_vcpus(self, type):
         try:
             maxvcpu = self.conn.getMaxVcpus(type)
@@ -112,7 +112,7 @@ class ConnectAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
-    
+
     def get_type(self):
         try:
             type = self.conn.getType()
@@ -121,7 +121,7 @@ class ConnectAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
-    
+
     def get_uri(self):
         try:
             uri = self.conn.getURI()
@@ -130,11 +130,11 @@ class ConnectAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
-    
+
     def ref(self,  uri):
         try:
             refer = self.conn.ref()
-            return refer 
+            return refer
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
@@ -143,12 +143,12 @@ class ConnectAPI(object):
     def get_cells_free_memory(self, startCell, maxCells):
         try:
             cfreemem = self.conn.getCellsFreeMemory(startCell, maxCells)
-            return cfreemem 
+            return cfreemem
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
-    
+
     def get_info(self):
         try:
             info = self.conn.getInfo()
@@ -192,8 +192,8 @@ class ConnectAPI(object):
 
     def domain_XML_from_native(self, nativeFormat, nativeConfig, flag = 0):
         try:
-            return self.conn.domainXMLFromNative(nativeFormat, 
-                                                 nativeConfig, 
+            return self.conn.domainXMLFromNative(nativeFormat,
+                                                 nativeConfig,
                                                  flag)
         except libvirt.libvirtError, e:
             message = e.get_error_message()
@@ -231,7 +231,7 @@ class ConnectAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
-    
+
     def newStream(self, flag = 0):
         try:
             return self.conn.newStream(flag)
@@ -272,53 +272,53 @@ class ConnectAPI(object):
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
 
-    def dispatch_domain_event_graphics_callback(self, 
-                                                dom, 
-                                                phase, 
-                                                localAddr, 
-                                                remoteAddr, 
-                                                authScheme, 
-                                                subject, 
+    def dispatch_domain_event_graphics_callback(self,
+                                                dom,
+                                                phase,
+                                                localAddr,
+                                                remoteAddr,
+                                                authScheme,
+                                                subject,
                                                 cbData):
         try:
-            return self.conn.dispatchDomainEventGraphicsCallback(dom, 
-                                                                 phase, 
-                                                                 localAddr, 
-                                                                 remoteAddr, 
-                                                                 authScheme, 
-                                                                 subject, 
+            return self.conn.dispatchDomainEventGraphicsCallback(dom,
+                                                                 phase,
+                                                                 localAddr,
+                                                                 remoteAddr,
+                                                                 authScheme,
+                                                                 subject,
                                                                  cbData)
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
 
-    def dispatch_domain_event_IOError_callback(self, 
-                                               dom, 
-                                               srcPath, 
-                                               devAlias, 
-                                               action, 
+    def dispatch_domain_event_IOError_callback(self,
+                                               dom,
+                                               srcPath,
+                                               devAlias,
+                                               action,
                                                cbData):
         try:
-            return self.conn.dispatchDomainEventIOErrorCallback(dom, 
-                                                                srcPath, 
-                                                                devAlias, 
-                                                                action, 
+            return self.conn.dispatchDomainEventIOErrorCallback(dom,
+                                                                srcPath,
+                                                                devAlias,
+                                                                action,
                                                                 cbData)
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
 
-    def dispatch_domain_event_IOError_reason_callback(self, 
-                                                      dom, 
-                                                      srcPath, 
-                                                      devAlias, 
-                                                      action, 
-                                                      reason, 
+    def dispatch_domain_event_IOError_reason_callback(self,
+                                                      dom,
+                                                      srcPath,
+                                                      devAlias,
+                                                      action,
+                                                      reason,
                                                       cbData):
         try:
-            return self.conn.dispatchDomainEventIOErrorReasonCallback(dom, 
+            return self.conn.dispatchDomainEventIOErrorReasonCallback(dom,
                                                                       srcPath,
                                                                       devAlias,
                                                                       action,
@@ -329,15 +329,15 @@ class ConnectAPI(object):
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
 
-    def dispatch_domain_event_lifecycle_callback(self, 
-                                                 dom, 
-                                                 event, 
-                                                 detail, 
+    def dispatch_domain_event_lifecycle_callback(self,
+                                                 dom,
+                                                 event,
+                                                 detail,
                                                  cbData):
         try:
-            return self.conn.dispatchDomainEventLifecycleCallback(dom, 
-                                                                  event, 
-                                                                  detail, 
+            return self.conn.dispatchDomainEventLifecycleCallback(dom,
+                                                                  event,
+                                                                  detail,
                                                                   cbData)
         except libvirt.libvirtError, e:
             message = e.get_error_message()
@@ -346,8 +346,8 @@ class ConnectAPI(object):
 
     def dispatch_domain_event_RTC_change_callback(self, dom, offset, cbData):
         try:
-            return self.conn.dispatchDomainEventRTCChangeCallback(dom, 
-                                                                  offset, 
+            return self.conn.dispatchDomainEventRTCChangeCallback(dom,
+                                                                  offset,
                                                                   cbData)
         except libvirt.libvirtError, e:
             message = e.get_error_message()
@@ -356,8 +356,8 @@ class ConnectAPI(object):
 
     def dispatch_domain_event_watchdog_callback(self, dom, action, cbData):
         try:
-            return self.conn.dispatchDomainEventWatchdogCallback(dom, 
-                                                                 action, 
+            return self.conn.dispatchDomainEventWatchdogCallback(dom,
+                                                                 action,
                                                                  cbData)
         except libvirt.libvirtError, e:
             message = e.get_error_message()
@@ -451,7 +451,7 @@ class ConnectAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
-    
+
     def nwfilterLookupByUUID(self, uuid):
         try:
             return self.nwfilterLookupByUUID(self, uuid)
@@ -459,7 +459,7 @@ class ConnectAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
-            
+
 VIR_CRED_AUTHNAME = libvirt.VIR_CRED_AUTHNAME
 VIR_CRED_PASSPHRASE = libvirt.VIR_CRED_PASSPHRASE
 

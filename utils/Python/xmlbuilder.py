@@ -13,8 +13,8 @@
 # The GPL text is available in the file COPYING that accompanies this
 # distribution and at <http://www.gnu.org/licenses>.
 #
-# Filename: xmlbuilder.py 
-# Summary: operation for building domain xml 
+# Filename: xmlbuilder.py
+# Summary: operation for building domain xml
 # Description: The module is to provide operation for building domain xml
 
 __DEBUG__ = False
@@ -27,11 +27,11 @@ class XmlBuilder:
     """Operation for building domain xml"""
     def write_toxml(self, doc):
         print doc.toprettyxml()
-    
+
     def add_domain(self, params):
         domain = xmlgenerator.domain_xml(params)
         return domain
-    
+
     def add_disk(self, params, domain):
         disk = xmlgenerator.disk_xml(params)
         disk_node = domain.importNode(disk.childNodes[0], True)
@@ -43,13 +43,13 @@ class XmlBuilder:
         floppy_node = domain.importNode(floppy.childNodes[0], True)
         domain.getElementsByTagName("devices")[0].insertBefore(
         floppy_node, domain.getElementsByTagName("console")[0])
-    
+
     def add_cdrom(self, params, domain):
         cdrom = xmlgenerator.disk_xml(params, True)
         cdrom_node = domain.importNode(cdrom.childNodes[0], True)
         domain.getElementsByTagName("devices")[0].insertBefore(
         cdrom_node, domain.getElementsByTagName("console")[0])
-    
+
     def add_interface(self, params, domain):
         interface = xmlgenerator.interface_xml(params)
         interface_node = domain.importNode(interface.childNodes[0], True)
@@ -63,7 +63,7 @@ class XmlBuilder:
         domain.getElementsByTagName("devices")[0].insertBefore(
         hostdev_node, domain.getElementsByTagName("console")[0])
         return hostdev
-    
+
     def build_domain_install(self, params):
         domain = xmlgenerator.domain_xml(params, True)
         self.add_disk(params, domain)
@@ -74,7 +74,7 @@ class XmlBuilder:
         if __DEBUG__:
             self.write_toxml(domain)
         return domain.toxml()
-    
+
     def build_domain_install_win(self, params):
         domain = xmlgenerator.domain_xml(params, True)
         self.add_disk(params, domain)
@@ -85,33 +85,33 @@ class XmlBuilder:
         if __DEBUG__:
             self.write_toxml(domain)
         return domain.toxml()
-    
+
     def build_domain(self, domain):
         if __DEBUG__:
             self.write_toxml(domain)
         return domain.toxml()
-    
+
     def build_disk(self, params):
         if params.get('hdmodel', None) == None:
             params['hdmodel'] = 'ide'
-    
+
         if params['hdmodel'] == 'ide':
             target_dev = 'hdb'
         elif params['hdmodel'] == 'virtio':
             target_dev = 'vdb'
         else:
             print 'Wrong harddisk model.'
-            
+
         disk = xmlgenerator.disk_xml(params)
         if params['guesttype'] == 'xenpv':
             disk.getElementsByTagName("target")[0].setAttribute("dev", "xvdb")
         else:
-            disk.getElementsByTagName("target")[0].setAttribute("dev", 
+            disk.getElementsByTagName("target")[0].setAttribute("dev",
                                                                 target_dev)
         if __DEBUG__:
             self.write_toxml(disk)
         return disk.toxml()
-    
+
     def build_interface(self, params):
         interface = xmlgenerator.interface_xml(params)
         if __DEBUG__:
@@ -123,19 +123,19 @@ class XmlBuilder:
         if __DEBUG__:
             self.write_toxml(hostdev)
         return hostdev.toxml()
-    
+
     def build_pool(self, params):
         pool = xmlgenerator.pool_xml(params)
         if __DEBUG__:
             self.write_toxml(pool)
         return pool.toxml()
-    
+
     def build_volume(self, params):
         volume = xmlgenerator.volume_xml(params)
         if __DEBUG__:
             self.write_toxml(volume)
         return volume.toxml()
-    
+
     def build_network(self, params):
         network = xmlgenerator.network_xml(params)
         if __DEBUG__:
@@ -147,13 +147,13 @@ class XmlBuilder:
         if __DEBUG__:
             self.write_toxml(interface)
         return interface.toxml()
-        
+
     def build_domain_snapshot(self, params):
         snapshot = xmlgenerator.snapshot_xml(params)
         if __DEBUG__:
             self.write_toxml(snapshot)
         return snapshot.toxml()
-        
+
     def build_secret(self, params):
         secret = xmlgenerator.secret_xml(params)
         if __DEBUG__:
@@ -225,7 +225,7 @@ if __name__ == "__main__":
     params['volformat'] = 'lvm2'
     params['capacity'] = '10'
     params['suffix'] = 'M'
-    
+
 
     volumexml = xmlobj.build_volume(params)
 
@@ -258,7 +258,7 @@ if __name__ == "__main__":
     # get hostdev xml string
     params['devmode'] = 'subsystem'
     # The device type can be specified with 'usb' or 'pci'
-    params['devtype'] = 'pci'  
+    params['devtype'] = 'pci'
     params['vendorid'] = '0x1234'
     params['productid'] = '0xbeef'
     params['bus'] = '0x06'

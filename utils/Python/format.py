@@ -13,8 +13,8 @@
 # The GPL text is available in the file COPYING that accompanies this
 # distribution and at <http://www.gnu.org/licenses>.
 #
-# Filename: format.py 
-# Summary: generate specified kind of format string 
+# Filename: format.py
+# Summary: generate specified kind of format string
 # Description: The module is a tool to generate specified kind of format string
 
 from string import Template
@@ -34,7 +34,7 @@ class Format(object):
         """The function is dispather,which uses prefix print_ cat
            format to construct function call,and its argument is
            varible long
-        """  
+        """
         exec_func = getattr(self, "print_%s" %format)
         if len(args) == 1:
             for arg in args:
@@ -68,7 +68,7 @@ class Format(object):
         console = "    %s" % msg
         num = (128 - len(msg))/2 - 2
         tpl = Template("\n$sep   $str  $sep\n")
-        msgs = tpl.substitute(sep = '-'*num, str = msg) 
+        msgs = tpl.substitute(sep = '-'*num, str = msg)
         print console
         self.write_log(msgs)
 
@@ -80,16 +80,16 @@ class Format(object):
             console_result = '\033[1;36mOK\033[1;m'
         if flag == 1:
             result = 'FAIL'
-            console_result = '\033[1;31mFAIL\033[1;m' 
+            console_result = '\033[1;31mFAIL\033[1;m'
         if flag == 100:
             result = 'Skip'
-            console_result = '\033[1;38mSkip\033[1;m' 
+            console_result = '\033[1;38mSkip\033[1;m'
 
         console = "            Result: %s\n" % console_result
         msg = msg + ' ' + result
         num = (128 - len(msg))/2 - 2
         tpl = Template("$sep   $str  $sep")
-        msgs = tpl.substitute(sep = '-'*num, str = msg) 
+        msgs = tpl.substitute(sep = '-'*num, str = msg)
         print console,
         self.write_log(msgs)
         separator = '\n' + '-' * 128 + '\n'

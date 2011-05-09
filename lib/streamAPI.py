@@ -49,7 +49,7 @@ class StreamAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
-  
+
     def connect(self, flag = 0):
         try:
             stream_obj = newStream(flag)
@@ -58,7 +58,7 @@ class StreamAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
-    
+
     def finish(self, flag = 0):
         try:
             stream_obj = newStream(flag)
@@ -85,7 +85,7 @@ class StreamAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
- 
+
     def eventAddCallback(self, flag = 0, cb, opaque):
         try:
             stream_obj = newStream(flag)
@@ -94,7 +94,7 @@ class StreamAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
- 
+
     def eventRemoveCallback(self, flag = 0):
         try:
             stream_obj = newStream(flag)
@@ -102,7 +102,7 @@ class StreamAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code) 
+            raise exception.LibvirtAPI(message, code)
 
     def eventUpdateCallback(self, flag = 0, events)
         try:

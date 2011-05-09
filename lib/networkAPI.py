@@ -19,7 +19,7 @@
 # Updated: Mon Apr 12, 2010
 # Version: 0.1.0
 
-import sys 
+import sys
 import libvirt
 import re
 import os
@@ -30,8 +30,8 @@ def append_path(path):
         pass
     else:
         sys.path.append(path)
-    
-pwd = os.getcwd() 
+
+pwd = os.getcwd()
 result = re.search('(.*)libvirt-test-API', pwd)
 append_path(result.group(0))
 
@@ -39,7 +39,7 @@ import exception
 
 class NetworkAPI(object):
     def __init__(self, connection):
-        self.conn = connection     
+        self.conn = connection
 
     def define(self, netxmldesc):
         try:
@@ -63,7 +63,7 @@ class NetworkAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)            
+            raise exception.LibvirtAPI(message, code)
 
     def network_list(self):
         try:
@@ -79,7 +79,7 @@ class NetworkAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)            
+            raise exception.LibvirtAPI(message, code)
 
     def get_number(self):
         try:
@@ -88,7 +88,7 @@ class NetworkAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
-            
+
 
     def netwok_lookupby_UUIDString(UUIDString):
         try:
@@ -105,7 +105,7 @@ class NetworkAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)        
+            raise exception.LibvirtAPI(message, code)
 
     def get_connect(self, netname):
         try:
@@ -115,8 +115,8 @@ class NetworkAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)            
- 
+            raise exception.LibvirtAPI(message, code)
+
     def get_uuid(self, netname):
         try:
             netobj = self.get_net_obj(netname)
@@ -125,8 +125,8 @@ class NetworkAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)            
-    
+            raise exception.LibvirtAPI(message, code)
+
     def get_uuid_string(self, netname):
         try:
             netobj = self.get_net_obj(netname)
@@ -135,7 +135,7 @@ class NetworkAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
-    
+
     def get_ref(self, netname):
         try:
             netobj = self.get_net_obj(netname)
@@ -143,8 +143,8 @@ class NetworkAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)          
-        
+            raise exception.LibvirtAPI(message, code)
+
     def get_bridge_name(self, netname):
         try:
             netobj = self.get_net_obj(netname)
@@ -161,7 +161,7 @@ class NetworkAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)        
+            raise exception.LibvirtAPI(message, code)
 
     def undefine(self, netname):
         try:
@@ -173,7 +173,7 @@ class NetworkAPI(object):
             raise exception.LibvirtAPI(message, code)
 
     def destroy(self, netname):
-        try: 
+        try:
             netobj = self.get_net_obj(netname)
             return netobj.destroy()
         except libvirt.libvirtError, e:
@@ -182,7 +182,7 @@ class NetworkAPI(object):
             raise exception.LibvirtAPI(message, code)
 
     def start(self, netname):
-        try: 
+        try:
             netobj = self.get_net_obj(netname)
             return netobj.create()
         except libvirt.libvirtError, e:
@@ -198,8 +198,8 @@ class NetworkAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
- 
-    def get_autostart(self, netname):  
+
+    def get_autostart(self, netname):
         autostatus = None
         try:
             netobj = self.get_net_obj(netname)
@@ -216,7 +216,7 @@ class NetworkAPI(object):
             raise exception.LibvirtAPI(message, code)
 
     def isActive(self, netname):
-        try: 
+        try:
             netobj = self.get_net_obj(netname)
             return netobj.isActive()
         except libvirt.libvirtError, e:
@@ -225,7 +225,7 @@ class NetworkAPI(object):
             raise exception.LibvirtAPI(message, code)
 
     def isPersistent(self, netname):
-        try: 
+        try:
             netobj = self.get_net_obj(netname)
             return netobj.isPersistent()
         except libvirt.libvirtError, e:

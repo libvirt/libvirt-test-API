@@ -24,14 +24,14 @@ import libvirt
 import re
 import os
 
-def append_path(path): 
+def append_path(path):
     """Append root path of package"""
     if path in sys.path:
         pass
     else:
         sys.path.append(path)
-        
-pwd = os.getcwd() 
+
+pwd = os.getcwd()
 result = re.search('(.*)libvirt-test-API', pwd)
 append_path(result.group(0))
 
@@ -47,7 +47,7 @@ class SecretAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def get_defined_number(self):
         try:
@@ -55,23 +55,23 @@ class SecretAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-    
+            raise exception.LibvirtAPI(message, code)
+
     def get_secret_by_uuid(self, uuid):
         try:
             return self.conn.secretLookupByUUID(uuid)
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-        
+            raise exception.LibvirtAPI(message, code)
+
     def get_secret_by_uuid_string(self, uuidstr):
         try:
             return self.conn.secretLookupByUUIDString(uuidstr)
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def get_secret_by_usage(self, usageType, usageID):
         try:
@@ -79,8 +79,8 @@ class SecretAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-        
+            raise exception.LibvirtAPI(message, code)
+
     def get_uuid(self, uuidstr):
         try:
             secret_obj = self.get_secret_by_uuid_string(uuidstr)
@@ -88,7 +88,7 @@ class SecretAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def get_uuid_string(self, usageType, usageID):
         try:
@@ -97,7 +97,7 @@ class SecretAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def get_xml_desc(self, uuidstr):
         try:
@@ -106,8 +106,8 @@ class SecretAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-    
+            raise exception.LibvirtAPI(message, code)
+
     def get_usage_id(self, uuidstr):
         try:
             secret_obj = self.get_secret_by_uuid_string(uuidstr)
@@ -115,8 +115,8 @@ class SecretAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-    
+            raise exception.LibvirtAPI(message, code)
+
     def get_usage_type(self, uuidstr):
         try:
             secret_obj = self.get_secret_by_uuid_string(uuidstr)
@@ -124,7 +124,7 @@ class SecretAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def set_value(self, uuidstr, flag = 0):
         try:
@@ -133,7 +133,7 @@ class SecretAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def get_value(self, flag = 0):
         """can get value if and only if private value is yes"""
@@ -143,7 +143,7 @@ class SecretAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
+            raise exception.LibvirtAPI(message, code)
 
     def define(self, xml_desc, flag = 0):
         try:
@@ -151,8 +151,8 @@ class SecretAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)      
-           
+            raise exception.LibvirtAPI(message, code)
+
     def undefine(self, uuidstr):
         try:
             secret_obj = self.get_secret_by_uuid_string(uuidstr)
@@ -160,7 +160,7 @@ class SecretAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)     
+            raise exception.LibvirtAPI(message, code)
 
     def connect(self, uuidstr):
         try:
@@ -170,4 +170,4 @@ class SecretAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
-         
+
