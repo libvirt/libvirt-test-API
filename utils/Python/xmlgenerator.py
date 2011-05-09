@@ -13,9 +13,9 @@
 # The GPL text is available in the file COPYING that accompanies this
 # distribution and at <http://www.gnu.org/licenses>.
 #
-# Filename: xmlgenerator.py 
-# Summary: generate domain xml 
-# Description: The module is a tool to generate domain xml 
+# Filename: xmlgenerator.py
+# Summary: generate domain xml
+# Description: The module is a tool to generate domain xml
 
 import os
 import sys
@@ -199,23 +199,23 @@ def domain_xml(params, install = False):
 
     # <devices> -- START
     devices_element = domain.createElement('devices')
-    if params['guesttype'] == 'xenfv':
-        emulator_element = domain.createElement('emulator')
-        host_arch = utils.Utils().get_host_arch()
-        if host_arch == 'i386' or host_arch == 'ia64':
-            emulator_node = domain.createTextNode('/usr/lib/xen/bin/qemu-dm')
-        elif host_arch == 'x86_64':
-            emulator_node = domain.createTextNode('/usr/lib64/xen/bin/qemu-dm')
-        else:
-            print 'Wrong arch is specified.'
-            sys.exit(1)
-        emulator_element.appendChild(emulator_node)
-        devices_element.appendChild(emulator_element)
-    if params['guesttype'] == 'kvm' or params['guesttype'] == 'qemu':
-        emulator_element = domain.createElement('emulator')
-        emulator_node = domain.createTextNode('/usr/libexec/qemu-kvm')
-        emulator_element.appendChild(emulator_node)
-        devices_element.appendChild(emulator_element)
+#    if params['guesttype'] == 'xenfv':
+#        emulator_element = domain.createElement('emulator')
+#        host_arch = utils.Utils().get_host_arch()
+#        if host_arch == 'i386' or host_arch == 'ia64':
+#            emulator_node = domain.createTextNode('/usr/lib/xen/bin/qemu-dm')
+#        elif host_arch == 'x86_64':
+#            emulator_node = domain.createTextNode('/usr/lib64/xen/bin/qemu-dm')
+#        else:
+#            print 'Wrong arch is specified.'
+#            sys.exit(1)
+#        emulator_element.appendChild(emulator_node)
+#        devices_element.appendChild(emulator_element)
+#    if params['guesttype'] == 'kvm' or params['guesttype'] == 'qemu':
+#        emulator_element = domain.createElement('emulator')
+#        emulator_node = domain.createTextNode('/usr/libexec/qemu-kvm')
+#        emulator_element.appendChild(emulator_node)
+#        devices_element.appendChild(emulator_element)
 
     # <console>
     console_element = domain.createElement('console')
