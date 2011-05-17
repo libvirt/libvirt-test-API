@@ -102,21 +102,22 @@ def define_netfs_pool(params):
     display_pool_info(stgobj, logger)
 
     try:
-        logger.info("define %s storage pool" % poolname)
-        stgobj.define_pool(poolxml)
-        pool_num2 = stgobj.get_number_of_defpools()
-        logger.info("current storage pool define number: %s" % pool_num2)
-        display_pool_info(stgobj, logger)
-        if check_pool_define(poolname, logger) and pool_num2 > pool_num1:
-            logger.info("define %s storage pool is successful" % poolname)
-            return 0
-        else:
-            logger.error("%s storage pool is undefined" % poolname)
+        try:
+            logger.info("define %s storage pool" % poolname)
+            stgobj.define_pool(poolxml)
+            pool_num2 = stgobj.get_number_of_defpools()
+            logger.info("current storage pool define number: %s" % pool_num2)
+            display_pool_info(stgobj, logger)
+            if check_pool_define(poolname, logger) and pool_num2 > pool_num1:
+                logger.info("define %s storage pool is successful" % poolname)
+                return 0
+            else:
+                logger.error("%s storage pool is undefined" % poolname)
+                return 1
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.response()['message'], e.response()['code']))
             return 1
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" \
-                     % (e.response()['message'], e.response()['code']))
-        return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

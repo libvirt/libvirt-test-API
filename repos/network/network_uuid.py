@@ -86,19 +86,20 @@ def netuuid(params):
         return 1
 
     try:
-        UUIDString = netobj.get_uuid_string(networkname)
-        logger.info("the UUID string of network %s is %s" % (networkname, UUIDString))
+        try:
+            UUIDString = netobj.get_uuid_string(networkname)
+            logger.info("the UUID string of network %s is %s" % (networkname, UUIDString))
 
-        if check_network_uuid(networkname, UUIDString, logger):
-            logger.info(VIRSH_NETUUID + " test succeeded.")
-            return 0
-        else:
-            logger.error(VIRSH_NETUUID + " test failed.")
+            if check_network_uuid(networkname, UUIDString, logger):
+                logger.info(VIRSH_NETUUID + " test succeeded.")
+                return 0
+            else:
+                logger.error(VIRSH_NETUUID + " test failed.")
+                return 1
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s" % \
+                         (e.response()['message'], e.response()['code']))
             return 1
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % \
-                     (e.response()['message'], e.response()['code']))
-        return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

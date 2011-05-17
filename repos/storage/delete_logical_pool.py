@@ -115,21 +115,22 @@ def delete_logical_pool(params):
     display_physical_volume()
 
     try:
-        logger.info("delete %s storage pool" % poolname)
-        stgobj.delete_pool(poolname)
-        display_pool_info(stgobj)
-        display_physical_volume()
+        try:
+            logger.info("delete %s storage pool" % poolname)
+            stgobj.delete_pool(poolname)
+            display_pool_info(stgobj)
+            display_physical_volume()
 
-        if check_delete_pool(poolname):
-            logger.info("delete %s storage pool is successful" % poolname)
-            return 0
-        else:
-            logger.error("fail to delete %s storage pool" % poolname)
+            if check_delete_pool(poolname):
+                logger.info("delete %s storage pool is successful" % poolname)
+                return 0
+            else:
+                logger.error("fail to delete %s storage pool" % poolname)
+                return 1
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.response()['message'], e.response()['code']))
             return 1
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" \
-                     % (e.response()['message'], e.response()['code']))
-        return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

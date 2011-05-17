@@ -85,19 +85,20 @@ def domuuid(params):
         return 1
 
     try:
-        logger.info("get the UUID string of %s" % guestname)
-        UUIDString = domobj.get_uuid_string(guestname)
-        if check_domain_uuid(guestname, UUIDString, logger):
-            logger.info("UUIDString from API is the same as the one from virsh")
-            logger.info("UUID String is %s" % UUIDString)
-            return 0
-        else:
-            logger.error("UUIDString from API is not the same as the one from virsh")
+        try:
+            logger.info("get the UUID string of %s" % guestname)
+            UUIDString = domobj.get_uuid_string(guestname)
+            if check_domain_uuid(guestname, UUIDString, logger):
+                logger.info("UUIDString from API is the same as the one from virsh")
+                logger.info("UUID String is %s" % UUIDString)
+                return 0
+            else:
+                logger.error("UUIDString from API is not the same as the one from virsh")
+                return 1
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s" % \
+                         (e.response()['message'], e.response()['code']))
             return 1
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % \
-                     (e.response()['message'], e.response()['code']))
-        return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

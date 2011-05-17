@@ -88,12 +88,13 @@ def destroy(params):
 
     # Destroy domain
     try:
-        dom_obj.destroy(guestname)
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % \
-                     (e.response()['message'], e.response()['code']))
-        logger.error("fail to destroy domain")
-        return 1
+        try:
+            dom_obj.destroy(guestname)
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s" % \
+                         (e.response()['message'], e.response()['code']))
+            logger.error("fail to destroy domain")
+            return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

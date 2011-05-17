@@ -139,27 +139,28 @@ def create_netfs_pool(params):
     logger.debug("storage pool xml:\n%s" % poolxml)
 
     try:
-        logger.info("Creating %s storage pool" % poolname)
-        stgobj.create_pool(poolxml)
-        display_pool_info(stgobj, logger)
-        if check_pool_create_libvirt(stgobj, poolname, logger):
-            logger.info("creating %s storage pool is \
-                         successful in libvirt" % poolname)
-            if check_pool_create_OS(stgobj, poolname, logger):
-                logger.info("creating %s storage pool is SUCCESSFUL!!!" % poolname)
-                return 0
+        try:
+            logger.info("Creating %s storage pool" % poolname)
+            stgobj.create_pool(poolxml)
+            display_pool_info(stgobj, logger)
+            if check_pool_create_libvirt(stgobj, poolname, logger):
+                logger.info("creating %s storage pool is \
+                             successful in libvirt" % poolname)
+                if check_pool_create_OS(stgobj, poolname, logger):
+                    logger.info("creating %s storage pool is SUCCESSFUL!!!" % poolname)
+                    return 0
+                else:
+                    logger.info("creating %s storage pool is \
+                                 UNSUCCESSFUL!!!" % poolname)
+                    return 1
             else:
                 logger.info("creating %s storage pool is \
-                             UNSUCCESSFUL!!!" % poolname)
+                             UNSUCCESSFUL in libvirt!!!" % poolname)
                 return 1
-        else:
-            logger.info("creating %s storage pool is \
-                         UNSUCCESSFUL in libvirt!!!" % poolname)
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s" % \
+                         (e.response()['message'], e.response()['code']))
             return 1
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % \
-                     (e.response()['message'], e.response()['code']))
-        return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

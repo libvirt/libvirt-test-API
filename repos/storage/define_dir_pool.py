@@ -35,7 +35,7 @@ from exception import LibvirtAPI
 
 VIRSH_POOLLIST = "virsh --quiet pool-list --all|awk '{print $1}'|grep \"^%s$\""
 POOL_STAT = "virsh --quiet pool-list --all|grep \"^%s\\b\" |grep \"inactive\""
-POOL_DESTROY = "virsh pool-destroy %s" 
+POOL_DESTROY = "virsh pool-destroy %s"
 POOL_UNDEFINE = "virsh pool-undefine %s"
 
 def usage(params):
@@ -110,21 +110,22 @@ def define_dir_pool(params):
     display_pool_info(stgobj, logger)
 
     try:
-        logger.info("define %s storage pool" % poolname)
-        stgobj.define_pool(poolxml)
-        pool_num2 = stgobj.get_number_of_defpools()
-        logger.info("current storage pool define number: %s" % pool_num2)
-        display_pool_info(stgobj, logger)
-        if check_pool_define(poolname, logger) and pool_num2 > pool_num1:
-            logger.info("define %s storage pool is successful" % poolname)
-            return 0
-        else:
-            logger.error("%s storage pool is undefined" % poolname)
+        try:
+            logger.info("define %s storage pool" % poolname)
+            stgobj.define_pool(poolxml)
+            pool_num2 = stgobj.get_number_of_defpools()
+            logger.info("current storage pool define number: %s" % pool_num2)
+            display_pool_info(stgobj, logger)
+            if check_pool_define(poolname, logger) and pool_num2 > pool_num1:
+                logger.info("define %s storage pool is successful" % poolname)
+                return 0
+            else:
+                logger.error("%s storage pool is undefined" % poolname)
+                return 1
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.response()['message'], e.response()['code']))
             return 1
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" \
-                     % (e.response()['message'], e.response()['code']))
-        return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")
@@ -133,7 +134,7 @@ def define_dir_pool(params):
 
 def define_dir_pool_clean(params):
     logger = params['logger']
-    poolname = params['poolname'] 
+    poolname = params['poolname']
     (status, output) = commands.getstatusoutput(VIRSH_POOLLIST % poolname)
     if status:
         pass
@@ -146,7 +147,7 @@ def define_dir_pool_clean(params):
                logger.error("failed to destroy storage pool %s" % poolname)
                logger.error("%s" % output)
            else:
-               (status, output) = commands.getstatusoutput(POOL_UNDEFINE % poolname)   
+               (status, output) = commands.getstatusoutput(POOL_UNDEFINE % poolname)
                if status:
                    logger.error("failed to undefine storage pool %s" % poolname)
                    logger.error("%s" % output)
@@ -156,5 +157,5 @@ def define_dir_pool_clean(params):
                 logger.error("failed to undefine storage pool %s" % poolname)
                 logger.error("%s" % output)
 
-                       
+
 

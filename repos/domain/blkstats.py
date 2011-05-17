@@ -72,10 +72,11 @@ def block_stats(params):
         domobj.start(guestname)
         time.sleep(90)
     try:
-        (blkstats, path) = domobj.get_block_stats(guestname)
-    except exception.LibvirtAPI, e:
-        logger.error("libvirt error: error code - %s; error message - %s" %(e.code, e.message))
-        return 1;
+        try:
+            (blkstats, path) = domobj.get_block_stats(guestname)
+        except exception.LibvirtAPI, e:
+            logger.error("libvirt error: error code - %s; error message - %s" %(e.code, e.message))
+            return 1;
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

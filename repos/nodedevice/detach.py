@@ -119,24 +119,25 @@ def dettach(dicts):
     nodeobj = nodedevAPI.NodedevAPI(virconn)
 
     try:
-        logger.info("dettach the node device")
-        nodeobj.dettach(device_name)
-        current_driver = check_node_dettach(pciaddress)
-        logger.info("current device driver: %s" % current_driver)
-        if current_driver != original_driver and current_driver == pciback:
-            logger.info("the node %s device dettach is successful" \
-                        % device_name)
-            test_result = True
-        else:
-            logger.info("the node %s device dettach is failed" % device_name)
+        try:
+            logger.info("dettach the node device")
+            nodeobj.dettach(device_name)
+            current_driver = check_node_dettach(pciaddress)
+            logger.info("current device driver: %s" % current_driver)
+            if current_driver != original_driver and current_driver == pciback:
+                logger.info("the node %s device dettach is successful" \
+                            % device_name)
+                test_result = True
+            else:
+                logger.info("the node %s device dettach is failed" % device_name)
+                test_result = False
+                return 1
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.response()['message'], e.response()['code']))
+            logger.error("Error: fail to dettach %s node device" % device_name)
             test_result = False
             return 1
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" \
-                     % (e.response()['message'], e.response()['code']))
-        logger.error("Error: fail to dettach %s node device" % device_name)
-        test_result = False
-        return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

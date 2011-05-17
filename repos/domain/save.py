@@ -124,20 +124,21 @@ def save(params):
         logger.info("closed hypervisor connection")
         return 1
     try:
-        domobj.save(guestname, filepath)
-        if check_guest_save(guestname, domobj, util, logger):
-            logger.info("save %s domain successful" %guestname)
-            test_result = True
-        else:
-            logger.error("Error: fail to check save domain")
+        try:
+            domobj.save(guestname, filepath)
+            if check_guest_save(guestname, domobj, util, logger):
+                logger.info("save %s domain successful" %guestname)
+                test_result = True
+            else:
+                logger.error("Error: fail to check save domain")
+                test_result = False
+                return 1
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s" % \
+                          (e.response()['message'], e.response()['code']))
+            logger.error("Error: fail to save %s domain" %guestname)
             test_result = False
             return 1
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % \
-                      (e.response()['message'], e.response()['code']))
-        logger.error("Error: fail to save %s domain" %guestname)
-        test_result = False
-        return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

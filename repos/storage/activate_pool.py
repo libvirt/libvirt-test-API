@@ -101,18 +101,19 @@ def activate_pool(params):
         logger.info("closed hypervisor connection")
         return 1
     try:
-        stgobj.active_pool(poolname)
-        time.sleep(5)
-        if check_pool_active(stgobj, poolname, logger):
-            logger.info("activating %s storage pool is SUCCESSFUL!!!" % poolname)
-            return 0
-        else:
-            logger.info("activating %s storage pool is UNSUCCESSFUL!!!" % poolname)
+        try:
+            stgobj.active_pool(poolname)
+            time.sleep(5)
+            if check_pool_active(stgobj, poolname, logger):
+                logger.info("activating %s storage pool is SUCCESSFUL!!!" % poolname)
+                return 0
+            else:
+                logger.info("activating %s storage pool is UNSUCCESSFUL!!!" % poolname)
+                return 1
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.response()['message'], e.response()['code']))
             return 1
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" \
-                     % (e.response()['message'], e.response()['code']))
-        return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

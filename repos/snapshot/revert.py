@@ -81,13 +81,14 @@ def revert(params):
         return 1
 
     try:
-        logger.info("revert a snapshot for %s" % guestname)
-        snap_obj.revertToSnapshot(guestname, snapshotname)
-        logger.info("revert snapshot succeeded")
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % \
-(e.response()['message'], e.response()['code']))
-        return 1
+        try:
+            logger.info("revert a snapshot for %s" % guestname)
+            snap_obj.revertToSnapshot(guestname, snapshotname)
+            logger.info("revert snapshot succeeded")
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s" % \
+                          (e.response()['message'], e.response()['code']))
+            return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

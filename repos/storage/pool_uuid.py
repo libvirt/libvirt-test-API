@@ -87,18 +87,19 @@ def pool_uuid(params):
         return 1
 
     try:
-        UUIDString = stgobj.get_pool_uuidstring(poolname)
-        logger.info("the UUID string of pool %s is %s" % (poolname, UUIDString))
-        if check_pool_uuid(poolname, UUIDString, logger):
-            logger.info(VIRSH_POOLUUID + " test succeeded.")
-            return 0
-        else:
-            logger.error(VIRSH_POOLUUID + " test failed.")
+        try:
+            UUIDString = stgobj.get_pool_uuidstring(poolname)
+            logger.info("the UUID string of pool %s is %s" % (poolname, UUIDString))
+            if check_pool_uuid(poolname, UUIDString, logger):
+                logger.info(VIRSH_POOLUUID + " test succeeded.")
+                return 0
+            else:
+                logger.error(VIRSH_POOLUUID + " test failed.")
+                return 1
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s" % \
+                         (e.response()['message'], e.response()['code']))
             return 1
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % \
-                     (e.response()['message'], e.response()['code']))
-        return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

@@ -86,23 +86,24 @@ def destroy(params):
     logger.info("original network active number: %s" % net_num1)
 
     try:
-        netobj.destroy(networkname)
-        net_num2 = netobj.get_number()
-        if not check_network_status(networkname, netobj, logger) and \
-            net_num1 > net_num2:
-            logger.info("current network active number: %s\n" % net_num2)
-            logger.info("destroy %s network successful" % networkname)
-            test_result = True
-        else:
-            logger.error("the %s network is still running" % networkname)
+        try:
+            netobj.destroy(networkname)
+            net_num2 = netobj.get_number()
+            if not check_network_status(networkname, netobj, logger) and \
+                net_num1 > net_num2:
+                logger.info("current network active number: %s\n" % net_num2)
+                logger.info("destroy %s network successful" % networkname)
+                test_result = True
+            else:
+                logger.error("the %s network is still running" % networkname)
+                test_result = False
+                return 1
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.response()['message'], e.response()['code']))
+            logger.error("fail to destroy %s network" % networkname)
             test_result = False
             return 1
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" \
-                     % (e.response()['message'], e.response()['code']))
-        logger.error("fail to destroy %s network" % networkname)
-        test_result = False
-        return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

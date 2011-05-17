@@ -110,22 +110,23 @@ def create(params):
 
 
     try:
-        ifaceobj.create(ifacename)
-        logger.info("create host interface %s" % ifacename)
-        display_current_interface(ifaceobj)
-        if  check_create_interface(ifacename, util):
-            logger.info("create host interface %s is successful" % ifacename)
-            test_result = True
-        else:
-            logger.error("fail to check create interface")
+        try:
+            ifaceobj.create(ifacename)
+            logger.info("create host interface %s" % ifacename)
+            display_current_interface(ifaceobj)
+            if  check_create_interface(ifacename, util):
+                logger.info("create host interface %s is successful" % ifacename)
+                test_result = True
+            else:
+                logger.error("fail to check create interface")
+                test_result = False
+                return 1
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.response()['message'], e.response()['code']))
+            logger.error("fail to create interface %s" %ifacename)
             test_result = False
             return 1
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" \
-                     % (e.response()['message'], e.response()['code']))
-        logger.error("fail to create interface %s" %ifacename)
-        test_result = False
-        return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

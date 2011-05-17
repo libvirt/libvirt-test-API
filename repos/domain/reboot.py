@@ -81,12 +81,13 @@ def reboot(params):
 
     # Reboot domain
     try:
-        dom_obj.reboot(domain_name)
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" %
-                     (e.response()['message'], e.response()['code']))
-        logger.error("fail to reboot domain")
-        return 1
+        try:
+            dom_obj.reboot(domain_name)
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s" %
+                         (e.response()['message'], e.response()['code']))
+            logger.error("fail to reboot domain")
+            return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

@@ -113,26 +113,27 @@ def autostart(params):
     logger.debug("the output of 'virsh net-list --all' is %s" % text)
 
     try:
-        netobj.setnetAutostart(networkname, flag)
-        if check_network_autostart(networkname,
-                                   "qemu",
-                                   flag,
-                                   logger):
-            logger.info("current virtual network %s autostart: %s" % \
-                         (networkname, netobj.get_autostart(networkname)))
-            logger.info("executing autostart operation is successful")
-            test_result = True
-        else:
-            logger.error("Error: fail to check autostart status of \
-                          virtual network %s" % networkname)
+        try:
+            netobj.setnetAutostart(networkname, flag)
+            if check_network_autostart(networkname,
+                                       "qemu",
+                                       flag,
+                                       logger):
+                logger.info("current virtual network %s autostart: %s" % \
+                             (networkname, netobj.get_autostart(networkname)))
+                logger.info("executing autostart operation is successful")
+                test_result = True
+            else:
+                logger.error("Error: fail to check autostart status of \
+                              virtual network %s" % networkname)
+                test_result = False
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s" % \
+                         (e.response()['message'], e.response()['code']))
+            logger.error("Error: fail to autostart virtual network %s " % \
+                          networkname)
             test_result = False
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % \
-                     (e.response()['message'], e.response()['code']))
-        logger.error("Error: fail to autostart virtual network %s " % \
-                      networkname)
-        test_result = False
-        return 1
+            return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

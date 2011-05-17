@@ -115,20 +115,21 @@ def build_dir_pool(params):
     display_pool_info(stgobj)
 
     try:
-        logger.info("build %s storage pool" % poolname)
-        stgobj.build_pool(poolname)
-        display_pool_info(stgobj)
+        try:
+            logger.info("build %s storage pool" % poolname)
+            stgobj.build_pool(poolname)
+            display_pool_info(stgobj)
 
-        if check_build_pool(path_value):
-            logger.info("build %s storage pool is successful" % poolname)
-            return 0
-        else:
-            logger.error("fail to build %s storage pool" % poolname)
+            if check_build_pool(path_value):
+                logger.info("build %s storage pool is successful" % poolname)
+                return 0
+            else:
+                logger.error("fail to build %s storage pool" % poolname)
+                return 1
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.response()['message'], e.response()['code']))
             return 1
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" \
-                     % (e.response()['message'], e.response()['code']))
-        return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

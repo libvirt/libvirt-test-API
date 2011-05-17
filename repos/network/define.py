@@ -97,22 +97,23 @@ def define(params):
     logger.info("original network define number: %s" % net_num1)
 
     try:
-        netobj.define(netxml)
-        net_num2 = netobj.get_define_number()
-        if check_network_define(networkname, logger) and net_num2 > net_num1:
-            logger.info("current network define number: %s" % net_num2)
-            logger.info("define %s network is successful" % networkname)
-            test_result = True
-        else:
-            logger.error("%s network is undefined" % networkname)
+        try:
+            netobj.define(netxml)
+            net_num2 = netobj.get_define_number()
+            if check_network_define(networkname, logger) and net_num2 > net_num1:
+                logger.info("current network define number: %s" % net_num2)
+                logger.info("define %s network is successful" % networkname)
+                test_result = True
+            else:
+                logger.error("%s network is undefined" % networkname)
+                test_result = False
+                return 1
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.response()['message'], e.response()['code']))
+            logger.error("define a network from xml: \n%s" % netxml)
             test_result = False
             return 1
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" \
-                     % (e.response()['message'], e.response()['code']))
-        logger.error("define a network from xml: \n%s" % netxml)
-        test_result = False
-        return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

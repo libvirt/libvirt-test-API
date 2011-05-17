@@ -111,22 +111,23 @@ def destroy(params):
     #logger.debug("interface xml:\n%s" %iface_xml)
 
     try:
-        ifaceobj.destroy(ifacename)
-        logger.info("destroy host interface %s" % ifacename)
-        display_current_interface(ifaceobj)
-        if  check_destroy_interface(hostip):
-            logger.info("destroy host interface %s is successful" % ifacename)
-            test_result = True
-        else:
-            logger.error("fail to check destroy interface")
+        try:
+            ifaceobj.destroy(ifacename)
+            logger.info("destroy host interface %s" % ifacename)
+            display_current_interface(ifaceobj)
+            if  check_destroy_interface(hostip):
+                logger.info("destroy host interface %s is successful" % ifacename)
+                test_result = True
+            else:
+                logger.error("fail to check destroy interface")
+                test_result = False
+                return 1
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.response()['message'], e.response()['code']))
+            logger.error("fail to destroy interface %s" %ifacename)
             test_result = False
             return 1
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" \
-                     % (e.response()['message'], e.response()['code']))
-        logger.error("fail to destroy interface %s" %ifacename)
-        test_result = False
-        return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

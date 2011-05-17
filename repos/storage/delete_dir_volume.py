@@ -118,20 +118,21 @@ def delete_dir_volume(params):
     display_volume_info(stgobj, poolname)
 
     try:
-        logger.info("delete %s storage volume" % volname)
-        stgobj.delete_volume(poolname, volname)
-        vol_num2 = get_storage_volume_number(stgobj, poolname)
-        display_volume_info(stgobj, poolname)
-        if check_volume_delete(volkey) and vol_num1 > vol_num2:
-            logger.info("delete %s storage volume is successful" % volname)
-            return 0
-        else:
-            logger.error("%s storage volume is undeleted" % volname)
+        try:
+            logger.info("delete %s storage volume" % volname)
+            stgobj.delete_volume(poolname, volname)
+            vol_num2 = get_storage_volume_number(stgobj, poolname)
+            display_volume_info(stgobj, poolname)
+            if check_volume_delete(volkey) and vol_num1 > vol_num2:
+                logger.info("delete %s storage volume is successful" % volname)
+                return 0
+            else:
+                logger.error("%s storage volume is undeleted" % volname)
+                return 1
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.response()['message'], e.response()['code']))
             return 1
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" \
-                     % (e.response()['message'], e.response()['code']))
-        return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

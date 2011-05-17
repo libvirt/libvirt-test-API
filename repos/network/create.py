@@ -89,22 +89,23 @@ def create(params):
     logger.info("original network active number: %s" % net_num1)
 
     try:
-        netobj.create(netxml)
-        net_num2 = netobj.get_number()
-        if  not check_network_status(networkname, netobj, logger) and \
-                net_num2 > net_num1:
-            logger.info("current network active number: %s\n" % net_num2)
-            test_result = True
-        else:
-            logger.error("the %s network is inactive" % networkname)
-            logger.error("fail to create network from :\n%s" % netxml)
+        try:
+            netobj.create(netxml)
+            net_num2 = netobj.get_number()
+            if  not check_network_status(networkname, netobj, logger) and \
+                    net_num2 > net_num1:
+                logger.info("current network active number: %s\n" % net_num2)
+                test_result = True
+            else:
+                logger.error("the %s network is inactive" % networkname)
+                logger.error("fail to create network from :\n%s" % netxml)
+                test_result = False
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.response()['message'], e.response()['code']))
+            logger.error("create a network from xml: \n%s" % netxml)
             test_result = False
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" \
-                     % (e.response()['message'], e.response()['code']))
-        logger.error("create a network from xml: \n%s" % netxml)
-        test_result = False
-        return 1
+            return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

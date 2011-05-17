@@ -115,16 +115,17 @@ def define(params):
 
     # Define domain from xml
     try:
-        dom_obj.define(dom_xml)
-        if  check_define_domain(guestname, guesttype, logger):
-            logger.info("define a domain form xml is successful")
-            test_result = True
-        else:
-            logger.error("fail to check define domain")
+        try:
+            dom_obj.define(dom_xml)
+            if  check_define_domain(guestname, guesttype, logger):
+                logger.info("define a domain form xml is successful")
+                test_result = True
+            else:
+                logger.error("fail to check define domain")
+                test_result = False
+        except:
+            logger.error("fail to define a domain from xml")
             test_result = False
-    except:
-        logger.error("fail to define a domain from xml")
-        test_result = False
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

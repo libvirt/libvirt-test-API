@@ -89,21 +89,22 @@ def attach_interface(params):
 
     # Attach interface to domain
     try:
-        domobj.attach_device(guestname, interfacexml)
-        iface_num2 = util.dev_num(guestname, "interface")
-        logger.debug("update interface number to %s" %iface_num2)
-        if  check_attach_interface(iface_num1, iface_num2):
-            logger.info("current interface number: %s" %iface_num2)
-            test_result = True
-        else:
-            logger.error("fail to attach a interface to guest: %s" %iface_num2)
+        try:
+            domobj.attach_device(guestname, interfacexml)
+            iface_num2 = util.dev_num(guestname, "interface")
+            logger.debug("update interface number to %s" %iface_num2)
+            if  check_attach_interface(iface_num1, iface_num2):
+                logger.info("current interface number: %s" %iface_num2)
+                test_result = True
+            else:
+                logger.error("fail to attach a interface to guest: %s" %iface_num2)
+                test_result = False
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s"  %
+                         (e.response()['message'], e.response()['code']))
+            logger.error("attach a interface to guest %s" % guestname)
             test_result = False
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s"  %
-                     (e.response()['message'], e.response()['code']))
-        logger.error("attach a interface to guest %s" % guestname)
-        test_result = False
-        return 1
+            return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection") 

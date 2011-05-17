@@ -120,21 +120,22 @@ def build_logical_pool(params):
     display_physical_volume()
 
     try:
-        logger.info("build %s storage pool" % poolname)
-        stgobj.build_pool(poolname)
-        display_pool_info(stgobj)
-        display_physical_volume()
+        try:
+            logger.info("build %s storage pool" % poolname)
+            stgobj.build_pool(poolname)
+            display_pool_info(stgobj)
+            display_physical_volume()
 
-        if check_build_pool(poolname):
-            logger.info("build %s storage pool is successful" % poolname)
-            return 0
-        else:
-            logger.error("fail to build %s storage pool" % poolname)
+            if check_build_pool(poolname):
+                logger.info("build %s storage pool is successful" % poolname)
+                return 0
+            else:
+                logger.error("fail to build %s storage pool" % poolname)
+                return 1
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.response()['message'], e.response()['code']))
             return 1
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" \
-                     % (e.response()['message'], e.response()['code']))
-        return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

@@ -98,20 +98,21 @@ def undefine(params):
     ifaceobj = interfaceAPI.InterfaceAPI(virconn)
 
     try:
-        ifaceobj.undefine(ifacename)
-        if  check_undefine_interface(ifacename):
-            logger.info("undefine a interface form xml is successful")
-            test_result = True
-        else:
-            logger.error("fail to check undefine interface")
+        try:
+            ifaceobj.undefine(ifacename)
+            if  check_undefine_interface(ifacename):
+                logger.info("undefine a interface form xml is successful")
+                test_result = True
+            else:
+                logger.error("fail to check undefine interface")
+                test_result = False
+                return 1
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.response()['message'], e.response()['code']))
+            logger.error("fail to undefine a interface from xml")
             test_result = False
             return 1
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" \
-                     % (e.response()['message'], e.response()['code']))
-        logger.error("fail to undefine a interface from xml")
-        test_result = False
-        return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

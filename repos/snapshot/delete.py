@@ -105,18 +105,19 @@ def delete(params):
         return 1
 
     try:
-        logger.info("delete a snapshot for %s" % guestname)
-        snap_obj.delete(guestname, snapshotname)
-        if not delete_check(guestname, snapshotname, "noexist", logger):
-            logger.error("after deleting, the corresponding \
-                         xmlfile still exists in %s" % SNAPSHOT_DIR)
+        try:
+            logger.info("delete a snapshot for %s" % guestname)
+            snap_obj.delete(guestname, snapshotname)
+            if not delete_check(guestname, snapshotname, "noexist", logger):
+                logger.error("after deleting, the corresponding \
+                             xmlfile still exists in %s" % SNAPSHOT_DIR)
+                return 1
+            else:
+                logger.info("delete snapshot %s succeeded" % snapshotname)
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s" % \
+                          (e.response()['message'], e.response()['code']))
             return 1
-        else:
-            logger.info("delete snapshot %s succeeded" % snapshotname)
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % \
-(e.response()['message'], e.response()['code']))
-        return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

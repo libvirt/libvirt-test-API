@@ -118,24 +118,25 @@ def reattach(dicts):
     nodeobj = nodedevAPI.NodedevAPI(virconn)
 
     try:
-        nodeobj.reattach(device_name)
-        logger.info("reattach the node device")
-        current_driver = check_node_reattach(pciaddress)
-        logger.info("current device driver: %s" % current_driver)
-        if original_driver == pciback and current_driver != pciback:
-            logger.info("the node %s device reattach is successful" \
-                        % device_name)
-            test_result = True
-        else:
-            logger.info("the node %s device reattach is failed" % device_name)
+        try:
+            nodeobj.reattach(device_name)
+            logger.info("reattach the node device")
+            current_driver = check_node_reattach(pciaddress)
+            logger.info("current device driver: %s" % current_driver)
+            if original_driver == pciback and current_driver != pciback:
+                logger.info("the node %s device reattach is successful" \
+                            % device_name)
+                test_result = True
+            else:
+                logger.info("the node %s device reattach is failed" % device_name)
+                test_result = False
+                return 1
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.response()['message'], e.response()['code']))
+            logger.error("Error: fail to reattach %s node device" % device_name)
             test_result = False
             return 1
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" \
-                     % (e.response()['message'], e.response()['code']))
-        logger.error("Error: fail to reattach %s node device" % device_name)
-        test_result = False
-        return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

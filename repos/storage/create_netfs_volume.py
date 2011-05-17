@@ -172,12 +172,13 @@ def create_netfs_volume(params):
     logger.debug("volume xml:\n%s" % volumexml)
 
     try:
-        logger.info("create %s volume" % volname)
-        stgobj.create_volume(poolname, volumexml)
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" \
-                     % (e.response()['message'], e.response()['code']))
-        return 1
+        try:
+            logger.info("create %s volume" % volname)
+            stgobj.create_volume(poolname, volumexml)
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.response()['message'], e.response()['code']))
+            return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

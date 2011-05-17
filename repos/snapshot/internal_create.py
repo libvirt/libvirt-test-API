@@ -111,13 +111,14 @@ def internal_create(params):
     logger.debug("%s snapshot xml:\n%s" % (guestname, snapshot_xml))
 
     try:
-        logger.info("create a snapshot for %s" % guestname)
-        snap_obj.create(guestname, snapshot_xml)
-        logger.info("creating snapshot succeeded")
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % \
-(e.response()['message'], e.response()['code']))
-        return 1
+        try:
+            logger.info("create a snapshot for %s" % guestname)
+            snap_obj.create(guestname, snapshot_xml)
+            logger.info("creating snapshot succeeded")
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s" % \
+                          (e.response()['message'], e.response()['code']))
+            return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

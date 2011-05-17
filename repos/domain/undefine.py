@@ -70,16 +70,17 @@ def undefine(params):
     dom_obj = domainAPI.DomainAPI(virconn)
 
     try:
-        dom_obj.undefine(guestname)
-        if  check_undefine_domain(guestname):
-            logger.info("undefine the domain is successful")
-            test_result = True
-        else:
-            logger.error("fail to check domain undefine")
+        try:
+            dom_obj.undefine(guestname)
+            if  check_undefine_domain(guestname):
+                logger.info("undefine the domain is successful")
+                test_result = True
+            else:
+                logger.error("fail to check domain undefine")
+                test_result = False
+        except:
+            logger.error("fail to undefine the domain")
             test_result = False
-    except:
-        logger.error("fail to undefine the domain")
-        test_result = False
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

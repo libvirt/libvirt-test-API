@@ -98,12 +98,13 @@ def create(params):
 
     # Create domain from xml
     try:
-        domobj.create(domxml)
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" %
-                      (e.response()['message'], e.response()['code']))
-        logger.error("fail to create domain %s" % guestname)
-        return 1
+        try:
+            domobj.create(domxml)
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s" %
+                          (e.response()['message'], e.response()['code']))
+            logger.error("fail to create domain %s" % guestname)
+            return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

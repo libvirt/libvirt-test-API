@@ -117,24 +117,25 @@ def create_virtual_hba(params):
     logger.debug("node device xml:\n%s" % nodedev_xml)
 
     try:
-        logger.info("creating a virtual HBA ...")
-        nodedev_obj = nodedev.create(nodedev_xml)
-        dev_name = nodedev.get_name(nodedev_obj)
+        try:
+            logger.info("creating a virtual HBA ...")
+            nodedev_obj = nodedev.create(nodedev_xml)
+            dev_name = nodedev.get_name(nodedev_obj)
 
-        if check_nodedev_create(wwpn, dev_name) and \
-            check_nodedev_parent(nodedev, params['parent'], dev_name):
-            logger.info("the virtual HBA '%s' was created successfully" \
-                        % dev_name)
-            return 0
-        else:
-            logger.error("fail to create the virtual HBA '%s'" \
-                         % dev_name)
+            if check_nodedev_create(wwpn, dev_name) and \
+                check_nodedev_parent(nodedev, params['parent'], dev_name):
+                logger.info("the virtual HBA '%s' was created successfully" \
+                            % dev_name)
+                return 0
+            else:
+                logger.error("fail to create the virtual HBA '%s'" \
+                             % dev_name)
+                return 1
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.response()['message'], e.response()['code']))
+            logger.error("Error: fail to create %s virtual hba" % dev_name)
             return 1
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" \
-                     % (e.response()['message'], e.response()['code']))
-        logger.error("Error: fail to create %s virtual hba" % dev_name)
-        return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

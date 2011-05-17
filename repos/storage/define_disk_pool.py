@@ -125,22 +125,23 @@ def define_disk_pool(params):
     display_pool_info(stgobj)
 
     try:
-        logger.info("define %s storage pool" % poolname)
-        stgobj.define_pool(poolxml)
-        pool_num2 = stgobj.get_number_of_defpools()
-        logger.info("current storage pool define number: %s" % pool_num2)
-        display_pool_info(stgobj)
-        if check_pool_define(poolname) and pool_num2 > pool_num1:
-            logger.info("It is successful to define %s storage pool" % poolname)
-            return 0
-        else:
-            logger.error("%s storage pool was not defined successfully" % \
-                          poolname)
+        try:
+            logger.info("define %s storage pool" % poolname)
+            stgobj.define_pool(poolxml)
+            pool_num2 = stgobj.get_number_of_defpools()
+            logger.info("current storage pool define number: %s" % pool_num2)
+            display_pool_info(stgobj)
+            if check_pool_define(poolname) and pool_num2 > pool_num1:
+                logger.info("It is successful to define %s storage pool" % poolname)
+                return 0
+            else:
+                logger.error("%s storage pool was not defined successfully" % \
+                              poolname)
+                return 1
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.response()['message'], e.response()['code']))
             return 1
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" \
-                     % (e.response()['message'], e.response()['code']))
-        return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

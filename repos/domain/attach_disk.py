@@ -120,21 +120,22 @@ def attach_disk(params):
 
     # Attach disk to domain
     try:
-        domobj.attach_device(guestname, diskxml)
-        disk_num2 = util.dev_num(guestname, "disk")
-        logger.debug("update disk number to %s" %disk_num2)
-        if  check_attach_disk(disk_num1, disk_num2):
-            logger.info("current disk number: %s\n" %disk_num2)
-            test_result = True
-        else:
-            logger.error("fail to attach a disk to guest: %s\n" %disk_num2)
+        try:
+            domobj.attach_device(guestname, diskxml)
+            disk_num2 = util.dev_num(guestname, "disk")
+            logger.debug("update disk number to %s" %disk_num2)
+            if  check_attach_disk(disk_num1, disk_num2):
+                logger.info("current disk number: %s\n" %disk_num2)
+                test_result = True
+            else:
+                logger.error("fail to attach a disk to guest: %s\n" %disk_num2)
+                test_result = False
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s" %
+                         (e.response()['message'], e.response()['code']))
+            logger.error("attach %s disk to guest %s" % (imagename, guestname))
             test_result = False
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" %
-                     (e.response()['message'], e.response()['code']))
-        logger.error("attach %s disk to guest %s" % (imagename, guestname))
-        test_result = False
-        return 1
+            return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

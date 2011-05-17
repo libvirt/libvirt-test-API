@@ -85,22 +85,23 @@ def undefine(params):
     logger.info("original network define number: %s" % net_num1)
 
     try:
-        netobj.undefine(networkname)
-        net_num2 = netobj.get_define_number()
-        if  check_network_undefine(networkname) and net_num2 < net_num1:
-            logger.info("current network define number: %s" % net_num2)
-            logger.info("undefine %s network is successful" % networkname)
-            test_result = True
-        else:
-            logger.error("the network %s is still define" % networkname)
+        try:
+            netobj.undefine(networkname)
+            net_num2 = netobj.get_define_number()
+            if  check_network_undefine(networkname) and net_num2 < net_num1:
+                logger.info("current network define number: %s" % net_num2)
+                logger.info("undefine %s network is successful" % networkname)
+                test_result = True
+            else:
+                logger.error("the network %s is still define" % networkname)
+                test_result = False
+                return 1
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.response()['message'], e.response()['code']))
+            logger.error("fail to undefine a network")
             test_result = False
             return 1
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" \
-                     % (e.response()['message'], e.response()['code']))
-        logger.error("fail to undefine a network")
-        test_result = False
-        return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

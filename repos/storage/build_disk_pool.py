@@ -141,20 +141,21 @@ def build_disk_pool(params):
                  (source_device, device_type))
 
     try:
-        logger.info("begin to build the storage pool")
-        stgobj.build_pool(poolname)
-        time.sleep(5)
-        if not check_pool_built(source_device, device_type):
-            logger.info("building %s storage pool is SUCCESSFUL!!!" % poolname)
-            return 0
-        else:
-            logger.info("building %s storage pool is UNSUCCESSFUL!!!" % \
-                         poolname)
+        try:
+            logger.info("begin to build the storage pool")
+            stgobj.build_pool(poolname)
+            time.sleep(5)
+            if not check_pool_built(source_device, device_type):
+                logger.info("building %s storage pool is SUCCESSFUL!!!" % poolname)
+                return 0
+            else:
+                logger.info("building %s storage pool is UNSUCCESSFUL!!!" % \
+                             poolname)
+                return 1
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.response()['message'], e.response()['code']))
             return 1
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" \
-                     % (e.response()['message'], e.response()['code']))
-        return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

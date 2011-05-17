@@ -94,21 +94,22 @@ def autostart(params):
     # Set autostart for domain
     domobj = domainAPI.DomainAPI(virconn)
     try:
-        domobj.set_auto_start(guestname, flag)
-        if check_guest_autostart(guestname, uri.split(":")[0], flag, logger):
-            logger.info("current %s autostart: %s" %
-                        (guestname, domobj.get_auto_start(guestname)))
-            logger.info("executing autostart operation is successful")
-            test_result = True
-        else:
-            logger.error("Error: fail to check autostart domain")
+        try:
+            domobj.set_auto_start(guestname, flag)
+            if check_guest_autostart(guestname, uri.split(":")[0], flag, logger):
+                logger.info("current %s autostart: %s" %
+                            (guestname, domobj.get_auto_start(guestname)))
+                logger.info("executing autostart operation is successful")
+                test_result = True
+            else:
+                logger.error("Error: fail to check autostart domain")
+                test_result = False
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s" %
+                         (e.response()['message'], e.response()['code']))
+            logger.error("Error: fail to autostart %s domain" %guestname)
             test_result = False
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" %
-                     (e.response()['message'], e.response()['code']))
-        logger.error("Error: fail to autostart %s domain" %guestname)
-        test_result = False
-        return 1
+            return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

@@ -99,21 +99,22 @@ def detach_disk(params):
             time.sleep(90)
 
     try:
-        domobj.detach_device(guestname, diskxml)
-        disk_num2 = util.dev_num(guestname, "disk")
-        logger.debug("update disk number to %s" %disk_num2)
-        if  check_detach_disk(disk_num1, disk_num2):
-            logger.info("current disk number: %s\n" %disk_num2)
-            test_result = True
-        else:
-            logger.error("fail to detach a disk to guest: %s\n" %disk_num2)
+        try:
+            domobj.detach_device(guestname, diskxml)
+            disk_num2 = util.dev_num(guestname, "disk")
+            logger.debug("update disk number to %s" %disk_num2)
+            if  check_detach_disk(disk_num1, disk_num2):
+                logger.info("current disk number: %s\n" %disk_num2)
+                test_result = True
+            else:
+                logger.error("fail to detach a disk to guest: %s\n" %disk_num2)
+                test_result = False
+        except LibvirtAPI, e:
+            logger.error("API error message: %s, error code is %s" % \
+                         (e.response()['message'], e.response()['code']))
+            logger.error("detach %s disk from guest %s" % (imagename, guestname))
             test_result = False
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % \
-                     (e.response()['message'], e.response()['code']))
-        logger.error("detach %s disk from guest %s" % (imagename, guestname))
-        test_result = False
-        return 1
+            return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")
