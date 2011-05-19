@@ -8,8 +8,8 @@ __author__ = 'Alex Jia: ajia@redhat.com'
 __date__ = 'Wed Jan 27, 2010'
 __version__ = '0.1.0'
 __credits__ = 'Copyright (C) 2009 Red Hat, Inc.'
-__all__ = ['usage', 'check_guest_status', 'check_block_stats',
-           'block_stats']
+__all__ = ['usage', 'check_guest_status', 'check_blkstats',
+           'blkstats']
 
 import os
 import sys
@@ -43,11 +43,11 @@ def check_guest_status(guestname, domobj):
     else:
         return True
 
-def check_block_stats():
+def check_blkstats():
     """Check block device statistic result"""
     pass
 
-def block_stats(params):
+def blkstats(params):
     """Domain block device statistic"""
     # Initiate and check parameters
     usage(params)
@@ -82,7 +82,7 @@ def block_stats(params):
         logger.info("closed hypervisor connection")
 
     if blkstats:
-        # check_block_stats()
+        # check_blkstats()
         logger.debug(blkstats)
         logger.info("%s rd_req %s" %(path, blkstats[0]))
         logger.info("%s rd_bytes %s" %(path, blkstats[1]))
@@ -98,6 +98,6 @@ def block_stats(params):
     else:
         return 1
 
-def block_stats_clean(params):
+def blkstats_clean(params):
     """ clean testing environment """
     pass

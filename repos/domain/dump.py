@@ -10,7 +10,7 @@ __date__ = 'Fri Dec 25, 2009'
 __version__ = '0.1.2'
 __credits__ = 'Copyright (C) 2009 Red Hat, Inc.'
 __all__ = ['usage', 'check_guest_status', 'check_guest_kernel',
-           'check_core_dump', 'core_dump']
+           'check_dump', 'dump']
 
 import os
 import re
@@ -89,7 +89,7 @@ def check_guest_kernel(*args):
     else:
         return None
 
-def check_core_dump(*args):
+def check_dump(*args):
     """Check dumpping core file validity"""
     (guestname, file, kernel, logger) = args
 
@@ -139,7 +139,7 @@ def check_core_dump(*args):
         logger.debug("file argument is required")
         return 1
 
-def check_core_dump1(*args):
+def check_dump1(*args):
     """check whether core dump file is generated"""
     (core_file_path, logger) = args
     if os.access(core_file_path, os.R_OK):
@@ -150,7 +150,7 @@ def check_core_dump1(*args):
                      core_file_path)
         return 1
 
-def core_dump(dicts):
+def dump(dicts):
     """This method will dump the core of a domain on a given file
        for analysis. Note that for remote Xen Daemon the file path
        will be interpreted in the remote host.
@@ -185,7 +185,7 @@ def core_dump(dicts):
 
         try:
             domobj.core_dump(guestname, file)
-            retval = check_core_dump1(file, logger)
+            retval = check_dump1(file, logger)
 
             if retval == 0:
                 test_result = True
@@ -207,7 +207,7 @@ def core_dump(dicts):
     else:
         return return_close(conn, logger, 1)
 
-def core_dump_clean(params):
+def dump_clean(params):
     """ clean testing environment """
     logger = params['logger']
     filepath = params['file']

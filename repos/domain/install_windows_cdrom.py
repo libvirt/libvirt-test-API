@@ -332,7 +332,7 @@ def install_windows_cdrom(params):
     cdkey = envparser.get_value("guest", "%s_%s_key" % (guestos, guestarch))
 
     windows_unattended_path = os.path.join(homepath,
-                              "repos/Python/domain/windows_unattended")
+                              "repos/domain/windows_unattended")
 
     logger.debug('install source: \n    %s' % iso_file)
 

@@ -263,11 +263,9 @@ class Check(object):
                                  password, nic_type, logger):
         """Validate network interface type on specified host"""
         nic_type_to_name_dict = {'e1000':
-                                 'Intel Corporation \
-                                  82540EM Gigabit Ethernet Controller',
+                                 '82540EM Gigabit Ethernet Controller',
                                  'rtl8139':
-                                 'Realtek Semiconductor Co., Ltd. \
-                                  RTL-8139/8139C/8139C+',
+                                 'RTL-8139/8139C/8139C+',
                                  'virtio':'Virtio network device'}
         nic_type_to_driver_dict = {'e1000':'e1000', 'rtl8139':'8139cp',
                                   'virtio':'virtio_net'}

@@ -9,7 +9,7 @@ __date__ = 'Wed Jan 27, 2010'
 __version__ = '0.1.0'
 __credits__ = 'Copyright (C) 2009 Red Hat, Inc.'
 __all__ = ['usage', 'check_guest_status', 'check_interface_stats',
-           'interface_stats']
+           'ifstats']
 
 import os
 import re
@@ -54,7 +54,7 @@ def check_interface_stats():
     """Check interface statistic result"""
     pass
 
-def interface_stats(params):
+def ifstats(params):
     """Domain interface statistic"""
     usage(params)
 
@@ -122,6 +122,6 @@ def interface_stats(params):
     else:
         return -1
 
-def interface_stats_clean(params):
+def ifstats_clean(params):
     """ clean testing environment """
     pass

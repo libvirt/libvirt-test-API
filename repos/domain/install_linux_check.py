@@ -19,7 +19,7 @@ __author__ = "Jianlin Liu <jialiu@redhat.com>"
 __date__ = "Wed Jul 05 2010"
 __version__ = "0.1.0"
 __credits__ = "Copyright (C) 2010 Red Hat, Inc."
-__all__ = ['installation_linux_check', 'usage']
+__all__ = ['install_linux_check', 'usage']
 
 import os
 import sys
@@ -91,7 +91,7 @@ def check_params(params):
 
     return 0
 
-def installation_linux_check(params):
+def install_linux_check(params):
     """check guest status after installation, including network ping,
        read/write option in guest. return value: 0 - ok; 1 - bad
     """
@@ -257,7 +257,7 @@ def installation_linux_check(params):
 
     return Test_Result
 
-def installation_linux_check_clean(params):
+def install_linux_check_clean(params):
     """ clean testing environment """
     pass
 
