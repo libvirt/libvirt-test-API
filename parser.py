@@ -31,13 +31,18 @@ class CaseFileParser(object):
     """ Parser the case configuration file to generate a data list.
     """
     def __init__(self, casefile=None, debug=False):
-        """ Initialize the list and optionally parse case file. """
         self.list = [[]]
         self.variables = {}
         self.missing_variables = []
         self.debug = debug
         self.casefile = casefile
         self.env = env_parser.Envparser("env.cfg")
+        self.loop_finish = False
+        self.loop_start = 0
+        self.loop_end = 0
+        self.loop_times = 0
+        self.loop_list = []
+
         if casefile:
             self.parse_file(casefile)
 
@@ -306,6 +311,7 @@ class CaseFileParser(object):
 
     def parse(self, fh, list):
         """ For the testcase name parsing. """
+
         while True:
             if self.debug:
                 self.debug_print("the list is", list)
@@ -329,6 +335,45 @@ class CaseFileParser(object):
                 if self.debug:
                     self.debug_print("we begin to handle the case",
                                      tripped_casename)
+
+                if self.loop_finish:
+                    for i in range(len(list)):
+                        self.loop_list.append([])
+
+                    i = 0
+                    for caselist in list:
+                        for j in range(self.loop_start, self.loop_end):
+                            self.loop_list[i].append(caselist.pop())
+
+                        self.loop_list[i].reverse()
+                        self.debug_print("loop_list is", self.loop_list)
+                        caselist.extend(self.loop_list[i] * self.loop_times)
+                        i += 1
+
+                    self.loop_finish = False
+                    self.loop_list = []
+
+                if len(tripped_caselist) == 2 and \
+                        tripped_caselist[1] == "start_loop":
+                    for caselist in list:
+                        newdict = {}
+                        newdict[tripped_casename] = {}
+                        caselist.append(newdict)
+                        self.loop_start = len(caselist) - 1
+                    continue
+
+                if len(tripped_caselist) == 3 and \
+                        tripped_caselist[1] == "end_loop":
+                    looptimes = tripped_caselist[2]
+                    self.debug_print("looptimes is", looptimes)
+                    self.loop_times = int(looptimes)
+                    self.loop_finish = True
+                    for caselist in list:
+                        newdict = {}
+                        newdict[tripped_casename] = {}
+                        caselist.append(newdict)
+                        self.loop_end = len(caselist)
+                    continue
 
                 if len(tripped_caselist) == 3 and \
                         tripped_caselist[1] == "times":
