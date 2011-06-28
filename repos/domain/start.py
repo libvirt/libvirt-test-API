@@ -31,6 +31,9 @@ from lib import domainAPI
 from utils.Python import utils
 from exception import LibvirtAPI
 
+NONE = 0
+START_PAUSED = 1
+
 def return_close(conn, logger, ret):
     conn.close()
     logger.info("closed hypervisor connection")
@@ -62,7 +65,8 @@ def start(params):
         {'logger': logger, 'guestname': guestname}
 
         logger -- an object of utils/Python/log.py
-        guestname -- same as the domain name
+        mandatory arguments : guestname -- same as the domain name
+	optional arguments : flags -- domain create flags <none|start_paused>
 
         Return 0 on SUCCESS or 1 on FAILURE
     """
@@ -71,6 +75,13 @@ def start(params):
     check_params(params)
     domname = params['guestname']
     logger = params['logger']
+
+    flags = None
+    if params.has_key('flags'):
+        flags = params['flags']
+        if flags != 'none' and flags != 'start_paused':
+            logger.error("flags value either \"none\" or \"start_paused\"");
+            return 1
 
     # Connect to local hypervisor connection URI
     util = utils.Utils()
@@ -84,11 +95,28 @@ def start(params):
     logger.info('start domain')
 
     try:
-        dom_obj.start(domname)
+        if flags == "none":
+            dom_obj.start_with_flags(domname, NONE)
+        elif flags == "start_paused":
+            dom_obj.start_with_flags(domname, START_PAUSED)
+        elif not flags:
+            dom_obj.start(domname)
+        else:
+            logger.error("flags error")
+            return (conn, logger, 1)
     except LibvirtAPI, e:
         logger.error(str(e))
         logger.error("start failed")
         return return_close(conn, logger, 1)
+
+    if flags == "start_paused":
+        state = dom_obj.get_state(domname)
+        if state == "paused":
+            logger.info("guest start with state paused successfully")
+            return return_close(conn, logger, 0)
+        else:
+            logger.error("guest state error")
+            return return_close(conn, logger, 1)
 
     while timeout:
         time.sleep(10)
