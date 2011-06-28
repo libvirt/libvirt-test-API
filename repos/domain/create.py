@@ -12,6 +12,7 @@
                        nicmodel
                        ifacetype
                        source
+                       flags
 """
 
 __author__ = 'Guannan Ren: gren@redhat.com'
@@ -42,6 +43,9 @@ from utils.Python import utils
 from utils.Python import xmlbuilder
 from exception import LibvirtAPI
 
+NONE = 0
+START_PAUSED = 1
+
 def usage():
     print '''usage: mandatory arguments:guesttype
                            guestname
@@ -54,7 +58,13 @@ def usage():
                            nicmodel
                            ifacetype
                            source
+                           flags
           '''
+
+def return_close(conn, logger, ret):
+    conn.close()
+    logger.info("closed hypervisor connection")
+    return ret
 
 def check_params(params):
     """Verify inputing parameter dictionary"""
@@ -78,6 +88,13 @@ def create(params):
     guestname = params['guestname']
     test_result = False
 
+    flags = None
+    if params.has_key('flags'):
+        flags = params['flags']
+        if flags != "none" and flags != "start_paused":
+            logger.error("flags value either \"none\" or \"start_paused\"");
+            return 1
+
     # Connect to local hypervisor connection URI
     util = utils.Utils()
     uri = util.get_uri('127.0.0.1')
@@ -98,16 +115,26 @@ def create(params):
 
     # Create domain from xml
     try:
-        try:
-            domobj.create(domxml)
-        except LibvirtAPI, e:
-            logger.error("API error message: %s, error code is %s" %
-                          (e.response()['message'], e.response()['code']))
-            logger.error("fail to create domain %s" % guestname)
-            return 1
-    finally:
-        conn.close()
-        logger.info("closed hypervisor connection")
+        if not flags or flags == "none":
+            domobj.create(domxml, NONE)
+        elif flags == "start_paused":
+            domobj.create(domxml, START_PAUSED)
+        else:
+            logger.error("flags error")
+    except LibvirtAPI, e:
+        logger.error("API error message: %s, error code is %s" %
+                      (e.response()['message'], e.response()['code']))
+        logger.error("fail to create domain %s" % guestname)
+        return return_close(conn, logger, 1)
+
+    if flags == "start_paused":
+        state = domobj.get_state(guestname)
+        if state == "paused":
+            logger.info("guest start with state paused successfully")
+            return return_close(conn, logger, 0)
+        else:
+            logger.error("guest state error")
+            return return_close(conn, logger, 1)
 
     logger.info("get the mac address of vm %s" % guestname)
     mac = util.get_dom_mac_addr(guestname)
@@ -132,9 +159,9 @@ def create(params):
         if timeout == 0:
             logger.info("fail to power on vm %s" % guestname)
             test_result = False
-            return 1
+            return return_close(conn, logger, 1)
 
     if test_result:
-        return 0
+        return return_close(conn, logger, 0)
     else:
-        return 1
+        return return_close(conn, logger, 1)
