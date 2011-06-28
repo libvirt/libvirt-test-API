@@ -40,18 +40,6 @@ append_path(result.group(0))
 
 import exception
 
-# DomainMigrateFlags
-VIR_MIGRATE_LIVE = 1
-
-# DomainState
-VIR_DOMAIN_NOSTATE = 0
-VIR_DOMAIN_RUNNING = 1
-VIR_DOMAIN_BLOCKED = 2
-VIR_DOMAIN_PAUSED = 3
-VIR_DOMAIN_SHUTDOWN = 4
-VIR_DOMAIN_SHUTOFF = 5
-VIR_DOMAIN_CRASHED = 6
-
 class DomainAPI(object):
     def __init__(self, connection):
         self.conn = connection
@@ -182,6 +170,16 @@ class DomainAPI(object):
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
 
+    def start_with_flags(self, domname, flags = 0):
+        try:
+            dom_obj = self.get_defined_obj(domname)
+            retval = dom_obj.createWithFlags(flags)
+            return retval
+        except libvirt.libvirtError, e:
+            message = e.get_error_message()
+            code = e.get_error_code()
+            raise exception.LibvirtAPI(message, code)
+
     def suspend(self, domname):
         try:
             dom_obj = self.get_domain_by_name(domname)
@@ -223,10 +221,10 @@ class DomainAPI(object):
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
 
-    def migrate(self, domname, dconn, flags = VIR_MIGRATE_LIVE):
+    def migrate(self, domname, dconn, flags, dname = None, uri = None, bandwidth = 0):
         try:
             dom_obj = self.get_domain_by_name(domname)
-            retval = dom_obj.migrate(dconn, flags, None, None, 0)
+            retval = dom_obj.migrate(dconn, flags, dname, uri, 0)
             return retval
         except libvirt.libvirtError, e:
             message = e.get_error_message()
@@ -484,7 +482,7 @@ class DomainAPI(object):
             dom_obj = self.get_domain_by_name(domname)
             state = dom_obj.info()
             if state[0] == VIR_DOMAIN_NOSTATE:
-                dom_state = 'no state'
+                dom_state = 'nostate'
             elif state[0] == VIR_DOMAIN_RUNNING:
                 dom_state = 'running'
             elif state[0] == VIR_DOMAIN_BLOCKED:
@@ -581,7 +579,7 @@ class DomainAPI(object):
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
 
-    def isActive(self, domname):
+    def is_active(self, domname):
         try:
             dom_obj = self.get_domain_by_name(domname)
             return dom_obj.isActive()
@@ -590,7 +588,7 @@ class DomainAPI(object):
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
 
-    def isPersistent(self, domname):
+    def is_persistent(self, domname):
         try:
             dom_obj = self.get_domain_by_name(domname)
             return dom_obj.isPersistent()
@@ -662,10 +660,10 @@ class DomainAPI(object):
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
 
-    def migrate_to_uri(self, domname, duri, dname, bandwidth, flag = 0):
+    def migrate_to_uri(self, domname, duri, flags, dname = None, bandwidth = 0):
         try:
             dom_obj = self.get_domain_by_name(domname)
-            return dom_obj.migrateToURI(duri, dname, bandwidth, flag)
+            return dom_obj.migrateToURI(duri, flags, dname, bandwidth)
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
@@ -760,4 +758,25 @@ class DomainAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
+
+
+# DomainState
+VIR_DOMAIN_NOSTATE = 0
+VIR_DOMAIN_RUNNING = 1
+VIR_DOMAIN_BLOCKED = 2
+VIR_DOMAIN_PAUSED = 3
+VIR_DOMAIN_SHUTDOWN = 4
+VIR_DOMAIN_SHUTOFF = 5
+VIR_DOMAIN_CRASHED = 6
+
+
+# virDomainMigrateFlags
+VIR_MIGRATE_LIVE = 1
+VIR_MIGRATE_PEER2PEER = 2
+VIR_MIGRATE_TUNNELLED = 4
+VIR_MIGRATE_PERSIST_DEST = 8
+VIR_MIGRATE_UNDEFINE_SOURCE = 16
+VIR_MIGRATE_PAUSED = 32
+VIR_MIGRATE_NON_SHARED_DISK = 64
+VIR_MIGRATE_NON_SHARED_INC = 128
 
