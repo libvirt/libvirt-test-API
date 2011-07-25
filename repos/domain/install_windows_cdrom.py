@@ -51,6 +51,15 @@ __version__ = "0.1.0"
 __credits__ = "Copyright (C) 2010 Red Hat, Inc."
 __all__ = ['install_windows_cdrom', 'usage']
 
+VIRSH_QUIET_LIST = "virsh --quiet list --all|awk '{print $2}'|grep \"^%s$\""
+VM_STAT = "virsh --quiet list --all| grep \"\\b%s\\b\"|grep off"
+VM_DESTROY = "virsh destroy %s"
+VM_UNDEFINE = "virsh undefine %s"
+
+FLOOPY_IMG = "/tmp/floppy.img"
+ISO_MOUNT_POINT = "/mnt/libvirt_windows"
+
+
 def usage():
     print '''usage: mandatory arguments:guesttype
                            guestname
@@ -132,19 +141,19 @@ def prepare_iso(iso_file, mount_point):
     return 0, iso_local_path
 
 def prepare_floppy_image(guestname, guestos, guestarch,
-                         windows_unattended_path, cdkey, floppy_img):
+                         windows_unattended_path, cdkey, FLOOPY_IMG):
     """Making corresponding floppy images for the given guestname
     """
-    if os.path.exists(floppy_img):
-        os.remove(floppy_img)
+    if os.path.exists(FLOOPY_IMG):
+        os.remove(FLOOPY_IMG)
 
-    create_cmd = 'dd if=/dev/zero of=%s bs=1440k count=1' % floppy_img
+    create_cmd = 'dd if=/dev/zero of=%s bs=1440k count=1' % FLOOPY_IMG
     (status, text) = commands.getstatusoutput(create_cmd)
     if status:
         logger.error("failed to create floppy image")
         return 1
 
-    format_cmd = 'mkfs.msdos -s 1 %s' % floppy_img
+    format_cmd = 'mkfs.msdos -s 1 %s' % FLOOPY_IMG
     (status, text) = commands.getstatusoutput(format_cmd)
     if status:
         logger.error("failed to format floppy image")
@@ -159,7 +168,7 @@ def prepare_floppy_image(guestname, guestos, guestarch,
     os.makedirs(floppy_mount)
 
     try:
-        mount_cmd = 'mount -o loop %s %s' % (floppy_img, floppy_mount)
+        mount_cmd = 'mount -o loop %s %s' % (FLOOPY_IMG, floppy_mount)
         (status, text) = commands.getstatusoutput(mount_cmd)
         if status:
             logger.error(
@@ -202,7 +211,7 @@ def prepare_floppy_image(guestname, guestos, guestarch,
 
         cleanup(floppy_mount)
 
-    os.chmod(floppy_img, 0755)
+    os.chmod(FLOOPY_IMG, 0755)
     logger.info("Boot floppy created successfuly")
 
     return 0
@@ -339,22 +348,18 @@ def install_windows_cdrom(params):
     logger.info('prepare pre-installation environment...')
     logger.info('mount windows nfs server to /mnt/libvirt_windows')
 
-    iso_mount_point = "/mnt/libvirt_windows"
-
-    status, iso_local_path = prepare_iso(iso_file, iso_mount_point)
+    status, iso_local_path = prepare_iso(iso_file, ISO_MOUNT_POINT)
     if status:
         logger.error("installation failed")
         return 1
     params['bootcd'] = iso_local_path
 
-    floppy_img = "/tmp/floppy.img"
-
     status = prepare_floppy_image(guestname, guestos, guestarch,
-                                  windows_unattended_path, cdkey, floppy_img)
+                                  windows_unattended_path, cdkey, FLOOPY_IMG)
     if status:
         logger.error("making floppy image failed")
         return 1
-    params['floppysource'] = floppy_img
+    params['floppysource'] = FLOOPY_IMG
 
     xmlobj = xmlbuilder.XmlBuilder()
     guestxml = xmlobj.build_domain_install_win(params)
@@ -458,3 +463,58 @@ def install_windows_cdrom(params):
 
     return return_close(conn, logger, 0)
 
+def install_windows_cdrom_clean(params):
+    """ clean testing environment """
+    logger = params['logger']
+    guestname = params.get('guestname')
+    guesttype = params.get('guesttype')
+
+    util = utils.Utils()
+    hypervisor = util.get_hypervisor()
+    if hypervisor == 'xen':
+        imgfullpath = os.path.join('/var/lib/xen/images', guestname)
+    elif hypervisor == 'kvm':
+        imgfullpath = os.path.join('/var/lib/libvirt/images', guestname)
+
+    (status, output) = commands.getstatusoutput(VIRSH_QUIET_LIST % guestname)
+    if status:
+        pass
+    else:
+        logger.info("remove guest %s, and its disk image file" % guestname)
+        (status, output) = commands.getstatusoutput(VM_STAT % guestname)
+        if status:
+            (status, output) = commands.getstatusoutput(VM_DESTROY % guestname)
+            if status:
+                logger.error("failed to destroy guest %s" % guestname)
+                logger.error("%s" % output)
+            else:
+                (status, output) = commands.getstatusoutput(VM_UNDEFINE % guestname)
+                if status:
+                    logger.error("failed to undefine guest %s" % guestname)
+                    logger.error("%s" % output)
+        else:
+            (status, output) = commands.getstatusoutput(VM_UNDEFINE % guestname)
+            if status:
+                logger.error("failed to undefine guest %s" % guestname)
+                logger.error("%s" % output)
+
+    guestos = params.get('guestos')
+    guestarch = params.get('guestarch')
+
+    envfile = os.path.join(homepath, 'env.cfg')
+    envparser = env_parser.Envparser(envfile)
+    iso_file = envparser.get_value("guest", guestos + '_' + guestarch)
+
+    status, iso_local_path = prepare_iso(iso_file, ISO_MOUNT_POINT)
+    if os.path.exists(iso_local_path):
+        os.remove(iso_local_path)
+
+    iso_local_path_1 = iso_local_path + ".1"
+    if os.path.exists(iso_local_path_1):
+        os.remove(iso_local_path_1)
+
+    if os.path.exists(imgfullpath):
+        os.remove(imgfullpath)
+
+    if os.path.exists(FLOOPY_IMG):
+        os.remove(FLOOPY_IMG)
