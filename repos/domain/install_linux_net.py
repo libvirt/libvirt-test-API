@@ -51,6 +51,13 @@ from utils.Python import env_parser
 from utils.Python import xmlbuilder
 from exception import LibvirtAPI
 
+VIRSH_QUIET_LIST = "virsh --quiet list --all|awk '{print $2}'|grep \"^%s$\""
+VM_STAT = "virsh --quiet list --all| grep \"\\b%s\\b\"|grep off"
+VM_DESTROY = "virsh destroy %s"
+VM_UNDEFINE = "virsh undefine %s"
+
+BOOT_DIR = "/var/lib/libvirt/boot/"
+
 def return_close(conn, logger, ret):
     conn.close()
     logger.info("closed hypervisor connection")
@@ -433,3 +440,54 @@ def install_linux_net(params):
             return return_close(conn, logger, 1)
 
     return return_close(conn, logger, 0)
+
+def install_linux_net_clean(params):
+    """ clean testing environment """
+    logger = params['logger']
+    guestname = params.get('guestname')
+    guesttype = params.get('guesttype')
+
+    util = utils.Utils()
+    hypervisor = util.get_hypervisor()
+    if hypervisor == 'xen':
+        imgfullpath = os.path.join('/var/lib/xen/images', guestname)
+    elif hypervisor == 'kvm':
+        imgfullpath = os.path.join('/var/lib/libvirt/images', guestname)
+
+    (status, output) = commands.getstatusoutput(VIRSH_QUIET_LIST % guestname)
+    if status:
+        pass
+    else:
+        logger.info("remove guest %s, and its disk image file" % guestname)
+        (status, output) = commands.getstatusoutput(VM_STAT % guestname)
+        if status:
+            (status, output) = commands.getstatusoutput(VM_DESTROY % guestname)
+            if status:
+                logger.error("failed to destroy guest %s" % guestname)
+                logger.error("%s" % output)
+            else:
+                (status, output) = commands.getstatusoutput(VM_UNDEFINE % guestname)
+                if status:
+                    logger.error("failed to undefine guest %s" % guestname)
+                    logger.error("%s" % output)
+        else:
+            (status, output) = commands.getstatusoutput(VM_UNDEFINE % guestname)
+            if status:
+                logger.error("failed to undefine guest %s" % guestname)
+                logger.error("%s" % output)
+
+    if os.path.exists(imgfullpath):
+        os.remove(imgfullpath)
+
+    if guesttype == 'xenpv' or guesttype == 'kvm':
+        vmlinuz = os.path.join(BOOT_DIR, 'vmlinuz')
+        initrd = os.path.join(BOOT_DIR, 'initrd.img')
+        if os.path.exists(vmlinuz):
+            os.remove(vmlinuz)
+        if os.path.exists(initrd):
+            os.remove(initrd)
+    elif guesttype == 'xenfv':
+        guest_dir = os.path.join(homepath, guestname)
+        if os.path.exists(guest_dir):
+            shutil.rmtree(guest_dir)
+
