@@ -26,6 +26,9 @@ import commands
 import socket
 import fcntl
 import struct
+import pexpect
+import string
+import subprocess
 from xml.dom import minidom
 
 class Utils(object):
@@ -57,6 +60,10 @@ class Utils(object):
         ret = commands.getoutput('uname -a')
         arch = ret.split(" ")[-2]
         return arch
+
+    def get_local_hostname(self):
+        """ get local host name """
+        return socket.gethostname()
 
     def get_libvirt_version(self, ver = ''):
         ver = commands.getoutput("rpm -q libvirt|head -1")
@@ -364,3 +371,65 @@ class Utils(object):
         (ret, out) = commands.getstatusoutput(cmd)
         return ret
 
+    def exec_cmd(self, command, sudo=False, cwd=None, infile=None, outfile=None, shell=False, data=None):
+        """
+        Executes an external command, optionally via sudo.
+        """
+        if sudo:
+            if type(command) == type(""):
+                command = "sudo " + command
+            else:
+                command = ["sudo"] + command
+        if infile == None:
+            infile = subprocess.PIPE
+        if outfile == None:
+            outfile = subprocess.PIPE
+        p = subprocess.Popen(command, shell=shell, close_fds=True, cwd=cwd,
+                        stdin=infile, stdout=outfile, stderr=subprocess.PIPE)
+        (out, err) = p.communicate(data)
+        if out == None:
+            # Prevent splitlines() from barfing later on
+            out = ""
+        return (p.returncode, out.splitlines())
+
+    def remote_exec_pexpect(self, hostname, username, password, cmd):
+        """ Remote exec function via pexpect """
+        user_hostname = "%s@%s" % (username, hostname)
+        child = pexpect.spawn("/usr/bin/ssh", [user_hostname, cmd],
+                              timeout = 60, maxread = 2000, logfile = None)
+        while True:
+            index = child.expect(['(yes\/no)', 'password:', pexpect.EOF,
+                                 pexpect.TIMEOUT])
+            if index == 0:
+                child.sendline("yes")
+            elif index == 1:
+                child.sendline(password)
+            elif index == 2:
+                child.close()
+                return 0
+            elif index == 3:
+                child.close()
+                return 1
+
+        return 0
+
+    def scp_file(self, hostname, username, password, target_path, file):
+        """ Scp file to remote host """
+        user_hostname = "%s@%s:%s" % (username, hostname, target_path)
+        child = pexpect.spawn("/usr/bin/scp", [file, user_hostname])
+        while True:
+            index = child.expect(['yes\/no', 'password: ',
+                                   pexpect.EOF,
+                                   pexpect.TIMEOUT])
+            if index == 0:
+                child.sendline("yes")
+            elif index == 1:
+                child.sendline(password)
+            elif index == 2:
+                child.close()
+                return 0
+            elif index == 3:
+                child.close()
+                return 1
+
+        return 0
