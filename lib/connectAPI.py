@@ -40,11 +40,11 @@ import exception
 
 class ConnectAPI(object):
     def __init__(self):
-        pass
+        self.conn = None
 
     def open(self, uri):
         try:
-            self.conn = libvirt.open(uri)
+            conn = libvirt.open(uri)
             return self.conn
         except libvirt.libvirtError, e:
             message = e.get_error_message()
@@ -53,7 +53,7 @@ class ConnectAPI(object):
 
     def open_read_only(self, uri):
         try:
-            self.conn = libvirt.openReadOnly(uri)
+            conn = libvirt.openReadOnly(uri)
             return self.conn
         except libvirt.libvirtError, e:
             message = e.get_error_message()
@@ -62,16 +62,8 @@ class ConnectAPI(object):
 
     def openAuth(self, uri, auth, flags = 0):
         try:
-            self.conn = libvirt.openAuth(uri, auth, flags)
+            conn = libvirt.openAuth(uri, auth, flags)
             return self.conn
-        except libvirt.libvirtError, e:
-            message = e.get_error_message()
-            code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)
-
-    def close(self):
-        try:
-            self.conn.close()
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
@@ -398,7 +390,8 @@ class ConnectAPI(object):
 
     def close(self):
         try:
-            return self.conn.close()
+            if self.conn:
+                return self.conn.close()
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
