@@ -86,6 +86,15 @@ def libvirt_configure(unix_sock_group, auth_unix_ro, auth_unix_rw, logger):
         logger.error("setting auth_unix_rw to %s failed" % auth_unix_rw)
         return 1
 
+    # restart remote libvirtd service
+    libvirtd_restart_cmd = "service libvirtd restart"
+    logger.info("libvirtd restart")
+    status, output = get_output(libvirtd_restart_cmd, 0, logger)
+    if status:
+        logger.error("failed to restart libvirtd service")
+        return 1
+
+    logger.info("done to libvirtd configuration")
     return 0
 
 def group_sasl_set(unix_sock_group, auth_unix_ro, auth_unix_rw, logger):
