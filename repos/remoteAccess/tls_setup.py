@@ -8,6 +8,10 @@
             root
         password
             xxxxxx
+        listen_tls
+            enable|disable
+        auth_tls
+            none|sasl
         pkipath(optional)
             /tmp/pkipath
 """
@@ -45,8 +49,10 @@ CERTTOOL = "/usr/bin/certtool"
 CP = "/bin/cp"
 MKDIR = "/bin/mkdir"
 CA_FOLDER = "/etc/pki/CA"
+SASLPASSWD2 = "/usr/sbin/saslpasswd2"
 PRIVATE_KEY_FOLDER = "/etc/pki/libvirt/private"
 CERTIFICATE_FOLDER = "/etc/pki/libvirt"
+LIBVIRTD_CONF = "/etc/libvirt/libvirtd.conf"
 
 TEMP_TLS_FOLDER = "/tmp/libvirt_test_API_tls"
 CAKEY = os.path.join(TEMP_TLS_FOLDER, 'cakey.pem')
@@ -59,7 +65,7 @@ CLIENTCERT = os.path.join(TEMP_TLS_FOLDER, 'clientcert.pem')
 def check_params(params):
     """check out the arguments requried for migration"""
     logger = params['logger']
-    keys = ['target_machine', 'username', 'password']
+    keys = ['listen_tls', 'auth_tls', 'target_machine', 'username', 'password']
     for key in keys:
         if key not in params:
             logger.error("Argument %s is required" % key)
@@ -247,25 +253,53 @@ def deliver_cert(target_machine, username, password, pkipath, util, logger):
     logger.info("done to delivery")
     return 0
 
-def tls_libvirtd_set(target_machine, username, password, util, logger):
+def sasl_user_add(target_machine, username, password, util, logger):
+    """ execute saslpasswd2 to add sasl user """
+    logger.info("add sasl user on server side")
+    saslpasswd2_add = "echo %s | %s -a libvirt %s" % (password, SASLPASSWD2, username)
+    ret = util.remote_exec_pexpect(target_machine, username,
+                                    password, saslpasswd2_add)
+    if ret:
+        logger.error("failed to add sasl user")
+        return 1
+
+    return 0
+
+def tls_libvirtd_set(target_machine, username, password,
+                     listen_tls, auth_tls, util, logger):
     """ configure libvirtd.conf on tls server """
     logger.info("setting libvirtd.conf on tls server")
     # open libvirtd --listen option
     listen_open_cmd = "echo 'LIBVIRTD_ARGS=\"--listen\"' >> /etc/sysconfig/libvirtd"
-    ret = util.remote_exec_pexpect(target_machine, username, password, listen_open_cmd)
+    ret = util.remote_exec_pexpect(target_machine, username,
+                                    password, listen_open_cmd)
     if ret:
         logger.error("failed to uncomment --listen in /etc/sysconfig/libvirtd")
         return 1
 
-    listen_tcp_cmd = "echo \"listen_tcp = 1\" >> /etc/libvirt/libvirtd.conf"
-    ret = util.remote_exec_pexpect(target_machine, username, password, listen_tcp_cmd)
-    if ret:
-        logger.error("failed to uncomment listen_tcp in /etc/libvirt/libvirtd.conf")
-        return 1
+    if listen_tls == 'disable':
+        logger.info("set listen_tls to 0 in %s" % LIBVIRTD_CONF)
+        listen_tls_disable = "echo \"listen_tls = 0\" >> %s" % LIBVIRTD_CONF
+        ret = util.remote_exec_pexpect(target_machine, username,
+                                        password, listen_tls_disable)
+        if ret:
+            logger.error("failed to set listen_tls to 0 in %s" % LIBVIRTD_CONF)
+            return 1
+
+    if auth_tls == 'sasl':
+        logger.info("enable auth_tls = sasl in %s" % LIBVIRTD_CONF)
+        auth_tls_set = "echo 'auth_tls = \"sasl\"' >> %s" % LIBVIRTD_CONF
+        ret = util.remote_exec_pexpect(target_machine, username,
+                                       password, auth_tls_set)
+        if ret:
+            logger.error("failed to set auth_tls to sasl in %s" % LIBVIRTD_CONF)
+            return 1
 
     # restart remote libvirtd service
     libvirtd_restart_cmd = "service libvirtd restart"
-    ret = util.remote_exec_pexpect(target_machine, username, password, libvirtd_restart_cmd)
+    logger.info("libvirtd restart")
+    ret = util.remote_exec_pexpect(target_machine, username,
+                                    password, libvirtd_restart_cmd)
     if ret:
         logger.error("failed to restart libvirtd service")
         return 1
@@ -277,7 +311,8 @@ def iptables_stop(target_machine, username, password, util, logger):
     """ This is a temprory method in favor of migration """
     logger.info("stop local and remote iptables temprorily")
     iptables_stop_cmd = "service iptables stop"
-    ret = util.remote_exec_pexpect(target_machine, username, password, iptables_stop_cmd)
+    ret = util.remote_exec_pexpect(target_machine, username,
+                                   password, iptables_stop_cmd)
     if ret:
         logger.error("failed to stop remote iptables service")
         return 1
@@ -291,6 +326,53 @@ def iptables_stop(target_machine, username, password, util, logger):
     logger.info("done the iptables stop job")
     return 0
 
+def request_credentials(credentials, user_data):
+    for credential in credentials:
+        if credential[0] == connectAPI.VIR_CRED_AUTHNAME:
+            credential[4] = user_data[0]
+
+            if len(credential[4]) == 0:
+                credential[4] = credential[3]
+        elif credential[0] == connectAPI.VIR_CRED_PASSPHRASE:
+            credential[4] = user_data[1]
+        else:
+            return -1
+
+    return 0
+
+def hypervisor_connecting_test(uri, auth_tls, username,
+                                password, logger, expected_result):
+    """ connect remote server """
+    try:
+        conn = connectAPI.ConnectAPI()
+        if auth_tls == 'none':
+            virconn = conn.open(uri)
+        elif auth_tls == 'sasl':
+            user_data = [username, password]
+            auth = [[connectAPI.VIR_CRED_AUTHNAME, connectAPI.VIR_CRED_PASSPHRASE], request_credentials, user_data]
+            virconn = conn.openAuth(uri, auth, 0)
+
+    except LibvirtAPI, e:
+        logger.error("API error message: %s, error code is %s" % \
+                     (e.response()['message'], e.response()['code']))
+
+    conn.close()
+
+    if ret == 0 and expected_result == 'success':
+        logger.info("tls authentication success")
+        return 0
+    elif ret == 1 and expected_result == 'fail':
+        logger.info("tls authentication failed, but that is expected")
+        return 0
+    elif ret == 0 and expected_result == 'fail':
+        logger.error("tls authentication success, but we hope the reverse")
+        return 1
+    elif ret == 1 and expected_result == 'success':
+        logger.error("tls authentication failed")
+        return 1
+
+    return 0
+
 def tls_setup(params):
     """ generate tls certificates and configure libvirt """
     logger = params['logger']
@@ -301,6 +383,8 @@ def tls_setup(params):
     target_machine = params['target_machine']
     username = params['username']
     password = params['password']
+    listen_tls = params['listen_tls']
+    auth_tls = params['auth_tls']
 
     pkipath = ""
     if params.has_key('pkipath'):
@@ -310,11 +394,17 @@ def tls_setup(params):
 
         os.mkdir(pkipath)
 
+    uri = "qemu://%s/system" % target_machine
+    if pkipath:
+        uri += "?pkipath=%s" % pkipath
+
     util = utils.Utils()
     local_machine = util.get_local_hostname()
 
     logger.info("the hostname of server is %s" % target_machine)
     logger.info("the hostname of local machine is %s" % local_machine)
+    logger.info("the value of listen_tls is %s" % listen_tls)
+    logger.info("the value of auth_tls is %s" % auth_tls)
 
     if not util.do_ping(target_machine, 0):
         logger.error("failed to ping host %s" % target_machine)
@@ -337,26 +427,26 @@ def tls_setup(params):
     if tls_client_cert(local_machine, util, logger):
         return 1
 
-    if deliver_cert(target_machine, username, password, pkipath, util, logger):
+    if deliver_cert(target_machine, username,
+                     password, pkipath, util, logger):
         return 1
 
-    if tls_libvirtd_set(target_machine, username, password, util, logger):
+    if auth_tls == 'sasl':
+        if sasl_user_add(target_machine, username, password, util, logger):
+            return 1
+
+    if tls_libvirtd_set(target_machine, username, password,
+                        listen_tls, auth_tls, util, logger):
         return 1
 
-    uri = "qemu://%s/system" % target_machine
-    if pkipath:
-        uri += "?pkipath=%s" % pkipath
-
-    try:
-        conn = connectAPI.ConnectAPI()
-        virconn = conn.open(uri)
-        virconn.close()
-        logger.info("tls authentication success")
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % \
-                     (e.response()['message'], e.response()['code']))
-        logger.error("tls authentication failed")
-        return 1
+    if listen_tls == 'disable':
+        if hypervisor_connecting_test(uri, auth_tls, username,
+                                       password, logger, 'fail'):
+            return 1
+    elif listen_tls == 'enable':
+        if hypervisor_connecting_test(uri, auth_tls, username,
+                                       password, logger, 'success'):
+            return 1
 
     return 0
 
@@ -369,18 +459,29 @@ def tls_setup_clean(params):
     target_machine = params['target_machine']
     username = params['username']
     password = params['password']
+    listen_tls = params['listen_tls']
+    auth_tls = params['auth_tls']
 
     util = utils.Utils()
     cacert_rm = "rm -f %s/cacert.pem" % CA_FOLDER
-    ret = util.remote_exec_pexpect(target_machine, username, password, cacert_rm)
+    ret = util.remote_exec_pexpect(target_machine, username,
+                                    password, cacert_rm)
     if ret:
         logger.error("failed to remove cacert.pem on remote machine")
 
     ca_libvirt_rm = "rm -rf %s" % CERTIFICATE_FOLDER
-    ret = util.remote_exec_pexpect(target_machine, username, password, ca_libvirt_rm)
+    ret = util.remote_exec_pexpect(target_machine, username,
+                                    password, ca_libvirt_rm)
     if ret:
         logger.error("failed to remove libvirt folder")
 
     os.remove("%s/cacert.pem" % CA_FOLDER)
     shutil.rmtree(CERTIFICATE_FOLDER)
+
+    if auth_tls == 'sasl':
+        saslpasswd2_delete = "%s -a libvirt -d %s" % (SASLPASSWD2, username)
+        ret = util.remote_exec_pexpect(target_machine, username,
+                                        password, saslpasswd2_delete)
+        if ret:
+            logger.error("failed to delete sasl user")
 
