@@ -44,7 +44,7 @@ class ConnectAPI(object):
 
     def open(self, uri):
         try:
-            conn = libvirt.open(uri)
+            self.conn = libvirt.open(uri)
             return self.conn
         except libvirt.libvirtError, e:
             message = e.get_error_message()
@@ -53,7 +53,7 @@ class ConnectAPI(object):
 
     def open_read_only(self, uri):
         try:
-            conn = libvirt.openReadOnly(uri)
+            self.conn = libvirt.openReadOnly(uri)
             return self.conn
         except libvirt.libvirtError, e:
             message = e.get_error_message()
@@ -62,7 +62,7 @@ class ConnectAPI(object):
 
     def openAuth(self, uri, auth, flags = 0):
         try:
-            conn = libvirt.openAuth(uri, auth, flags)
+            self.conn = libvirt.openAuth(uri, auth, flags)
             return self.conn
         except libvirt.libvirtError, e:
             message = e.get_error_message()
