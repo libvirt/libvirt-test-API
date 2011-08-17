@@ -8,6 +8,7 @@
    optional arguments: memory
                        vcpu
                        disksize
+                       imagetype
                        imagepath
                        hdmodel
                        nicmodel
@@ -70,6 +71,7 @@ def usage():
        optional arguments: memory
                            vcpu
                            disksize
+                           imagetype
                            imagepath
                            hdmodel
                            nicmodel
@@ -86,7 +88,7 @@ def check_params(params):
     mandatory_args = ['guestname', 'guesttype', 'guestos', 'guestarch']
     optional_args = ['memory', 'vcpu', 'disksize', 'imagepath', 'hdmodel',
                      'nicmodel', 'macaddr', 'ifacetype', 'source', 'type',
-                     'volumepath']
+                     'volumepath', 'imagetype']
 
     for arg in mandatory_args:
         if arg not in params_given.keys():
@@ -255,7 +257,7 @@ def install_linux_cdrom(params):
     logger.debug("the uri to connect is %s" % uri)
 
     if params.has_key('imagepath') and not params.has_key('volumepath'):
-        imgfullpath = os.join.path(params.get('imagepath'), guestname)
+        imgfullpath = os.path.join(params.get('imagepath'), guestname)
 
     elif not params.has_key('imagepath') and not params.has_key('volumepath'):
         if hypervisor == 'xen':
@@ -280,13 +282,18 @@ def install_linux_cdrom(params):
     else:
         seeksize = '10'
 
-    logger.info("the size of disk image is %sG" % (seeksize))
-    shell_disk_dd = "dd if=/dev/zero of=%s bs=1 count=1 seek=%sG" % \
-                    (imgfullpath, seeksize)
-    logger.debug("the commands line of creating disk images is '%s'" %
-                 shell_disk_dd)
+    if params.has_key('imagetype'):
+        imagetype = params.get('imagetype')
+    else:
+        imagetype = 'raw'
 
-    (status, message) = commands.getstatusoutput(shell_disk_dd)
+    logger.info("create disk image with size %sG, format %s" % (seeksize, imagetype))
+    disk_create = "qemu-img create -f %s %s %sG" % \
+                    (imagetype, imgfullpath, seeksize)
+    logger.debug("the commands line of creating disk images is '%s'" % \
+                   disk_create)
+
+    (status, message) = commands.getstatusoutput(disk_create)
 
     if status != 0:
         logger.debug(message)

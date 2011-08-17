@@ -9,6 +9,7 @@
    optional arguments: memory
                        vcpu
                        disksize
+                       imagetype
                        imagepath
                        hdmodel
                        nicmodel
@@ -72,6 +73,7 @@ def usage():
        optional arguments: memory
                            vcpu
                            disksize
+                           imagetype
                            imagepath
                            hdmodel
                            nicmodel
@@ -88,7 +90,8 @@ def check_params(params):
                       'guestarch','netmethod']
 
     optional_args = ['memory', 'vcpu', 'disksize', 'imagepath',
-                     'hdmodel', 'nicmodel', 'ifacetype', 'source', 'type']
+                     'hdmodel', 'nicmodel', 'ifacetype',
+                     'imagetype', 'source', 'type']
 
     for arg in mandatory_args:
         if arg not in params_given.keys():
@@ -233,7 +236,7 @@ def install_linux_net(params):
     logger.debug("the uri to connect is %s" % uri)
 
     if params.has_key('imagepath'):
-        fullimagepath = os.join.path(params.get('imagepath'), guestname)
+        fullimagepath = os.path.join(params.get('imagepath'), guestname)
     else:
         if hypervisor == 'xen':
             fullimagepath = os.path.join('/var/lib/xen/images', guestname)
@@ -246,29 +249,28 @@ def install_linux_net(params):
                 fullimagepath)
 
     if params.has_key('disksize'):
-        logger.info("the size of disk image is %sG" % (params.get('disksize')))
-        shell_disk_dd = "dd if=/dev/zero of=%s bs=1 count=1 seek=%sG" % \
-                        (fullimagepath, params.get('disksize'))
-        logger.debug("the commands line of creating disk images is '%s'" %
-                     shell_disk_dd)
-
-        (status, message) = commands.getstatusoutput(shell_disk_dd)
-        if status != 0:
-            logger.debug(message)
-        else:
-            logger.info("creating disk images file is successful.")
+        seeksize = params.get('disksize')
     else:
-        logger.info("the size of disk image is 10G")
-        shell_disk_dd = "dd if=/dev/zero of=%s bs=1 count=1 seek=10G" % \
-                         fullimagepath
-        logger.debug("the commands line of creating disk images is '%s'" %
-                     shell_disk_dd)
+        seeksize = '10'
 
-        (status, message) = commands.getstatusoutput(shell_disk_dd)
-        if status != 0:
-            logger.debug(message)
-        else:
-            logger.info("creating disk images file is successful.")
+    if params.has_key('imagetype'):
+        imagetype = params.get('imagetype')
+    else:
+        imagetype = 'raw'
+
+    logger.info("create disk image with size %sG, format %s" % (seeksize, imagetype))
+    disk_create = "qemu-img create -f %s %s %sG" % \
+                    (imagetype, fullimagepath, seeksize)
+    logger.debug("the commands line of creating disk images is '%s'" % \
+                   disk_create)
+
+    (status, message) = commands.getstatusoutput(disk_create)
+
+    if status != 0:
+        logger.debug(message)
+    else:
+        logger.info("creating disk images file is successful.")
+
 
     logger.info("get system environment information")
     envfile = os.path.join(homepath, 'env.cfg')
