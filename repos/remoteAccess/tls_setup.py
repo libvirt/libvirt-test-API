@@ -343,6 +343,7 @@ def request_credentials(credentials, user_data):
 def hypervisor_connecting_test(uri, auth_tls, username,
                                 password, logger, expected_result):
     """ connect remote server """
+    ret = 0
     try:
         conn = connectAPI.ConnectAPI()
         if auth_tls == 'none':
@@ -355,6 +356,7 @@ def hypervisor_connecting_test(uri, auth_tls, username,
     except LibvirtAPI, e:
         logger.error("API error message: %s, error code is %s" % \
                      (e.response()['message'], e.response()['code']))
+        ret = 1
 
     conn.close()
 
