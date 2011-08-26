@@ -523,10 +523,30 @@ class DomainAPI(object):
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
 
+    def get_sched_params_flags(self, domname, flags):
+        try:
+            dom_obj = self.get_domain_by_name(domname)
+            sched_params_flags = dom_obj.schedulerParametersFlags(flags)
+            return sched_params_flags
+        except libvirt.libvirtError, e:
+            message = e.get_error_message()
+            code = e.get_error_code()
+            raise exception.LibvirtAPI(message, code)
+
     def set_sched_params(self, domname, params):
         try:
             dom_obj = self.get_domain_by_name(domname)
             retval = dom_obj.setSchedulerParameters(params)
+            return retval
+        except libvirt.libvirtError, e:
+            message = e.get_error_message()
+            code = e.get_error_code()
+            raise exception.LibvirtAPI(message, code)
+
+    def set_sched_params_flags(self, domname, params, flags):
+        try:
+            dom_obj = self.get_domain_by_name(domname)
+            retval = dom_obj.setSchedulerParameters(params, flags)
             return retval
         except libvirt.libvirtError, e:
             message = e.get_error_message()
@@ -769,7 +789,6 @@ VIR_DOMAIN_SHUTDOWN = 4
 VIR_DOMAIN_SHUTOFF = 5
 VIR_DOMAIN_CRASHED = 6
 
-
 # virDomainMigrateFlags
 VIR_MIGRATE_LIVE = 1
 VIR_MIGRATE_PEER2PEER = 2
@@ -779,4 +798,9 @@ VIR_MIGRATE_UNDEFINE_SOURCE = 16
 VIR_MIGRATE_PAUSED = 32
 VIR_MIGRATE_NON_SHARED_DISK = 64
 VIR_MIGRATE_NON_SHARED_INC = 128
+
+# virDomainModificationImpact
+VIR_DOMAIN_AFFECT_CURRENT = 0
+VIR_DOMAIN_AFFECT_LIVE = 1
+VIR_DOMAIN_AFFECT_CONFIG = 2
 
