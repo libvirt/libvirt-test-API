@@ -296,7 +296,7 @@ def install_windows_cdrom(params):
     logger.debug("the uri to connect is %s" % uri)
 
     if params.has_key('imagepath') and not params.has_key('volumepath'):
-        imgfullpath = os..path.join(params.get('imagepath'), guestname)
+        imgfullpath = os.path.join(params.get('imagepath'), guestname)
     elif not params.has_key('imagepath') and not params.has_key('volumepath'):
         if hypervisor == 'xen':
             imgfullpath = os.path.join('/var/lib/xen/images', guestname)
