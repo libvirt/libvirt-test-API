@@ -406,10 +406,10 @@ class Utils(object):
                 child.sendline(password)
             elif index == 2:
                 child.close()
-                return 0
+                return 0, child.before
             elif index == 3:
                 child.close()
-                return 1
+                return 1, ""
 
         return 0
 

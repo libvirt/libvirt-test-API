@@ -213,7 +213,7 @@ def deliver_cert(target_machine, username, password, pkipath, util, logger):
 
     # mkdir /etc/pki/libvirt/private on remote host
     libvirt_priv_cmd = "mkdir -p %s" % PRIVATE_KEY_FOLDER
-    ret = util.remote_exec_pexpect(target_machine, username, password, libvirt_priv_cmd)
+    ret, output = util.remote_exec_pexpect(target_machine, username, password, libvirt_priv_cmd)
     if ret:
         logger.error("failed to make /etc/pki/libvirt/private on %s" % target_machine)
         return 1
@@ -257,7 +257,7 @@ def sasl_user_add(target_machine, username, password, util, logger):
     """ execute saslpasswd2 to add sasl user """
     logger.info("add sasl user on server side")
     saslpasswd2_add = "echo %s | %s -a libvirt %s" % (password, SASLPASSWD2, username)
-    ret = util.remote_exec_pexpect(target_machine, username,
+    ret, output = util.remote_exec_pexpect(target_machine, username,
                                     password, saslpasswd2_add)
     if ret:
         logger.error("failed to add sasl user")
@@ -271,7 +271,7 @@ def tls_libvirtd_set(target_machine, username, password,
     logger.info("setting libvirtd.conf on tls server")
     # open libvirtd --listen option
     listen_open_cmd = "echo 'LIBVIRTD_ARGS=\"--listen\"' >> /etc/sysconfig/libvirtd"
-    ret = util.remote_exec_pexpect(target_machine, username,
+    ret, output = util.remote_exec_pexpect(target_machine, username,
                                     password, listen_open_cmd)
     if ret:
         logger.error("failed to uncomment --listen in /etc/sysconfig/libvirtd")
@@ -280,7 +280,7 @@ def tls_libvirtd_set(target_machine, username, password,
     if listen_tls == 'disable':
         logger.info("set listen_tls to 0 in %s" % LIBVIRTD_CONF)
         listen_tls_disable = "echo \"listen_tls = 0\" >> %s" % LIBVIRTD_CONF
-        ret = util.remote_exec_pexpect(target_machine, username,
+        ret, output = util.remote_exec_pexpect(target_machine, username,
                                         password, listen_tls_disable)
         if ret:
             logger.error("failed to set listen_tls to 0 in %s" % LIBVIRTD_CONF)
@@ -289,7 +289,7 @@ def tls_libvirtd_set(target_machine, username, password,
     if auth_tls == 'sasl':
         logger.info("enable auth_tls = sasl in %s" % LIBVIRTD_CONF)
         auth_tls_set = "echo 'auth_tls = \"sasl\"' >> %s" % LIBVIRTD_CONF
-        ret = util.remote_exec_pexpect(target_machine, username,
+        ret, output = util.remote_exec_pexpect(target_machine, username,
                                        password, auth_tls_set)
         if ret:
             logger.error("failed to set auth_tls to sasl in %s" % LIBVIRTD_CONF)
@@ -298,7 +298,7 @@ def tls_libvirtd_set(target_machine, username, password,
     # restart remote libvirtd service
     libvirtd_restart_cmd = "service libvirtd restart"
     logger.info("libvirtd restart")
-    ret = util.remote_exec_pexpect(target_machine, username,
+    ret, output = util.remote_exec_pexpect(target_machine, username,
                                     password, libvirtd_restart_cmd)
     if ret:
         logger.error("failed to restart libvirtd service")
@@ -311,7 +311,7 @@ def iptables_stop(target_machine, username, password, util, logger):
     """ This is a temprory method in favor of migration """
     logger.info("stop local and remote iptables temprorily")
     iptables_stop_cmd = "service iptables stop"
-    ret = util.remote_exec_pexpect(target_machine, username,
+    ret, output = util.remote_exec_pexpect(target_machine, username,
                                    password, iptables_stop_cmd)
     if ret:
         logger.error("failed to stop remote iptables service")
@@ -466,13 +466,13 @@ def tls_setup_clean(params):
 
     util = utils.Utils()
     cacert_rm = "rm -f %s/cacert.pem" % CA_FOLDER
-    ret = util.remote_exec_pexpect(target_machine, username,
+    ret, output = util.remote_exec_pexpect(target_machine, username,
                                     password, cacert_rm)
     if ret:
         logger.error("failed to remove cacert.pem on remote machine")
 
     ca_libvirt_rm = "rm -rf %s" % CERTIFICATE_FOLDER
-    ret = util.remote_exec_pexpect(target_machine, username,
+    ret, output = util.remote_exec_pexpect(target_machine, username,
                                     password, ca_libvirt_rm)
     if ret:
         logger.error("failed to remove libvirt folder")
@@ -482,7 +482,7 @@ def tls_setup_clean(params):
 
     if auth_tls == 'sasl':
         saslpasswd2_delete = "%s -a libvirt -d %s" % (SASLPASSWD2, username)
-        ret = util.remote_exec_pexpect(target_machine, username,
+        ret, output = util.remote_exec_pexpect(target_machine, username,
                                         password, saslpasswd2_delete)
         if ret:
             logger.error("failed to delete sasl user")
