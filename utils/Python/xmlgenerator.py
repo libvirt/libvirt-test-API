@@ -308,7 +308,7 @@ def disk_xml(params, cdrom = False):
                                       params['guestname']
         elif hypertype == 'xen':
             params['imagepath'] = '/var/lib/xen/images'
-            params['fullimagepath'] = '/var/lib/xen/images' + '/' + \
+            params['fullimagepath'] = params['imagepath'] + '/' + \
                                       params['guestname']
         else:
             print 'DO NOT supported hypervisor.'
@@ -367,14 +367,15 @@ def disk_xml(params, cdrom = False):
 def floppy_xml(params):
     # Disk element
     floppy = xml.dom.minidom.Document()
-    disk_element = floppy.createElement('disk')
-    disk_element.setAttribute('device', 'floppy')
-    floppy.appendChild(disk_element)
+    floppy_element = floppy.createElement('disk')
+    floppy_element.setAttribute('type', 'file')
+    floppy_element.setAttribute('device', 'floppy')
+    floppy.appendChild(floppy_element)
 
     # Source element
     source_element = floppy.createElement('source')
     source_element.setAttribute('file', params['floppysource'])
-    disk_element.appendChild(source_element)
+    floppy_element.appendChild(source_element)
 
     # Target element
     target_element = floppy.createElement('target')
@@ -384,11 +385,11 @@ def floppy_xml(params):
         target_element.setAttribute('dev', 'fda')
 
     target_element.setAttribute('bus', 'fdc')
-    disk_element.appendChild(target_element)
+    floppy_element.appendChild(target_element)
 
     # Readonly
     readonly = floppy.createElement('readonly')
-    disk_element.appendChild(readonly)
+    floppy_element.appendChild(readonly)
 
     return floppy
 

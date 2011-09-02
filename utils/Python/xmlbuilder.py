@@ -112,6 +112,33 @@ class XmlBuilder:
             self.write_toxml(disk)
         return disk.toxml()
 
+    def build_cdrom(self, params):
+        if params.get('hdmodel', None) == None:
+            params['hdmodel'] = 'ide'
+
+        if params['hdmodel'] == 'ide':
+            target_dev = 'hdc'
+        elif params['hdmodel'] == 'scsi':
+            target_dev = 'sdc'
+        else:
+            print 'Wrong cdrom model.'
+
+        cdrom = xmlgenerator.disk_xml(params, True)
+        if params['guesttype'] == 'xenpv':
+            cdrom.getElementsByTagName("target")[0].setAttribute("dev", "xvdc")
+        else:
+            cdrom.getElementsByTagName("target")[0].setAttribute("dev",
+                                                                target_dev)
+        if __DEBUG__:
+            self.write_toxml(cdrom)
+        return cdrom.toxml()
+
+    def build_floppy(self, params):
+        floppy = xmlgenerator.floppy_xml(params)
+        if __DEBUG__:
+            self.write_toxml(floppy)
+        return floppy.toxml()
+
     def build_interface(self, params):
         interface = xmlgenerator.interface_xml(params)
         if __DEBUG__:
@@ -177,10 +204,28 @@ if __name__ == "__main__":
     print '=' * 30, 'disk xml', '=' * 30
     params['guesttype'] = 'kvm'
     params['guestname'] = 'foo'
-    params['imagepath'] = '/images'
     params['hdmodel'] = 'virtio'
 
     diskxml = xmlobj.build_disk(params)
+
+    #---------------------
+    # get cdrom xml string
+    #---------------------
+    print '=' * 30, 'cdrom xml', '=' * 30
+    params['guesttype'] = 'kvm'
+    params['guestname'] = 'foo'
+    params['hdmodel'] = 'ide'
+    params['bootcd'] = '/tmp/cdrom.img'
+
+    cdromxml = xmlobj.build_cdrom(params)
+
+    #---------------------
+    # get floppy xml string
+    #---------------------
+    print '=' * 30, 'floppy xml', '=' * 30
+    params['floppysource'] = '/tmp/floppy.img'
+
+    floppyxml = xmlobj.build_floppy(params)
 
     #--------------------------
     # get interface xml string
