@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 """this script is for migration testing
    domain:migrate
+       transport
+           tcp|tls|ssh
        target_machine
            10.66.5.5
        username
@@ -105,7 +107,7 @@ def env_clean(src, dst, srcdom, dstdom, target_machine, guestname, logger):
 def check_params(params):
     """check out the arguments requried for migration"""
     logger = params['logger']
-    keys = ['target_machine', 'username', 'password', 'guestname', 'flags']
+    keys = ['transport', 'target_machine', 'username', 'password', 'guestname', 'flags']
     for key in keys:
         if key not in params:
             logger.error("Argument %s is required" % key)
@@ -194,6 +196,7 @@ def migrate(params):
     if params_check_result:
         return 1
 
+    transport = params['transport']
     target_machine = params['target_machine']
     username = params['username']
     password = params['password']
@@ -243,7 +246,7 @@ def migrate(params):
     commands.getstatusoutput("ssh-add")
 
     srcuri = "qemu:///system"
-    dsturi = "qemu+ssh://%s/system" % target_machine
+    dsturi = "qemu+%s://%s/system" % (transport, target_machine)
 
     # Connect to local hypervisor connection URI
     util = utils.Utils()
