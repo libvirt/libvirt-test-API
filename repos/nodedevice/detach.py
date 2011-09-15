@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 """this test case is used for testing
-   dettach a specific node device
+   detach a specific node device
 """
 
 __author__ = 'Alex Jia: ajia@redhat.com'
 __date__ = 'Tue Apr 6, 2010'
 __version__ = '0.1.0'
 __credits__ = 'Copyright (C) 2009 Red Hat, Inc.'
-__all__ = ['usage', 'check_node_dettach', 'dettach']
+__all__ = ['usage', 'check_node_detach', 'detach']
 
 
 import os
@@ -45,8 +45,8 @@ def usage(params):
         else:
             pass
 
-def check_node_dettach(pciaddress):
-    """Check node device dettach result, if dettachment is successful, the
+def check_node_detach(pciaddress):
+    """Check node device detach result, if detachment is successful, the
        device host driver should be hided and the device should be bound
        to pci-stub driver, argument 'address' is a address of the node device
     """
@@ -64,7 +64,7 @@ def check_node_dettach(pciaddress):
     driver = os.path.basename(retval)
     return driver
 
-def dettach(dicts):
+def detach(dicts):
     """Dettach a specific node device and bind it to pci-stub driver, argument
        'dicts' is a dictionary type and includes 'pciaddress' key, whose value
        uniquely identify a pci address of the node device
@@ -78,7 +78,7 @@ def dettach(dicts):
     pciaddress = dicts['pciaddress']
 
 
-    original_driver = check_node_dettach(pciaddress)
+    original_driver = check_node_detach(pciaddress)
     logger.info("original device driver: %s" % original_driver)
 
     util = utils.Utils()
@@ -120,22 +120,22 @@ def dettach(dicts):
 
     try:
         try:
-            logger.info("dettach the node device")
+            logger.info("detach the node device")
             nodeobj.dettach(device_name)
-            current_driver = check_node_dettach(pciaddress)
+            current_driver = check_node_detach(pciaddress)
             logger.info("current device driver: %s" % current_driver)
             if current_driver != original_driver and current_driver == pciback:
-                logger.info("the node %s device dettach is successful" \
+                logger.info("the node %s device detach is successful" \
                             % device_name)
                 test_result = True
             else:
-                logger.info("the node %s device dettach is failed" % device_name)
+                logger.info("the node %s device detach is failed" % device_name)
                 test_result = False
                 return 1
         except LibvirtAPI, e:
             logger.error("API error message: %s, error code is %s" \
                          % (e.response()['message'], e.response()['code']))
-            logger.error("Error: fail to dettach %s node device" % device_name)
+            logger.error("Error: fail to detach %s node device" % device_name)
             test_result = False
             return 1
     finally:

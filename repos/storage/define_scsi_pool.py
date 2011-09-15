@@ -140,7 +140,7 @@ def define_scsi_pool(params):
             logger.error("API error message: %s, error code is %s" \
                          % (e.response()['message'], e.response()['code']))
             return 1
-    finally
+    finally:
         conn.close()
         logger.info("closed hypervisor connection")
 

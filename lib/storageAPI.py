@@ -231,7 +231,7 @@ class StorageAPI(object):
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
 
-    def delete_pool(self, poolname, flags = 1):
+    def delete_pool(self, poolname, flags = 0):
         try:
             pool_obj = self.get_pool_obj(poolname)
             return pool_obj.delete(flags)

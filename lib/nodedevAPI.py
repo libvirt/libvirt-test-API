@@ -185,7 +185,7 @@ class NodedevAPI:
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
 
-    def connect(self, name)
+    def connect(self, name):
         try:
             obj = self.lookup_by_name(name)
             return obj.connect()
