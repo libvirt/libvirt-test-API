@@ -64,7 +64,6 @@ from exception import LibvirtAPI
 
 SSH_KEYGEN = "ssh-keygen -t rsa"
 SSH_COPY_ID = "ssh-copy-id"
-GUEST_XML = "/etc/libvirt/qemu/%s.xml"
 
 def exec_command(logger, command, flag):
     """execute shell command
@@ -167,28 +166,6 @@ def ssh_tunnel(hostname, username, password, logger):
 
     return 0
 
-def remote_guest_define(target_machine, username, guestname, logger):
-    """copy guest xml description to target machine and define it"""
-    xml_file = GUEST_XML % guestname
-
-    if not os.path.exists(xml_file):
-        logger.error("guest %s xml file doesn't exsits" % guestname)
-        return 1
-
-    SCP_CMD = "scp %s %s@%s:/tmp" %(xml_file, username, target_machine)
-    status, ret = exec_command(logger, SCP_CMD, 0)
-    if status:
-        logger.error("copy guest file failed")
-        return 1
-
-    VIRSH_DEFINE = "ssh %s \"virsh define /tmp/%s.xml\"" % (target_machine, guestname)
-    status, ret = exec_command(logger, VIRSH_DEFINE, 0)
-    if status:
-        logger.error("faied to define guest on target machine")
-        return 1
-
-    return 0
-
 def migrate(params):
     """ migrate a guest back and forth between two machines"""
     logger = params['logger']
@@ -258,11 +235,13 @@ def migrate(params):
     dstdom = DomainAPI(dst)
 
     if predstconfig == "true":
-        ret = remote_guest_define(target_machine, username, guestname, logger)
-        if ret:
+        guest_names = dstdom.get_defined_list()
+        if guestname in guest_names:
+            logger.info("Dst VM exists")
+        else:
+            logger.error("Dst VM missing config, should define VM on Dst first")
             env_clean(src, dst, srcdom, dstdom, target_machine, guestname, logger)
             return 1
-
 
     try:
         if(migflags & VIR_MIGRATE_PEER2PEER):
