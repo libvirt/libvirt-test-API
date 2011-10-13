@@ -45,6 +45,13 @@ def domain_xml(params, install = False):
     name_element.appendChild(name_node)
     domain_element.appendChild(name_element)
 
+    # <uuid>
+    if params.has_key('uuid'):
+        uuid_element = domain.createElement('uuid')
+        uuid_node = domain.createTextNode(params['uuid'])
+        uuid_element.appendChild(uuid_node)
+        domain_element.appendChild(uuid_element)
+
     # <memory>
     memory_element = domain.createElement('memory')
     if params.has_key('memory'):
