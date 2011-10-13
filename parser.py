@@ -125,13 +125,11 @@ class CaseFileParser(object):
 
     def add_option_value(self, caselist, casename, option, value):
         """ Add option to the data list. """
-        for dictionary in caselist:
-            testkey = dictionary.keys()[0]
-            if casename == testkey:
-                if not dictionary[testkey].has_key(option):
-                    dictionary[testkey][option] = value
-            else:
-                continue
+        dictionary = caselist[-1]
+        testkey = dictionary.keys()[0]
+        if casename == testkey:
+            if not dictionary[testkey].has_key(option):
+                dictionary[testkey][option] = value
 
     def debug_print(self, str1, str2=""):
         """Nicely print two strings and an arrow.  For internal use."""
