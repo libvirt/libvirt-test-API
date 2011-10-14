@@ -6,7 +6,8 @@
                        guestos
                        guestarch
                        netmethod
-   optional arguments: memory
+   optional arguments: uuid
+                       memory
                        vcpu
                        disksize
                        imagetype
@@ -70,7 +71,8 @@ def usage():
                            guestos
                            guestarch
                            netmethod
-       optional arguments: memory
+       optional arguments: uuid
+                           memory
                            vcpu
                            disksize
                            imagetype
@@ -89,9 +91,10 @@ def check_params(params):
     mandatory_args = ['guestname', 'guesttype', 'guestos',
                       'guestarch','netmethod']
 
-    optional_args = ['memory', 'vcpu', 'disksize', 'imagepath',
-                     'hdmodel', 'nicmodel', 'ifacetype',
-                     'imagetype', 'source', 'type']
+    optional_args = ['uuid', 'memory', 'vcpu', 'disksize',
+                     'imagepath', 'hdmodel', 'nicmodel',
+                     'ifacetype', 'imagetype', 'source',
+                     'type']
 
     for arg in mandatory_args:
         if arg not in params_given.keys():

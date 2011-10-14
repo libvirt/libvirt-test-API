@@ -3,7 +3,8 @@
    create domain from xml
    mandatory arguments:guesttype
                        guestname
-   optional arguments: memory
+   optional arguments: uuid
+                       memory
                        vcpu
                        disksize
                        imagepath
@@ -49,7 +50,8 @@ START_PAUSED = 1
 def usage():
     print '''usage: mandatory arguments:guesttype
                            guestname
-       optional arguments: memory
+       optional arguments: uuid
+                           memory
                            vcpu
                            disksize
                            imagepath

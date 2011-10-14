@@ -5,7 +5,8 @@
                        guestname
                        guestos
                        guestarch
-   optional arguments: memory
+   optional arguments: uuid
+                       memory
                        vcpu
                        imagepath
                        imagetype
@@ -54,7 +55,7 @@ def check_params(params):
     """Checking the arguments required"""
     params_given = copy.deepcopy(params)
     mandatory_args = ['guestname', 'guesttype', 'guestos', 'guestarch']
-    optional_args = ['memory', 'vcpu', 'imagepath', 'imagetype',
+    optional_args = ['uuid', 'memory', 'vcpu', 'imagepath', 'imagetype',
                      'hdmodel', 'nicmodel']
 
     for arg in mandatory_args:

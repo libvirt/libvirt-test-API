@@ -5,7 +5,8 @@
                        guestname
                        guestos
                        guestarch
-   optional arguments: memory
+   optional arguments: uuid
+                       memory
                        vcpu
                        disksize
                        imagetype
@@ -68,7 +69,8 @@ def return_close(conn, logger, ret):
 def usage():
     print '''usage: mandatory arguments:guesttype
                            guestname
-       optional arguments: memory
+       optional arguments: uuid
+                           memory
                            vcpu
                            disksize
                            imagetype
@@ -86,9 +88,9 @@ def check_params(params):
     """Checking the arguments required"""
     params_given = copy.deepcopy(params)
     mandatory_args = ['guestname', 'guesttype', 'guestos', 'guestarch']
-    optional_args = ['memory', 'vcpu', 'disksize', 'imagepath', 'hdmodel',
-                     'nicmodel', 'macaddr', 'ifacetype', 'source', 'type',
-                     'volumepath', 'imagetype']
+    optional_args = ['uuid', 'memory', 'vcpu', 'disksize', 'imagepath',
+                     'hdmodel', 'nicmodel', 'macaddr', 'ifacetype', 'source',
+                     'type', 'volumepath', 'imagetype']
 
     for arg in mandatory_args:
         if arg not in params_given.keys():
