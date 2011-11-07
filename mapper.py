@@ -24,20 +24,34 @@ class Mapper(object):
     def __init__(self, testcases_list):
         self.testcases_list = copy.deepcopy(testcases_list)
 
-    def get_package_tripped(self):
+    def package_casename_func_map(self):
         """ Remove the package information to form a new dictionary """
         tripped_cases_list = []
+        prev_testcasename = ''
+        prev_testcases_params = ''
 
         for testcase in self.testcases_list:
             tripped_case = {}
-            casename = testcase.keys()[0]
+            testcase_name = testcase.keys()[0]
+            if ":" in testcase_name:
+                casename = testcase_name.split(":")[1]
+                func = casename
 
-            if casename == 'sleep':
+            if testcase_name == 'sleep':
                 tripped_cases_list.append(testcase)
                 continue
 
-            testcases_params = testcase.values()[0]
-            tripped_case[casename] = testcases_params
+            if testcase_name == 'clean':
+                func = casename + "_clean"
+                tripped_case[prev_testcasename + ":" + func] = prev_testcases_params
+                tripped_cases_list.append(tripped_case)
+                continue
 
+            testcases_params = testcase.values()[0]
+            tripped_case[testcase_name + ":" + func] = testcases_params
             tripped_cases_list.append(tripped_case)
+
+            prev_testcasename = testcase_name
+            prev_testcases_params = testcases_params
+
         return tripped_cases_list

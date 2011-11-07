@@ -30,17 +30,22 @@ class Proxy(object):
     def get_func_call_dict(self):
         for testcase_name in self.testcases_names:
             # Get programming package, casename
-            package = testcase_name.split(":")[0]
-            casename = testcase_name.split(":")[1]
+            elements = testcase_name.split(":")
+            package = elements[0]
+            casename = elements[1]
+            func = casename
+
+            if len(elements) == 3:
+                keyword = elements[2]
+                func = casename + keyword
 
             # Dispatch functions
             funcs = getattr(self, "get_call_dict")
             func_ref = None
-            func = casename
             func_ref = funcs(package, casename, func)
 
             # Construct function call dictionary
-            key = package + ":" + casename
+            key = package + ":" + casename + ":" + func
             self.func_dict[key] = func_ref
         return self.func_dict
 

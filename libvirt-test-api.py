@@ -100,12 +100,19 @@ class LibvirtTestAPI(object):
         # extract the string of combination of
         # language, package, testname of a testcase.
         all_testcases_names = []
+        prev_casename = ''
         for activity in activities_list:
             for testcase in activity:
                 testcases_names = testcase.keys()
                 if 'sleep' in testcases_names:
                     testcases_names.remove('sleep')
+                if not cmp('clean', testcases_names[0]):
+                    all_testcases_names += [prev_casename + ":_clean"]
+                    continue
+
+                prev_casename = testcases_names[0]
                 all_testcases_names += testcases_names
+
 
         unique_testcases_names = list(set(all_testcases_names))
 
