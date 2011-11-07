@@ -391,12 +391,21 @@ class CaseFileParser(object):
 
                 if len(tripped_caselist) == 2 and \
                         tripped_casename == "sleep":
-                   sleepsecs = tripped_caselist[1]
-                   for caselist in list:
-                       newdict = {}
-                       newdict[tripped_casename] = {'sleep':sleepsecs}
-                       caselist.append(newdict)
-                   continue
+                    sleepsecs = tripped_caselist[1]
+                    for caselist in list:
+                        newdict = {}
+                        newdict[tripped_casename] = {'sleep':sleepsecs}
+                        caselist.append(newdict)
+                    continue
+
+                if len(tripped_caselist) == 1 and \
+                        tripped_casename == "clean":
+                    cleanflag = 'yes'
+                    for caselist in list:
+                        newdict = {}
+                        newdict[tripped_casename] = {'clean': cleanflag}
+                        caselist.append(newdict)
+                    continue
 
                 if tripped_casename == "options":
                     option_case = [{'options':{}}]
