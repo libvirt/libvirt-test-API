@@ -41,6 +41,7 @@ class FuncGen(object):
         self.lockfile = lockfile
         self.bugstxt = bugstxt
         self.loglevel = loglevel
+        self.testcase_number = 0
 
         self.fmt = format.Format(logfile)
         self.log_xml_parser = log_xml_parser
@@ -49,19 +50,21 @@ class FuncGen(object):
         self.__case_info_save(activity, testrunid)
 
         mapper_obj = mapper.Mapper(activity)
-        pkg_tripped_cases = mapper_obj.get_package_tripped()
+        pkg_casename_func = mapper_obj.package_casename_func_map()
 
-        for test_procedure in pkg_tripped_cases:
+        for test_procedure in pkg_casename_func:
             log_xml_parser.add_testprocedure_xml(testrunid,
                                                  testid,
                                                  test_procedure)
         self.cases_ref_names = []
-        for case in pkg_tripped_cases:
+        for case in pkg_casename_func:
             case_ref_name = case.keys()[0]
+            if case_ref_name[-6:] != "_clean":
+                self.testcase_number += 1
             self.cases_ref_names.append(case_ref_name)
 
         self.cases_params_list = []
-        for case in pkg_tripped_cases:
+        for case in pkg_casename_func:
             case_params = case.values()[0]
             self.cases_params_list.append(case_params)
 
@@ -101,7 +104,7 @@ class FuncGen(object):
 
         envlog = log.EnvLog(self.logfile, self.loglevel)
         logger = envlog.env_log()
-        testcase_number = len(self.cases_ref_names)
+        loop_number = len(self.cases_ref_names)
         start_time = time.strftime("%Y-%m-%d %H:%M:%S")
 
         logger.info("Checking Testing Environment... ")
@@ -111,7 +114,7 @@ class FuncGen(object):
             sys.exit(1)
         else:
             logger.info("\nStart Testing:")
-            logger.info("    Case Count: %s" % testcase_number)
+            logger.info("    Case Count: %s" % self.testcase_number)
             logger.info("    Log File: %s\n" % self.logfile)
             del envlog
 
@@ -119,21 +122,31 @@ class FuncGen(object):
         logger = caselog.case_log()
 
         retflag = 0
-        for i in range(testcase_number):
+        for i in range(loop_number):
 
             case_ref_name = self.cases_ref_names[i]
-            self.fmt.printf('start', case_ref_name)
+            pkg_casename = case_ref_name.rpartition(":")[0]
+            funcname = case_ref_name.rpartition(":")[-1]
+
+            cleanoper = 0 if "_clean" not in funcname else 1
+
+            if not cleanoper:
+                self.fmt.printf('start', pkg_casename)
+            else:
+                self.fmt.printf('string', 12*" " + "Cleaning...")
+
             case_params = self.cases_params_list[i]
 
             case_start_time = time.strftime("%Y-%m-%d %H:%M:%S")
 
             ret = -1
+            clean_ret = -1
             try:
                 try:
                     if case_ref_name != 'sleep':
                         case_params['logger'] = logger
 
-                    existed_bug_list = self.bug_check(case_ref_name)
+                    existed_bug_list = self.bug_check(pkg_casename)
 
                     if len(existed_bug_list) == 0:
                         if case_ref_name == 'sleep':
@@ -143,13 +156,16 @@ class FuncGen(object):
                             ret = 0
                         else:
                             ret = self.cases_func_ref_dict[case_ref_name](case_params)
+                            if cleanoper:
+                                clean_ret = ret
+                                ret = 0
                     else:
                         logger.info("about the testcase , bug existed:")
                         for existed_bug in existed_bug_list:
                             logger.info("%s" % existed_bug)
 
                         ret = 100
-                        self.fmt.printf('end', case_ref_name, ret)
+                        self.fmt.printf('end', pkg_casename, ret)
                         continue
                 except Exception, e:
                     logger.error(traceback.format_exc())
@@ -163,7 +179,11 @@ class FuncGen(object):
                 else:
                     pass
                 retflag += ret
-                self.fmt.printf('end', case_ref_name, ret)
+
+                if not cleanoper:
+                    self.fmt.printf('end', pkg_casename, ret)
+                else:
+                    self.fmt.printf('string', 21*" " + "Done" if clean_ret < 1 else 21*" " + "Fail")
 
         end_time = time.strftime("%Y-%m-%d %H:%M:%S")
         del caselog
@@ -172,7 +192,7 @@ class FuncGen(object):
         logger = envlog.env_log()
         logger.info("\nSummary:")
         logger.info("    Total:%s [Pass:%s Fail:%s]" % \
-                     (testcase_number, (testcase_number - retflag), retflag))
+                     (self.testcase_number, (self.testcase_number - retflag), retflag))
         del envlog
 
         result = (retflag and "FAIL") or "PASS"
