@@ -14,7 +14,7 @@
 # distribution and at <http://www.gnu.org/licenses>.
 #
 # This module matches the reference of clearing function from each testcase
-# to the corresponding testcase's argument in the order of testcase running 
+# to the corresponding testcase's argument in the order of testcase running
 #
 
 import mapper
@@ -28,17 +28,17 @@ class EnvClear(object):
         self.cases_clearfunc_ref_dict = cases_clearfunc_ref_dict
         self.logfile = logfile
         self.loglevel = loglevel
-  
+
         mapper_obj = mapper.Mapper(activity)
-        pkg_tripped_cases = mapper_obj.get_package_tripped()
+        clean_pkg_casename_func = mapper_obj.clean_package_casename_func_map()
 
         self.cases_ref_names = []
-        for case in pkg_tripped_cases:
+        for case in clean_pkg_casename_func:
             case_ref_name = case.keys()[0]
             self.cases_ref_names.append(case_ref_name)
 
         self.cases_params_list = []
-        for case in pkg_tripped_cases:
+        for case in clean_pkg_casename_func:
             case_params = case.values()[0]
             self.cases_params_list.append(case_params)
 
@@ -48,10 +48,10 @@ class EnvClear(object):
 
     def env_clear(self):
         """ Run each clearing function with the corresponding arguments """
- 
+
         envlog = log.EnvLog(self.logfile, self.loglevel)
         logger = envlog.env_log()
-        
+
         testcase_number = len(self.cases_ref_names)
 
         for i in range(testcase_number):
@@ -59,12 +59,9 @@ class EnvClear(object):
             case_ref_name = self.cases_ref_names[i]
             case_params = self.cases_params_list[i]
 
-            if case_ref_name == 'sleep':
-                continue
-            else:
-                case_params['logger'] = logger
-                self.cases_clearfunc_ref_dict[case_ref_name](case_params)
+            case_params['logger'] = logger
+            self.cases_clearfunc_ref_dict[case_ref_name](case_params)
 
         del envlog
 
-        return 0 
+        return 0
