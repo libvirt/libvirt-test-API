@@ -25,9 +25,10 @@ class Proxy(object):
     def __init__(self, testcases_names):
         """ Argument case_list is test case list """
         self.testcases_names = testcases_names
-        self.func_dict = dict()
 
     def get_func_call_dict(self):
+        """Return running function reference dictionary """
+        self.func_dict = dict()
         for testcase_name in self.testcases_names:
             # Get programming package, casename
             elements = testcase_name.split(":")
@@ -51,8 +52,14 @@ class Proxy(object):
 
     def get_clearfunc_call_dict(self):
         """ Return a clearing function reference dictionary. """
+        self.func_dict = dict()
         for testcase_name in self.testcases_names:
             # Get programming package, casename
+            elements = testcase_name.split(":")
+
+            if len(elements) == 3:
+                continue
+
             package = testcase_name.split(":")[0]
             casename = testcase_name.split(":")[1]
 
@@ -64,7 +71,7 @@ class Proxy(object):
             func_ref = funcs(package, casename, func)
 
             # Construct function call dictionary
-            key = package + ":" + casename
+            key = package + ":" + casename + ":" + func
             self.func_dict[key] = func_ref
         return self.func_dict
 

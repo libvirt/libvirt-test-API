@@ -55,3 +55,22 @@ class Mapper(object):
             prev_testcases_params = testcases_params
 
         return tripped_cases_list
+
+    def clean_package_casename_func_map(self):
+        """get testcase function maping without cleaning ones """
+        tripped_cases_list = []
+        for testcase in self.testcases_list:
+            tripped_case = {}
+            testcase_name = testcase.keys()[0]
+            if ":" in testcase_name:
+                casename = testcase_name.split(":")[1]
+                func = casename + "_clean"
+
+            if testcase_name == 'sleep' or testcase_name == 'clean':
+                continue
+
+            testcases_params = testcase.values()[0]
+            tripped_case[testcase_name + ":" + func] = testcases_params
+            tripped_cases_list.append(tripped_case)
+
+        return tripped_cases_list
