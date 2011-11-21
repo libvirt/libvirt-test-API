@@ -126,27 +126,9 @@ def file_flag(params):
 
     return return_close(conn, logger, 0)
 
+def file_flag_clean(params):
+    """ clean testing environment """
+    util = utils.Utils()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    util.clean_ssh()
+    return 0

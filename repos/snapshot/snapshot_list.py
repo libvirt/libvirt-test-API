@@ -93,17 +93,7 @@ def snapshot_list(params):
                 return 1
     return 0
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+def snapshot_list_clean(params):
+    """ clean testing environment """
+    return 0
 

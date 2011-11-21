@@ -483,3 +483,13 @@ def domain_nfs_start_clean(params):
 
     conn.close()
 
+    clean_nfs_conf = "sed -i '$d' /etc/exports"
+    util.exec_cmd(clean_nfs_conf, shell=True)
+
+    clean_qemu_conf = "sed -i '$d' %s" % QEMU_CONF
+    util.exec_cmd(clean_qemu_conf, shell=True)
+
+    cmd = "service libvirtd restart"
+    util.exec_cmd(cmd, shell=True)
+
+    return 0

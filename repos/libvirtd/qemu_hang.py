@@ -135,8 +135,16 @@ def qemu_hang(params):
 
     return 0
 
-def qemu_hang_cleanup(params):
+def qemu_hang_clean(params):
     """ clean testing environment """
-    pass
+    logger = params['logger']
+    guestname = params['guestname']
+    util = utils.Utils()
 
+    ret = get_domain_pid(util, logger, guestname)
+    cmd = "kill -CONT %s" % ret[1]
+    ret = util.exec_cmd(cmd, shell=True)
+    if ret[0]:
+        logger.error("failed to resume qemu process of %s" % guestname)
 
+    return 0

@@ -246,3 +246,8 @@ def cpu_topology(params):
 
     conn.close()
     return 0
+
+def cpu_topology_clean(params):
+    """clean testing enviorment"""
+    return 0
+

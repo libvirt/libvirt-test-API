@@ -95,4 +95,7 @@ def revert(params):
 
     return 0
 
+def revert_clean(params):
+    """ clean testing environment """
+    return 0
 

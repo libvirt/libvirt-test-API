@@ -22,6 +22,7 @@ import sys
 import commands
 
 from pwd import getpwnam
+from utils.Python import utils
 
 def append_path(path):
     """Append root path of package"""
@@ -214,6 +215,7 @@ def unix_perm_sasl(params):
 def unix_perm_sasl_clean(params):
     """clean testing environment"""
     logger = params['logger']
+    util = utils.Utils()
 
     auth_unix_ro = params['auth_unix_ro']
     auth_unix_rw = params['auth_unix_rw']
@@ -241,3 +243,11 @@ def unix_perm_sasl_clean(params):
         if status:
             logger.error("failed to delete sasl user %s" % TESTING_USER)
 
+    clean_libvirtd_conf = "sed -i -e :a -e '$d;N;2,3ba' -e 'P;D' %s" % \
+                          LIBVIRTD_CONF
+    util.exec_cmd(clean_libvirtd_conf, shell=True)
+
+    cmd = "service libvirtd restart"
+    util.exec_cmd(cmd, shell=True)
+
+    return 0

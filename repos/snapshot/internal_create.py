@@ -125,7 +125,9 @@ def internal_create(params):
 
     return 0
 
-
+def internal_create_clean(params):
+    """ clean testing environment """
+    return 0
 
 
 

@@ -307,6 +307,9 @@ def ownership_test_clean(params):
                 for i in range(len(out)):
                     logger.error(out[i])
 
+        clean_nfs_conf = "sed -i '$d' /etc/exports"
+        util.exec_cmd(clean_nfs_conf, shell=True)
+
         filepath = TEMP_FILE
     elif use_nfs == 'disable':
         filepath = SAVE_FILE
@@ -314,3 +317,10 @@ def ownership_test_clean(params):
     if os.path.exists(filepath):
         os.remove(filepath)
 
+    clean_qemu_conf = "sed -i '$d' %s" % QEMU_CONF
+    util.exec_cmd(clean_qemu_conf, shell=True)
+
+    cmd = "service libvirtd restart"
+    util.exec_cmd(cmd, shell=True)
+
+    return 0

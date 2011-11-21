@@ -127,4 +127,6 @@ def flag_check(params):
 
     return return_close(conn, logger, 0)
 
-
+def flag_check_clean(params):
+    """ clean testing environment """
+    return 0

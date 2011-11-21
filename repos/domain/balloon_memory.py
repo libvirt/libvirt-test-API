@@ -299,6 +299,8 @@ def balloon_memory(params):
         logger.info("the actual size of memory is \
                      rounded to the value %s we expected" % maxmem)
 
+    util.clean_ssh()
+
     if count:
         return return_close(conn, logger, 1)
     else:

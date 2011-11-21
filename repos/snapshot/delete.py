@@ -124,18 +124,6 @@ def delete(params):
 
     return 0
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+def delete_clean(params):
+    """ clean testing environment """
+    return 0
