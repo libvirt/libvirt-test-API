@@ -137,15 +137,6 @@ class NodedevAPI:
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
 
-    def ref(self, name):
-        try:
-            obj = self.lookup_by_name(name)
-            obj.ref()
-        except libvirt.libvirtError, e:
-            message = e.get_error_message()
-            code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)
-
     def get_name(self, obj):
         try:
             device_name = obj.name()

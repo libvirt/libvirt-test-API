@@ -84,7 +84,7 @@ class SecretAPI(object):
     def get_uuid(self, uuidstr):
         try:
             secret_obj = self.get_secret_by_uuid_string(uuidstr)
-            return secret_obj.uuid()
+            return secret_obj.UUID()
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
