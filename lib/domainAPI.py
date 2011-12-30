@@ -546,7 +546,7 @@ class DomainAPI(object):
     def set_sched_params_flags(self, domname, params, flags):
         try:
             dom_obj = self.get_domain_by_name(domname)
-            retval = dom_obj.setSchedulerParameters(params, flags)
+            retval = dom_obj.setSchedulerParametersFlags(params, flags)
             return retval
         except libvirt.libvirtError, e:
             message = e.get_error_message()
@@ -581,6 +581,105 @@ class DomainAPI(object):
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
 
+    def block_pull(self, domname, device, bandwidth = 0, flag = 0):
+        try:
+            dom_obj = self.get_domain_by_name(domname)
+            return dom_obj.blockPull(device, bandwidth, flag)
+        except libvirt.libvirtError, e:
+            message = e.get_error_message()
+            code = e.get_error_code()
+            raise exception.LibvirtAPI(message, code)
+
+    def block_resize(self, domname, device, size, flag = 0):
+        try:
+            dom_obj = self.get_domain_by_name(domname)
+            return dom_obj.blockResize(device, size, flag)
+        except libvirt.libvirtError, e:
+            message = e.get_error_message()
+            code = e.get_error_code()
+            raise exception.LibvirtAPI(message, code)
+
+    def block_job_abort(self, domname, device, flag = 0):
+        try:
+            dom_obj = self.get_domain_by_name(domname)
+            return dom_obj.blockJobAbort(device, flag)
+        except libvirt.libvirtError, e:
+            message = e.get_error_message()
+            code = e.get_error_code()
+            raise exception.LibvirtAPI(message, code)
+
+    def block_job_set_speed(self, domname, device, bandwidth, flag = 0):
+        try:
+            dom_obj = self.get_domain_by_name(domname)
+            return dom_obj.blockJobSetSpeed(device, bandwidth, flag)
+        except libvirt.libvirtError, e:
+            message = e.get_error_message()
+            code = e.get_error_code()
+            raise exception.LibvirtAPI(message, code)
+
+    def get_block_job_info(self, domname, device, flag = 0):
+        try:
+            dom_obj = self.get_domain_by_name(domname)
+            return dom_obj.blockJobInfo(device, flag)
+        except libvirt.libvirtError, e:
+            message = e.get_error_message()
+            code = e.get_error_code()
+            raise exception.LibvirtAPI(message, code)
+
+    def get_blkio_parameters(self, domname, flag):
+        try:
+            dom_obj = self.get_domain_by_name(domname)
+            return dom_obj.blkioParameters(flag)
+        except libvirt.libvirtError, e:
+            message = e.get_error_message()
+            code = e.get_error_code()
+            raise exception.LibvirtAPI(message, code)
+
+    def get_block_io_tune(self, domname, device, flag):
+        try:
+            dom_obj = self.get_domain_by_name(domname)
+            return dom_obj.blockIoTune(device, params, flag)
+        except libvirt.libvirtError, e:
+            message = e.get_error_message()
+            code = e.get_error_code()
+            raise exception.LibvirtAPI(message, code)
+
+    def set_blkio_parameters(self, domname, params, flag):
+        try:
+            dom_obj = self.get_domain_by_name(domname)
+            return dom_obj.setBlkioParameters(params, flag)
+        except libvirt.libvirtError, e:
+            message = e.get_error_message()
+            code = e.get_error_code()
+            raise exception.LibvirtAPI(message, code)
+
+    def set_block_io_tune(self, domname, device, params, flag):
+        try:
+            dom_obj = self.get_domain_by_name(domname)
+            return dom_obj.setBlockIoTune(device, params, flag)
+        except libvirt.libvirtError, e:
+            message = e.get_error_message()
+            code = e.get_error_code()
+            raise exception.LibvirtAPI(message, code)
+
+    def get_memory_parameters(self, domname, flag):
+        try:
+            dom_obj = self.get_domain_by_name(domname)
+            return dom_obj.memoryParameters(flag)
+        except libvirt.libvirtError, e:
+            message = e.get_error_message()
+            code = e.get_error_code()
+            raise exception.LibvirtAPI(message, code)
+
+    def set_memory_parameters(self, domname, params, flag):
+        try:
+            dom_obj = self.get_domain_by_name(domname)
+            return dom_obj.setMemoryParameters(params, flag)
+        except libvirt.libvirtError, e:
+            message = e.get_error_message()
+            code = e.get_error_code()
+            raise exception.LibvirtAPI(message, code)
+
     def memory_stats(self, domname):
         try:
             dom_obj = self.get_domain_by_name(domname)
@@ -593,7 +692,7 @@ class DomainAPI(object):
     def memory_peek(self, domname, start, size, buffer, flag = 0):
         try:
             dom_obj = self.get_domain_by_name(domname)
-            return dom_obj.blockPeek(start, size, buffer, flag)
+            return dom_obj.memoryPeek(start, size, buffer, flag)
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
