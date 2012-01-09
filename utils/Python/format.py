@@ -17,6 +17,7 @@
 # Summary: generate specified kind of format string
 # Description: The module is a tool to generate specified kind of format string
 
+import os
 from string import Template
 
 class Format(object):
@@ -30,49 +31,24 @@ class Format(object):
         fp.write(msg)
         fp.close()
 
-    def printf(self, format, *args):
-        """The function is dispather,which uses prefix print_ cat
-           format to construct function call,and its argument is
-           varible long
-        """
-        exec_func = getattr(self, "print_%s" %format)
-        if len(args) == 1:
-            for arg in args:
-                return exec_func(arg)
-        elif len(args) == 2:
-            arg1, arg2 = args
-            return exec_func(arg1, arg2)
-        else:
-            arg1, arg2, arg3 = args
-            return exec_func(arg1, arg2, arg3)
-
-    def print_title(self, msg, delimiter = '-', num = 128):
-        """Print a string title"""
-        blank = ' '*((num - len(msg))/2)
-        delimiters =  delimiter * num
-        lists = list()
-        lists.append(blank)
-        lists.append(msg)
-        msg = ''.join(lists)
-        msgs = "\n%s\n%s\n%s" % (delimiters, msg, delimiters)
-        print msgs
-        self.write_log(msgs)
-
-    def print_string(self, msg):
+    def print_string(self, msg, env_logger):
         """Only print a simple string"""
-        print msg
+        env_logger(msg)
         self.write_log('\n%s' %msg)
 
-    def print_start(self, msg):
+    def print_start(self, msg, env_logger):
         """When test case starting,this function is called"""
         console = "    %s" % msg
         num = (128 - len(msg))/2 - 2
         tpl = Template("\n$sep   $str  $sep\n")
         msgs = tpl.substitute(sep = '-'*num, str = msg)
-        print console
+        if os.environ.has_key('AUTODIR'):
+            env_logger.info(msg)
+        else:
+            env_logger.info(console)
         self.write_log(msgs)
 
-    def print_end(self, msg, flag):
+    def print_end(self, msg, flag, env_logger):
         """When test case finishing,this function is called"""
         result = ''
         if flag == 0:
@@ -90,7 +66,10 @@ class Format(object):
         num = (128 - len(msg))/2 - 2
         tpl = Template("$sep   $str  $sep")
         msgs = tpl.substitute(sep = '-'*num, str = msg)
-        print console,
+        if os.environ.has_key('AUTODIR'):
+            env_logger.info(result)
+        else:
+            print console
         self.write_log(msgs)
         separator = '\n' + '-' * 128 + '\n'
         self.write_log(separator)

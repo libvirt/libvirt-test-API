@@ -46,17 +46,15 @@ class Log(object):
     def __init__(self, logname, loglevel):
         self.name = logname
         self.loglevel = loglevel
-        self.logger = logging.getLogger(self.name)
-        self.logger.setLevel(logging.DEBUG)
         self.filehd = logging.FileHandler(self.name, 'a+')
         self.console = logging.StreamHandler()
 
 class CaseLog(Log):
 
-    def __del__(self):
-        self.logger.removeHandler(self.filehd)
-        self.logger.removeHandler(self.console)
-        del self.logger
+    def __init__(self, logname, loglevel):
+        self.logger = logging.getLogger(logname + "_case")
+        self.logger.setLevel(logging.DEBUG)
+        super(CaseLog, self).__init__(logname, loglevel)
 
     def case_log(self):
         """Initialize log file"""
@@ -64,7 +62,9 @@ class CaseLog(Log):
                '[%(asctime)s] %(process)d %(levelname)-8s \
                 (%(module)s:%(lineno)d) %(message)s',
                'console_formatter':
-               '            %(asctime)s|%(levelname)-6s|%(message)s'}
+               '            %(asctime)s|%(levelname)-6s|%(message)s',
+               'autotest_formatter':
+               '    %(message)s'}
 
 
         datefmt = '%H:%M:%S'
@@ -77,7 +77,11 @@ class CaseLog(Log):
         if int(self.loglevel) != 1:
             self.console.setLevel(logging.INFO)
 
-            console_formatter = logging.Formatter(fmt['console_formatter'], datefmt)
+            if os.environ.has_key('AUTODIR'):
+                console_formatter = logging.Formatter(fmt['autotest_formatter'], datefmt)
+            else:
+                console_formatter = logging.Formatter(fmt['console_formatter'], datefmt)
+
             self.console.setFormatter(console_formatter)
             self.logger.addHandler(self.console)
         return self.logger
@@ -85,10 +89,10 @@ class CaseLog(Log):
 
 class EnvLog(Log):
 
-    def __del__(self):
-        self.logger.removeHandler(self.filehd)
-        self.logger.removeHandler(self.console)
-        del self.logger
+    def __init__(self, logname, loglevel):
+        self.logger = logging.getLogger(logname + "_env")
+        self.logger.setLevel(logging.DEBUG)
+        super(EnvLog, self).__init__(logname, loglevel)
 
     def env_log(self):
         """Initialize log file"""

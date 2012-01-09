@@ -133,7 +133,11 @@ class LibvirtTestAPI(object):
             logname = log.Log.get_log_name()
             testid = logname[-3:]
             log_xml_parser.add_test_xml(testrunid, testid)
-            logfile = os.path.join('log/%s' % testrunid, logname)
+            if os.environ.has_key('AUTODIR'):
+                autotest_testdir = os.path.join(os.environ['AUTODIR'],'tests/libvirt_test_API')
+                logfile = os.path.join('%s/libvirt-test-API/log/%s' % (autotest_testdir, testrunid), logname)
+            else:
+                logfile = os.path.join('log/%s' % testrunid, logname)
             procs.append(generator.FuncGen(cases_func_ref_dict,
                                            activity,
                                            logfile,
@@ -202,6 +206,11 @@ class LibvirtTestAPI(object):
                 pass
             else:
                 pass
+
+        if failnum:
+            return 1
+        else:
+            return 0
 
     def remove_log(self, testrunid, testid = None):
         """  to remove log item in the log xmlfile """
@@ -323,5 +332,7 @@ if __name__ == "__main__":
                 sys.exit(0)
 
     libvirt_test_api = LibvirtTestAPI(casefile, logxml, loglevel, bugstxt)
-    libvirt_test_api.run()
-
+    if libvirt_test_api.run():
+        sys.exit(1)
+    else:
+        sys.exit(0)
