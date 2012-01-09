@@ -47,17 +47,19 @@ def eventToString(event):
                      "Started",
                      "Suspended",
                      "Resumed",
-                     "Stopped" );
+                     "Stopped",
+                     "Shutdown" );
     return eventStrings[event];
 
 def detailToString(event, detail):
     eventStrings = (
         ( "Added", "Updated" ),
-        ( "Removed" ),
+        ( "Removed", ),
         ( "Booted", "Migrated", "Restored", "Snapshot" ),
         ( "Paused", "Migrated", "IOError", "Watchdog" ),
         ( "Unpaused", "Migrated"),
         ( "Shutdown", "Destroyed", "Crashed", "Migrated", "Saved", "Failed", "Snapshot")
+        ( "Finished", )
         )
     return eventStrings[event][detail]
 
