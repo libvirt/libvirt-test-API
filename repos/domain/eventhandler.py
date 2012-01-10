@@ -58,7 +58,7 @@ def detailToString(event, detail):
         ( "Booted", "Migrated", "Restored", "Snapshot" ),
         ( "Paused", "Migrated", "IOError", "Watchdog" ),
         ( "Unpaused", "Migrated"),
-        ( "Shutdown", "Destroyed", "Crashed", "Migrated", "Saved", "Failed", "Snapshot")
+        ( "Shutdown", "Destroyed", "Crashed", "Migrated", "Saved", "Failed", "Snapshot"),
         ( "Finished", )
         )
     return eventStrings[event][detail]
