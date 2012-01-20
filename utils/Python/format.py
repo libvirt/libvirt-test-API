@@ -33,7 +33,7 @@ class Format(object):
 
     def print_string(self, msg, env_logger):
         """Only print a simple string"""
-        env_logger(msg)
+        env_logger.info(msg)
         self.write_log('\n%s' %msg)
 
     def print_start(self, msg, env_logger):
