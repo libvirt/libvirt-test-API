@@ -124,10 +124,14 @@ class FuncGen(object):
         for i in range(loop_number):
 
             case_ref_name = self.cases_ref_names[i]
-            pkg_casename = case_ref_name.rpartition(":")[0]
-            funcname = case_ref_name.rpartition(":")[-1]
+            pkg_casename = case_ref_name.rsplit(":", 1)[0]
+            funcname = case_ref_name.rsplit(":", 1)[-1]
 
-            cleanoper = 0 if "_clean" not in funcname else 1
+            if "_clean" not in funcname:
+                cleanoper = 0
+            else:
+                cleanoper = 1
+
 
             if not cleanoper:
                 self.fmt.print_start(pkg_casename, env_logger)
@@ -182,7 +186,10 @@ class FuncGen(object):
                 if not cleanoper:
                     self.fmt.print_end(pkg_casename, ret, env_logger)
                 else:
-                    self.fmt.print_string(21*" " + "Done" if clean_ret < 1 else 21*" " + "Fail", env_logger)
+                    if clean_ret < 1:
+                        self.fmt.print_string(21*" " + "Done", env_logger)
+                    else:
+                        self.fmt.print_string(21*" " + "Fail", env_logger)
 
         end_time = time.strftime("%Y-%m-%d %H:%M:%S")
 
