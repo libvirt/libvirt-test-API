@@ -1,0 +1,457 @@
+#!/bin/sh
+
+ATHOME=/usr/local/autotest
+LOG=/tmp/InstallAutotestServer.log
+ATPASSWD=redhat
+MYSQLPW=autotest
+
+echo Installing the Autotest server
+echo A log of operation is kept in $LOG
+echo -n "Install started at: " > $LOG
+date >> $LOG
+
+LOCALFREE=`df -k /usr/local | awk '{ print $4 }' | grep -v Avai`
+VARFREE=`df -k /var | awk '{ print $4 }' | grep -v Avai`
+
+echo /usr/local free $LOCALFREE
+echo /var free $VARFREE
+
+if expr $LOCALFREE \< 5000 > /dev/null
+then
+    echo you should have more free space in /usr/local >> $LOG
+    echo you should have more free space in /usr/local
+    exit 1
+fi
+if expr $VARFREE \< 10000 > /dev/null
+then
+    echo you should have more free space in /var >> $LOG
+    echo you should have more free space in /var
+    exit 1
+fi
+
+if [ ! -x /usr/local/bin/substitute ]
+then
+    mkdir -p /usr/local/bin
+    cat << EOF > /usr/local/bin/substitute
+#! /bin/sh
+
+if [ "\$1" = "" -o "\$3" = "" ]
+then
+    echo usage : \$0 old_string new_string files ...
+    exit 1
+fi
+
+old_string=\$1
+new_string=\$2
+shift
+shift
+
+echo substituing \$old_string by \$new_string in
+
+while [ "\$1" != "" ]
+do
+    echo -n \$1 " : "
+    tmpname=`basename \$1`
+    if [ ! -f "\$1" ]
+    then
+        echo warning : \$1 "doesn't exist"
+        shift
+        continue
+    fi
+    if [ -L "\$1" ]
+    then
+        echo warning : \$1 symbolic link, skipped
+        shift
+        continue
+    fi
+    if [ ! -w "\$1" ]
+    then
+        echo warning : \$1 non writable, skipped
+        shift
+       continue
+    fi
+
+    rm -f /tmp/substitute_\$\$_\$1
+
+    sed s+"\$old_string"+"\$new_string"+g < \$1 > /tmp/substitute_\$\$_\$tmpname
+
+    if [ "\$?" != "0" ]
+    then
+        echo no change
+        rm -f /tmp/substitute_\$\$_\$tmpname
+    else
+        if [ "\$?" = "1" ]
+	then
+	    echo changed
+	    mv \$1 \$1.old
+	    mv /tmp/substitute_\$\$_\$tmpname \$1
+	else
+	    echo "trouble ..."
+	    rm -f /tmp/substitute_\$\$_\$tmpname
+	    exit 1
+	fi
+    fi
+    shift
+done
+
+EOF
+    chmod +x /usr/local/bin/substitute
+
+fi
+
+MYSQL=`rpm -q mysql-server`
+if [ "`echo $MYSQL | grep 'not installed'`" != "" ]
+then
+    echo Installing MySQL Database server
+    yum -y groupinstall 'MySQL Database' >> $LOG 2>&1
+    MYSQL=`rpm -q mysql-server`
+fi
+
+if [ "`echo $MYSQL | grep 'mysql-server-'`" = "" ]
+then
+    echo Failed to install mysql-server
+    exit 1
+fi
+
+echo MySQL version $MYSQL >> $LOG
+echo MySQL version $MYSQL
+
+HTTPD=`rpm -q httpd`
+if [ "`echo $HTTPD | grep 'not installed'`" != "" ]
+then
+    echo Installing Web server
+    yum -y groupinstall 'Web Server' >> $LOG 2>&1
+    HTTPD=`rpm -q httpd`
+fi
+
+if [ "`echo $HTTPD | grep 'httpd-'`" = "" ]
+then
+    echo Failed to install httpd
+    exit 1
+fi
+
+echo Web server version $HTTPD >> $LOG
+echo Web server version $HTTPD
+
+JAVADEV=`rpm -q --whatprovides java-devel`
+if [ "`echo $JAVADEV | grep 'no package'`" != "" ]
+then
+    echo Installing Java Development
+    yum -y install java-1.6.0-openjdk-devel >> $LOG 2>&1
+    JAVADEV=`rpm -q --whatprovides java-devel`
+fi
+
+if [ "`echo $JAVADEV | grep 'devel-'`" = "" ]
+then
+    echo Failed to install Java Development
+    exit 1
+fi
+
+echo Java Development version $JAVADEV >> $LOG
+echo Java Development version $JAVADEV
+
+PHP=`rpm -q php`
+if [ "`echo $PHP | grep 'not installed'`" != "" ]
+then
+    echo Installing PHP
+    yum -y install php-mysql php-cli php >> $LOG 2>&1
+    PHP=`rpm -q php`
+fi
+
+if [ "`echo $PHP | grep 'php-'`" = "" ]
+then
+    echo Failed to install php
+    exit 1
+fi
+
+echo PHP version $PHP >> $LOG
+echo PHP version $PHP
+
+PHPMY=`rpm -q php-mysql`
+if [ "`echo $PHP | grep 'not installed'`" != "" ]
+then
+    echo Installing PHP MySQL bindings
+    yum -y install php-mysql php-cli >> $LOG 2>&1
+    PHPMY=`rpm -q php-mysql`
+fi
+
+if [ "`echo $PHPMY | grep 'php-mysql-'`" = "" ]
+then
+    echo Failed to install php-mysql
+    exit 1
+fi
+
+echo PHP MySQL version $PHPMY >> $LOG
+echo PHP MySQL version $PHPMY
+
+GIT=`rpm -q git`
+if [ "`echo $GIT | grep 'not installed'`" != "" ]
+then
+    echo Installing GIT
+    yum -y groupinstall 'Development Tools' >> $LOG 2>&1
+    yum -y install git patch rpm-build >> $LOG 2>&1
+    GIT=`rpm -q git`
+fi
+
+if [ "`echo $GIT | grep 'git-'`" = "" ]
+then
+    echo Failed to install git
+    exit 1
+fi
+
+echo Git version $GIT >> $LOG
+echo Git version $GIT
+
+ATLAS=`rpm -q atlas`
+if [ "`echo $ATLAS | grep 'not installed'`" != "" ]
+then
+    echo Installing Atlas
+    yum -y install atlas >> $LOG 2>&1
+    ATLAS=`rpm -q atlas`
+fi
+
+if [ "`echo $ATLAS | grep 'atlas-'`" = "" ]
+then
+    echo Failed to install atlas
+    exit 1
+fi
+
+echo Atlas version $ATLAS >> $LOG
+echo Atlas version $ATLAS
+
+PYSET=`rpm -q python-setuptools`
+if [ "`echo $PYSET | grep 'not installed'`" != "" ]
+then
+    echo Installing python-setuptools
+    yum -y install python-setuptools >> $LOG 2>&1
+    PYSET=`rpm -q python-setuptools`
+fi
+
+if [ "`echo $PYSET | grep 'python-setuptools-'`" = "" ]
+then
+    echo Failed to install python-setuptools
+    exit 1
+fi
+
+echo Python setuptools version $PYSET >> $LOG
+echo Python setuptools version $PYSET
+
+NUMPY=`rpm -q numpy`
+if [ "`echo $NUMPY | grep 'not installed'`" != "" ]
+then
+    echo Installing Numpy
+    yum -y install numpy >> $LOG 2>&1
+    NUMPY=`rpm -q numpy`
+fi
+
+if [ "`echo $NUMPY | grep 'numpy-'`" = "" ]
+then
+    echo Failed to install numpy
+    exit 1
+fi
+
+echo Numpy version $NUMPY >> $LOG
+echo Numpy version $NUMPY
+
+SELINUX=`rpm -q --queryformat '%{name} %{version} %{release}\n' selinux-policy`
+if [ "`echo $SELINUX | grep '3.10.0'`" != "" ]
+then
+    echo Updating selinux policy >> $LOG
+    echo Updating selinux policy
+    yum update -y selinux-policy selinux-policy-targeted >> $LOG 2>&1
+    SELINUX=`rpm -q --queryformat '%{name} %{version} %{release}\n' selinux-policy`
+fi
+echo SELinux version $SELINUX >> $LOG
+echo SELinux version $SELINUX
+
+echo starting MySQL server >> $LOG
+echo starting MySQL server
+systemctl enable mysqld.service >> $LOG
+systemctl restart mysqld.service >> $LOG
+
+
+echo installing autotest data
+if [ "`grep "^www:" /etc/group`" = "" ]
+then
+    echo Adding group www >> $LOG
+    echo Adding group www
+    groupadd www -g 69
+fi
+if [ "`grep "^autotest:" /etc/passwd`" = "" ]
+then
+    echo Adding user autotest >> $LOG
+    echo Adding user autotest
+    useradd autotest -u 6666 -g www
+    echo Setting autotest user password
+    echo "$ATPASSWD
+$ATPASSWD" | passwd --stdin autotest >> $LOG
+fi
+
+mkdir -p /usr/local
+if [ ! -e $ATHOME/.git/config ]
+then
+    echo Cloning autotest repo in $ATHOME >> $LOG
+    echo Cloning autotest repo in $ATHOME
+    cd /usr/local
+    git clone git://github.com/autotest/autotest.git 
+else
+    echo Updating autotest repo in $ATHOME >> $LOG
+    echo Updating autotest repo in $ATHOME
+    cd $ATHOME
+    git checkout master
+    git pull
+fi
+
+chown -R autotest:www $ATHOME
+
+echo Verifying MySQL root password >> $LOG
+echo Verifying MySQL root password
+mysqladmin -u root password $MYSQLPW > /dev/null 2>&1
+
+DB=`echo "use autotest_web;" | mysql --user=root --password=$MYSQLPW 2>&1`
+if [ "`echo $DB | grep 'Access denied'`" != "" ]
+then
+    echo MySQL already has a different root password !!! >> $LOG
+    echo MySQL already has a different root password !!!
+    exit 1
+fi
+if [ "`echo $DB | grep 'Unknown database'`" != "" ]
+then
+    echo Creating MySQL databases for autotest >> $LOG
+    echo Creating MySQL databases for autotest
+    cat << SQLEOF | mysql --user=root --password=$MYSQLPW >> $LOG
+create database autotest_web;
+grant all privileges on autotest_web.* TO 'autotest'@'localhost' identified by "$MYSQLPW";
+grant SELECT on autotest_web.* TO 'nobody'@'%';
+grant SELECT on autotest_web.* TO 'nobody'@'localhost';
+create database tko;
+grant all privileges on tko.* TO 'autotest'@'localhost' identified by "$MYSQLPW";
+grant SELECT on tko.* TO 'nobody'@'%';
+grant SELECT on tko.* TO 'nobody'@'localhost';
+SQLEOF
+
+fi
+
+echo Running autotest dependencies build >> $LOG
+echo Running autotest dependencies build
+echo This may take a bit of time as it may download files
+cat << EOF | su - autotest >> $LOG 2>&1
+cd /usr/local/autotest
+./utils/build_externals.py
+EOF
+chown -R autotest:www $ATHOME
+
+echo starting Web server >> $LOG
+echo starting Web server
+if [ ! -e  /etc/httpd/conf.d/autotest.conf ]
+then
+    ln -s /usr/local/autotest/apache/conf/all-directives /etc/httpd/conf.d/autotest.conf
+fi
+systemctl enable httpd.service >> $LOG
+systemctl restart httpd.service >> $LOG
+
+echo Setting up the autotest configuration files >> $LOG
+echo Setting up the autotest configuration files
+
+# TODO: notify_email in [SCHEDULER] section of global_config.ini
+
+cat << EOF | su - autotest
+/usr/local/bin/substitute please_set_this_password "$MYSQLPW" $ATHOME/global_config.ini
+if [ "`grep "password: $MYSQLPW" $ATHOME/shadow_config.ini`" = "" ]
+then
+    cp $ATHOME/shadow_config.ini $ATHOME/shadow_config.ini.orig
+    echo '[AUTOTEST_WEB]' > $ATHOME/shadow_config.ini.orig
+    echo 'user: autotest' >> $ATHOME/shadow_config.ini.orig
+    echo "password: $MYSQLPW" >> $ATHOME/shadow_config.ini.orig
+fi
+EOF
+
+TABLES=`echo "use autotest_web; show tables;" | mysql --user=root --password=$MYSQLPW 2>&1`
+
+if [ "`echo $TABLES | grep tko_test_view_outer_joins`" = "" ]
+then
+    echo Setting up the database schemas >> $LOG
+    echo Setting up the database schemas
+    
+    cat << EOF | su - autotest
+yes yes | $ATHOME/database/migrate.py --database=AUTOTEST_WEB sync
+EOF
+else
+    echo database schemas are already in place >> $LOG
+    echo database schemas are already in place
+fi
+
+# Fixing a permission problem
+echo "use autotest_web; update auth_user set is_superuser=1 where username='debug_user';" | mysql --user=root --password=$MYSQLPW >> $LOG 2>&1
+
+# Patch up a python 2.7 problem
+if [ "`grep '^CFUNCTYPE(c_int)(lambda: None)' /usr/lib64/python2.7/ctypes/__init__.py`" != "" ]
+then
+    /usr/local/bin/substitute 'CFUNCTYPE(c_int)(lambda: None)' '# CFUNCTYPE(c_int)(lambda: None)' /usr/lib64/python2.7/ctypes/__init__.py
+fi
+
+echo Patching the front-end
+if [ "`grep 'return logUrl;' $ATHOME/frontend/client/src/autotest/common/Utils.java`" = "" ]
+then
+    cat << EOF | (cd $ATHOME && patch -p1) >> $LOG
+diff --git a/frontend/client/src/autotest/common/Utils.java b/frontend/client/src/autotest/common/Utils.java
+index 303d378..e62d3f7 100644
+--- a/frontend/client/src/autotest/common/Utils.java
++++ b/frontend/client/src/autotest/common/Utils.java
+@@ -208,7 +208,8 @@ public class Utils {
+ 
+     public static String getRetrieveLogsUrl(String path) {
+         String logUrl = URL.encode(getLogsUrl(path));
+-        return RETRIEVE_LOGS_URL + "?job=" + logUrl;
++//        return RETRIEVE_LOGS_URL + "?job=" + logUrl;
++        return logUrl;
+     }
+ 
+     public static String jsonToString(JSONValue value) {
+EOF
+
+fi
+
+echo Building the front-end classes >> $LOG
+echo "Building the front-end classes (may take some time)"
+cat << EOF | su - autotest >> $LOG
+/usr/local/autotest/utils/compile_gwt_clients.py -a
+EOF
+
+echo Initializing django and setting up permissions >> $LOG
+echo Initializing django and setting up permissions
+chown -R autotest:www $ATHOME
+chmod -R o+rX $ATHOME
+chmod o+x $ATHOME/tko/*.cgi
+
+echo Starting the scheduler >> $LOG
+echo Starting the scheduler
+/usr/local/bin/substitute 'Group=autotest' 'Group=www' $ATHOME/utils/autotestd.service >> $LOG
+cp $ATHOME/utils/autotestd.service /etc/systemd/system/ >> $LOG
+systemctl daemon-reload >> $LOG
+systemctl enable autotestd.service >> $LOG
+systemctl stop autotestd.service >> $LOG
+rm -f $ATHOME/monitor_db_babysitter.pid $ATHOME/monitor_db.pid
+systemctl start autotestd.service >> $LOG
+
+if [ "`grep -- '--dport 80 -j ACCEPT' /etc/sysconfig/iptables`" = "" ]
+then
+    echo Opening firewall for http traffic >> $LOG
+    echo Opening firewall for http traffic
+    awk '/-A INPUT -i lo -j ACCEPT/ { print; print "-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT"; next}
+{print}' /etc/sysconfig/iptables > /tmp/tmp$$
+    if [ ! -f /etc/sysconfig/iptables.orig ]
+    then
+        cp /etc/sysconfig/iptables /etc/sysconfig/iptables.orig
+    fi
+    cp /tmp/tmp$$ /etc/sysconfig/iptables
+    rm /tmp/tmp$$
+   
+    systemctl restart iptables.service >> $LOG
+fi
+
+systemctl status autotestd.service >> $LOG
+systemctl status autotestd.service
+echo -n "Install finished at: " >> $LOG
+date >> $LOG
+echo Finished
