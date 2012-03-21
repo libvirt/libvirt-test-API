@@ -18,6 +18,8 @@
 # The proxy examines the list of unique test cases, received from the
 # generator and import each test case from appropriate module directory.
 
+import exception
+
 
 class Proxy(object):
     """ The Proxy class is used for getting real function call reference """
@@ -86,6 +88,8 @@ class Proxy(object):
 
         # Import recursively module
         for component in components[1:]:
+            if component == "":
+                raise exception.CaseConfigfileError("Missing module name after \":\"")
             case_mod = getattr(case_mod, component)
         main_function_ref = getattr(case_mod, func)
         return main_function_ref
