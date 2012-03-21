@@ -48,7 +48,7 @@ def check_params(params):
 
     logger = params['logger']
 
-    keys = ['guestname', 'logger']
+    keys = ['guestname', 'flags', 'logger']
     for key in keys:
         if key not in params:
             logger.error("key '%s' is required" % key)
@@ -66,7 +66,7 @@ def start(params):
 
         logger -- an object of utils/Python/log.py
         mandatory arguments : guestname -- same as the domain name
-	optional arguments : flags -- domain create flags <none|start_paused>
+	optional arguments : flags -- domain create flags <none|start_paused|noping>
 
         Return 0 on SUCCESS or 1 on FAILURE
     """
@@ -75,13 +75,11 @@ def start(params):
     check_params(params)
     domname = params['guestname']
     logger = params['logger']
+    flags = params['flags']
 
-    flags = None
-    if params.has_key('flags'):
-        flags = params['flags']
-        if flags != 'none' and flags != 'start_paused':
-            logger.error("flags value either \"none\" or \"start_paused\"");
-            return 1
+    if "none" in flags and "start_paused" in flags:
+        logger.error("Flags error: Can't specify none and start_paused simultaneously")
+        return return_close(conn, logger, 1)
 
     # Connect to local hypervisor connection URI
     util = utils.Utils()
@@ -95,21 +93,18 @@ def start(params):
     logger.info('start domain')
 
     try:
-        if flags == "none":
+        if "none" in flags:
             dom_obj.start_with_flags(domname, NONE)
-        elif flags == "start_paused":
+        elif "start_paused" in flags:
             dom_obj.start_with_flags(domname, START_PAUSED)
-        elif not flags:
-            dom_obj.start(domname)
         else:
-            logger.error("flags error")
-            return (conn, logger, 1)
+            dom_obj.start(domname)
     except LibvirtAPI, e:
         logger.error(str(e))
         logger.error("start failed")
         return return_close(conn, logger, 1)
 
-    if flags == "start_paused":
+    if "start_paused" in flags:
         state = dom_obj.get_state(domname)
         if state == "paused":
             logger.info("guest start with state paused successfully")
@@ -119,29 +114,32 @@ def start(params):
             return return_close(conn, logger, 1)
 
     while timeout:
-        time.sleep(10)
-        timeout -= 10
-        logger.info(str(timeout) + "s left")
-
         state = dom_obj.get_state(domname)
         expect_states = ['running', 'no state', 'blocked']
 
         if state in expect_states:
             break
 
+        time.sleep(10)
+        timeout -= 10
+        logger.info(str(timeout) + "s left")
+
     if timeout <= 0:
         logger.error('The domain state is not as expected, state: ' + state)
         return return_close(conn, logger, 1)
 
-    # Get domain ip and ping ip to check domain's status
-    mac = util.get_dom_mac_addr(domname)
-    logger.info("get ip by mac address")
-    ip = util.mac_to_ip(mac, 180)
+    logger.info("Guest started")
 
-    logger.info('ping guest')
-    if not util.do_ping(ip, 300):
-        logger.error('Failed on ping guest, IP: ' + str(ip))
-        return return_close(conn, logger, 1)
+    # Get domain ip and ping ip to check domain's status
+    if not "noping" in flags:
+        mac = util.get_dom_mac_addr(domname)
+        logger.info("get ip by mac address")
+        ip = util.mac_to_ip(mac, 180)
+
+        logger.info('ping guest')
+        if not util.do_ping(ip, 300):
+            logger.error('Failed on ping guest, IP: ' + str(ip))
+            return return_close(conn, logger, 1)
 
     logger.info("PASS")
     return return_close(conn, logger, 0)

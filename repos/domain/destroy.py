@@ -50,7 +50,10 @@ def destroy(params):
        {'guestname': guestname}
 
        logger -- an object of utils/Python/log.py
-       guestname -- same as the domain name
+       guestname -- the domain name
+       flags -- optional arguments:
+                  noping: Don't do the ping test
+
 
        Return 0 on SUCCESS or 1 on FAILURE
     """
@@ -62,6 +65,9 @@ def destroy(params):
     if params_check_result:
         return 1
     guestname = params['guestname']
+    flags = ""
+    if params.has_key('flags'):
+        flags = params['flags']
 
     # Connect to local hypervisor connection URI
     util = utils.Utils()
@@ -73,18 +79,19 @@ def destroy(params):
     dom_obj = domainAPI.DomainAPI(virconn)
     dom_name_list = dom_obj.get_list()
     if guestname not in dom_name_list:
-        logger.error("guest %s doesn't exist or not be running." % guestname)
+        logger.error("guest %s doesn't exist or isn't running." % guestname)
         conn.close()
         logger.info("closed hypervisor connection")
         return 1
     timeout = 60
     logger.info('destroy domain')
 
-    # Get domain ip
-    mac = util.get_dom_mac_addr(guestname)
-    logger.info("get ip by mac address")
-    ip = util.mac_to_ip(mac, 180)
-    logger.info("the ip address of guest is %s" % ip)
+    if not "noping" in flags:
+        # Get domain ip
+        mac = util.get_dom_mac_addr(guestname)
+        logger.info("get ip by mac address")
+        ip = util.mac_to_ip(mac, 180)
+        logger.info("the ip address of guest is %s" % ip)
 
     # Destroy domain
     try:
@@ -93,30 +100,31 @@ def destroy(params):
         except LibvirtAPI, e:
             logger.error("API error message: %s, error code is %s" % \
                          (e.response()['message'], e.response()['code']))
-            logger.error("fail to destroy domain")
+            logger.error("failed to destroy domain")
             return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")
 
     # Check domain status by ping ip
-    while timeout:
-        time.sleep(10)
-        timeout -= 10
-        logger.info(str(timeout) + "s left")
+    if not "noping" in flags:
+        while timeout:
+            time.sleep(10)
+            timeout -= 10
+            logger.info(str(timeout) + "s left")
 
-        logger.info('ping guest')
+            logger.info('ping guest')
 
-        if util.do_ping(ip, 30):
-            logger.error('The guest is still active, IP: ' + str(ip))
+            if util.do_ping(ip, 30):
+                logger.error('The guest is still active, IP: ' + str(ip))
+                return 1
+            else:
+                logger.info("domain %s was destroyed successfully" % guestname)
+                break
+
+        if timeout <= 0:
+            logger.error("the domain couldn't be destroyed within 60 seconds.")
             return 1
-        else:
-            logger.info("domain %s is destroied successfully" % guestname)
-            break
-
-    if timeout <= 0:
-        logger.error("the domain couldn't be destroied within 60 secs.")
-        return 1
 
     return 0
 
