@@ -6,8 +6,8 @@ if [[ -z $mac ]]; then
    exit 1
 fi
 
-if ! rpm -qa |grep -q nmap ;then
-   echo "need nmap rpmball installed."
+if ! type nmap >/dev/null 2>&1; then
+   echo "nmap package needs to be installed."
    exit 1
 fi
 
