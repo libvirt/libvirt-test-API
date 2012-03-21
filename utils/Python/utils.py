@@ -317,7 +317,7 @@ class Utils(object):
     def locate_utils(self):
         """Get the directory path of 'utils'"""
         pwd = os.getcwd()
-        result = re.search('(.*)libvirt-test-API', pwd)
+        result = re.search('(.*)libvirt-test-API(.*)', pwd)
         return result.group(0) + "/utils"
 
     def mac_to_ip(self, mac, timeout):
