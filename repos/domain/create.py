@@ -1,4 +1,4 @@
-#!/usr/bin/evn python
+#!/usr/bin/env python
 """this test case is used for testing
    create domain from xml
    mandatory arguments:guesttype
