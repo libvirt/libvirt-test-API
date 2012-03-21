@@ -878,6 +878,14 @@ class DomainAPI(object):
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
 
+    def openConsole(self, domname, device, st_obj, flags = 0):
+        try:
+            dom_obj = self.get_domain_by_name(domname)
+            return dom_obj.openConsole(device, st_obj, flags)
+        except libvirt.libvirtError, e:
+            message = e.get_error_message()
+            code = e.get_error_code()
+            raise exception.LibvirtAPI(message, code)
 
 # DomainState
 VIR_DOMAIN_NOSTATE = 0
