@@ -38,78 +38,83 @@ append_path(result.group(0))
 import exception
 
 class StreamAPI(object):
-    def __init__(self, connection):
-        self.conn = connection
-
-    def abort(self, flag = 0):
+    def __init__(self, conn, flags = 0):
         try:
-            stream_obj = newStream(flag)
-            return stream_obj.abort()
+            self.stream = conn.newStream(flags)
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
 
-    def connect(self, flag = 0):
+    def getStream(self):
+        return self.stream
+
+    def abort(self):
         try:
-            stream_obj = newStream(flag)
-            return stream_obj.connect()
+            return self.stream.abort()
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
 
-    def finish(self, flag = 0):
+    def connect(self):
         try:
-            stream_obj = newStream(flag)
-            return stream_obj.finish()
+            return self.stream.connect()
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
 
-    def recv(self, flag = 0, data, nbytes):
+    def finish(self):
         try:
-            stream_obj = newStream(flag)
-            return stream_obj.recv(data, nbytes)
+            return self.stream.finish()
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
 
-    def send(self, flag = 0, data, nbytes):
+    def recv(self, nbytes):
         try:
-            stream_obj = newStream(flag)
-            return stream_obj.send(data, nbytes)
+            return self.stream.recv(nbytes)
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
 
-    def eventAddCallback(self, flag = 0, cb, opaque):
+    def send(self, data):
         try:
-            stream_obj = newStream(flag)
-            return stream_obj.eventAddCallback(cb, opaque)
+            return self.stream.send(data)
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
 
-    def eventRemoveCallback(self, flag = 0):
+    def eventAddCallback(self, events, cb, opaque):
         try:
-            stream_obj = newStream(flag)
-            return stream_obj.eventRemoveCallback()
+            return self.stream.eventAddCallback(events, cb, opaque)
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
 
-    def eventUpdateCallback(self, flag = 0, events)
+    def eventRemoveCallback(self):
         try:
-            stream_obj = newStream(flag)
-            return stream_obj.eventUpdateCallback(events)
+            return self.stream.eventRemoveCallback()
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
 
+    def eventUpdateCallback(self, events):
+        try:
+            return self.stream.eventUpdateCallback(events)
+        except libvirt.libvirtError, e:
+            message = e.get_error_message()
+            code = e.get_error_code()
+            raise exception.LibvirtAPI(message, code)
+
+# virEventHandleType
+VIR_EVENT_HANDLE_READABLE = 1
+VIR_EVENT_HANDLE_WRITABLE = 2
+VIR_EVENT_HANDLE_ERROR = 4
+VIR_EVENT_HANDLE_HANGUP = 8
