@@ -878,9 +878,10 @@ class DomainAPI(object):
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
 
-    def openConsole(self, domname, device, st_obj, flags = 0):
+    def openConsole(self, domname, device, stream, flags = 0):
         try:
             dom_obj = self.get_domain_by_name(domname)
+            st_obj = stream.getStream()
             return dom_obj.openConsole(device, st_obj, flags)
         except libvirt.libvirtError, e:
             message = e.get_error_message()
