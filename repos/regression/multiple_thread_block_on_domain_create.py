@@ -145,7 +145,7 @@ def multiple_thread_block_on_domain_create(params):
 
     util = utils.Utils()
     hypervisor = util.get_hypervisor()
-    uri = util.get_uri('127.0.0.1')
+    uri = params['uri']
 
     auth = [[connectAPI.VIR_CRED_AUTHNAME, connectAPI.VIR_CRED_PASSPHRASE], request_credentials, None]
 

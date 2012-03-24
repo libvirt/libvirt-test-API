@@ -114,7 +114,7 @@ def install_linux_check(params):
     # Connect to local hypervisor connection URI
     util = utils.Utils()
     hypervisor = util.get_hypervisor()
-    uri = util.get_uri('127.0.0.1')
+    uri = params['uri']
 
     logger.info("the type of hypervisor is %s" % hypervisor)
     logger.debug("the uri to connect is %s" % uri)

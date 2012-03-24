@@ -86,7 +86,7 @@ def sched_params(params):
        to verify validity of the result
     """
     util = utils.Utils()
-    uri = util.get_uri('127.0.0.1')
+    uri = params['uri']
     hypervisor = util.get_hypervisor()
     usage(params, hypervisor)
 

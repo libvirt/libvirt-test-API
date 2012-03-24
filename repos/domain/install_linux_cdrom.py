@@ -51,7 +51,7 @@ from exception import LibvirtAPI
 __author__ = "Guannan Ren <gren@redhat.com>"
 __date__ = "Tue Mar 11 2010"
 __version__ = "0.1.0"
-__credits__ = "Copyright (C) 2010 Red Hat, Inc."
+__credits__ = "Copyright (C) 2010, 2012 Red Hat, Inc."
 __all__ = ['install_linux_cdrom', 'usage']
 
 VIRSH_QUIET_LIST = "virsh --quiet list --all|awk '{print $2}'|grep \"^%s$\""
@@ -222,8 +222,9 @@ def install_linux_cdrom(params):
     """ install a new virtual machine """
     global logger
     logger = params['logger']
-
     params.pop('logger')
+    uri = params['uri']
+    params.pop('uri')
 
     logger.info("Checking the validation of arguments provided.")
     params_check_result = check_params(params)
@@ -242,7 +243,6 @@ def install_linux_cdrom(params):
     logger.info("the type of guest is %s" % guesttype)
 
     util = utils.Utils()
-    uri = util.get_uri('127.0.0.1')
     hypervisor = util.get_hypervisor()
     conn = connectAPI.ConnectAPI()
     virconn = conn.open(uri)

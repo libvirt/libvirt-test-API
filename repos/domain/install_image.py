@@ -17,7 +17,7 @@
 __author__ = "Guannan Ren <gren@redhat.com>"
 __date__ = "Tue Mar 15 2010"
 __version__ = "0.1.0"
-__credits__ = "Copyright (C) 2010 Red Hat, Inc."
+__credits__ = "Copyright (C) 2010, 2012 Red Hat, Inc."
 __all__ = ['install_windows', 'usage']
 
 import os
@@ -84,6 +84,9 @@ def install_image(params):
     global logger
     logger = params['logger']
     params.pop('logger')
+    uri = params['uri']
+    params.pop('uri')
+
     logger.info("Checking the validation of arguments provided.")
     params_check_result = check_params(params)
 
@@ -105,7 +108,6 @@ def install_image(params):
     # Connect to local hypervisor connection URI
     util = utils.Utils()
     hypervisor = util.get_hypervisor()
-    uri = util.get_uri('127.0.0.1')
 
     logger.info("the type of hypervisor is %s" % hypervisor)
     logger.debug("the uri to connect is %s" % uri)

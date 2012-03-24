@@ -59,7 +59,7 @@ def reboot(params):
 
     # Connect to local hypervisor connection URI
     util = utils.Utils()
-    uri = util.get_uri('127.0.0.1')
+    uri = params['uri']
     hypervisor = util.get_hypervisor()
     if hypervisor == "kvm":
         logger.info("kvm hypervisor doesn't support the funtion now")

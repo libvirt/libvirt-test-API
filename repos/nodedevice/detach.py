@@ -82,7 +82,7 @@ def detach(dicts):
     logger.info("original device driver: %s" % original_driver)
 
     util = utils.Utils()
-    uri = util.get_uri('127.0.0.1')
+    uri = params['uri']
 
     kernel_version = util.get_host_kernel_version()
     hypervisor = util.get_hypervisor()

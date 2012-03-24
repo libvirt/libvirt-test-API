@@ -63,7 +63,7 @@ def start(params):
                  networkname)
 
     util = utils.Utils()
-    uri = util.get_uri('127.0.0.1')
+    uri = params['uri']
 
     logger.info("uri address is %s" % uri)
 

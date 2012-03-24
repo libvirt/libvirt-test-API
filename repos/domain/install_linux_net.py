@@ -22,7 +22,7 @@
 __author__ = "Guannan Ren <gren@redhat.com>"
 __date__ = "Wed Apr 07 2010"
 __version__ = "0.1.0"
-__credits__ = "Copyright (C) 2010 Red Hat, Inc."
+__credits__ = "Copyright (C) 2010, 2012 Red Hat, Inc."
 __all__ = ['install_linux', 'usage']
 
 import os
@@ -211,6 +211,9 @@ def install_linux_net(params):
     global logger
     logger = params['logger']
     params.pop('logger')
+    uri = params['uri']
+    params.pop('uri')
+
     logger.info("Checking the validation of arguments provided.")
     params_check_result = check_params(params)
 
@@ -232,7 +235,6 @@ def install_linux_net(params):
     util = utils.Utils()
     hypervisor = util.get_hypervisor()
     macaddr = util.get_rand_mac()
-    uri = util.get_uri('127.0.0.1')
 
     logger.info("the macaddress is %s" % macaddr)
     logger.info("the type of hypervisor is %s" % hypervisor)
@@ -495,4 +497,3 @@ def install_linux_net_clean(params):
         guest_dir = os.path.join(homepath, guestname)
         if os.path.exists(guest_dir):
             shutil.rmtree(guest_dir)
-

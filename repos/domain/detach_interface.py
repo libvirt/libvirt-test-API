@@ -73,7 +73,7 @@ def detach_interface(params):
 
     # Connect to local hypervisor connection URI
     util = utils.Utils()
-    uri = util.get_uri('127.0.0.1')
+    uri = params['uri']
     macs = util.get_dom_mac_addr(guestname)
     mac_list = macs.split("\n")
     logger.debug("mac address: \n%s" % macs)

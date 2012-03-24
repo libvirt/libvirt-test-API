@@ -212,7 +212,7 @@ def update_devflag(params):
         flag = domainAPI.VIR_DOMAIN_AFFECT_CONFIG
 
     # Connect to local hypervisor connection URI
-    uri = util.get_uri('127.0.0.1')
+    uri = params['uri']
     mac = util.get_dom_mac_addr(guestname)
     guestip = util.mac_to_ip(mac, 180)
     logger.debug("ip address: %s" % guestip)

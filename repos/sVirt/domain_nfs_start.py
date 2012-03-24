@@ -170,7 +170,7 @@ def domain_nfs_start(params):
     util = utils.Utils()
 
     # Connect to local hypervisor connection URI
-    uri = util.get_uri('127.0.0.1')
+    uri = params['uri']
     conn = connectAPI.ConnectAPI()
     virconn = conn.open(uri)
     domobj = domainAPI.DomainAPI(virconn)
@@ -458,7 +458,7 @@ def domain_nfs_start_clean(params):
     util = utils.Utils()
 
     # Connect to local hypervisor connection URI
-    uri = util.get_uri('127.0.0.1')
+    uri = params['uri']
     conn = connectAPI.ConnectAPI()
     virconn = conn.open(uri)
     domobj = domainAPI.DomainAPI(virconn)

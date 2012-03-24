@@ -90,7 +90,7 @@ def create(params):
     ifacename = params['ifacename']
 
     util = utils.Utils()
-    uri = util.get_uri('127.0.0.1')
+    uri = params['uri']
     try:
         hostip = util.get_ip_address(ifacename)
         logger.error("interface %s is running" % ifacename)

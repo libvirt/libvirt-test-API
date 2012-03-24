@@ -76,7 +76,7 @@ def resume(params):
 
     # Connect to local hypervisor connection URI
     util = utils.Utils()
-    uri = util.get_uri('127.0.0.1')
+    uri = params['uri']
 
     # Resume domain
     conn = connectAPI.ConnectAPI()

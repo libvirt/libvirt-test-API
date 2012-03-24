@@ -134,7 +134,7 @@ def create_logical_volume(params):
     # default is KB in the /etc/lvm/backup/{poolname}
     caps_kbyte = dicts['capacity_byte']/1024
 
-    uri = util.get_uri('127.0.0.1')
+    uri = params['uri']
     conn = connectAPI.ConnectAPI()
     virconn = conn.open(uri)
 

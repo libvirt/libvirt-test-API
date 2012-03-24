@@ -253,7 +253,7 @@ def eventhandler(params):
 
     # Connect to local hypervisor connection URI
     util = utils.Utils()
-    uri = util.get_uri('127.0.0.1')
+    uri = params['uri']
     conn = connectAPI.ConnectAPI()
 
     virconn = conn.open(uri)

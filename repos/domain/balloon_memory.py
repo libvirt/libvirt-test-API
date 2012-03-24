@@ -179,7 +179,7 @@ def balloon_memory(params):
     # Connect to local hypervisor connection URI
     global util
     util = utils.Utils()
-    uri = util.get_uri('127.0.0.1')
+    uri = params['uri']
 
     logger.info("get the mac address of vm %s" % domain_name)
     mac = util.get_dom_mac_addr(domain_name)
