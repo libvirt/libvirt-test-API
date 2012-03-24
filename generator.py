@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# libvirt-test-API is copyright 2010 Red Hat, Inc.
+# libvirt-test-API is copyright 2010, 2012 Red Hat, Inc.
 #
 # libvirt-test-API is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
@@ -23,9 +23,17 @@ import sys
 import traceback
 
 import mapper
-import env_inspect
 from utils.Python import log
 from utils.Python import format
+
+# Import of distribution-specific code.  If this is needed somewhere
+# else in the future, please don't copy-paste this, but create some
+# sensible distribution-specific package
+import os
+for dist in os.listdir('dist'):
+    if os.path.exists('/etc/%s-release' % dist):
+        exec('from dist.%s import env_inspect' % dist)
+        break
 
 class FuncGen(object):
     """ To generate a callable testcase"""
