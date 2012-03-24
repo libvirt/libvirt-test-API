@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 """for testing the start function of domain
    mandatory arguments: guestname
+   optional arguments: flags
 """
 
 __author__ = "Osier Yang <jyang@redhat.com>"
 __date__ = "Tue Oct 27, 2009"
 __version__ = "0.1.0"
-__credits__ = "Copyright (C) 2009 Red Hat, Inc."
+__credits__ = "Copyright (C) 2009, 2012 Red Hat, Inc."
 __all__ = ['start', 'check_params', 'parse_opts',
            'usage', 'version', 'append_path']
 
@@ -34,6 +35,11 @@ from exception import LibvirtAPI
 NONE = 0
 START_PAUSED = 1
 
+def usage():
+    print '''usage: mandatory arguments: guestname
+       optional arguments: flags
+          '''
+
 def return_close(conn, logger, ret):
     conn.close()
     logger.info("closed hypervisor connection")
@@ -48,7 +54,7 @@ def check_params(params):
 
     logger = params['logger']
 
-    keys = ['guestname', 'flags', 'logger']
+    keys = ['guestname', 'logger']
     for key in keys:
         if key not in params:
             logger.error("key '%s' is required" % key)
@@ -66,7 +72,7 @@ def start(params):
 
         logger -- an object of utils/Python/log.py
         mandatory arguments : guestname -- same as the domain name
-	optional arguments : flags -- domain create flags <none|start_paused|noping>
+        optional arguments : flags -- domain create flags <none|start_paused|noping>
 
         Return 0 on SUCCESS or 1 on FAILURE
     """
@@ -75,7 +81,7 @@ def start(params):
     check_params(params)
     domname = params['guestname']
     logger = params['logger']
-    flags = params['flags']
+    flags = params.get('flags', '')
 
     if "none" in flags and "start_paused" in flags:
         logger.error("Flags error: Can't specify none and start_paused simultaneously")
@@ -98,6 +104,7 @@ def start(params):
         elif "start_paused" in flags:
             dom_obj.start_with_flags(domname, START_PAUSED)
         else:
+            # this covers flags = None as well as flags = 'noping'
             dom_obj.start(domname)
     except LibvirtAPI, e:
         logger.error(str(e))
