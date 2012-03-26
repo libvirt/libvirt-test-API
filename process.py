@@ -13,10 +13,10 @@
 # The GPL text is available in the file COPYING that accompanies this
 # distribution and at <http://www.gnu.org/licenses>.
 #
-# Filename: process.py 
-# Summary: multiprocessing module 
+# Filename: process.py
+# Summary: multiprocessing module
 # Description: If the switch of multiprocessing is on,
-#              the module will be called to fork subprocess 
+#              the module will be called to fork subprocess
 
 import os
 import sys

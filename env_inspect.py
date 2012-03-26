@@ -13,11 +13,11 @@
 # The GPL text is available in the file COPYING that accompanies this
 # distribution and at <http://www.gnu.org/licenses>.
 #
-# Filename: envinspect.py 
-# Summary: To generate a callable class for clearing testing environment  
-# Description: The module match the reference of clearing function 
-#              from each testcase to the corresponding testcase's 
-#              argument in the order of testcase running 
+# Filename: envinspect.py
+# Summary: To generate a callable class for clearing testing environment
+# Description: The module match the reference of clearing function
+#              from each testcase to the corresponding testcase's
+#              argument in the order of testcase running
 
 import subprocess
 
@@ -72,7 +72,7 @@ class EnvInspect(object):
     """to check and collect the testing enviroment infomation
        before performing testing
     """
-    
+
     def __init__(self, logger):
         self.logger = logger
 
@@ -87,7 +87,7 @@ class EnvInspect(object):
         self.logger.info("    %-36s%-6s" % (get_libvirt_ver()[1], result))
 
         if get_libvirt_pyth_ver()[0] == 100:
-            result = NOTOK 
+            result = NOTOK
             flag = 1
         else:
             result = OK
@@ -100,7 +100,7 @@ class EnvInspect(object):
             result = OK
         self.logger.info("    %-36s%-6s" % (get_libvirt_cli_ver()[1], result))
 
-        if get_qemu_kvm_ver()[0] == 150 and flag == 0: 
+        if get_qemu_kvm_ver()[0] == 150 and flag == 0:
             flag = 0
         elif get_qemu_kvm_ver()[0] == 150 and flag == 1:
             flag = 1
@@ -115,8 +115,8 @@ class EnvInspect(object):
             result = OK
         self.logger.info("    %-36s%-6s" % (get_kernel_ver()[1], result))
 
-        return flag 
-        
+        return flag
+
 
 OK = "ok"
 NOTOK = "not ok"

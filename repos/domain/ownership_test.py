@@ -230,7 +230,7 @@ def ownership_test(params):
     logger.info("check the domain state")
     ret = check_domain_running(domobj, guestname, logger)
     if ret:
-        return return_close(conn, logger, 1) 
+        return return_close(conn, logger, 1)
 
     try:
         domobj.save(guestname, SAVE_FILE)

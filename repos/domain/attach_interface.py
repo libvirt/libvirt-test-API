@@ -107,7 +107,7 @@ def attach_interface(params):
             return 1
     finally:
         conn.close()
-        logger.info("closed hypervisor connection") 
+        logger.info("closed hypervisor connection")
 
     if test_result:
         return 0

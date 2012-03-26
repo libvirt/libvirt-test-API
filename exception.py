@@ -13,10 +13,10 @@
 # The GPL text is available in the file COPYING that accompanies this
 # distribution and at <http://www.gnu.org/licenses>.
 #
-# Filename: exception.py 
-# Summary: the exception class  
-# Description: The module defines the exceptions the framework could use  
-#              when fatal error occurred. 
+# Filename: exception.py
+# Summary: the exception class
+# Description: The module defines the exceptions the framework could use
+#              when fatal error occurred.
 
 import libvirt
 
@@ -32,13 +32,13 @@ class LibvirtException(Exception):
         return repr(self.errorstr)
 
     def response(self):
-        self.status = {'code':self.code, 'message':"%s:%s" % 
+        self.status = {'code':self.code, 'message':"%s:%s" %
                        (self.message, str(self))}
         return self.status
 
 class FileDoesNotExist(LibvirtException):
     code = 201
-    message = "File does not exist" 
+    message = "File does not exist"
 
 class SectionDoesNotExist(LibvirtException):
     code = 202

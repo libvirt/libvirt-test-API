@@ -24,14 +24,14 @@ import libvirt
 import re
 import os
 
-def append_path(path): 
+def append_path(path):
     """Append root path of package"""
     if path in sys.path:
         pass
     else:
         sys.path.append(path)
-        
-pwd = os.getcwd() 
+
+pwd = os.getcwd()
 result = re.search('(.*)libvirt-test-API', pwd)
 append_path(result.group(0))
 
@@ -39,7 +39,7 @@ import exception
 
 class SnapshotAPI(object):
     def __init__(self, connection):
-        self.conn = connection     
+        self.conn = connection
 
     def create(self, domname, xml_desc, flag = 0):
 	try:
@@ -57,7 +57,7 @@ class SnapshotAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)        
+            raise exception.LibvirtAPI(message, code)
 
     def snapshot_name_list(self, domname, flag = 0):
         try:
@@ -66,7 +66,7 @@ class SnapshotAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code) 
+            raise exception.LibvirtAPI(message, code)
 
     def snapshot_nums(self, domname, flag = 0):
         try:
@@ -95,7 +95,7 @@ class SnapshotAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
-            
+
     def delete(self, domname, snapname, flag = 0):
         try:
             snap = self.snapshot_lookup_by_name(domname, snapname, flag = 0)
@@ -103,7 +103,7 @@ class SnapshotAPI(object):
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
-            raise exception.LibvirtAPI(message, code)            
+            raise exception.LibvirtAPI(message, code)
 
     def get_xml_desc(self, domname, snapname, flag = 0):
         try:
@@ -122,4 +122,4 @@ class SnapshotAPI(object):
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
-  
+
