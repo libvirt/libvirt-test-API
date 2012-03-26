@@ -120,5 +120,3 @@ class EnvInspect(object):
 
 OK = "ok"
 NOTOK = "not ok"
-
-
