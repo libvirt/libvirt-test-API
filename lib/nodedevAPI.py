@@ -40,7 +40,7 @@ import exception
 
 class NodedevAPI:
     def __init__(self, connection):
-        self.conn = connection
+        self.conn = connection.get_conn()
 
     def create(self, device_xml):
         try:

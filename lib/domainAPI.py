@@ -42,7 +42,7 @@ import exception
 
 class DomainAPI(object):
     def __init__(self, connection):
-        self.conn = connection
+        self.conn = connection.get_conn()
 
     def get_list(self):
         dom_list = []

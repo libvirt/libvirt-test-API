@@ -39,7 +39,7 @@ import exception
 
 class nwfilterAPI(object):
     def __init__(self, connection):
-        self.conn = connection
+        self.conn = connection.get_conn()
 
     def get_list(self):
         try:

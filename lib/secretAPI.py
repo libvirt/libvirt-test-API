@@ -39,7 +39,7 @@ import exception
 
 class SecretAPI(object):
     def __init__(self, connection):
-        self.conn = connection
+        self.conn = connection.get_conn()
 
     def get_defined_list(self):
         try:

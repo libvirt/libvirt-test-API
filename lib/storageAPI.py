@@ -45,7 +45,7 @@ VIR_STORAGE_POOL_DEGRADED = 3
 
 class StorageAPI(object):
     def __init__(self, connection):
-        self.conn = connection
+        self.conn = connection.get_conn()
 
     def define_pool(self, storage_xml):
         try:

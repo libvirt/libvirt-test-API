@@ -39,7 +39,7 @@ import exception
 
 class NetworkAPI(object):
     def __init__(self, connection):
-        self.conn = connection
+        self.conn = connection.get_conn()
 
     def define(self, netxmldesc):
         try:

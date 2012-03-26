@@ -39,7 +39,7 @@ import exception
 
 class SnapshotAPI(object):
     def __init__(self, connection):
-        self.conn = connection
+        self.conn = connection.get_conn()
 
     def create(self, domname, xml_desc, flag = 0):
 	try:

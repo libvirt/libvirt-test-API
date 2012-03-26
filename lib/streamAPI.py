@@ -38,9 +38,10 @@ append_path(result.group(0))
 import exception
 
 class StreamAPI(object):
-    def __init__(self, conn, flags = 0):
+    def __init__(self, connection, flags = 0):
         try:
-            self.stream = conn.newStream(flags)
+            self.conn = connection.get_conn()
+            self.stream = self.conn.newStream(flags)
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()

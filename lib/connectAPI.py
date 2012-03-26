@@ -39,35 +39,36 @@ append_path(result.group(0))
 import exception
 
 class ConnectAPI(object):
-    def __init__(self):
+    def __init__(self, uri):
+        self.uri = uri
         self.conn = None
 
-    def open(self, uri):
+    def open(self):
         try:
-            self.conn = libvirt.open(uri)
-            return self.conn
+            self.conn = libvirt.open(self.uri)
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
 
-    def open_read_only(self, uri):
+    def open_read_only(self):
         try:
-            self.conn = libvirt.openReadOnly(uri)
-            return self.conn
+            self.conn = libvirt.openReadOnly(self.uri)
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
 
-    def openAuth(self, uri, auth, flags = 0):
+    def openAuth(self, auth, flags = 0):
         try:
-            self.conn = libvirt.openAuth(uri, auth, flags)
-            return self.conn
+            self.conn = libvirt.openAuth(self.uri, auth, flags)
         except libvirt.libvirtError, e:
             message = e.get_error_message()
             code = e.get_error_code()
             raise exception.LibvirtAPI(message, code)
+
+    def get_conn(self):
+        return self.conn
 
     def get_caps(self):
         try:

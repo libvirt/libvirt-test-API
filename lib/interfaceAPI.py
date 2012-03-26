@@ -44,7 +44,7 @@ VIR_INTERFACE_ERROR = -1
 
 class InterfaceAPI(object):
     def __init__(self, connection):
-        self.conn = connection
+        self.conn = connection.get_conn()
 
     def get_active_list(self):
         try:
