@@ -216,9 +216,9 @@ def cpu_topology(params):
     uri = params['uri']
 
     logger.info("the uri is %s" % uri)
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
-    domobj = domainAPI.DomainAPI(virconn)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
+    domobj = domainAPI.DomainAPI(conn)
 
     if check_domain_running(domobj, guestname, logger):
         conn.close()

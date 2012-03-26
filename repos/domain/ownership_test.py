@@ -220,12 +220,12 @@ def ownership_test(params):
 
     # Connect to local hypervisor connection URI
     uri = params['uri']
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
 
     # save domain to the file
     logger.info("save domain %s to the file %s" % (guestname, SAVE_FILE))
-    domobj = domainAPI.DomainAPI(virconn)
+    domobj = domainAPI.DomainAPI(conn)
 
     logger.info("check the domain state")
     ret = check_domain_running(domobj, guestname, logger)

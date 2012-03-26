@@ -134,9 +134,9 @@ def install_image(params):
     urllib.urlretrieve(image_url, imgfullpath)
     logger.info("the image is located in %s" % imgfullpath)
 
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
-    domobj = domainAPI.DomainAPI(virconn)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
+    domobj = domainAPI.DomainAPI(conn)
 
     xmlobj = xmlbuilder.XmlBuilder()
     domain = xmlobj.add_domain(params)

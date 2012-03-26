@@ -67,13 +67,13 @@ def start(params):
 
     logger.info("uri address is %s" % uri)
 
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
 
     caps = conn.get_caps()
     logger.debug(caps)
 
-    netobj = networkAPI.NetworkAPI(virconn)
+    netobj = networkAPI.NetworkAPI(conn)
 
     net_defined_list = netobj.defined_list()
 

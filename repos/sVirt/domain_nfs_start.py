@@ -171,9 +171,9 @@ def domain_nfs_start(params):
 
     # Connect to local hypervisor connection URI
     uri = params['uri']
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
-    domobj = domainAPI.DomainAPI(virconn)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
+    domobj = domainAPI.DomainAPI(conn)
 
     logger.info("get the domain state")
     try:
@@ -219,9 +219,9 @@ def domain_nfs_start(params):
         return return_close(conn, logger, 1)
 
     # reconnect
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
-    domobj = domainAPI.DomainAPI(virconn)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
+    domobj = domainAPI.DomainAPI(conn)
 
     logger.info("begin to test start domain from nfs storage")
     logger.info("First, start the domain without chown the img file to qemu")
@@ -459,9 +459,9 @@ def domain_nfs_start_clean(params):
 
     # Connect to local hypervisor connection URI
     uri = params['uri']
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
-    domobj = domainAPI.DomainAPI(virconn)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
+    domobj = domainAPI.DomainAPI(conn)
 
     if domobj.get_state(guestname) != "shutoff":
         domobj.destroy(guestname)

@@ -135,13 +135,13 @@ def create_logical_volume(params):
     caps_kbyte = dicts['capacity_byte']/1024
 
     uri = params['uri']
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
 
     caps = conn.get_caps()
     logger.debug(caps)
 
-    stgobj = storageAPI.StorageAPI(virconn)
+    stgobj = storageAPI.StorageAPI(conn)
 
     # active pool can create volume
     if not check_pool_active(stgobj, poolname):

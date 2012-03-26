@@ -153,24 +153,24 @@ def hypervisor_connecting_test(uri, auth_unix_ro, auth_unix_rw, logger):
     os.seteuid(testing_user_id)
 
     try:
-        conn = connectAPI.ConnectAPI()
+        conn = connectAPI.ConnectAPI(uri)
         if auth_unix_ro == 'none':
-            virconn = conn.open_read_only(uri)
+            conn.open_read_only()
         elif auth_unix_ro == 'sasl':
             user_data = [TESTING_USER, TESTING_USER]
             auth = [[connectAPI.VIR_CRED_AUTHNAME, \
                      connectAPI.VIR_CRED_PASSPHRASE],
                     request_credentials, user_data]
-            virconn = conn.openAuth(uri, auth, 0)
+            conn.openAuth(auth, 0)
 
         if auth_unix_rw == 'none':
-            virconn = conn.open(uri)
+            conn.open()
         elif auth_unix_rw == 'sasl':
             user_data = [TESTING_USER, TESTING_USER]
             auth = [[connectAPI.VIR_CRED_AUTHNAME, \
                      connectAPI.VIR_CRED_PASSPHRASE],
                     request_credentials, user_data]
-            virconn = conn.openAuth(uri, auth, 0)
+            conn.openAuth(auth, 0)
         conn.close()
     except LibvirtAPI, e:
         logger.error("API error message: %s, error code is %s" % \

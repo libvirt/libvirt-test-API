@@ -244,9 +244,9 @@ def install_linux_cdrom(params):
 
     util = utils.Utils()
     hypervisor = util.get_hypervisor()
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
-    domobj = domainAPI.DomainAPI(virconn)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
+    domobj = domainAPI.DomainAPI(conn)
 
     check_domain_state(domobj, guestname, logger)
 

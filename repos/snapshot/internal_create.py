@@ -92,12 +92,12 @@ def internal_create(params):
 
     util = utils.Utils()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
 
     logger.info("the uri is %s" % uri)
-    domobj = domainAPI.DomainAPI(virconn)
-    snap_obj = snapshotAPI.SnapshotAPI(virconn)
+    domobj = domainAPI.DomainAPI(conn)
+    snap_obj = snapshotAPI.SnapshotAPI(conn)
 
     logger.info("checking domain and the format of its disk")
     if not check_domain_image(domobj, util, guestname, logger):

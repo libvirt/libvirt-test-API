@@ -100,14 +100,14 @@ def create(params):
     # Connect to local hypervisor connection URI
     util = utils.Utils()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
 
     caps = conn.get_caps()
     logger.debug(caps)
 
     # Generate domain xml
-    domobj = domainAPI.DomainAPI(virconn)
+    domobj = domainAPI.DomainAPI(conn)
     xmlobj = xmlbuilder.XmlBuilder()
     domain = xmlobj.add_domain(params)
     xmlobj.add_disk(params, domain)

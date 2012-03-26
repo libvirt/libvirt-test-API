@@ -79,14 +79,14 @@ def detach_interface(params):
     logger.debug("mac address: \n%s" % macs)
     params['macaddr'] = mac_list[-1]
 
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
 
     caps = conn.get_caps()
     logger.debug(caps)
 
     # Detach disk
-    domobj = domainAPI.DomainAPI(virconn)
+    domobj = domainAPI.DomainAPI(conn)
     xmlobj = xmlbuilder.XmlBuilder()
     ifacexml = xmlobj.build_interface(params)
     logger.debug("interface xml:\n%s" % ifacexml)

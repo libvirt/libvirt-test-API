@@ -138,10 +138,10 @@ def create_netfs_volume(params):
     util = utils.Utils()
     uri = params['uri']
 
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
 
-    stgobj = storageAPI.StorageAPI(virconn)
+    stgobj = storageAPI.StorageAPI(conn)
 
     storage_pool_list = stgobj.storage_pool_list()
 

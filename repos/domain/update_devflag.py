@@ -217,11 +217,11 @@ def update_devflag(params):
     guestip = util.mac_to_ip(mac, 180)
     logger.debug("ip address: %s" % guestip)
 
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
     caps = conn.get_caps()
     logger.debug(caps)
-    domobj = domainAPI.DomainAPI(virconn)
+    domobj = domainAPI.DomainAPI(conn)
 
     try:
         if guestname not in domobj.get_defined_list():

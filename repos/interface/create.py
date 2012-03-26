@@ -99,13 +99,13 @@ def create(params):
     except:
         logger.info("interface %s is deactive" % ifacename)
 
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
 
     caps = conn.get_caps()
     logger.debug(caps)
 
-    ifaceobj = interfaceAPI.InterfaceAPI(virconn)
+    ifaceobj = interfaceAPI.InterfaceAPI(conn)
     display_current_interface(ifaceobj)
 
 

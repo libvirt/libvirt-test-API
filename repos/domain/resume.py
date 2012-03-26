@@ -79,9 +79,9 @@ def resume(params):
     uri = params['uri']
 
     # Resume domain
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
-    domobj = domainAPI.DomainAPI(virconn)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
+    domobj = domainAPI.DomainAPI(conn)
     logger.info('resume domain')
     try:
         domobj.resume(domname)

@@ -105,10 +105,10 @@ def define_disk_pool(params):
     util = utils.Utils()
     uri = params['uri']
 
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
 
-    stgobj = storageAPI.StorageAPI(virconn)
+    stgobj = storageAPI.StorageAPI(conn)
 
     if check_pool_define(poolname):
         logger.error("%s storage pool is defined" % poolname)

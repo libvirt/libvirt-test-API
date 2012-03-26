@@ -165,14 +165,14 @@ def dump(dicts):
     # Connect to local hypervisor connection URI
     util = utils.Utils()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
 
     caps = conn.get_caps()
     logger.debug(caps)
 
     # Domain core dump
-    domobj = domainAPI.DomainAPI(virconn)
+    domobj = domainAPI.DomainAPI(conn)
 
     if check_guest_status(guestname, domobj, logger):
         kernel = check_guest_kernel(guestname, logger)

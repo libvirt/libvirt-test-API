@@ -88,8 +88,8 @@ def attach_disk(params):
     # Connect to local hypervisor connection URI
     util = utils.Utils()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
 
     caps = conn.get_caps()
     logger.debug(caps)
@@ -103,7 +103,7 @@ def attach_disk(params):
         return 1
 
     # Generate disk xml
-    domobj = domainAPI.DomainAPI(virconn)
+    domobj = domainAPI.DomainAPI(conn)
     xmlobj = xmlbuilder.XmlBuilder()
     diskxml = xmlobj.build_disk(params)
     logger.debug("disk xml:\n%s" %diskxml)

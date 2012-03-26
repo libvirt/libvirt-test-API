@@ -83,8 +83,8 @@ def undefine(params):
     util = utils.Utils()
     uri = params['uri']
 
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
 
     caps = conn.get_caps()
     logger.debug(caps)
@@ -95,7 +95,7 @@ def undefine(params):
         logger.info("closed hypervisor connection")
         return 1
 
-    ifaceobj = interfaceAPI.InterfaceAPI(virconn)
+    ifaceobj = interfaceAPI.InterfaceAPI(conn)
 
     try:
         try:

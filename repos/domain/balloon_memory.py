@@ -185,9 +185,9 @@ def balloon_memory(params):
     mac = util.get_dom_mac_addr(domain_name)
     logger.info("the mac address of vm %s is %s" % (domain_name, mac))
 
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
-    domobj = domainAPI.DomainAPI(virconn)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
+    domobj = domainAPI.DomainAPI(conn)
 
     Defined_dom_list =  domobj.get_defined_list()
     Active_dom_list = domobj.get_list()

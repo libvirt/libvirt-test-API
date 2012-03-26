@@ -254,12 +254,12 @@ def eventhandler(params):
     # Connect to local hypervisor connection URI
     util = utils.Utils()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI()
+    conn = connectAPI.ConnectAPI(uri)
 
-    virconn = conn.open(uri)
+    conn.open()
 
     logger.info("the uri is %s" % uri)
-    domobj = domainAPI.DomainAPI(virconn)
+    domobj = domainAPI.DomainAPI(conn)
 
     if check_domain_running(domobj, guestname, logger):
         conn.close()

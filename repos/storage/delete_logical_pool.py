@@ -97,13 +97,13 @@ def delete_logical_pool(params):
     util = utils.Utils()
     uri = params['uri']
 
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
 
     caps = conn.get_caps()
     logger.debug(caps)
 
-    stgobj = storageAPI.StorageAPI(virconn)
+    stgobj = storageAPI.StorageAPI(conn)
 
     if check_delete_pool(poolname):
         logger.debug("%s storage pool is deleted" % poolname)

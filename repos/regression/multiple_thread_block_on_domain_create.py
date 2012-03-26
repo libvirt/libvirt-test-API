@@ -149,9 +149,9 @@ def multiple_thread_block_on_domain_create(params):
 
     auth = [[connectAPI.VIR_CRED_AUTHNAME, connectAPI.VIR_CRED_PASSPHRASE], request_credentials, None]
 
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.openAuth(uri, auth, 0)
-    domobj = domainAPI.DomainAPI(virconn)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.openAuth(auth, 0)
+    domobj = domainAPI.DomainAPI(conn)
 
     logger.info("the type of hypervisor is %s" % hypervisor)
     logger.debug("the uri to connect is %s" % uri)

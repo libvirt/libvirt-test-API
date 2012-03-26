@@ -345,13 +345,13 @@ def hypervisor_connecting_test(uri, auth_tls, username,
     """ connect remote server """
     ret = 0
     try:
-        conn = connectAPI.ConnectAPI()
+        conn = connectAPI.ConnectAPI(uri)
         if auth_tls == 'none':
-            virconn = conn.open(uri)
+            conn.open()
         elif auth_tls == 'sasl':
             user_data = [username, password]
             auth = [[connectAPI.VIR_CRED_AUTHNAME, connectAPI.VIR_CRED_PASSPHRASE], request_credentials, user_data]
-            virconn = conn.openAuth(uri, auth, 0)
+            conn.openAuth(auth, 0)
 
     except LibvirtAPI, e:
         logger.error("API error message: %s, error code is %s" % \

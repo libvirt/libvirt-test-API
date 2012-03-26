@@ -90,11 +90,11 @@ def start(params):
     # Connect to local hypervisor connection URI
     util = utils.Utils()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
 
     # Start domain
-    dom_obj = domainAPI.DomainAPI(virconn)
+    dom_obj = domainAPI.DomainAPI(conn)
     timeout = 600
     logger.info('start domain')
 

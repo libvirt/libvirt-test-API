@@ -204,15 +204,15 @@ def define(params):
     else:
         uri = util.get_uri('127.0.0.1')
 
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
 
     # Get capabilities debug info
     caps = conn.get_caps()
     logger.debug(caps)
 
     # Generate damain xml
-    dom_obj = domainAPI.DomainAPI(virconn)
+    dom_obj = domainAPI.DomainAPI(conn)
     xml_obj = xmlbuilder.XmlBuilder()
     domain = xml_obj.add_domain(params)
     xml_obj.add_disk(params, domain)

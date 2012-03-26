@@ -65,11 +65,11 @@ def reboot(params):
         logger.info("kvm hypervisor doesn't support the funtion now")
         return 0
 
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
 
     # Get domain ip
-    dom_obj = domainAPI.DomainAPI(virconn)
+    dom_obj = domainAPI.DomainAPI(conn)
     logger.info("get the mac address of vm %s" % domain_name)
     mac = util.get_dom_mac_addr(domain_name)
     logger.info("the mac address of vm %s is %s" % (domain_name, mac))

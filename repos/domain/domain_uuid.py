@@ -72,11 +72,11 @@ def domuuid(params):
 
     util = utils.Utils()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
 
     logger.info("the uri is %s" % uri)
-    domobj = domainAPI.DomainAPI(virconn)
+    domobj = domainAPI.DomainAPI(conn)
 
     if not check_domain_exists(domobj, guestname, logger):
         logger.error("need a defined guest, may or may not be active")

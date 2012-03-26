@@ -122,11 +122,11 @@ def create_netfs_pool(params):
     util = utils.Utils()
     uri  = params['uri']
 
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
     caps = conn.get_caps()
     logger.debug(caps)
-    stgobj = storageAPI.StorageAPI(virconn)
+    stgobj = storageAPI.StorageAPI(conn)
 
     if check_pool_create_libvirt(stgobj, poolname, logger):
         logger.error("%s storage pool has already been created" % poolname)

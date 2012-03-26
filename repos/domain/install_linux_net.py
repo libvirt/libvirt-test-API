@@ -335,9 +335,9 @@ def install_linux_net(params):
     logger.debug('dump installation guest xml:\n%s' % guestxml)
 
     #start installation
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
-    domobj = domainAPI.DomainAPI(virconn)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
+    domobj = domainAPI.DomainAPI(conn)
     installtype = params.get('type')
     if installtype == None or installtype == 'define':
         logger.info('define guest from xml description')

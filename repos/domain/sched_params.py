@@ -94,13 +94,13 @@ def sched_params(params):
     guestname = params['guestname']
     test_result = False
 
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
 
     caps = conn.get_caps()
     logger.debug(caps)
 
-    domobj = domainAPI.DomainAPI(virconn)
+    domobj = domainAPI.DomainAPI(conn)
     if check_guest_status(guestname, domobj):
         sched_params = domobj.get_sched_params(guestname)
         logger.info("original scheduler parameters: %s\n" % sched_params)

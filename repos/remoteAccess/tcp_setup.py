@@ -135,13 +135,13 @@ def hypervisor_connecting_test(uri, auth_tcp, username,
     """ connect remote server """
     ret = 1
     try:
-        conn = connectAPI.ConnectAPI()
+        conn = connectAPI.ConnectAPI(uri)
         if auth_tcp == 'none':
-            virconn = conn.open(uri)
+            conn.open()
         elif auth_tcp == 'sasl':
             user_data = [username, password]
             auth = [[connectAPI.VIR_CRED_AUTHNAME, connectAPI.VIR_CRED_PASSPHRASE], request_credentials, user_data]
-            virconn = conn.openAuth(uri, auth, 0)
+            conn.openAuth(auth, 0)
 
         ret = 0
         conn.close()

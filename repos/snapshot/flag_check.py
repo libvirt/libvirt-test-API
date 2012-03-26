@@ -79,11 +79,11 @@ def flag_check(params):
     util = utils.Utils()
     chk = check.Check()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
 
     logger.info("the uri is %s" % uri)
-    domobj = domainAPI.DomainAPI(virconn)
+    domobj = domainAPI.DomainAPI(conn)
 
     if not check_domain_running(domobj, guestname, logger):
         logger.error("need a running guest")

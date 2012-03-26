@@ -91,9 +91,9 @@ def destroy_pool(params):
     poolname = params['poolname']
     util = utils.Utils()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
-    stgobj = storageAPI.StorageAPI(virconn)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
+    stgobj = storageAPI.StorageAPI(conn)
 
     if check_pool_existence(stgobj, poolname, logger):
         # Make sure that the pool is active.

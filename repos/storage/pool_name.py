@@ -74,11 +74,11 @@ def pool_name(params):
 
     util = utils.Utils()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
 
     logger.info("the uri is %s" % uri)
-    stgobj = storageAPI.StorageAPI(virconn)
+    stgobj = storageAPI.StorageAPI(conn)
 
     if not check_pool_exists(stgobj, poolname, logger):
         logger.error("need a defined pool, may or may not be active")

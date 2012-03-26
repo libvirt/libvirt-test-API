@@ -78,13 +78,13 @@ def reset(dicts):
         (slot, func) = slot_func.split(".")
         device_name = "pci_0000_%s_%s_%s" % (bus, slot, func)
 
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
 
     caps = conn.get_caps()
     logger.debug(caps)
 
-    nodeobj = nodedevAPI.NodedevAPI(virconn)
+    nodeobj = nodedevAPI.NodedevAPI(conn)
 
     try:
         try:

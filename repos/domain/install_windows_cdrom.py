@@ -376,9 +376,9 @@ def install_windows_cdrom(params):
     logger.debug('dump installation guest xml:\n%s' % guestxml)
 
     # Generate guest xml
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
-    domobj = domainAPI.DomainAPI(virconn)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
+    domobj = domainAPI.DomainAPI(conn)
     installtype = params.get('type')
     if installtype == None or installtype == 'define':
         logger.info('define guest from xml description')

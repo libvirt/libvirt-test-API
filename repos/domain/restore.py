@@ -106,14 +106,14 @@ def restore(params):
     # Connect to local hypervisor connection URI
     util = utils.Utils()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
 
     caps = conn.get_caps()
     logger.debug(caps)
 
     # Restore domain
-    domobj = domainAPI.DomainAPI(virconn)
+    domobj = domainAPI.DomainAPI(conn)
     if check_guest_status(guestname, domobj, logger):
         logger.error("Error: current guest status is not shutoff or shutdown,\
                       can not do restore operation")

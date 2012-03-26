@@ -243,12 +243,12 @@ def cpu_affinity(params):
     # Connect to local hypervisor connection URI
     util = utils.Utils()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
     hypervisor = uri.split(':')[0]
 
     # Get cpu affinity
-    domobj = domainAPI.DomainAPI(virconn)
+    domobj = domainAPI.DomainAPI(conn)
     dom_name_list = domobj.get_list()
     if domain_name not in dom_name_list:
         logger.error("guest %s doesn't exist or not be running." %

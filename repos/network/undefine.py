@@ -67,13 +67,13 @@ def undefine(params):
     util = utils.Utils()
     uri = params['uri']
 
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
 
     caps = conn.get_caps()
     logger.debug(caps)
 
-    netobj = networkAPI.NetworkAPI(virconn)
+    netobj = networkAPI.NetworkAPI(conn)
 
     if check_network_undefine(networkname):
         logger.error("the network %s is undefine" % networkname)

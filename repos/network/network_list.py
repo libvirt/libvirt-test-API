@@ -177,10 +177,10 @@ def network_list(params):
 
     util = utils.Utils()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
 
-    netobj = networkAPI.NetworkAPI(virconn)
+    netobj = networkAPI.NetworkAPI(conn)
 
     for option in option_list:
         if option == ' ':

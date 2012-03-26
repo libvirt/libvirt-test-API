@@ -66,12 +66,12 @@ def revert(params):
 
     util = utils.Utils()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
 
     logger.info("the uri is %s" % uri)
-    domobj = domainAPI.DomainAPI(virconn)
-    snap_obj = snapshotAPI.SnapshotAPI(virconn)
+    domobj = domainAPI.DomainAPI(conn)
+    snap_obj = snapshotAPI.SnapshotAPI(conn)
 
     logger.info("checking if the guest is poweroff")
     if not check_domain_state(domobj, guestname, logger):

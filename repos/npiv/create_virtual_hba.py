@@ -90,13 +90,13 @@ def create_virtual_hba(params):
     util = utils.Utils()
     uri = params['uri']
 
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
 
     caps = conn.get_caps()
     logger.debug(caps)
 
-    nodedev = nodedevAPI.NodedevAPI(virconn)
+    nodedev = nodedevAPI.NodedevAPI(conn)
     scsi_list = nodedev.lists('scsi_host')
 
     for fc_name in scsi_list:

@@ -227,12 +227,13 @@ def migrate(params):
 
     # Connect to local hypervisor connection URI
     util = utils.Utils()
-    conn = connectAPI.ConnectAPI()
-    src = conn.open(srcuri)
-    dst = conn.open(dsturi)
+    srcconn = connectAPI.ConnectAPI(srcuri)
+    dstconn = connectAPI.ConnectAPI(dsturi)
+    srcconn.open()
+    dstconn.open()
 
-    srcdom = DomainAPI(src)
-    dstdom = DomainAPI(dst)
+    srcdom = DomainAPI(srcconn)
+    dstdom = DomainAPI(dstconn)
 
     if predstconfig == "true":
         guest_names = dstdom.get_defined_list()

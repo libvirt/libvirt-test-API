@@ -73,11 +73,11 @@ def netname(params):
 
     util = utils.Utils()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
 
     logger.info("the uri is %s" % uri)
-    netobj = networkAPI.NetworkAPI(virconn)
+    netobj = networkAPI.NetworkAPI(conn)
 
     if not check_network_exists(netobj, networkname, logger):
         logger.error("need a defined network, may or may not be active")

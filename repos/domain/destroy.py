@@ -72,11 +72,11 @@ def destroy(params):
     # Connect to local hypervisor connection URI
     util = utils.Utils()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
 
     # Get running domain by name
-    dom_obj = domainAPI.DomainAPI(virconn)
+    dom_obj = domainAPI.DomainAPI(conn)
     dom_name_list = dom_obj.get_list()
     if guestname not in dom_name_list:
         logger.error("guest %s doesn't exist or isn't running." % guestname)

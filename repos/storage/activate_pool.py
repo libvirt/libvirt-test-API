@@ -90,10 +90,10 @@ def activate_pool(params):
     util = utils.Utils()
     uri = params['uri']
 
-    conn = connectAPI.ConnectAPI()
-    virconn = conn.open(uri)
+    conn = connectAPI.ConnectAPI(uri)
+    conn.open()
 
-    stgobj = storageAPI.StorageAPI(virconn)
+    stgobj = storageAPI.StorageAPI(conn)
 
     if not check_pool_inactive(stgobj, poolname, logger):
         logger.error("%s storage pool isn't defined or inactive" % poolname)
