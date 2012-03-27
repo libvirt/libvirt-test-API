@@ -25,6 +25,7 @@ import traceback
 import mapper
 from utils.Python import log
 from utils.Python import format
+from utils.Python import env_parser
 
 # Import of distribution-specific code.  If this is needed somewhere
 # else in the future, please don't copy-paste this, but create some
@@ -56,6 +57,8 @@ class FuncGen(object):
 
         # Save case information to a file in a format
         self.__case_info_save(activity, testrunid)
+
+        self.env = env_parser.Envparser("env.cfg")
 
         mapper_obj = mapper.Mapper(activity)
         pkg_casename_func = mapper_obj.package_casename_func_map()
@@ -154,6 +157,11 @@ class FuncGen(object):
             clean_ret = -1
             try:
                 try:
+                    # Get default uri from env.cfg, if the uri is defined in
+                    # case config file, the value will be overrode.
+                    if 'uri' not in case_params:
+                        case_params['uri'] = self.env.get_value("variables", "defaulturi")
+
                     if case_ref_name != 'sleep':
                         case_params['logger'] = case_logger
 
