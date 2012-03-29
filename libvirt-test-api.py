@@ -50,6 +50,13 @@ def usage():
            \n         python libvirt-test-api.py -f TEST.XML \
 -r TESTRUNID TESTID ..."
 
+def append_path():
+    """Append root path of package"""
+    pwd = os.getcwd()
+    if pwd in sys.path:
+        pass
+    else:
+        sys.path.append(pwd)
 
 class LibvirtTestAPI(object):
     """ The class provides methods to run a new test and manage
@@ -330,6 +337,9 @@ if __name__ == "__main__":
                 libvirt_test_api = LibvirtTestAPI(casefile, logxml, loglevel, bugstxt)
                 libvirt_test_api.rerun(testrunid, testid_list)
                 sys.exit(0)
+
+    # Add root path of libvirt-test-API into sys.path
+    append_path()
 
     libvirt_test_api = LibvirtTestAPI(casefile, logxml, loglevel, bugstxt)
     if libvirt_test_api.run():
