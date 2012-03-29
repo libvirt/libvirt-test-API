@@ -26,22 +26,13 @@ import os
 import re
 import sys
 
-QEMU_CONF = "/etc/libvirt/qemu.conf"
-
-def append_path(path):
-    """Append root path of package"""
-    if path not in sys.path:
-        sys.path.append(path)
-
 from lib import connectAPI
 from lib import domainAPI
 from utils.Python import utils
 from exception import LibvirtAPI
 from shutil import copy
 
-pwd = os.getcwd()
-result = re.search('(.*)libvirt-test-API', pwd)
-append_path(result.group(0))
+QEMU_CONF = "/etc/libvirt/qemu.conf"
 
 def return_close(conn, logger, ret):
     """close hypervisor connection and return the given value"""

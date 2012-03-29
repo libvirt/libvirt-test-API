@@ -14,23 +14,10 @@ import sys
 import re
 import commands
 
-def append_path(path):
-    """Append root path of package"""
-    if path in sys.path:
-        pass
-    else:
-        sys.path.append(path)
-
-pwd = os.getcwd()
-result = re.search('(.*)libvirt-test-API', pwd)
-append_path(result.group(0))
-
-
 CONFIG_DIR = '/etc/libvirt/qemu'
 RUNNING_DIR = '/var/run/libvirt/qemu'
 VIRSH_QUIET_LIST = "virsh --quiet list %s|awk '{print $2}'"
 VIRSH_LIST = "virsh list %s"
-
 
 def get_option_list(params):
     """return options we need to test

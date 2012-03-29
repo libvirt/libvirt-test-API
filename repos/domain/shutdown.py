@@ -8,23 +8,12 @@ __date__ = "Tue Oct 27, 2009"
 __version__ = "0.1.0"
 __credits__ = "Copyright (C) 2009 Red Hat, Inc."
 __all__ = ['shutdown', 'check_params', 'parse_opts',
-           'usage', 'version', 'append_path']
+           'usage', 'version']
 
 import os
 import sys
 import re
 import time
-
-def append_path(path):
-    """Append root path of package"""
-    if path in sys.path:
-        pass
-    else:
-        sys.path.append(path)
-
-pwd = os.getcwd()
-result = re.search('(.*)libvirt-test-API', pwd)
-append_path(result.group(0))
 
 from lib import connectAPI
 from lib import domainAPI

@@ -28,18 +28,6 @@ import copy
 import commands
 import shutil
 
-def append_path(path):
-    """Append root path of package"""
-    if path in sys.path:
-        pass
-    else:
-        sys.path.append(path)
-
-pwd = os.getcwd()
-result = re.search('(.*)libvirt-test-API', pwd)
-homepath = result.group(0)
-append_path(homepath)
-
 from lib import connectAPI
 from lib import domainAPI
 from utils.Python import utils

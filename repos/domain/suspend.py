@@ -8,17 +8,6 @@ import sys
 import re
 import time
 
-def append_path(path):
-    """Append root path of package"""
-    if path in sys.path:
-        pass
-    else:
-        sys.path.append(path)
-
-pwd = os.getcwd()
-result = re.search('(.*)libvirt-test-API', pwd)
-append_path(result.group(0))
-
 from lib import connectAPI
 from lib import domainAPI
 from utils.Python import utils
@@ -31,8 +20,7 @@ __all__ = ['suspend',
           'check_params',
           'parse_opts',
           'usage',
-          'version',
-          'append_path']
+          'version']
 
 def return_close(conn, logger, ret):
     conn.close()

@@ -13,15 +13,6 @@ import re
 import sys
 import time
 
-def append_path(path):
-    """Append root path of package"""
-    if path not in sys.path:
-        sys.path.append(path)
-
-pwd = os.getcwd()
-result = re.search('(.*)libvirt-test-API', pwd)
-append_path(result.group(0))
-
 from utils.Python import utils
 from shutil import copy
 

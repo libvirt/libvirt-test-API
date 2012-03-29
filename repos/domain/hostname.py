@@ -13,17 +13,6 @@ import sys
 import re
 import commands
 
-def append_path(path):
-    """Append root path of package"""
-    if path in sys.path:
-        pass
-    else:
-        sys.path.append(path)
-
-pwd = os.getcwd()
-result = re.search('(.*)libvirt-test-API', pwd)
-append_path(result.group(0))
-
 VIRSH_HOSTNAME = "virsh hostname"
 
 def hostname(params):

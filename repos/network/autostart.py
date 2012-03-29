@@ -15,22 +15,10 @@ import re
 import sys
 import commands
 
-def append_path(path):
-    """Append root path of package"""
-    if path in sys.path:
-        pass
-    else:
-        sys.path.append(path)
-
-pwd = os.getcwd()
-result = re.search('(.*)libvirt-test-API', pwd)
-append_path(result.group(0))
-
 from lib import connectAPI
 from lib import networkAPI
 from utils.Python import utils
 from exception import LibvirtAPI
-
 
 def check_params(params):
     """Verify inputing parameter dictionary"""

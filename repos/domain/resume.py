@@ -11,23 +11,11 @@ __all__ = ['resume',
           'check_params',
           'parse_opts',
           'usage',
-          'version',
-          'append_path']
+          'version',]
 
 import os
 import sys
 import re
-
-def append_path(path):
-    """Append root path of package"""
-    if path in sys.path:
-        pass
-    else:
-        sys.path.append(path)
-
-pwd = os.getcwd()
-result = re.search('(.*)libvirt-test-API', pwd)
-append_path(result.group(0))
 
 from lib import connectAPI
 from lib import domainAPI
