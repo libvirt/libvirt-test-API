@@ -30,6 +30,7 @@ import pexpect
 import string
 import subprocess
 from xml.dom import minidom
+from urlparse import urlparse
 
 class Utils(object):
     """Basic operation on host"""
@@ -55,6 +56,10 @@ class Utils(object):
             if hypervisor == "kvm":
                 uri = "qemu+ssh://%s/system" % ip
         return uri
+
+    def parser_uri(self, uri):
+        #this is a simple parser for uri
+        return urlparse(uri)
 
     def get_host_arch(self):
         ret = commands.getoutput('uname -a')
@@ -363,13 +368,6 @@ class Utils(object):
             timeout -= 10
 
         return (timeout and 1) or 0
-
-    def clean_ssh(self):
-        """Clean /root/.ssh directory"""
-        ssh_dir = '/root/.ssh/'
-        cmd = 'rm -rf ' + ssh_dir
-        (ret, out) = commands.getstatusoutput(cmd)
-        return ret
 
     def exec_cmd(self, command, sudo=False, cwd=None, infile=None, outfile=None, shell=False, data=None):
         """

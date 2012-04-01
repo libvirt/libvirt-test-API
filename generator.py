@@ -161,6 +161,10 @@ class FuncGen(object):
                     # case config file, the value will be overrode.
                     if 'uri' not in case_params:
                         case_params['uri'] = self.env.get_value("variables", "defaulturi")
+                    if 'username' not in case_params:
+                        case_params['username'] = self.env.get_value("variables", "username")
+                    if 'password' not in case_params:
+                        case_params['password'] = self.env.get_value("variables", "password")
 
                     if case_ref_name != 'sleep':
                         case_params['logger'] = case_logger

@@ -25,8 +25,6 @@ import string
 
 from utils.Python import env_parser
 
-import exception
-
 class CaseFileParser(object):
     """ Parser the case configuration file to generate a data list.
     """
