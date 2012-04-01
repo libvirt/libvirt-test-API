@@ -3,25 +3,17 @@
    a logical type storage volume from xml
 """
 
-__author__ = 'Alex Jia: ajia@redhat.com'
-__date__ = 'Thu May 20, 2010'
-__version__ = '0.1.0'
-__credits__ = 'Copyright (C) 2009 Red Hat, Inc.'
-__all__ = ['usage', 'check_volume_create', 'check_pool_inactive', \
-           'display_volume_info', 'create_logical_volume']
-
-
 import os
 import re
 import sys
 import commands
 from xml.dom import minidom
 
-from lib import connectAPI
-from lib import storageAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
 from utils.Python import xmlbuilder
-from exception import LibvirtAPI
 
 def usage(params):
     """Verify inputing parameter dictionary"""
@@ -39,9 +31,9 @@ def usage(params):
         else:
             return True
 
-def get_pool_path(stgobj, poolname):
+def get_pool_path(poolobj):
     """ Get pool target path """
-    poolxml = stgobj.dump_pool(poolname)
+    poolxml = poolobj.XMLDesc(0)
 
     logger.debug("the xml description of pool is %s" % poolxml)
 
@@ -50,10 +42,10 @@ def get_pool_path(stgobj, poolname):
     textnode = path_element.childNodes[0]
     return textnode.data
 
-def display_volume_info(stg, poolname):
+def display_volume_info(poolobj):
     """Display current storage volume information"""
     logger.debug("current created storage volume: %s" \
-% stg.get_volume_list(poolname))
+% poolobj.listVolumes())
 
 def display_physical_volume():
     """Display current physical volume information"""
@@ -61,27 +53,13 @@ def display_physical_volume():
     logger.debug("lvdisplay command execute return value: %d" % stat)
     logger.debug("lvdisplay command execute return result: %s" % ret)
 
-def get_storage_volume_number(stgobj, poolname):
+def get_storage_volume_number(poolobj):
     """Get storage volume number"""
-    vol_num = stgobj.get_volume_number(poolname)
+    vol_num = poolobj.numOfVolumes()
     logger.info("current storage volume number: %s" % vol_num)
     return vol_num
 
-def check_pool_active(stgobj, poolname):
-    """Check to make sure that the pool is active"""
-    pool_names = stgobj.defstorage_pool_list()
-    pool_names += stgobj.storage_pool_list()
-    if poolname in pool_names:
-        if stgobj.isActive_pool(poolname):
-            return True
-        else:
-            logger.error("%s pool is inactive" % poolname)
-            return False
-    else:
-        logger.error("%s pool don't exist" % poolname)
-        return False
-
-def check_volume_create(stg, poolname, volname, size):
+def check_volume_create(poolobj, poolname, volname, size):
     """Check storage volume result, poolname will exist under
        /etc/lvm/backup/ and lvcreate command is called if
        volume creation is successful
@@ -93,7 +71,7 @@ def check_volume_create(stg, poolname, volname, size):
         stat, ret = commands.getstatusoutput("grep \
 'lvcreate --name %s -L %sK /dev/%s' %s"\
  % (volname, size, poolname, path))
-        if stat == 0 and volname in stg.get_volume_list(poolname):
+        if stat == 0 and volname in poolobj.listVolumes():
             logger.debug(ret)
             return True
         else:
@@ -124,21 +102,24 @@ def create_logical_volume(params):
     caps_kbyte = dicts['capacity_byte']/1024
 
     uri = params['uri']
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
+    conn = libvirt.open(uri)
+    pool_names = conn.listDefinedStoragePools()
+    pool_names += conn.listStoragePools()
 
-    caps = conn.get_caps()
-    logger.debug(caps)
+    if poolname in pool_names:
+        poolobj = conn.storagePoolLookupByName(poolname)
+    else:
+        logger.error("%s not found\n" % poolname);
+        conn.close()
+        return 1
 
-    stgobj = storageAPI.StorageAPI(conn)
-
-    # active pool can create volume
-    if not check_pool_active(stgobj, poolname):
+    if not poolobj.isActive():
+        logger.error("%s pool is inactive" % poolname)
         conn.close()
         logger.info("closed hypervisor connection")
         return 1
 
-    poolpath = get_pool_path(stgobj, poolname)
+    poolpath = get_pool_path(poolobj)
     logger.debug("pool target path: %s" % poolpath)
     params['volpath'] = "%s/%s" % (poolpath, volname)
     logger.debug("volume target path: %s" % params['volpath'])
@@ -147,27 +128,27 @@ def create_logical_volume(params):
     volxml = xmlobj.build_volume(params)
     logger.debug("storage volume xml:\n%s" % volxml)
 
-    vol_num1 = get_storage_volume_number(stgobj, poolname)
-    display_volume_info(stgobj, poolname)
+    vol_num1 = get_storage_volume_number(poolobj)
+    display_volume_info(poolobj)
     display_physical_volume()
 
     try:
         try:
             logger.info("create %s storage volume" % volname)
-            stgobj.create_volume(poolname, volxml)
+            poolobj.createXML(volxml, 0)
             display_physical_volume()
-            vol_num2 = get_storage_volume_number(stgobj, poolname)
-            display_volume_info(stgobj, poolname)
-            if check_volume_create(stgobj, poolname, volname, caps_kbyte) \
+            vol_num2 = get_storage_volume_number(poolobj)
+            display_volume_info(poolobj)
+            if check_volume_create(poolobj, poolname, volname, caps_kbyte) \
                 and vol_num2 > vol_num1:
                 logger.info("create %s storage volume is successful" % volname)
                 return 0
             else:
                 logger.error("fail to crearte %s storage volume" % volname)
                 return 1
-        except LibvirtAPI, e:
+        except libvirtError, e:
             logger.error("API error message: %s, error code is %s" \
-                         % (e.response()['message'], e.response()['code']))
+                         % (e.message, e.get_error_code()))
             return 1
     finally:
         conn.close()

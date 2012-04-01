@@ -5,21 +5,15 @@
     given poolname exists or not. It won't check if the pool is active or not.
 """
 
-__author__   = 'Gurhan Ozen: gozen@redhat.com'
-__date__     = 'Fri May 07, 2010'
-__version__  = '0.1.0'
-__credits__  = 'Copyright (C) 2010 Red Hat, Inc.'
-__all__      = ['usage', 'check_pool_destroy', 'destroy_pool']
-
 import os
 import re
 import sys
 
-from lib import connectAPI
-from lib import storageAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
 from utils.Python import xmlbuilder
-from exception import LibvirtAPI
 
 def return_close(conn, logger, ret):
     conn.close()
@@ -39,24 +33,11 @@ def usage(params):
 
     return True
 
-def check_pool_existence(stgobj, poolname, logger):
-    """
-     Check to verify that there indeed is a pool named with the given poolname
-    """
-    pool_names =  stgobj.storage_pool_list()
-    pool_names += stgobj.defstorage_pool_list()
-
-    if poolname not in pool_names:
-        logger.error("%s doesn't seem to be a right poolname" % poolname)
-        return False
-
-    return True
-
-def check_pool_destroy(stgobj, poolname, logger):
+def check_pool_destroy(conn, poolname, logger):
     """
      Check to verify that the pool is actually gone
     """
-    pool_names = stgobj.storage_pool_list()
+    pool_names = conn.listStoragePools()
 
     if poolname not in pool_names:
         logger.info("destroy pool %s SUCCESS , " % poolname)
@@ -80,32 +61,33 @@ def destroy_pool(params):
     poolname = params['poolname']
     util = utils.Utils()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
-    stgobj = storageAPI.StorageAPI(conn)
+    conn = libvirt.open(uri)
 
-    if check_pool_existence(stgobj, poolname, logger):
-        # Make sure that the pool is active.
-        if stgobj.isActive_pool(poolname):
-            try:
-                # Go ahead and try to destroy the pool..
-                stgobj.destroy_pool(poolname)
-                # Check in libvirt to make sure that it's really destroyed..
-                if not check_pool_destroy(stgobj, poolname, logger):
-                    logger.error("%s doesn't seem to be destroyed properly" % poolname)
-                    return return_close(conn, logger, 1)
-                else:
-                    logger.info("%s is destroyed!!!" % poolname)
-                    return return_close(conn, logger, 0)
-            except LibvirtAPI, e:
-                logger.error("API error message: %s, error code is %s" % \
-                        (e.response()['message'], e.response()['code']))
-                return return_close(conn, logger, 1)
-        else:
-            logger.error("%s is not active. \
-                          It must be active to be destroyed." % poolname)
-            return return_close(conn, logger, 1)
+    pool_names = conn.listDefinedStoragePools()
+    pool_names += conn.listStoragePools()
+
+    if poolname in pool_names:
+        poolobj = conn.storagePoolLookupByName(poolname)
     else:
-        logger.error("%s doesn't exist")
-        return return_close(conn, logger, 0)
+        logger.error("%s not found\n" % poolname);
+        conn.close()
+        return 1
 
+    if not poolobj.isActive():
+        logger.error("%s is not active. \
+                          It must be active to be destroyed." % poolname)
+        return return_close(conn, logger, 1)
+
+    try:
+        poolobj.destroy()
+        # Check in libvirt to make sure that it's really destroyed..
+        if not check_pool_destroy(conn, poolname, logger):
+            logger.error("%s doesn't seem to be destroyed properly" % poolname)
+            return return_close(conn, logger, 1)
+        else:
+            logger.info("%s is destroyed!!!" % poolname)
+            return return_close(conn, logger, 0)
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                    % (e.message, e.get_error_code()))
+        return return_close(conn, logger, 1)

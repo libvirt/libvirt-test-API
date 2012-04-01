@@ -28,18 +28,12 @@ import copy
 import commands
 import shutil
 
-from lib import connectAPI
-from lib import domainAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
 from utils.Python import env_parser
 from utils.Python import xmlbuilder
-from exception import LibvirtAPI
-
-__author__ = "Guannan Ren <gren@redhat.com>"
-__date__ = "Tue Jun 29 2010"
-__version__ = "0.1.0"
-__credits__ = "Copyright (C) 2010, 2012 Red Hat, Inc."
-__all__ = ['install_windows_cdrom', 'usage']
 
 VIRSH_QUIET_LIST = "virsh --quiet list --all|awk '{print $2}'|grep \"^%s$\""
 VM_STAT = "virsh --quiet list --all| grep \"\\b%s\\b\"|grep off"
@@ -48,7 +42,7 @@ VM_UNDEFINE = "virsh undefine %s"
 
 FLOOPY_IMG = "/tmp/floppy.img"
 ISO_MOUNT_POINT = "/mnt/libvirt_windows"
-
+HOME_PATH = os.getcwd()
 
 def usage():
     print '''usage: mandatory arguments:guesttype
@@ -224,14 +218,15 @@ def prepare_boot_guest(domobj, dict, installtype):
     guestxml = xmlobj.build_domain(domain)
 
     if installtype != 'create':
-        domobj.undefine(guestname)
+        domobj.undefine()
         logger.info("undefine %s : \n" % guestname)
 
     try:
-        domobj.define(guestxml)
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" %
-                     (e.response()['message'], e.response()['code']))
+        conn = domobj._conn
+        domobj = conn.defineXML(guestxml)
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
         logger.error("fail to define domain %s" % guestname)
         return 1
 
@@ -242,10 +237,10 @@ def prepare_boot_guest(domobj, dict, installtype):
     logger.info('boot guest up ...')
 
     try:
-        domobj.start(guestname)
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" %
-                     (e.response()['message'], e.response()['code']))
+        domobj.create()
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
         logger.error("fail to start domain %s" % guestname)
         return 1
 
@@ -330,7 +325,7 @@ def install_windows_cdrom(params):
         logger.info("creating disk images file is successful.")
 
     logger.info("get system environment information")
-    envfile = os.path.join(homepath, 'env.cfg')
+    envfile = os.path.join(HOME_PATH, 'env.cfg')
     logger.info("the environment file is %s" % envfile)
 
     # Get iso file based on guest os and arch from env.cfg
@@ -338,7 +333,7 @@ def install_windows_cdrom(params):
     iso_file = envparser.get_value("guest", guestos + '_' + guestarch)
     cdkey = envparser.get_value("guest", "%s_%s_key" % (guestos, guestarch))
 
-    windows_unattended_path = os.path.join(homepath,
+    windows_unattended_path = os.path.join(HOME_PATH,
                               "repos/domain/windows_unattended")
 
     logger.debug('install source: \n    %s' % iso_file)
@@ -364,36 +359,34 @@ def install_windows_cdrom(params):
     logger.debug('dump installation guest xml:\n%s' % guestxml)
 
     # Generate guest xml
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
-    domobj = domainAPI.DomainAPI(conn)
+    conn = libvirt.open(uri)
     installtype = params.get('type')
     if installtype == None or installtype == 'define':
         logger.info('define guest from xml description')
         try:
-            domobj.define(guestxml)
-        except LibvirtAPI, e:
-            logger.error("API error message: %s, error code is %s" %
-                         (e.response()['message'], e.response()['code']))
+            domobj = conn.defineXML(guestxml)
+        except libvirtError, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.message, e.get_error_code()))
             logger.error("fail to define domain %s" % guestname)
             return return_close(conn, logger, 1)
 
         logger.info('start installation guest ...')
 
         try:
-            domobj.start(guestname)
-        except LibvirtAPI, e:
-            logger.error("API error message: %s, error code is %s" %
-                         (e.response()['message'], e.response()['code']))
+            domobj.create()
+        except libvirtError, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.message, e.get_error_code()))
             logger.error("fail to start domain %s" % guestname)
             return return_close(conn, logger, 1)
     elif installtype == 'create':
         logger.info('create guest from xml description')
         try:
-            domobj.create(guestxml)
-        except LibvirtAPI, e:
-            logger.error("API error message: %s, error code is %s" %
-                         (e.response()['message'], e.response()['code']))
+            conn.createXML(guestxml, 0)
+        except libvirtError, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.message, e.get_error_code()))
             logger.error("fail to define domain %s" % guestname)
             return return_close(conn, logger, 1)
 
@@ -401,8 +394,8 @@ def install_windows_cdrom(params):
     while(interval < 7200):
         time.sleep(20)
         if installtype == None or installtype == 'define':
-            state = domobj.get_state(guestname)
-            if(state == "shutoff"):
+            state = domobj.info()[0]
+            if(state == libvirt.VIR_DOMAIN_SHUTOFF):
                 logger.info("guest installaton of define type is complete.")
                 logger.info("boot guest vm off harddisk")
                 ret  = prepare_boot_guest(domobj, params, installtype)
@@ -414,8 +407,13 @@ def install_windows_cdrom(params):
                 interval += 20
                 logger.info('%s seconds passed away...' % interval)
         elif installtype == 'create':
-            dom_name_list = domobj.get_list()
-            if guestname not in dom_name_list:
+            guest_names = []
+            ids = conn.listDomainsID()
+            for id in ids:
+                obj = conn.lookupByID(id)
+                guest_names.append(obj.name())
+
+            if guestname not in guest_names:
                 logger.info("guest installation of create type is complete.")
                 logger.info("define the vm and boot it up")
                 ret = prepare_boot_guest(domobj, params, installtype)
@@ -499,7 +497,7 @@ def install_windows_cdrom_clean(params):
     guestos = params.get('guestos')
     guestarch = params.get('guestarch')
 
-    envfile = os.path.join(homepath, 'env.cfg')
+    envfile = os.path.join(HOME_PATH, 'env.cfg')
     envparser = env_parser.Envparser(envfile)
     iso_file = envparser.get_value("guest", guestos + '_' + guestarch)
 

@@ -8,24 +8,17 @@
                        hdmodel
 """
 
-__author__ = 'Alex Jia: ajia@redhat.com'
-__date__ = 'Mon Jan 28, 2010'
-__version__ = '0.1.0'
-__credits__ = 'Copyright (C) 2009 Red Hat, Inc.'
-__all__ = ['usage', 'check_guest_status', 'check_attach_disk',
-           'attach_disk']
-
 import os
 import re
 import sys
 import time
 import commands
 
-from lib import connectAPI
-from lib import domainAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
 from utils.Python import xmlbuilder
-from exception import LibvirtAPI
 
 def usage(params):
     """Verify inputing parameter dictionary"""
@@ -47,10 +40,10 @@ def create_image(name, size, logger):
     else:
         return False
 
-def check_guest_status(guestname, domobj):
+def check_guest_status(domobj):
     """Check guest current status"""
-    state = domobj.get_state(guestname)
-    if state == "shutoff" or state == "shutdown":
+    state = domobj.info()[0]
+    if state == libvirt.VIR_DOMAIN_SHUTOFF or state == libvirt.VIR_DOMAIN_SHUTDOWN:
     # add check function
         return False
     else:
@@ -77,11 +70,7 @@ def attach_disk(params):
     # Connect to local hypervisor connection URI
     util = utils.Utils()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
-
-    caps = conn.get_caps()
-    logger.debug(caps)
+    conn = libvirt.open(uri)
 
     # Create image
     if create_image(imagename, imagesize, logger):
@@ -91,8 +80,9 @@ def attach_disk(params):
         conn.close()
         return 1
 
+    domobj = conn.lookupByName(guestname)
+
     # Generate disk xml
-    domobj = domainAPI.DomainAPI(conn)
     xmlobj = xmlbuilder.XmlBuilder()
     diskxml = xmlobj.build_disk(params)
     logger.debug("disk xml:\n%s" %diskxml)
@@ -101,16 +91,16 @@ def attach_disk(params):
     logger.debug("original disk number: %s" %disk_num1)
 
     if disktype == "virtio":
-        if check_guest_status(guestname, domobj):
+        if check_guest_status(domobj):
             pass
         else:
-            domobj.start(guestname)
+            domobj.create()
             time.sleep(90)
 
     # Attach disk to domain
     try:
         try:
-            domobj.attach_device(guestname, diskxml)
+            domobj.attachDevice(diskxml)
             disk_num2 = util.dev_num(guestname, "disk")
             logger.debug("update disk number to %s" %disk_num2)
             if  check_attach_disk(disk_num1, disk_num2):
@@ -119,12 +109,11 @@ def attach_disk(params):
             else:
                 logger.error("fail to attach a disk to guest: %s\n" %disk_num2)
                 test_result = False
-        except LibvirtAPI, e:
-            logger.error("API error message: %s, error code is %s" %
-                         (e.response()['message'], e.response()['code']))
+        except libvirtError, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.message, e.get_error_code()))
             logger.error("attach %s disk to guest %s" % (imagename, guestname))
             test_result = False
-            return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

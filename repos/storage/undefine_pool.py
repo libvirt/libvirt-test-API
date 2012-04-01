@@ -3,21 +3,14 @@
    a specific name storage pool
 """
 
-__author__ = 'Alex Jia: ajia@redhat.com'
-__date__ = 'Thu May 20, 2010'
-__version__ = '0.1.0'
-__credits__ = 'Copyright (C) 2009 Red Hat, Inc.'
-__all__ = ['usage', 'check_pool_undefine', 'check_pool_active', \
-           'check_pool_inactive', 'display_pool_info', 'undefine_pool']
-
 import os
 import re
 import sys
 
-from lib import connectAPI
-from lib import storageAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
-from exception import LibvirtAPI
 
 def usage(params):
     """Verify inputing parameter dictionary"""
@@ -34,24 +27,10 @@ def usage(params):
         else:
             return True
 
-def display_pool_info(stg):
+def display_pool_info(conn):
     """Display current storage pool information"""
-    logger.debug("current define storage pool: %s" % stg.defstorage_pool_list())
-    logger.debug("current active storage pool: %s" % stg.storage_pool_list())
-
-def check_pool_inactive(stgobj, poolname):
-    """Check to make sure that the pool is defined and inactivate"""
-    pool_names = stgobj.defstorage_pool_list()
-    pool_names += stgobj.storage_pool_list()
-    if poolname in pool_names:
-        if stgobj.isActive_pool(poolname):
-            logger.error("%s pool is active" % poolname)
-            return False
-        else:
-            return True
-    else:
-        logger.error("%s pool don't exist" % poolname)
-        return False
+    logger.debug("current define storage pool: %s" % conn.listDefinedStoragePools())
+    logger.debug("current active storage pool: %s" % conn.listStoragePools())
 
 def check_pool_undefine(poolname):
     """Check undefine storage pool result, if undefine storage is successful,
@@ -78,42 +57,44 @@ def undefine_pool(params):
     util = utils.Utils()
     uri = params['uri']
 
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
+    conn = libvirt.open(uri)
+    pool_names = conn.listDefinedStoragePools()
+    pool_names += conn.listStoragePools()
 
-    caps = conn.get_caps()
-    logger.debug(caps)
+    if poolname in pool_names:
+        poolobj = conn.storagePoolLookupByName(poolname)
+    else:
+        logger.error("%s not found\n" % poolname);
+        conn.close()
+        return 1
 
-    stgobj = storageAPI.StorageAPI(conn)
-
-    if not check_pool_inactive(stgobj, poolname):
+    if poolobj.isActive():
+        logger.error("%s is active" % poolname)
         conn.close()
         logger.info("closed hypervisor connection")
         return 1
 
-    pool_num1 = stgobj.get_number_of_defpools()
+    pool_num1 = conn.numOfDefinedStoragePools()
     logger.info("original storage pool define number: %s" % pool_num1)
-    display_pool_info(stgobj)
+    display_pool_info(conn)
 
     try:
         try:
             logger.info("undefine %s storage pool" % poolname)
-            stgobj.undefine_pool(poolname)
-            pool_num2 = stgobj.get_number_of_defpools()
+            poolobj.undefine()
+            pool_num2 = conn.numOfDefinedStoragePools()
             logger.info("current storage pool define number: %s" % pool_num2)
-            display_pool_info(stgobj)
+            display_pool_info(conn)
             if check_pool_undefine(poolname) and pool_num2 < pool_num1:
                 logger.info("undefine %s storage pool is successful" % poolname)
                 return 0
             else:
                 logger.error("%s storage pool is undefined" % poolname)
                 return 1
-        except LibvirtAPI, e:
+        except libvirtError, e:
             logger.error("API error message: %s, error code is %s" \
-                         % (e.response()['message'], e.response()['code']))
+                         % (e.message, e.get_error_code()))
             return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")
-
-    return 0

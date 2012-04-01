@@ -3,21 +3,15 @@
    reset a specific node device
 """
 
-__author__ = 'Alex Jia: ajia@redhat.com'
-__date__ = 'Tue Apr 6, 2010'
-__version__ = '0.1.0'
-__credits__ = 'Copyright (C) 2009 Red Hat, Inc.'
-__all__ = ['usage', 'check_node_reset', 'reset']
-
 import os
 import re
 import sys
 import commands
 
-from lib import connectAPI
-from lib import nodedevAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
-from exception import LibvirtAPI
 
 def usage(params):
     """Verify inputing parameter dictionary"""
@@ -36,15 +30,14 @@ def check_node_reset():
     """Check node device reset result, I have no idea how to check it now"""
     pass
 
-def reset(dicts):
+def reset(params):
     """Reset a specific node device and return clean & certain status to it"""
-    usage(dicts)
+    usage(params)
 
-    test_result = False
     global logger
 
-    logger = dicts['logger']
-    pciaddress = dicts['pciaddress']
+    logger = params['logger']
+    pciaddress = params['pciaddress']
 
     util = utils.Utils()
     uri = params['uri']
@@ -62,36 +55,26 @@ def reset(dicts):
             vendor_ID = retval.split(":")[0]
             product_ID = retval.split(":")[1]
             device_name = "pci_%s_%s" % (vendor_ID, product_ID)
-    elif 'el6' in kernel_version:
+    else:
         (bus, slot_func) = pciaddress.split(":")
         (slot, func) = slot_func.split(".")
         device_name = "pci_0000_%s_%s_%s" % (bus, slot, func)
 
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
-
-    caps = conn.get_caps()
-    logger.debug(caps)
-
-    nodeobj = nodedevAPI.NodedevAPI(conn)
+    conn = libvirt.open(uri)
 
     try:
         try:
-            nodeobj.reset(device_name)
+            nodeobj = conn.nodeDeviceLookupByName(device_name)
+            nodeobj.reset()
             logger.info("reset the node device")
             logger.info("the node %s device reset is successful" % device_name)
-            test_result = True
-        except LibvirtAPI, e:
+        except libvirtError, e:
             logger.error("API error message: %s, error code is %s" \
-                         % (e.response()['message'], e.response()['code']))
+                         % (e.message, e.get_error_code()))
             logger.error("Error: fail to reset %s node device" % device_name)
-            test_result = False
             return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")
 
-    if test_result:
-        return 0
-    else:
-        return 1
+    return 0

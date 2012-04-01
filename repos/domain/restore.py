@@ -5,21 +5,14 @@
                         filepath
 """
 
-__author__ = 'Alex Jia: ajia@redhat.com'
-__date__ = 'Wed Mar 24, 2010'
-__version__ = '0.1.0'
-__credits__ = 'Copyright (C) 2009 Red Hat, Inc.'
-__all__ = ['usage', 'get_guest_ipaddr', 'restore',
-           'check_guest_status', 'check_guest_restore']
-
 import os
 import re
 import sys
 
-from lib import connectAPI
-from lib import domainAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
-from exception import LibvirtAPI
 
 def return_close(conn, logger, ret):
     conn.close()
@@ -59,12 +52,12 @@ def get_guest_ipaddr(*args):
 
 def check_guest_status(*args):
     """Check guest current status"""
-    (guestname, domobj, logger) = args
+    (domobj, logger) = args
 
-    state = domobj.get_state(guestname)
+    state = domobj.info()[0]
     logger.debug("current guest status: %s" % state)
 
-    if state == "shutoff" or state == "shutdown":
+    if state == libvirt.VIR_DOMAIN_SHUTOFF or state == libvirt.VIR_DOMAIN_SHUTDOWN:
         return False
     else:
         return True
@@ -75,7 +68,7 @@ def check_guest_restore(*args):
     """
     (guestname, domobj, util, logger) = args
 
-    if check_guest_status(guestname, domobj, logger):
+    if check_guest_status(domobj, logger):
         if get_guest_ipaddr(guestname, util, logger):
             return True
         else:
@@ -95,30 +88,25 @@ def restore(params):
     # Connect to local hypervisor connection URI
     util = utils.Utils()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
+    conn = libvirt.open(uri)
+    domobj = conn.lookupByName(guestname)
 
-    caps = conn.get_caps()
-    logger.debug(caps)
-
-    # Restore domain
-    domobj = domainAPI.DomainAPI(conn)
-    if check_guest_status(guestname, domobj, logger):
+    if check_guest_status(domobj, logger):
         logger.error("Error: current guest status is not shutoff or shutdown,\
                       can not do restore operation")
         return return_close(conn, logger, 1)
 
     try:
-        domobj.restore(guestname, filepath)
+        conn.restore(filepath)
         if check_guest_restore(guestname, domobj, util, logger):
             logger.info("restore %s domain successful" % guestname)
             test_result = True
         else:
             logger.error("Error: fail to check restore domain")
             test_result = False
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" %
-                      (e.response()['message'], e.response()['code']))
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
         logger.error("Error: fail to restore %s domain" % guestname)
         test_result = False
 

@@ -2,13 +2,6 @@
 """testing https://bugzilla.redhat.com/show_bug.cgi?id=672226
 """
 
-__author__ = "Guannan Ren <gren@redhat.com>"
-__date__ = "Tue Mar 1, 2011"
-__version__ = "0.1.0"
-__credits__ = "Copyright (C) 2011 Red Hat, Inc."
-__all__ = ['multiple_thread_block_on_domain_create', 'guest_install',
-           'request_credentials', 'check_params']
-
 import os
 import sys
 import re
@@ -18,12 +11,12 @@ import urllib
 import getpass
 from threading import Thread
 
-from lib import connectAPI
-from lib import domainAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
 from utils.Python import env_parser
 from utils.Python import xmlbuilder
-from exception import LibvirtAPI
 
 IMAG_PATH = "/var/lib/libvirt/images/"
 DISK_DD = "dd if=/dev/zero of=%s bs=1 count=1 seek=6G"
@@ -43,7 +36,7 @@ def check_params(params):
 
 def request_credentials(credentials, user_data):
     for credential in credentials:
-        if credential[0] == connectAPI.VIR_CRED_AUTHNAME:
+        if credential[0] == libvirt.VIR_CRED_AUTHNAME:
             # prompt the user to input a authname. display the provided message
             credential[4] = "root"
 
@@ -52,7 +45,7 @@ def request_credentials(credentials, user_data):
             # the list
             if len(credential[4]) == 0:
                 credential[4] = credential[3]
-        elif credential[0] == connectAPI.VIR_CRED_PASSPHRASE:
+        elif credential[0] == libvirt.VIR_CRED_PASSPHRASE:
             # use the getpass module to prompt the user to input a password.
             # display the provided message and return the result through the
             # last item of the list
@@ -66,14 +59,14 @@ def request_credentials(credentials, user_data):
 class guest_install(Thread):
     """function callable by as a thread to create guest
     """
-    def __init__(self, name, os, arch, type, ks, domobj, util, logger):
+    def __init__(self, name, os, arch, type, ks, conn, util, logger):
         Thread.__init__(self)
         self.name = name
         self.os = os
         self.arch = arch
         self.type = type
         self.ks = ks
-        self.domobj = domobj
+        self.conn = conn
         self.util = util
         self.logger = logger
 
@@ -98,11 +91,11 @@ class guest_install(Thread):
         self.logger.debug("guestxml is %s" % guestxml)
         self.logger.info('create guest %sfrom xml description' % self.name)
         try:
-            guestobj = self.domobj.create(guestxml)
+            guestobj = self.conn.createXML(guestxml, 0)
             self.logger.info('guest %s API createXML returned successfuly' % guestobj.name())
-        except LibvirtAPI, e:
-            self.logger.error("API error message: %s, error code is %s" %
-                         (e.response()['message'], e.response()['code']))
+        except libvirtError, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.message, e.get_error_code()))
             self.logger.error("fail to define domain %s" % guestname)
             return 1
 
@@ -135,11 +128,9 @@ def multiple_thread_block_on_domain_create(params):
     hypervisor = util.get_hypervisor()
     uri = params['uri']
 
-    auth = [[connectAPI.VIR_CRED_AUTHNAME, connectAPI.VIR_CRED_PASSPHRASE], request_credentials, None]
+    auth = [[libvirt.VIR_CRED_AUTHNAME, libvirt.VIR_CRED_PASSPHRASE], request_credentials, None]
 
-    conn = connectAPI.ConnectAPI(uri)
-    conn.openAuth(auth, 0)
-    domobj = domainAPI.DomainAPI(conn)
+    conn = libvirt.openAuth(uri, auth, 0)
 
     logger.info("the type of hypervisor is %s" % hypervisor)
     logger.debug("the uri to connect is %s" % uri)
@@ -164,7 +155,7 @@ def multiple_thread_block_on_domain_create(params):
     thread_pid = []
     for i in range(int(start_num), int(end_num)):
         guestname =  name + str(i)
-        thr = guest_install(guestname, guestos, arch, type, ks, domobj, util, logger)
+        thr = guest_install(guestname, guestos, arch, type, ks, conn, util, logger)
         thread_pid.append(thr)
 
     for id in thread_pid:

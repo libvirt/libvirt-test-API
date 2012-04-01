@@ -3,21 +3,15 @@
    mandatory arguments: guestname
 """
 
-__author__ = "Guannan Ren <gren@redhat.com>"
-__date__ = "Web March 24, 2010"
-__version__ = "0.1.0"
-__credits__ = "Copyright (C) 2010 Red Hat, Inc."
-__all__ = ['destroy', 'check_params']
-
 import os
 import sys
 import re
 import time
 
-from lib import connectAPI
-from lib import domainAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
-from exception import LibvirtAPI
 
 def check_params(params):
     """Verify the input parameter"""
@@ -61,17 +55,23 @@ def destroy(params):
     # Connect to local hypervisor connection URI
     util = utils.Utils()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
+    conn = libvirt.open(uri)
 
     # Get running domain by name
-    dom_obj = domainAPI.DomainAPI(conn)
-    dom_name_list = dom_obj.get_list()
-    if guestname not in dom_name_list:
+    guest_names = []
+    ids = conn.listDomainsID()
+    for id in ids:
+        obj = conn.lookupByID(id)
+        guest_names.append(obj.name())
+
+    if guestname not in guest_names:
         logger.error("guest %s doesn't exist or isn't running." % guestname)
         conn.close()
         logger.info("closed hypervisor connection")
         return 1
+
+    domobj = conn.lookupByName(guestname)
+
     timeout = 60
     logger.info('destroy domain')
 
@@ -85,10 +85,10 @@ def destroy(params):
     # Destroy domain
     try:
         try:
-            dom_obj.destroy(guestname)
-        except LibvirtAPI, e:
-            logger.error("API error message: %s, error code is %s" % \
-                         (e.response()['message'], e.response()['code']))
+            domobj.destroy()
+        except libvirtError, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.message, e.get_error_code()))
             logger.error("failed to destroy domain")
             return 1
     finally:

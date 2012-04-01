@@ -4,18 +4,13 @@
    mandatory arguments: guestname
 """
 
-__author__ = 'Alex Jia: ajia@redhat.com'
-__date__ = 'Thu Feb 11, 2010'
-__version__ = '0.1.0'
-__credits__ = 'Copyright (C) 2009 Red Hat, Inc.'
-__all__ = ['usage', 'check_undefine_domain', 'undefine']
-
 import os
 import re
 import sys
 
-from lib import connectAPI
-from lib import domainAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
 
 def usage(params):
@@ -48,27 +43,22 @@ def undefine(params):
     # Connect to local hypervisor connection URI
     util = utils.Utils()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
+    conn = libvirt.open(uri)
 
-    # Get capability debug info
-    caps = conn.get_caps()
-    logger.debug(caps)
-
-    # Undefine domain
-    dom_obj = domainAPI.DomainAPI(conn)
+    domobj = conn.lookupByName(guestname)
 
     try:
         try:
-            dom_obj.undefine(guestname)
-            if  check_undefine_domain(guestname):
+            domobj.undefine()
+            if check_undefine_domain(guestname):
                 logger.info("undefine the domain is successful")
                 test_result = True
             else:
                 logger.error("fail to check domain undefine")
                 test_result = False
-        except:
-            logger.error("fail to undefine the domain")
+        except libvirtError, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.message, e.get_error_code()))
             test_result = False
     finally:
         conn.close()

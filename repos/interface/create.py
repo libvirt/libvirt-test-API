@@ -3,25 +3,16 @@
    activating specific host interface
 """
 
-__author__ = 'Alex Jia: ajia@redhat.com'
-__date__ = 'Thu Apr 15, 2010'
-__version__ = '0.1.0'
-__credits__ = 'Copyright (C) 2009 Red Hat, Inc.'
-__all__ = ['usage', 'check_create_interface',
-           'display_current_interface', 'create']
-
-
 import os
 import re
 import sys
 import commands
 
-from lib import connectAPI
-from lib import interfaceAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
 from utils.Python import xmlbuilder
-from exception import LibvirtAPI
-
 
 def usage(params):
     """Verify inputing parameter dictionary"""
@@ -37,16 +28,16 @@ def usage(params):
         else:
             pass
 
-def display_current_interface(ifaceobj):
+def display_current_interface(conn):
     """Display current host interface information"""
     logger.debug("current active host interface number: %s " \
-% ifaceobj.get_active_number())
+% conn.numOfInterfaces)
     logger.debug("current active host interface list: %s " \
-% ifaceobj.get_active_list())
+% conn.listInterfaces())
     logger.debug("current defined host interface number: %s " \
-% ifaceobj.get_defined_number())
+% conn.numOfDefinedInterfaces())
     logger.debug("current defined host interface list: %s " \
-% ifaceobj.get_defined_list())
+% conn.listDefinedInterfaces())
 
 def check_create_interface(ifacename, util):
     """Check creating interface result, it will can ping itself
@@ -88,34 +79,26 @@ def create(params):
     except:
         logger.info("interface %s is deactive" % ifacename)
 
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
-
-    caps = conn.get_caps()
-    logger.debug(caps)
-
-    ifaceobj = interfaceAPI.InterfaceAPI(conn)
-    display_current_interface(ifaceobj)
-
+    conn = libvirt.open(uri)
+    ifaceobj = conn.interfaceLookupByName(ifacename)
+    display_current_interface(conn)
 
     try:
         try:
-            ifaceobj.create(ifacename)
+            ifaceobj.create(0)
             logger.info("create host interface %s" % ifacename)
-            display_current_interface(ifaceobj)
+            display_current_interface(conn)
             if  check_create_interface(ifacename, util):
                 logger.info("create host interface %s is successful" % ifacename)
                 test_result = True
             else:
                 logger.error("fail to check create interface")
                 test_result = False
-                return 1
-        except LibvirtAPI, e:
+        except libvirtError, e:
             logger.error("API error message: %s, error code is %s" \
-                         % (e.response()['message'], e.response()['code']))
+                         % (e.message, e.get_error_code()))
             logger.error("fail to create interface %s" %ifacename)
             test_result = False
-            return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

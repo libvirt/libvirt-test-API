@@ -4,22 +4,15 @@
    optional arguments: flags
 """
 
-__author__ = "Osier Yang <jyang@redhat.com>"
-__date__ = "Tue Oct 27, 2009"
-__version__ = "0.1.0"
-__credits__ = "Copyright (C) 2009, 2012 Red Hat, Inc."
-__all__ = ['start', 'check_params', 'parse_opts',
-           'usage', 'version']
-
 import os
 import sys
 import re
 import time
 
-from lib import connectAPI
-from lib import domainAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
-from exception import LibvirtAPI
 
 NONE = 0
 START_PAUSED = 1
@@ -79,30 +72,29 @@ def start(params):
     # Connect to local hypervisor connection URI
     util = utils.Utils()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
+    conn = libvirt.open(uri)
+    domobj = conn.lookupByName(domname)
 
-    # Start domain
-    dom_obj = domainAPI.DomainAPI(conn)
     timeout = 600
     logger.info('start domain')
 
     try:
         if "none" in flags:
-            dom_obj.start_with_flags(domname, NONE)
+            domobj.createWithFlags(NONE)
         elif "start_paused" in flags:
-            dom_obj.start_with_flags(domname, START_PAUSED)
+            domobj.createWithFlags(START_PAUSED)
         else:
             # this covers flags = None as well as flags = 'noping'
-            dom_obj.start(domname)
-    except LibvirtAPI, e:
-        logger.error(str(e))
+            domobj.create()
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
         logger.error("start failed")
         return return_close(conn, logger, 1)
 
     if "start_paused" in flags:
-        state = dom_obj.get_state(domname)
-        if state == "paused":
+        state = domobj.info()[0]
+        if state == libvirt.VIR_DOMAIN_PAUSED:
             logger.info("guest start with state paused successfully")
             return return_close(conn, logger, 0)
         else:
@@ -110,8 +102,8 @@ def start(params):
             return return_close(conn, logger, 1)
 
     while timeout:
-        state = dom_obj.get_state(domname)
-        expect_states = ['running', 'no state', 'blocked']
+        state = domobj.info()[0]
+        expect_states = [libvirt.VIR_DOMAIN_RUNNING, libvirt.VIR_DOMAIN_NOSTATE, libvirt.VIR_DOMAIN_BLOCKED]
 
         if state in expect_states:
             break

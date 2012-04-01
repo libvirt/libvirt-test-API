@@ -7,23 +7,16 @@
                         nicmodel
 """
 
-__author__ = 'Alex Jia: ajia@redhat.com'
-__date__ = 'Mon Jan 28, 2010'
-__version__ = '0.1.0'
-__credits__ = 'Copyright (C) 2009 Red Hat, Inc.'
-__all__ = ['usage', 'check_guest_status', 'check_detach_interface',
-           'detach_interface']
-
 import os
 import re
 import sys
 import time
 
-from lib import connectAPI
-from lib import domainAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
 from utils.Python import xmlbuilder
-from exception import LibvirtAPI
 
 def usage(params):
     """Verify inputing parameter dictionary"""
@@ -34,10 +27,10 @@ def usage(params):
             logger.error("%s is required" %key)
             return 1
 
-def check_guest_status(guestname, domobj):
+def check_guest_status(domobj):
     """Check guest current status"""
-    state = domobj.get_state(guestname)
-    if state == "shutoff" or state == "shutdown":
+    state = domobj.info()[0]
+    if state == libvirt.VIR_DOMAIN_SHUTOFF or state == libvirt.VIR_DOMAIN_SHUTDOWN:
     # add check function
         return False
     else:
@@ -68,14 +61,9 @@ def detach_interface(params):
     logger.debug("mac address: \n%s" % macs)
     params['macaddr'] = mac_list[-1]
 
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
+    conn = libvirt.open(uri)
+    domobj = conn.lookupByName(guestname)
 
-    caps = conn.get_caps()
-    logger.debug(caps)
-
-    # Detach disk
-    domobj = domainAPI.DomainAPI(conn)
     xmlobj = xmlbuilder.XmlBuilder()
     ifacexml = xmlobj.build_interface(params)
     logger.debug("interface xml:\n%s" % ifacexml)
@@ -83,15 +71,15 @@ def detach_interface(params):
     iface_num1 = util.dev_num(guestname, "interface")
     logger.debug("original interface number: %s" % iface_num1)
 
-    if check_guest_status(guestname, domobj):
+    if check_guest_status(domobj):
         pass
     else:
-        domobj.start(guestname)
+        domobj.create()
         time.sleep(90)
 
     try:
         try:
-            domobj.detach_device(guestname, ifacexml)
+            domobj.detachDevice(ifacexml)
             iface_num2 = util.dev_num(guestname, "interface")
             logger.debug("update interface number to %s" % iface_num2)
             if  check_detach_interface(iface_num1, iface_num2):
@@ -101,9 +89,9 @@ def detach_interface(params):
                 logger.error("fail to detach a interface to guest: %s" %
                               iface_num2)
                 test_result = False
-        except LibvirtAPI, e:
-            logger.error("API error message: %s, error code is %s" % \
-                         (e.response()['message'], e.response()['code']))
+        except libvirtError, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.message, e.get_error_code()))
             logger.error("detach the interface from guest %s" % guestname)
             test_result = False
             return 1

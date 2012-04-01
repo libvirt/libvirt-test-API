@@ -5,20 +5,14 @@
                        autostart
 """
 
-__author__ = 'Alex Jia: ajia@redhat.com'
-__date__ = 'Wed Mar 24, 2010'
-__version__ = '0.1.0'
-__credits__ = 'Copyright (C) 2009 Red Hat, Inc.'
-__all__ = ['usage', 'check_guest_autostart', 'autostart']
-
 import os
 import re
 import sys
 
-from lib import connectAPI
-from lib import domainAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
-from exception import LibvirtAPI
 
 def usage(params):
     """Verify inputing parameter dictionary"""
@@ -74,31 +68,26 @@ def autostart(params):
     # Connect to local hypervisor connection URI
     util = utils.Utils()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
+    conn = libvirt.open(uri)
 
-    caps = conn.get_caps()
-    logger.debug(caps)
+    domobj = conn.lookupByName(guestname)
 
-    # Set autostart for domain
-    domobj = domainAPI.DomainAPI(conn)
     try:
         try:
-            domobj.set_auto_start(guestname, flag)
+            domobj.setAutostart(flag)
             if check_guest_autostart(guestname, uri.split(":")[0], flag, logger):
                 logger.info("current %s autostart: %s" %
-                            (guestname, domobj.get_auto_start(guestname)))
+                            (guestname, domobj.autostart()))
                 logger.info("executing autostart operation is successful")
                 test_result = True
             else:
                 logger.error("Error: fail to check autostart domain")
                 test_result = False
-        except LibvirtAPI, e:
-            logger.error("API error message: %s, error code is %s" %
-                         (e.response()['message'], e.response()['code']))
+        except libvirtError, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.message, e.get_error_code()))
             logger.error("Error: fail to autostart %s domain" %guestname)
             test_result = False
-            return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

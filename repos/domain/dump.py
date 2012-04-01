@@ -5,36 +5,29 @@
                         file
 """
 
-__author__ = 'Alex Jia: ajia@redhat.com'
-__date__ = 'Fri Dec 25, 2009'
-__version__ = '0.1.2'
-__credits__ = 'Copyright (C) 2009 Red Hat, Inc.'
-__all__ = ['usage', 'check_guest_status', 'check_guest_kernel',
-           'check_dump', 'dump']
-
 import os
 import re
 import sys
 import time
 import commands
 
-from lib import connectAPI
-from lib import domainAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
 from utils.Python import check
-from exception import LibvirtAPI
 
 def return_close(conn, logger, ret):
     conn.close()
     logger.info("closed hypervisor connection")
     return ret
 
-def usage(dicts):
+def usage(params):
     """Verify inputing parameter dictsionary"""
-    logger = dicts['logger']
+    logger = params['logger']
     keys = ['guestname', 'file']
     for key in keys:
-        if key not in dicts:
+        if key not in params:
             logger.error("%s is required" %key)
             return 1
 
@@ -42,12 +35,11 @@ def check_guest_status(*args):
     """Check guest current status"""
     (guestname, domobj, logger) = args
 
-    state = domobj.get_state(guestname)
-    logger.debug("current guest status: %s" %state)
-    if state == "shutoff" or state == "shutdown":
-        domobj.start(guestname)
+    state = domobj.info()[0]
+    if state == libvirt.VIR_DOMAIN_SHUTOFF or state == libvirt.VIR_DOMAIN_SHUTDOWN:
+        domobj.create()
         time.sleep(60)
-        logger.debug("current guest status: %s" %state)
+        logger.debug("current guest status: %s" % state)
     # add check function
         return True
     else:
@@ -139,29 +131,23 @@ def check_dump1(*args):
                      core_file_path)
         return 1
 
-def dump(dicts):
+def dump(params):
     """This method will dump the core of a domain on a given file
        for analysis. Note that for remote Xen Daemon the file path
        will be interpreted in the remote host.
     """
     # Initiate and check parameters
-    usage(dicts)
-    logger = dicts['logger']
-    guestname = dicts['guestname']
-    file = dicts['file']
+    usage(params)
+    logger = params['logger']
+    guestname = params['guestname']
+    file = params['file']
     test_result = False
 
     # Connect to local hypervisor connection URI
     util = utils.Utils()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
-
-    caps = conn.get_caps()
-    logger.debug(caps)
-
-    # Domain core dump
-    domobj = domainAPI.DomainAPI(conn)
+    conn = libvirt.open(uri)
+    domobj = conn.lookupByName(guestname)
 
     if check_guest_status(guestname, domobj, logger):
         kernel = check_guest_kernel(guestname, logger)
@@ -173,7 +159,7 @@ def dump(dicts):
         logger.info("dump the core of %s to file %s\n" %(guestname, file))
 
         try:
-            domobj.core_dump(guestname, file)
+            domobj.coreDump(file, 0)
             retval = check_dump1(file, logger)
 
             if retval == 0:
@@ -182,14 +168,11 @@ def dump(dicts):
             else:
                 test_result = False
                 logger.error("check core dump: %d\n" %retval)
-                return return_close(conn, logger, 1)
-
-        except LibvirtAPI, e:
-            logger.error("API error message: %s, error code is %s" % \
-                         (e.response()['message'], e.response()['code']))
+        except libvirtError, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.message, e.get_error_code()))
             logger.error("Error: fail to core dump %s domain" %guestname)
             test_result = False
-            return return_close(conn, logger, 1)
 
     if test_result:
         return return_close(conn, logger, 0)

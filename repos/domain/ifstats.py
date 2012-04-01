@@ -4,22 +4,16 @@
    mandatory arguments: guestname
 """
 
-__author__ = 'Alex Jia: ajia@redhat.com'
-__date__ = 'Wed Jan 27, 2010'
-__version__ = '0.1.0'
-__credits__ = 'Copyright (C) 2009 Red Hat, Inc.'
-__all__ = ['usage', 'check_guest_status', 'check_interface_stats',
-           'ifstats']
-
 import os
 import re
 import sys
 import time
+import libxml2
 
-from lib import connectAPI
-from lib import domainAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
-from exception import LibvirtAPI
 
 def usage(params):
     """Verify inputing parameter dictionary"""
@@ -30,10 +24,10 @@ def usage(params):
             logger.error("%s is required" % key)
             return 1
 
-def check_guest_status(guestname, domobj):
+def check_guest_status(domobj):
     """Check guest current status"""
-    state = domobj.get_state(guestname)
-    if state == "shutoff" or state == "shutdown":
+    state = domobj.info()[0]
+    if state == libvirt.VIR_DOMAIN_SHUTOFF or state == libvirt.VIR_DOMAIN_SHUTDOWN:
     # add check function
         return False
     else:
@@ -54,22 +48,18 @@ def ifstats(params):
     util = utils.Utils()
     uri = params['uri']
 
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
+    conn = libvirt.open(uri)
+    domobj = conn.lookupByName(guestname)
 
-    caps = conn.get_caps()
-    logger.debug(caps)
-
-    domobj = domainAPI.DomainAPI(conn)
-
-    if check_guest_status(guestname, domobj):
+    if check_guest_status(domobj):
         pass
     else:
         try:
             logger.info("%s is not running , power on it" % guestname)
-            domobj.start(guestname)
-        except LibvirtAPI, e:
-            logger.error(str(e))
+            domobj.create()
+        except libvirtError, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.message, e.get_error_code()))
             logger.error("start failed")
             conn.close()
             logger.info("closed hypervisor connection")
@@ -86,7 +76,13 @@ def ifstats(params):
         logger.info("closed hypervisor connection")
         return 1
 
-    (ifstats, path) = domobj.get_interface_stats(guestname)
+    xml = domobj.XMLDesc(0)
+    doc = libxml2.parseDoc(xml)
+    ctx = doc.xpathNewContext()
+    devs = ctx.xpathEval("/domain/devices/interface/target/@dev")
+    path = devs[0].content
+    ifstats = domobj.interfaceStats(path)
+
     if ifstats:
     # check_interface_stats()
         logger.debug(ifstats)

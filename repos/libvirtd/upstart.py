@@ -2,12 +2,6 @@
 """Upstart libvirtd testing
 """
 
-__author__ = 'Wayne Sun: gsun@redhat.com'
-__date__ = 'Thu Aug 4, 2011'
-__version__ = '0.1.0'
-__credits__ = 'Copyright (C) 2011 Red Hat, Inc.'
-__all__ = ['upstart']
-
 import os
 import re
 import sys

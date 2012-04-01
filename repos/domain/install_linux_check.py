@@ -15,12 +15,6 @@
                        type: define|create
 """
 
-__author__ = "Jianlin Liu <jialiu@redhat.com>"
-__date__ = "Wed Jul 05 2010"
-__version__ = "0.1.0"
-__credits__ = "Copyright (C) 2010 Red Hat, Inc."
-__all__ = ['install_linux_check', 'usage']
-
 import os
 import sys
 import re
@@ -28,11 +22,14 @@ import time
 import copy
 import math
 
-from lib import connectAPI
-from lib import domainAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
 from utils.Python import check
 from utils.Python import env_parser
+
+HOME_PATH = os.getcwd()
 
 def usage():
     print '''usage: mandatory arguments:guestname
@@ -87,6 +84,8 @@ def install_linux_check(params):
     global logger
     logger = params['logger']
     params.pop('logger')
+    uri = params['uri']
+    params.pop('uri')
     logger.info("Checking the validation of arguments provided.")
     params_check_result = check_params(params)
     if params_check_result:
@@ -102,18 +101,16 @@ def install_linux_check(params):
     # Connect to local hypervisor connection URI
     util = utils.Utils()
     hypervisor = util.get_hypervisor()
-    uri = params['uri']
 
     logger.info("the type of hypervisor is %s" % hypervisor)
     logger.debug("the uri to connect is %s" % uri)
 
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
-    domobj = domainAPI.DomainAPI(conn)
-    state = domobj.get_state(guestname)
+    conn = libvirt.open(uri)
+    domobj = conn.lookupByName(guestname)
+    state = domobj.info()[0]
     conn.close()
 
-    if(state == "shutoff"):
+    if(state == libvirt.VIR_DOMAIN_SHUTOFF):
         logger.info("guest is shutoff, if u want to run this case, \
                      guest must be started")
         return 1
@@ -212,7 +209,7 @@ def install_linux_check(params):
     # Check app works fine in guest, such as: wget
     logger.info("check point5: check app works fine in guest, such as: wget")
     logger.info("get system environment information")
-    envfile = os.path.join(homepath, 'env.cfg')
+    envfile = os.path.join(HOME_PATH, 'env.cfg')
     logger.info("the environment file is %s" % envfile)
 
     envparser = env_parser.Envparser(envfile)
@@ -240,8 +237,6 @@ def install_linux_check(params):
                         (nic_type, blk_type))
             Test_Result = 1
             return Test_Result
-
-    util.clean_ssh()
 
     return Test_Result
 

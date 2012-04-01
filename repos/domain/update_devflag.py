@@ -11,23 +11,17 @@
            xxx
 """
 
-__author__ = 'Nan Zhang: nzhang@redhat.com'
-__date__ = 'Fri Sep 2, 2011'
-__version__ = '0.1.0'
-__credits__ = 'Copyright (C) 2011 Red Hat, Inc.'
-__all__ = ['check_updated_device', 'update_devflag']
-
 import os
 import re
 import sys
 import time
 from xml.dom import minidom
 
-from lib import connectAPI
-from lib import domainAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
 from utils.Python import xmlbuilder
-from exception import LibvirtAPI
 
 def check_params(params):
     """Verify inputing parameter dictionary"""
@@ -142,7 +136,7 @@ def check_device_in_guest(params, util, guestip):
 def check_updated_device(params, output, util, guestip, domobj, srcfile):
     """Check if the device is updated"""
     logger = params['logger']
-    xmlobj = domobj.get_xml_desc(params['guestname'])
+    xmlobj = domobj.XMLDesc(0)
     domxml = minidom.parseString(xmlobj)
 
     for diskTag in domxml.getElementsByTagName("source"):
@@ -197,7 +191,7 @@ def update_devflag(params):
         return 1
 
     if not params.has_key('flag'):
-        flag = domainAPI.VIR_DOMAIN_AFFECT_CONFIG
+        flag = libvirt.VIR_DOMAIN_AFFECT_CONFIG
 
     # Connect to local hypervisor connection URI
     uri = params['uri']
@@ -205,22 +199,20 @@ def update_devflag(params):
     guestip = util.mac_to_ip(mac, 180)
     logger.debug("ip address: %s" % guestip)
 
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
-    caps = conn.get_caps()
-    logger.debug(caps)
-    domobj = domainAPI.DomainAPI(conn)
+    conn = libvirt.open(uri)
 
     try:
-        if guestname not in domobj.get_defined_list():
+        if guestname not in conn.listDefinedDomains():
             logger.error("%s doesn't exist or in running state." % guestname)
             return 1
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" %
-                     (e.response()['message'], e.response()['code']))
+        else:
+            domobj = conn.lookupByName(guestname)
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
         return 1
 
-    guestxml = domobj.get_xml_desc(guestname)
+    guestxml = domobj.XMLDesc(0)
     guestobj = minidom.parseString(guestxml)
 
     # Generat device XML for original use
@@ -234,12 +226,12 @@ def update_devflag(params):
         guestxml = origxmlobj.build_domain(guestobj)
 
     try:
-        domobj.undefine(guestname)
-        domobj.define(guestxml)
-        domobj.start(guestname)
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" %
-                     (e.response()['message'], e.response()['code']))
+        domobj.undefine()
+        conn.defineXML(guestxml)
+        domobj.create()
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
         return 1
 
     time.sleep(60)
@@ -269,15 +261,15 @@ def update_devflag(params):
     logger.debug("block device xml desc for update:\n%s" % newdevxml)
 
     logger.debug("domain xml before updating:\n%s" \
-                                   % domobj.get_xml_desc(guestname))
+                                   % domobj.XMLDesc(0))
 
     try:
-        domobj.update_device_flag(guestname, newdevxml, flag)
+        domobj.updateDeviceFlags(newdevxml, 0)
         logger.debug("domain xml after updating:\n%s" \
-                                   % domobj.get_xml_desc(guestname))
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" %
-                     (e.response()['message'], e.response()['code']))
+                                   % domobj.XMLDesc(0))
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
         return 1
 
     result = check_updated_device(params, output, util, \

@@ -2,13 +2,6 @@
 """testing "virsh list" function
 """
 
-__author__ = "Guannan Ren <gren@redhat.com>"
-__date__ = "Mon Jan 17, 2011"
-__version__ = "0.1.0"
-__credits__ = "Copyright (C) 2011 Red Hat, Inc."
-__all__ = ['domain_list', 'get_option_list','check_default_option',
-           'check_inactive_option', 'check_all_option']
-
 import os
 import sys
 import re

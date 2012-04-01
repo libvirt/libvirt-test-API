@@ -3,24 +3,16 @@
    a dir type storage pool
 """
 
-__author__ = 'Alex Jia: ajia@redhat.com'
-__date__ = 'Fri May 28, 2010'
-__version__ = '0.1.0'
-__credits__ = 'Copyright (C) 2009 Red Hat, Inc.'
-__all__ = ['usage', 'check_build_pool', 'build_dir_pool', \
-           'display_pool_info', 'check_pool_defined']
-
-
 import os
 import re
 import sys
 import commands
 from xml.dom import minidom
 
-from lib import connectAPI
-from lib import storageAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
-from exception import LibvirtAPI
 
 def usage(params):
     """Verify inputing parameter dictionary"""
@@ -37,16 +29,16 @@ def usage(params):
         else:
             return True
 
-def display_pool_info(stgobj):
+def display_pool_info(conn):
     """Display current storage pool information"""
     logger.debug("current define storage pool: %s" \
-                 % stgobj.defstorage_pool_list())
+                 % conn.listDefinedStoragePools())
     logger.debug("current active storage pool: %s" \
-                 % stgobj.storage_pool_list())
+                 % conn.listStoragePools())
 
-def check_pool_defined(stgobj, poolname):
+def check_pool_defined(conn, poolname):
     """Check to make sure that the pool is defined"""
-    pool_names = stgobj.defstorage_pool_list()
+    pool_names = conn.listDefinedStoragePools()
     if poolname in pool_names:
         logger.debug("the pool %s is defined " %poolname)
         return True
@@ -79,21 +71,17 @@ def build_dir_pool(params):
     util = utils.Utils()
     uri = params['uri']
 
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
+    conn = libvirt.open(uri)
 
-    caps = conn.get_caps()
-    logger.debug(caps)
-
-    stgobj = storageAPI.StorageAPI(conn)
-
-    if not check_pool_defined(stgobj, poolname):
+    if not check_pool_defined(conn, poolname):
         logger.error("only have defined pool can be built")
         conn.close()
         logger.info("closed hypervisor connection")
         return 1
 
-    pool_xml = stgobj.dump_pool(poolname)
+    poolobj = conn.storagePoolLookupByName(poolname)
+
+    pool_xml = poolobj.XMLDesc(0)
     doc = minidom.parseString(pool_xml)
     unicode_path_value = doc.getElementsByTagName("path")[0].firstChild.data
     path_value = unicode_path_value.encode()
@@ -101,13 +89,13 @@ def build_dir_pool(params):
     if check_build_pool(path_value):
         logger.debug("%s directory has be built" % path_value)
 
-    display_pool_info(stgobj)
+    display_pool_info(conn)
 
     try:
         try:
             logger.info("build %s storage pool" % poolname)
-            stgobj.build_pool(poolname)
-            display_pool_info(stgobj)
+            poolobj.build(0)
+            display_pool_info(conn)
 
             if check_build_pool(path_value):
                 logger.info("build %s storage pool is successful" % poolname)
@@ -115,9 +103,9 @@ def build_dir_pool(params):
             else:
                 logger.error("fail to build %s storage pool" % poolname)
                 return 1
-        except LibvirtAPI, e:
+        except libvirtError, e:
             logger.error("API error message: %s, error code is %s" \
-                         % (e.response()['message'], e.response()['code']))
+                         % (e.message, e.get_error_code()))
             return 1
     finally:
         conn.close()

@@ -4,21 +4,15 @@
    mandatory arguments: guestname
 """
 
-__author__ = "Guannan Ren <gren@redhat.com>"
-__date__ = "Tue Dec 22 2009"
-__version__ = "0.1.0"
-__credits__ = "Copyright (C) 2009 Red Hat, Inc."
-__all__ = ['reboot', 'usage']
-
 import os
 import sys
 import re
 import time
 
-from lib import connectAPI
-from lib import domainAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
-from exception import LibvirtAPI
 
 def check_params(params_given):
     """Checking the arguments required"""
@@ -54,11 +48,10 @@ def reboot(params):
         logger.info("kvm hypervisor doesn't support the funtion now")
         return 0
 
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
+    conn = libvirt.open(uri)
+    domobj = conn.lookupByName(domain_name)
 
     # Get domain ip
-    dom_obj = domainAPI.DomainAPI(conn)
     logger.info("get the mac address of vm %s" % domain_name)
     mac = util.get_dom_mac_addr(domain_name)
     logger.info("the mac address of vm %s is %s" % (domain_name, mac))
@@ -71,10 +64,10 @@ def reboot(params):
     # Reboot domain
     try:
         try:
-            dom_obj.reboot(domain_name)
-        except LibvirtAPI, e:
-            logger.error("API error message: %s, error code is %s" %
-                         (e.response()['message'], e.response()['code']))
+            domobj = reboot(0)
+        except libvirtError, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.message, e.get_error_code()))
             logger.error("fail to reboot domain")
             return 1
     finally:

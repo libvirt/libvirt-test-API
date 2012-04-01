@@ -3,22 +3,13 @@
    mandatory arguments: guestname
 """
 
-__author__ = "Osier Yang <jyang@redhat.com>"
-__date__ = "Tue Oct 27, 2009"
-__version__ = "0.1.0"
-__credits__ = "Copyright (C) 2009 Red Hat, Inc."
-__all__ = ['resume',
-          'check_params',
-          'parse_opts',
-          'usage',
-          'version',]
-
 import os
 import sys
 import re
 
-from lib import connectAPI
-from lib import domainAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
 
 def return_close(conn, logger, ret):
@@ -67,19 +58,19 @@ def resume(params):
     uri = params['uri']
 
     # Resume domain
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
-    domobj = domainAPI.DomainAPI(conn)
+    conn = libvirt.open(uri)
+    domobj = conn.lookupByName(domname)
     logger.info('resume domain')
     try:
-        domobj.resume(domname)
-    except Exception, e:
-        logger.error(str(e))
+        domobj.resume()
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
         logger.error("resume failed")
         return return_close(conn, logger, 1)
 
-    state = domobj.get_state(domname)
-    expect_states = ['running', 'no state', 'blocked']
+    state = domobj.info()[0]
+    expect_states = [libvirt.VIR_DOMAIN_RUNNING, libvirt.VIR_DOMAIN_NOSTATE, libvirt.VIR_DOMAIN_BLOCKED]
 
     if state not in expect_states:
         logger.error('The domain state is not equal to "paused"')

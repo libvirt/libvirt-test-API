@@ -5,21 +5,14 @@
                         filepath
 """
 
-__author__ = 'Alex Jia: ajia@redhat.com'
-__date__ = 'Tue Mar 23, 2010'
-__version__ = '0.1.0'
-__credits__ = 'Copyright (C) 2009 Red Hat, Inc.'
-__all__ = ['usage', 'get_guest_ipaddr', 'check_guest_status',
-           'check_guest_save', 'save']
-
 import os
 import re
 import sys
 
-from lib import connectAPI
-from lib import domainAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
-from exception import LibvirtAPI
 
 def usage(params):
     """Verify inputing parameter dictionary"""
@@ -54,12 +47,14 @@ def get_guest_ipaddr(*args):
 
 def check_guest_status(*args):
     """Check guest current status"""
-    (guestname, domobj, logger) = args
+    (domobj, logger) = args
 
-    state = domobj.get_state(guestname)
-    logger.debug("current guest status: %s" %state)
+    state = domobj.info()[0]
+    logger.debug("current guest status: %s" % state)
 
-    if state == "shutoff" or state == "shutdown" or state == "blocked":
+    if state == libvirt.VIR_DOMAIN_SHUTOFF or \
+       state == libvirt.VIR_DOMAIN_SHUTDOWN or \
+       state == libvirt.VIR_DOMAIN_BLOCKED:
         return False
     else:
         return True
@@ -71,7 +66,7 @@ def check_guest_save(*args):
     """
     (guestname, domobj, util, logger) = args
 
-    if not check_guest_status(guestname, domobj, logger):
+    if not check_guest_status(domobj, logger):
         if not get_guest_ipaddr(guestname, util, logger):
             return True
         else:
@@ -91,17 +86,13 @@ def save(params):
     # Connect to local hypervisor connection URI
     util = utils.Utils()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
-
-    caps = conn.get_caps()
-    logger.debug(caps)
+    conn = libvirt.open(uri)
+    domobj = conn.lookupByName(guestname)
 
     # Save domain
-    domobj = domainAPI.DomainAPI(conn)
     ipaddr = get_guest_ipaddr(guestname, util, logger)
 
-    if not check_guest_status(guestname, domobj, logger):
+    if not check_guest_status(domobj, logger):
         logger.error("Error: current guest status is shutoff")
         conn.close()
         logger.info("closed hypervisor connection")
@@ -114,7 +105,7 @@ def save(params):
         return 1
     try:
         try:
-            domobj.save(guestname, filepath)
+            domobj.save(filepath)
             if check_guest_save(guestname, domobj, util, logger):
                 logger.info("save %s domain successful" %guestname)
                 test_result = True
@@ -122,9 +113,9 @@ def save(params):
                 logger.error("Error: fail to check save domain")
                 test_result = False
                 return 1
-        except LibvirtAPI, e:
-            logger.error("API error message: %s, error code is %s" % \
-                          (e.response()['message'], e.response()['code']))
+        except libvirtError, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.message, e.get_error_code()))
             logger.error("Error: fail to save %s domain" %guestname)
             test_result = False
             return 1

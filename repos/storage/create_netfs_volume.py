@@ -3,24 +3,17 @@
    from xml in the netfs type storage pool
 """
 
-__author__ = 'Alex Jia: ajia@redhat.com'
-__date__ = 'Tue May 18, 2010'
-__version__ = '0.1.0'
-__credits__ = 'Copyright (C) 2010 Red Hat, Inc.'
-__all__ = ['usage', 'check_params', \
-           'get_pool_path', 'netfs_volume_check', 'create_netfs_volume']
-
 import os
 import re
 import sys
 import commands
 from xml.dom import minidom
 
-from lib import connectAPI
-from lib import storageAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
 from utils.Python import xmlbuilder
-from exception import LibvirtAPI
 
 def usage():
     """usage infomation"""
@@ -47,9 +40,9 @@ def check_params(params):
         else:
             pass
 
-def get_pool_path(stgobj, poolname):
+def get_pool_path(poolobj):
     """ get pool xml description """
-    poolxml = stgobj.dump_pool(poolname)
+    poolxml = poolobj.XMLDesc(0)
 
     logger.debug("the xml description of pool is %s" % poolxml)
 
@@ -127,12 +120,9 @@ def create_netfs_volume(params):
     util = utils.Utils()
     uri = params['uri']
 
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
+    conn = libvirt.open(uri)
 
-    stgobj = storageAPI.StorageAPI(conn)
-
-    storage_pool_list = stgobj.storage_pool_list()
+    storage_pool_list = conn.listStoragePools()
 
     if poolname not in storage_pool_list:
         logger.error("pool %s doesn't exist or not running")
@@ -140,7 +130,9 @@ def create_netfs_volume(params):
         logger.info("closed hypervisor connection")
         return 1
 
-    path_value = get_pool_path(stgobj, poolname)
+    poolobj = conn.storagePoolLookupByName(poolname)
+
+    path_value = get_pool_path(poolobj)
 
     volume_path = path_value + "/" + volname
 
@@ -150,7 +142,7 @@ def create_netfs_volume(params):
     params['pooltype'] = 'netfs'
 
     logger.info("before create the new volume, current volume list is %s" % \
-                 stgobj.get_volume_list(poolname))
+                 poolobj.listVolumes())
 
     logger.info("and using virsh command to \
                  ouput the volume information in the pool %s" % poolname)
@@ -163,10 +155,10 @@ def create_netfs_volume(params):
     try:
         try:
             logger.info("create %s volume" % volname)
-            stgobj.create_volume(poolname, volumexml)
-        except LibvirtAPI, e:
+            poolobj.createXML(volumexml, 0)
+        except libvirtError, e:
             logger.error("API error message: %s, error code is %s" \
-                         % (e.response()['message'], e.response()['code']))
+                         % (e.message, e.get_error_code()))
             return 1
     finally:
         conn.close()

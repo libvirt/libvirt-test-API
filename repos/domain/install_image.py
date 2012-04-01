@@ -14,12 +14,6 @@
                        nicmodel
 """
 
-__author__ = "Guannan Ren <gren@redhat.com>"
-__date__ = "Tue Mar 15 2010"
-__version__ = "0.1.0"
-__credits__ = "Copyright (C) 2010, 2012 Red Hat, Inc."
-__all__ = ['install_windows', 'usage']
-
 import os
 import sys
 import re
@@ -27,12 +21,14 @@ import time
 import copy
 import urllib
 
-from lib import connectAPI
-from lib import domainAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
 from utils.Python import env_parser
 from utils.Python import xmlbuilder
-from exception import LibvirtAPI
+
+HOME_PATH = os.getcwd()
 
 def return_close(conn, logger, ret):
     conn.close()
@@ -112,7 +108,7 @@ def install_image(params):
     logger.info("the path of directory of disk images located on is %s" %
                  imgfullpath)
 
-    envfile = os.path.join(homepath, 'env.cfg')
+    envfile = os.path.join(HOME_PATH, 'env.cfg')
     logger.info("the environment file is %s" % envfile)
 
     envparser = env_parser.Envparser(envfile)
@@ -122,9 +118,7 @@ def install_image(params):
     urllib.urlretrieve(image_url, imgfullpath)
     logger.info("the image is located in %s" % imgfullpath)
 
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
-    domobj = domainAPI.DomainAPI(conn)
+    conn = libvirt.open(uri)
 
     xmlobj = xmlbuilder.XmlBuilder()
     domain = xmlobj.add_domain(params)
@@ -134,10 +128,10 @@ def install_image(params):
     guestxml = xmlobj.build_domain(domain)
 
     try:
-        domobj.define(guestxml)
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" %
-                     (e.response()['message'], e.response()['code']))
+        domobj = conn.defineXML(guestxml)
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
         logger.error("fail to define domain %s" % guestname)
         return return_close(conn, logger, 1)
 
@@ -148,10 +142,10 @@ def install_image(params):
     logger.info('boot guest up ...')
 
     try:
-        domobj.start(guestname)
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" %
-                     (e.response()['message'], e.response()['code']))
+        domobj.create()
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
         logger.error("fail to start domain %s" % guestname)
         return return_close(conn, logger, 1)
 

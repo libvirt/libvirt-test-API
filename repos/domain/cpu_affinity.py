@@ -5,13 +5,6 @@
                         vcpu
 """
 
-__author__ = "Guannan Ren <gren@redhat.com>"
-__date__ = "Fri Apri 16 2010"
-__version__ = "0.1.0"
-__credits__ = "Copyright (C) 2010 Red Hat, Inc."
-__all__ = ['cpu_affinity', 'vcpu_affinity_check', 'set_vcpus',
-           'redefine_vcpu_number', 'check_params']
-
 import os
 import sys
 import re
@@ -20,10 +13,10 @@ import commands
 import math
 from xml.dom import minidom
 
-from lib import connectAPI
-from lib import domainAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
-from exception import LibvirtAPI
 
 def return_close(conn, logger, ret):
     conn.close()
@@ -47,7 +40,7 @@ def redefine_vcpu_number(domobj, domain_name, vcpu):
     """dump domain xml description to change the vcpu number,
        then, define the domain again
     """
-    guestxml = domobj.get_xml_desc(domain_name)
+    guestxml = domobj.XMLDesc(0)
     logger.debug('''original guest %s xml :\n%s''' %(domain_name, guestxml))
 
     doc = minidom.parseString(guestxml)
@@ -79,10 +72,10 @@ def set_vcpus(util, domobj, domain_name, vcpu):
     logger.info("the ip address of vm %s is %s" % (domain_name, ip))
 
     try:
-        domobj.destroy(domain_name)
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % \
-                     (e.response()['message'], e.response()['code']))
+        domobj.destroy()
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                    % (e.message, e.get_error_code()))
         logger.error("fail to destroy domain")
         return 1
 
@@ -108,28 +101,29 @@ def set_vcpus(util, domobj, domain_name, vcpu):
 
     logger.info("undefine the original guest")
     try:
-        domobj.undefine(domain_name)
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % \
-                     (e.response()['message'], e.response()['code']))
+        domobj.undefine()
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
         logger.error("fail to undefine guest %" % domain_name)
         return 1
 
     logger.info("define guest with new xml")
     try:
-        domobj.define(newguestxml)
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % \
-                     (e.response()['message'], e.response()['code']))
+        conn = domobj._conn
+        conn.defineXML(newguestxml)
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
         logger.error("fail to define guest %s" % domain_name)
         return 1
 
     try:
         logger.info('boot guest up ...')
-        domobj.start(domain_name)
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % \
-                     (e.response()['message'], e.response()['code']))
+        domobj.create()
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
         logger.error("fail to start domain %s" % domain_name)
         return 1
 
@@ -232,17 +226,22 @@ def cpu_affinity(params):
     # Connect to local hypervisor connection URI
     util = utils.Utils()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
+    conn = libvirt.open(uri)
     hypervisor = uri.split(':')[0]
 
     # Get cpu affinity
-    domobj = domainAPI.DomainAPI(conn)
-    dom_name_list = domobj.get_list()
-    if domain_name not in dom_name_list:
+    guest_names = []
+    ids = conn.listDomainsID()
+    for id in ids:
+        obj = conn.lookupByID(id)
+        guest_names.append(obj.name())
+
+    if domain_name not in guest_names:
         logger.error("guest %s doesn't exist or not be running." %
                       domain_name)
         return return_close(conn, logger, 1)
+
+    domobj = conn.lookupByName(domain_name)
 
     vcpunum = util.get_num_vcpus(domain_name)
     logger.info("the current vcpu number of guest %s is %s" % \
@@ -288,11 +287,10 @@ def cpu_affinity(params):
                 text = commands.getstatusoutput(shell_cmd)[1]
                 logger.debug("before pinning, the vcpu status is %s" % text)
 
-                domobj.set_pin_vcpu(domain_name, vcpu_pinned,
-                                    cpu_affinity_test)
-            except LibvirtAPI, e:
-                logger.error("API error message: %s, error code is %s" % \
-                             (e.response()['message'], e.response()['code']))
+                domobj.pinVcpu(vcpu_pinned, cpu_affinity_test)
+            except libvirtError, e:
+                logger.error("API error message: %s, error code is %s" \
+                             % (e.message, e.get_error_code()))
                 logger.error("fail to vcpupin domain")
                 return return_close(conn, logger, 1)
 

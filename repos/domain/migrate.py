@@ -32,12 +32,6 @@ flags is the migration flags combination <0|peer2peer|tunnelled|live|paused \
                                          |persist_dest|undefine_source|>
 
 """
-__author__ = 'Guannan Ren: gren@redhat.com'
-__date__ = 'Sun June 26, 2011'
-__version__ = '0.1.0'
-__credits__ = 'Copyright (C) 2011 Red Hat, Inc.'
-__all__ = ['usage', 'migrate']
-
 import os
 import re
 import sys
@@ -45,14 +39,34 @@ import pexpect
 import string
 import commands
 
-from lib import connectAPI
-from lib.domainAPI import *
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
 from utils.Python import xmlbuilder
-from exception import LibvirtAPI
 
 SSH_KEYGEN = "ssh-keygen -t rsa"
 SSH_COPY_ID = "ssh-copy-id"
+
+def get_state(state):
+    dom_state = ''
+    if state == libvirt.VIR_DOMAIN_NOSTATE:
+        dom_state = 'nostate'
+    elif state == libvirt.VIR_DOMAIN_RUNNING:
+        dom_state = 'running'
+    elif state == libvirt.VIR_DOMAIN_BLOCKED:
+        dom_state = 'blocked'
+    elif state == libvirt.VIR_DOMAIN_PAUSED:
+        dom_state = 'paused'
+    elif state == libvirt.VIR_DOMAIN_SHUTDOWN:
+        dom_state = 'shutdown'
+    elif state == libvirt.VIR_DOMAIN_SHUTOFF:
+        dom_state = 'shutoff'
+    elif state == libvirt.VIR_DOMAIN_CRASHED:
+        dom_state = 'crashed'
+    else:
+        dom_state = 'no sure'
+    return dom_state
 
 def exec_command(logger, command, flag):
     """execute shell command
@@ -64,7 +78,7 @@ def exec_command(logger, command, flag):
     return status, ret
 
 
-def env_clean(src, dst, srcdom, dstdom, target_machine, guestname, logger):
+def env_clean(srcconn, dstconn, target_machine, guestname, logger):
 
     logger.info("destroy and undefine %s on both side if it exsits", guestname)
     exec_command(logger, "virsh destroy %s" % guestname, 1)
@@ -74,9 +88,9 @@ def env_clean(src, dst, srcdom, dstdom, target_machine, guestname, logger):
     REMOTE_UNDEFINE = "ssh %s \"virsh undefine %s\"" % (target_machine, guestname)
     exec_command(logger, REMOTE_UNDEFINE, 1)
 
-    src.close()
+    srcconn.close()
     logger.info("close local hypervisor connection")
-    dst.close()
+    dstconn.close()
     logger.info("close remote hypervisor connection")
 
     REMOVE_SSH = "ssh %s \"rm -rf /root/.ssh/*\"" % (target_machine)
@@ -183,17 +197,17 @@ def migrate(params):
         if flag == '0':
             migflags |= 0
         elif flag == 'peer2peer':
-            migflags |= VIR_MIGRATE_PEER2PEER
+            migflags |= libvirt.VIR_MIGRATE_PEER2PEER
         elif flag == 'tunnelled':
-            migflags |= VIR_MIGRATE_TUNNELLED
+            migflags |= libvirt.VIR_MIGRATE_TUNNELLED
         elif flag == 'live':
-            migflags |= VIR_MIGRATE_LIVE
+            migflags |= libvirt.VIR_MIGRATE_LIVE
         elif flag == 'persist_dest':
-            migflags |= VIR_MIGRATE_PERSIST_DEST
+            migflags |= libvirt.VIR_MIGRATE_PERSIST_DEST
         elif flag == 'undefine_source':
-            migflags |= VIR_MIGRATE_UNDEFINE_SOURCE
+            migflags |= libvirt.VIR_MIGRATE_UNDEFINE_SOURCE
         elif flag == 'paused':
-            migflags |= VIR_MIGRATE_PAUSED
+            migflags |= libvirt.VIR_MIGRATE_PAUSED
         else:
             logger.error("unknown flag")
             return 1
@@ -216,92 +230,74 @@ def migrate(params):
 
     # Connect to local hypervisor connection URI
     util = utils.Utils()
-    srcconn = connectAPI.ConnectAPI(srcuri)
-    dstconn = connectAPI.ConnectAPI(dsturi)
-    srcconn.open()
-    dstconn.open()
+    srcconn = libvirt.open(srcuri)
+    dstconn = libvirt.open(dsturi)
 
-    srcdom = DomainAPI(srcconn)
-    dstdom = DomainAPI(dstconn)
+    srcdom = srcconn.lookupByName(guestname)
 
     if predstconfig == "true":
-        guest_names = dstdom.get_defined_list()
+        guest_names = dstconn.listDefinedDomains()
         if guestname in guest_names:
             logger.info("Dst VM exists")
         else:
             logger.error("Dst VM missing config, should define VM on Dst first")
-            env_clean(src, dst, srcdom, dstdom, target_machine, guestname, logger)
+            env_clean(srcconn, dstconn, target_machine, guestname, logger)
             return 1
 
     try:
-        if(migflags & VIR_MIGRATE_PEER2PEER):
+        if(migflags & libvirt.VIR_MIGRATE_PEER2PEER):
             logger.info("use migrate_to_uri() API to migrate")
-            srcdom.migrate_to_uri(guestname, dsturi, migflags)
+            srcdom.migrateToURI(dsturi, migflags, None, 0)
         else:
             logger.info("use migrate() to migrate")
-            srcdom.migrate(guestname, dst, migflags)
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % \
-                     (e.response()['message'], e.response()['code']))
+            srcdom.migrate(dstconn, migflags, None, None, 0)
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
         logger.error("Migration Failed")
-        env_clean(src, dst, srcdom, dstdom, target_machine, guestname, logger)
+        env_clean(srcconn, dstconn, target_machine, guestname, logger)
         return 1
 
     if postsrcconfig == "true":
-        if srcdom.is_active(guestname):
+        if srcdom.isActive():
             logger.error("Source VM is still active")
-            env_clean(src, dst, srcdom, dstdom, target_machine, guestname, logger)
+            env_clean(srcconn, dstconn, target_machine, guestname, logger)
             return 1
-        if not srcdom.is_persistent(guestname):
+        if not srcdom.isPersistent():
             logger.error("Source VM missing config")
-            env_clean(src, dst, srcdom, dstdom, target_machine, guestname, logger)
+            env_clean(srcconn, dstconn, target_machine, guestname, logger)
             return 1
     else:
-        guest_names = srcdom.get_list()
-        guest_names += srcdom.get_defined_list()
+        guest_names = []
+        ids = srcconn.listDomainsID()
+        for id in ids:
+            obj = srcconn.lookupByID(id)
+            guest_names.append(obj.name())
+        guest_names += srcconn.listDefinedDomains()
+
         if guestname in guest_names:
             logger.error("Source VM still exists")
-            env_clean(src, dst, srcdom, dstdom, target_machine, guestname, logger)
+            env_clean(srcconn, dstconn, target_machine, guestname, logger)
             return 1
 
-    if not dstdom.is_active(guestname):
+    dstdom = dstconn.lookupByName(guestname)
+    if not dstdom.isActive():
         logger.error("Dst VM is not active")
-        env_clean(src, dst, srcdom, dstdom, target_machine, guestname, logger)
+        env_clean(srcconn, dstconn, target_machine, guestname, logger)
         return 1
 
     if postdstconfig == "true":
-        if not dstdom.is_persistent(guestname):
+        if not dstdom.isPersistent():
             logger.error("Dst VM missing config")
-            env_clean(src, dst, srcdom, dstdom, target_machine, guestname, logger)
+            env_clean(srcconn, dstconn, target_machine, guestname, logger)
             return 1
 
-    dstdom_state = dstdom.get_state(guestname)
-    if dstdom_state != poststate:
-        logger.error("Dst VM wrong state %s, should be %s", dstdom_state, poststate)
-        env_clean(src, dst, srcdom, dstdom, target_machine, guestname, logger)
+    dstdom_state = dstdom.info()[0]
+    if get_state(dstdom_state) != poststate:
+        logger.error("Dst VM wrong state %s, should be %s", get_state(dstdom_state), poststate)
+        env_clean(srcconn, dstconn, target_machine, guestname, logger)
         return 1
 
     logger.info("Migration PASS")
-    env_clean(src, dst, srcdom, dstdom, target_machine, guestname, logger)
+    env_clean(srcconn, dstconn, target_machine, guestname, logger)
     return 0
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -3,20 +3,14 @@
    mandatory arguments: guestname
 """
 
-__author__ = "Osier Yang <jyang@redhat.com>"
-__date__ = "Tue Oct 27, 2009"
-__version__ = "0.1.0"
-__credits__ = "Copyright (C) 2009 Red Hat, Inc."
-__all__ = ['shutdown', 'check_params', 'parse_opts',
-           'usage', 'version']
-
 import os
 import sys
 import re
 import time
 
-from lib import connectAPI
-from lib import domainAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
 
 def return_close(conn, logger, ret):
@@ -63,11 +57,9 @@ def shutdown(params):
     # Connect to local hypervisor connection URI
     util = utils.Utils()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
+    conn = libvirt.open(uri)
+    domobj = conn.lookupByName(domname)
 
-    # Get domain ip
-    dom_obj = domainAPI.DomainAPI(conn)
     timeout = 600
     logger.info('shutdown domain')
     mac = util.get_dom_mac_addr(domname)
@@ -77,9 +69,10 @@ def shutdown(params):
 
     # Shutdown domain
     try:
-        dom_obj.shutdown(domname)
-    except Exception, e:
-        logger.error(str(e))
+        domobj.shutdown()
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
         logger.error("shutdown failed")
         return return_close(conn, logger, 1)
 
@@ -89,8 +82,8 @@ def shutdown(params):
         timeout -= 10
         logger.info(str(timeout) + "s left")
 
-        state = dom_obj.get_state(domname)
-        if state == "shutoff":
+        state = domobj.info()[0]
+        if state == libvirt.VIR_DOMAIN_SHUTOFF:
             break
 
     if timeout <= 0:

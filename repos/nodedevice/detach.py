@@ -3,23 +3,15 @@
    detach a specific node device
 """
 
-__author__ = 'Alex Jia: ajia@redhat.com'
-__date__ = 'Tue Apr 6, 2010'
-__version__ = '0.1.0'
-__credits__ = 'Copyright (C) 2009 Red Hat, Inc.'
-__all__ = ['usage', 'check_node_detach', 'detach']
-
-
 import os
 import re
 import sys
 import commands
 
-from lib import connectAPI
-from lib import nodedevAPI
-from utils.Python import utils
-from exception import LibvirtAPI
+import libvirt
+from libvirt import libvirtError
 
+from utils.Python import utils
 
 def usage(params):
     """Verify inputing parameter dictionary"""
@@ -53,18 +45,17 @@ def check_node_detach(pciaddress):
     driver = os.path.basename(retval)
     return driver
 
-def detach(dicts):
+def detach(params):
     """Dettach a specific node device and bind it to pci-stub driver, argument
-       'dicts' is a dictionary type and includes 'pciaddress' key, whose value
+       'params' is a dictionary type and includes 'pciaddress' key, whose value
        uniquely identify a pci address of the node device
     """
-    usage(dicts)
+    usage(params)
 
-    test_result = False
     global logger
 
-    logger = dicts['logger']
-    pciaddress = dicts['pciaddress']
+    logger = params['logger']
+    pciaddress = params['pciaddress']
 
 
     original_driver = check_node_detach(pciaddress)
@@ -92,46 +83,34 @@ def detach(dicts):
             vendor_ID = retval.split(":")[0]
             product_ID = retval.split(":")[1]
             device_name = "pci_%s_%s" % (vendor_ID, product_ID)
-    elif 'el6' in kernel_version:
+    else:
         (bus, slot_func) = pciaddress.split(":")
         (slot, func) = slot_func.split(".")
         device_name = "pci_0000_%s_%s_%s" % (bus, slot, func)
 
     logger.debug("the name of the pci device is: %s" % device_name)
 
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
-
-    caps = conn.get_caps()
-    logger.debug(caps)
-
-    nodeobj = nodedevAPI.NodedevAPI(conn)
+    conn = libvirt.open(uri)
 
     try:
         try:
+            nodeobj = conn.nodeDeviceLookupByName(device_name)
             logger.info("detach the node device")
-            nodeobj.dettach(device_name)
+            nodeobj.dettach()
             current_driver = check_node_detach(pciaddress)
             logger.info("current device driver: %s" % current_driver)
             if current_driver != original_driver and current_driver == pciback:
                 logger.info("the node %s device detach is successful" \
                             % device_name)
-                test_result = True
             else:
                 logger.info("the node %s device detach is failed" % device_name)
-                test_result = False
                 return 1
-        except LibvirtAPI, e:
+        except libvirtError, e:
             logger.error("API error message: %s, error code is %s" \
-                         % (e.response()['message'], e.response()['code']))
-            logger.error("Error: fail to detach %s node device" % device_name)
-            test_result = False
+                         % (e.message, e.get_error_code()))
             return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")
 
-    if test_result:
-        return 0
-    else:
-        return 1
+    return 0

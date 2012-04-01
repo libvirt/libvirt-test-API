@@ -6,25 +6,16 @@
             xxx
 """
 
-__author__ = 'Guannan Ren: gren@redhat.com'
-__date__ = 'Mon Aug 29, 2011'
-__version__ = '0.1.0'
-__credits__ = 'Copyright (C) 2011 Red Hat, Inc.'
-__all__ = ['eventhandler', 'lifecycle_callback', 'loop_start',
-           'loop_stop', 'shutdown_event', 'bootup_event',
-           'suspend_event', 'resume_event']
-
 import os
 import re
 import sys
 import time
 import threading
 
-from lib import connectAPI
-from lib import eventAPI
-from lib import domainAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
-from exception import LibvirtAPI
 
 LoopThread = None
 looping = True
@@ -62,9 +53,13 @@ def check_params(params):
             return 1
     return 0
 
-def check_domain_running(domobj, guestname, logger):
+def check_domain_running(conn, guestname, logger):
     """ check if the domain exists, may or may not be active """
-    guest_names = domobj.get_list()
+    guest_names = []
+    ids = conn.listDomainsID()
+    for id in ids:
+        obj = conn.lookupByID(id)
+        guest_names.append(obj.name())
 
     if guestname not in guest_names:
         logger.error("%s doesn't exist or not running" % guestname)
@@ -72,10 +67,10 @@ def check_domain_running(domobj, guestname, logger):
     else:
         return 0
 
-def loop_run(eventobj):
+def loop_run():
     global looping
     while looping:
-        eventobj.run_default_impl()
+        libvirt.virEventRunDefaultImpl()
 
     return 0
 
@@ -84,14 +79,14 @@ def loop_stop(conn):
     global looping
     global LoopThread
     looping = False
-    conn.domain_event_deregister(lifecycle_callback)
+    conn.domainEventDeregister(lifecycle_callback)
     LoopThread.join()
 
-def loop_start(eventobj):
+def loop_start():
     """start running default event handler implementation"""
     global LoopThread
-    eventobj.register_default_impl()
-    loop_run_arg = (eventobj,)
+    libvirt.virEventRegisterDefaultImpl()
+    loop_run_arg = ()
     LoopThread = threading.Thread(target=loop_run, args=loop_run_arg, name="libvirtEventLoop")
     LoopThread.setDaemon(True)
     LoopThread.start()
@@ -111,10 +106,10 @@ def shutdown_event(domobj, guestname, timeout, logger):
     STATE = None
     logger.info("power off %s" % guestname)
     try:
-        domobj.shutdown(guestname)
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" %
-                      (e.response()['message'], e.response()['code']))
+        domobj.shutdown()
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
         logger.error("Error: fail to power off %s" % guestname)
         return 1
 
@@ -141,10 +136,10 @@ def bootup_event(domobj, guestname, timeout, logger):
     STATE = None
     logger.info("boot up guest %s" % guestname)
     try:
-        domobj.start(guestname)
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" %
-                      (e.response()['message'], e.response()['code']))
+        domobj.create()
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
         logger.error("Error: fail to bootup %s " % guestname)
         return 1
 
@@ -171,10 +166,10 @@ def suspend_event(domobj, guestname, timeout, logger):
     STATE = None
     logger.info("suspend guest %s" % guestname)
     try:
-        domobj.suspend(guestname)
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" %
-                      (e.response()['message'], e.response()['code']))
+        domobj.suspend()
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
         logger.error("Error: fail to suspend %s" % guestname)
         return 1
 
@@ -201,10 +196,10 @@ def resume_event(domobj, guestname, timeout, logger):
     STATE = None
     logger.info("resume guest %s" % guestname)
     try:
-        domobj.resume(guestname)
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" %
-                      (e.response()['message'], e.response()['code']))
+        domobj.resume()
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
         logger.error("Error: fail to resume %s" % guestname)
         return 1
 
@@ -237,24 +232,21 @@ def eventhandler(params):
     guestname = params['guestname']
     logger.info("the guestname is %s" % guestname)
 
-    eventobj = eventAPI.EventAPI()
-    loop_start(eventobj)
+    loop_start()
 
     # Connect to local hypervisor connection URI
     util = utils.Utils()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI(uri)
-
-    conn.open()
+    conn = libvirt.open(uri)
 
     logger.info("the uri is %s" % uri)
-    domobj = domainAPI.DomainAPI(conn)
 
-    if check_domain_running(domobj, guestname, logger):
+    if check_domain_running(conn, guestname, logger):
         conn.close()
         return 1
 
-    conn.domain_event_register(lifecycle_callback, logger)
+    domobj = conn.lookupByName(guestname)
+    conn.domainEventRegister(lifecycle_callback, logger)
 
     timeout = 600
     if shutdown_event(domobj, guestname, timeout, logger):

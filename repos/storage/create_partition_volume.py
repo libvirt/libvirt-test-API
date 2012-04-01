@@ -3,24 +3,16 @@
    a partition type storage pool from xml
 """
 
-__author__ = 'Guannan Ren: gren@redhat.com'
-__date__ = 'Thu May 19, 2010'
-__version__ = '0.1.0'
-__credits__ = 'Copyright (C) 2009 Red Hat, Inc.'
-__all__ = ['usage', 'check_params', \
-           'partition_volume_check', 'create_partition_volume']
-
-
 import os
 import re
 import sys
 import commands
 
-from lib import connectAPI
-from lib import storageAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
 from utils.Python import xmlbuilder
-from exception import LibvirtAPI
 
 def usage():
     """usage infomation"""
@@ -53,12 +45,13 @@ def check_params(params):
         else:
             return 0
 
-def partition_volume_check(stgobj, poolname, volname):
+def partition_volume_check(poolobj, volname):
     """check the new created volume, the way of checking is to get
        the path of the newly created volume, then grep /proc/partitions
        to find out the new partition in that. """
 
-    volpath = stgobj.get_volume_path(poolname, volname)
+    volobj = poolobj.storageVolLookupByName(volname)
+    volpath = volobj.path()
     logger.debug("the path of volume is %s" % volpath)
 
     partition_name = volpath.split("/")[-1]
@@ -68,7 +61,7 @@ def partition_volume_check(stgobj, poolname, volname):
 
     stat, ret = commands.getstatusoutput(shell_cmd)
 
-    if stat == 0 and volname in stgobj.get_volume_list(poolname):
+    if stat == 0 and volname in poolobj.listVolumes():
         return 0
     else:
         return 1
@@ -110,16 +103,15 @@ def create_partition_volume(params):
     util = utils.Utils()
     uri = params['uri']
 
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
+    conn = libvirt.open(uri)
 
-    stgobj = storageAPI.StorageAPI(conn)
-
-    storage_pool_list = stgobj.storage_pool_list()
+    storage_pool_list = conn.listStoragePools()
 
     if poolname not in storage_pool_list:
         logger.error("pool %s doesn't exist or not running")
         return return_close(conn, logger, 1)
+
+    poolobj = conn.storagePoolLookupByName(poolname)
 
     params['suffix'] = capacity[-1]
     params['capacity'] = capacity[:-1]
@@ -127,7 +119,7 @@ def create_partition_volume(params):
 
     logger.info("before create the new volume, \
                  current volume list is %s" % \
-                 stgobj.get_volume_list(poolname))
+                 poolobj.listVolumes())
 
     logger.info("and using virsh command to \
                  ouput the volume information in the pool %s" % poolname)
@@ -139,17 +131,17 @@ def create_partition_volume(params):
 
     try:
         logger.info("create %s volume" % volname)
-        stgobj.create_volume(poolname, volumexml)
-    except LibvirtAPI, e:
+        poolobj.createXML(volumexml, 0)
+    except libvirtError, e:
         logger.error("API error message: %s, error code is %s" \
-                   % (e.response()['message'], e.response()['code']))
+                    % (e.message, e.get_error_code()))
         return return_close(conn, logger, 1)
 
     logger.info("volume create successfully, and output the volume information")
     virsh_vol_list(poolname)
 
     logger.info("Now, check the validation of the created volume")
-    check_res = partition_volume_check(stgobj, poolname, volname)
+    check_res = partition_volume_check(poolobj, volname)
 
     if not check_res:
         logger.info("checking succeed")

@@ -4,22 +4,16 @@
     Xml is built by this testcase by using the parameters.
 """
 
-__author__   = 'Gurhan Ozen: gozen@redhat.com'
-__date__     = 'Fri May 05, 2010'
-__version__  = '0.1.0'
-__credits__  = 'Copyright (C) 2010 Red Hat, Inc.'
-__all__      = ['usage', 'check_pool', 'create_dir_pool']
-
 import os
 import re
 import sys
 
-from lib import connectAPI
-from lib import storageAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
 from utils.Python import xmlbuilder
 from utils.Python import XMLParser
-from exception import LibvirtAPI
 
 def usage(params):
     """
@@ -52,9 +46,9 @@ def usage(params):
         logger.error("it is: %s" % params['pooltype'])
 
 
-def check_pool_create_libvirt(stgobj, poolname, logger):
+def check_pool_create_libvirt(conn, poolname, logger):
     """Check the result of create storage pool inside libvirt """
-    pool_names = stgobj.storage_pool_list()
+    pool_names = conn.listStoragePools()
     logger.info("poolnames is: %s " % pool_names)
     # check thru libvirt that it's really created..
     try:
@@ -66,11 +60,12 @@ def check_pool_create_libvirt(stgobj, poolname, logger):
     # check
     return True
 
-def check_pool_create_OS(stgobj, poolname, logger):
+def check_pool_create_OS(conn, poolname, logger):
     """This function will check if the poolname mount location is really mounted
        by the OS or not. """
     # we need to get where libvirt thinks the poolname is mounted to...
-    poolxml = stgobj.dump_pool(poolname)
+    poolobj = conn.storagePoolLookupByName(poolname)
+    poolxml = poolobj.XMLDesc(0)
     # parse the xml to see where this is mounted...
     out = XMLParser.XMLParser().parse(poolxml)
     dest_path = out["target"]["path"]
@@ -92,10 +87,10 @@ def check_pool_create_OS(stgobj, poolname, logger):
         return False
 
 
-def display_pool_info(stg, logger):
+def display_pool_info(conn, logger):
     """Display current storage pool information"""
-    logger.debug("current define storage pool: %s" % stg.defstorage_pool_list())
-    logger.debug("current active storage pool: %s" % stg.storage_pool_list())
+    logger.debug("current define storage pool: %s" % conn.listDefinedStoragePools())
+    logger.debug("current active storage pool: %s" % conn.listStoragePools())
 
 def create_netfs_pool(params):
     """ Create a network FS type storage pool from xml"""
@@ -111,13 +106,9 @@ def create_netfs_pool(params):
     util = utils.Utils()
     uri  = params['uri']
 
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
-    caps = conn.get_caps()
-    logger.debug(caps)
-    stgobj = storageAPI.StorageAPI(conn)
+    conn = libvirt.open(uri)
 
-    if check_pool_create_libvirt(stgobj, poolname, logger):
+    if check_pool_create_libvirt(conn, poolname, logger):
         logger.error("%s storage pool has already been created" % poolname)
         conn.close()
         logger.info("closed hypervisor connection")
@@ -130,12 +121,12 @@ def create_netfs_pool(params):
     try:
         try:
             logger.info("Creating %s storage pool" % poolname)
-            stgobj.create_pool(poolxml)
-            display_pool_info(stgobj, logger)
-            if check_pool_create_libvirt(stgobj, poolname, logger):
+            conn.storagePoolCreateXML(poolxml, 0)
+            display_pool_info(conn, logger)
+            if check_pool_create_libvirt(conn, poolname, logger):
                 logger.info("creating %s storage pool is \
                              successful in libvirt" % poolname)
-                if check_pool_create_OS(stgobj, poolname, logger):
+                if check_pool_create_OS(conn, poolname, logger):
                     logger.info("creating %s storage pool is SUCCESSFUL!!!" % poolname)
                     return 0
                 else:
@@ -146,9 +137,9 @@ def create_netfs_pool(params):
                 logger.info("creating %s storage pool is \
                              UNSUCCESSFUL in libvirt!!!" % poolname)
                 return 1
-        except LibvirtAPI, e:
-            logger.error("API error message: %s, error code is %s" % \
-                         (e.response()['message'], e.response()['code']))
+        except libvirtError, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.message, e.get_error_code()))
             return 1
     finally:
         conn.close()

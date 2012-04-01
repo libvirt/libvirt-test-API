@@ -2,29 +2,22 @@
 """testing "virsh net-uuid" function
 """
 
-__author__ = "Guannan Ren <gren@redhat.com>"
-__date__ = "Web Jan 19, 2011"
-__version__ = "0.1.0"
-__credits__ = "Copyright (C) 2011 Red Hat, Inc."
-__all__ = ['netuuid', 'check_network_uuid',
-           'check_network_exists']
-
 import os
 import sys
 import re
 import commands
 
-from lib import connectAPI
-from lib import networkAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
-from exception import LibvirtAPI
 
 VIRSH_NETUUID = "virsh net-uuid"
 
-def check_network_exists(netobj, networkname, logger):
+def check_network_exists(conn, networkname, logger):
     """ check if the network exists, may or may not be active """
-    network_names = netobj.network_list()
-    network_names += netobj.defined_list()
+    network_names = conn.listNetworks()
+    network_names += conn.listDefinedNetworks()
 
     if networkname not in network_names:
         logger.error("%s doesn't exist" % networkname)
@@ -62,21 +55,21 @@ def netuuid(params):
 
     util = utils.Utils()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
+    conn = libvirt.open(uri)
 
     logger.info("the uri is %s" % uri)
-    netobj = networkAPI.NetworkAPI(conn)
 
-    if not check_network_exists(netobj, networkname, logger):
-        logger.error("need a defined network, may or may not be active")
+    if not check_network_exists(conn, networkname, logger):
+        logger.error("need a defined network")
         conn.close()
         logger.info("closed hypervisor connection")
         return 1
 
+    netobj = conn.networkLookupByName(networkname)
+
     try:
         try:
-            UUIDString = netobj.get_uuid_string(networkname)
+            UUIDString = netobj.UUIDString()
             logger.info("the UUID string of network %s is %s" % (networkname, UUIDString))
 
             if check_network_uuid(networkname, UUIDString, logger):
@@ -85,9 +78,9 @@ def netuuid(params):
             else:
                 logger.error(VIRSH_NETUUID + " test failed.")
                 return 1
-        except LibvirtAPI, e:
-            logger.error("API error message: %s, error code is %s" % \
-                         (e.response()['message'], e.response()['code']))
+        except libvirtError, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.message, e.get_error_code()))
             return 1
     finally:
         conn.close()

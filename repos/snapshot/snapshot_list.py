@@ -3,12 +3,6 @@
    mandatory arguments: guestname
 """
 
-__author__ = "Guannan Ren <gren@redhat.com>"
-__date__ = "Sun Feb 20, 2011"
-__version__ = "0.1.0"
-__credits__ = "Copyright (C) 2011 Red Hat, Inc."
-__all__ = ['snapshot_list', 'check_params']
-
 import os
 import sys
 import re

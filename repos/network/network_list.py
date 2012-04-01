@@ -2,20 +2,14 @@
 """testing "virsh net-list" function
 """
 
-__author__ = "Guannan Ren <gren@redhat.com>"
-__date__ = "Wed Jan 19, 2011"
-__version__ = "0.1.0"
-__credits__ = "Copyright (C) 2011 Red Hat, Inc."
-__all__ = ['network_list', 'get_option_list','check_default_option',
-           'check_inactive_option', 'check_all_option']
-
 import os
 import sys
 import re
 import commands
 
-from lib import connectAPI
-from lib import networkAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
 from exception import LibvirtAPI
 
@@ -60,7 +54,7 @@ def get_output(logger, command, flag):
         logger.error(ret)
     return status, ret
 
-def check_all_option(netobj, util, logger):
+def check_all_option(conn, util, logger):
     """check the output of virsh net-list with --all option
     """
     all_network = []
@@ -86,7 +80,7 @@ def check_all_option(netobj, util, logger):
                 return 1
     return 0
 
-def check_inactive_option(netobj, util, logger):
+def check_inactive_option(conn, util, logger):
     """check the output of virsh net-list with --inactive option
     """
     inactive_network = []
@@ -102,7 +96,8 @@ def check_inactive_option(netobj, util, logger):
 
     for network in inactive_network:
         try:
-            bridgename = netobj.get_bridge_name(network)
+            netobj = conn.networkLookupByName(network)
+            bridgename = netobj.bridgeName()
             status, ip = get_output(logger, GET_BRIDGE_IP % bridgename, 1)
 
             if not status:
@@ -117,7 +112,7 @@ def check_inactive_option(netobj, util, logger):
 
     return 0
 
-def check_default_option(netobj, util, logger):
+def check_default_option(conn, util, logger):
     """check the output of virsh net-list
     """
     active_network = []
@@ -133,7 +128,8 @@ def check_default_option(netobj, util, logger):
 
     for network in active_network:
         try:
-            bridgename = netobj.get_bridge_name(network)
+            netobj = conn.networkLookupByName(network)
+            bridgename = netobj.bridgeName()
             status, ip = get_output(logger, GET_BRIDGE_IP % bridgename, 0)
             if not status and util.do_ping(ip, 0):
                 logger.info("network %s is active as we expected" % network)
@@ -166,15 +162,12 @@ def network_list(params):
 
     util = utils.Utils()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
-
-    netobj = networkAPI.NetworkAPI(conn)
+    conn = libvirt.open(uri)
 
     for option in option_list:
         if option == ' ':
             logger.info("check the output of virsh net-list")
-            if not check_default_option(netobj, util, logger):
+            if not check_default_option(conn, util, logger):
                 logger.info("virsh net-list checking succeeded")
                 execute_virsh_netlist(option, logger)
             else:
@@ -182,7 +175,7 @@ def network_list(params):
                 return return_close(conn, logger, 1)
         elif option == '--inactive':
             logger.info("check the output of virsh net-list --inactive")
-            if not check_inactive_option(netobj, util, logger):
+            if not check_inactive_option(conn, util, logger):
                 logger.info("virsh net-list --inactive checking succeeded")
                 execute_virsh_netlist(option, logger)
             else:
@@ -190,7 +183,7 @@ def network_list(params):
                 return return_close(conn, logger, 1)
         elif option == '--all':
             logger.info("check the output of virsh net-list --all")
-            if not check_all_option(netobj, util, logger):
+            if not check_all_option(conn, util, logger):
                 logger.info("virsh net-list --all checking succeeded")
                 execute_virsh_netlist(option, logger)
             else:

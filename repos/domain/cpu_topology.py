@@ -15,22 +15,16 @@
             2
 """
 
-__author__ = 'Guannan Ren: gren@redhat.com'
-__date__ = 'Tue Aug 30, 2011'
-__version__ = '0.1.0'
-__credits__ = 'Copyright (C) 2011 Red Hat, Inc.'
-__all__ = []
-
 import os
 import re
 import sys
 import time
 from xml.dom import minidom
 
-from lib import connectAPI
-from lib import domainAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
-from exception import LibvirtAPI
 
 def check_params(params):
     """check out the arguments requried for testing"""
@@ -43,9 +37,9 @@ def check_params(params):
             return 1
     return 0
 
-def check_domain_running(domobj, guestname, logger):
-    """check if the domain exists, may or may not be active"""
-    defined_guest_names = domobj.get_defined_list()
+def check_domain_running(conn, guestname, logger):
+    """check if the domain exists"""
+    defined_guest_names = conn.listDefinedDomains()
 
     if guestname not in defined_guest_names:
         logger.error("%s doesn't exist or still in running" % guestname)
@@ -56,7 +50,7 @@ def check_domain_running(domobj, guestname, logger):
 def add_cpu_xml(domobj, guestname, sockets, cores, threads, logger):
     """edit domain xml description and insert <cpu> element"""
 
-    guestxml = domobj.get_xml_desc(guestname)
+    guestxml = domobj.XMLDesc(0)
     logger.debug('''original guest %s xml :\n%s''' %(guestname, guestxml))
 
     doc = minidom.parseString(guestxml)
@@ -79,15 +73,15 @@ def add_cpu_xml(domobj, guestname, sockets, cores, threads, logger):
 
     return doc.toxml()
 
-def guest_undefine(domobj, guestname, logger):
+def guest_undefine(domobj, logger):
     """undefine original guest"""
     try:
         logger.info("undefine guest")
-        domobj.undefine(guestname)
+        domobj.undefine()
         logger.info("undefine the domain is successful")
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % \
-                     (e.response()['message'], e.response()['code']))
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                    % (e.message, e.get_error_code()))
         logger.error("fail to undefine domain")
         return 1
 
@@ -97,11 +91,12 @@ def guest_define(domobj, domxml, logger):
     """define new guest xml"""
     try:
         logger.info("define guest")
-        domobj.define(domxml)
+        conn = domobj._conn;
+        conn.defineXML(domxml)
         logger.info("success to define new domain xml description")
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % \
-                     (e.response()['message'], e.response()['code']))
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                    % (e.message, e.get_error_code()))
         logger.error("fail to define domain")
         return 1
 
@@ -115,10 +110,10 @@ def guest_start(domobj, guestname, util, logger):
 
     try:
         logger.info("start guest")
-        domobj.start(guestname)
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % \
-                     (e.response()['message'], e.response()['code']))
+        domobj.create()
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                    % (e.message, e.get_error_code()))
         logger.error("fail to start domain")
         return 1
 
@@ -205,17 +200,16 @@ def cpu_topology(params):
     uri = params['uri']
 
     logger.info("the uri is %s" % uri)
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
-    domobj = domainAPI.DomainAPI(conn)
+    conn = libvirt.open(uri)
 
-    if check_domain_running(domobj, guestname, logger):
+    if check_domain_running(conn, guestname, logger):
         conn.close()
         return 1
 
+    domobj = conn.lookupByName(guestname)
     domxml = add_cpu_xml(domobj, guestname, sockets, cores, threads, logger)
 
-    if guest_undefine(domobj, guestname, logger):
+    if guest_undefine(domobj, logger):
         conn.close()
         return 1
 

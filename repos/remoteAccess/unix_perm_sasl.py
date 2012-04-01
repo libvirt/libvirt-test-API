@@ -9,22 +9,16 @@
             libvirt
 """
 
-__author__ = 'Guannan Ren: gren@redhat.com'
-__date__ = 'Fri Aug 5, 2011'
-__version__ = '0.1.0'
-__credits__ = 'Copyright (C) 2011 Red Hat, Inc.'
-__all__ = ['unix_perm_sasl', 'group_sasl_set',
-           'libvirt_configure', 'hypervisor_connecting_test']
-
 import os
 import re
 import sys
 import commands
 from pwd import getpwnam
 
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
-from lib import connectAPI
-from exception import LibvirtAPI
 
 TESTING_USER = 'testapi'
 LIBVIRTD_CONF = "/etc/libvirt/libvirtd.conf"
@@ -118,12 +112,12 @@ def group_sasl_set(unix_sock_group, auth_unix_ro, auth_unix_rw, logger):
 
 def request_credentials(credentials, user_data):
     for credential in credentials:
-        if credential[0] == connectAPI.VIR_CRED_AUTHNAME:
+        if credential[0] == libvirt.VIR_CRED_AUTHNAME:
             credential[4] = user_data[0]
 
             if len(credential[4]) == 0:
                 credential[4] = credential[3]
-        elif credential[0] == connectAPI.VIR_CRED_PASSPHRASE:
+        elif credential[0] == libvirt.VIR_CRED_PASSPHRASE:
             credential[4] = user_data[1]
         else:
             return -1
@@ -141,28 +135,27 @@ def hypervisor_connecting_test(uri, auth_unix_ro, auth_unix_rw, logger):
     os.seteuid(testing_user_id)
 
     try:
-        conn = connectAPI.ConnectAPI(uri)
         if auth_unix_ro == 'none':
-            conn.open_read_only()
+            conn = libvirt.openReadOnly(uri)
         elif auth_unix_ro == 'sasl':
             user_data = [TESTING_USER, TESTING_USER]
-            auth = [[connectAPI.VIR_CRED_AUTHNAME, \
-                     connectAPI.VIR_CRED_PASSPHRASE],
+            auth = [[libvirt.VIR_CRED_AUTHNAME, \
+                     libvirt.VIR_CRED_PASSPHRASE],
                     request_credentials, user_data]
-            conn.openAuth(auth, 0)
+            conn = libvirt.openAuth(uri, auth, 0)
 
         if auth_unix_rw == 'none':
-            conn.open()
+            conn = libvirt.open(uri)
         elif auth_unix_rw == 'sasl':
             user_data = [TESTING_USER, TESTING_USER]
-            auth = [[connectAPI.VIR_CRED_AUTHNAME, \
-                     connectAPI.VIR_CRED_PASSPHRASE],
+            auth = [[libvirt.VIR_CRED_AUTHNAME, \
+                     libvirt.VIR_CRED_PASSPHRASE],
                     request_credentials, user_data]
-            conn.openAuth(auth, 0)
+            conn = libvirt.openAuth(uri, auth, 0)
         conn.close()
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % \
-                     (e.response()['message'], e.response()['code']))
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
         logger.info("set euid back to %d" % orginal_user)
         os.seteuid(orginal_user)
         conn.close()

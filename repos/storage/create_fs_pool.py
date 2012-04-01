@@ -4,22 +4,16 @@
     Xml is built by this testcase by using the parameters.
 """
 
-__author__   = 'Gurhan Ozen: gozen@redhat.com'
-__date__     = 'Fri April 30, 2010'
-__version__  = '0.1.0'
-__credits__  = 'Copyright (C) 2010 Red Hat, Inc.'
-__all__      = ['usage', 'check_pool_create', 'create_fs_pool']
-
 import os
 import re
 import sys
 
-from lib import connectAPI
-from lib import storageAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
 from utils.Python import xmlbuilder
 from utils.Python import XMLParser
-from exception import LibvirtAPI
 
 def usage(params):
     """ Verifies the params dictionary for the required arguments """
@@ -47,20 +41,9 @@ def usage(params):
         logger.error("pooltype parameter must be fs")
         logger.error("it is: %s" % params['pooltype'])
 
-def check_pool_exists(stgobj, poolname, logger):
-    """ Check to see if the pool exists """
-    pool_names = stgobj.storage_pool_list()
-    pool_names += stgobj.defstorage_pool_list()
-    logger.info("poolnames is: %s " % pool_names)
-
-    if poolname in pool_names:
-        return True
-    else:
-        return False
-
-def check_pool_create_libvirt(stgobj, poolname, logger):
+def check_pool_create_libvirt(conn, poolname, logger):
     """Check the result of create storage pool on libvirt level.  """
-    pool_names = stgobj.storage_pool_list()
+    pool_names = conn.listStoragePools()
     logger.info("poolnames is: %s " % pool_names)
     # check thru libvirt that it's really created..
     if poolname in pool_names:
@@ -70,9 +53,9 @@ def check_pool_create_libvirt(stgobj, poolname, logger):
                      doesn't exist in libvirt!!!!" % poolname)
         return False
 
-def check_pool_create_OS(stgobj, poolname, logger):
+def check_pool_create_OS(poolobj, logger):
     """Check the result of create storage pool on OS level.  """
-    poolxml = stgobj.dump_pool(poolname)
+    poolxml = poolobj.XMLDesc(0)
     out = XMLParser.XMLParser().parse(poolxml)
     src_path = out["source"]["device"]["attr"]["path"]
     dest_path = out["target"]["path"]
@@ -89,10 +72,10 @@ def check_pool_create_OS(stgobj, poolname, logger):
     else:
         return False
 
-def display_pool_info(stg, logger):
+def display_pool_info(conn, logger):
     """Display current storage pool information"""
-    logger.debug("current define storage pool: %s" % stg.defstorage_pool_list())
-    logger.debug("current active storage pool: %s" % stg.storage_pool_list())
+    logger.debug("current define storage pool: %s" % conn.listDefinedStoragePools())
+    logger.debug("current active storage pool: %s" % conn.listStoragePools())
 
 def create_fs_pool(params):
     """ Create a fs type storage pool from xml"""
@@ -108,13 +91,11 @@ def create_fs_pool(params):
     util = utils.Utils()
     uri  = params['uri']
 
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
-    caps = conn.get_caps()
-    logger.debug(caps)
-    stgobj = storageAPI.StorageAPI(conn)
+    conn = libvirt.open(uri)
+    pool_names = conn.listDefinedStoragePools()
+    pool_names += conn.listStoragePools()
 
-    if check_pool_exists(stgobj, poolname, logger):
+    if poolname in pool_names:
         logger.error("%s storage pool has already been created" % poolname)
         conn.close()
         logger.info("closed hypervisor connection")
@@ -127,11 +108,11 @@ def create_fs_pool(params):
     try:
         try:
             logger.info("Creating %s storage pool" % poolname)
-            stgobj.create_pool(poolxml)
-            display_pool_info(stgobj, logger)
-            if check_pool_create_libvirt(stgobj, poolname, logger):
+            poolobj = conn.storagePoolCreateXML(poolxml, 0)
+            display_pool_info(conn, logger)
+            if check_pool_create_libvirt(conn, poolname, logger):
                 logger.info("creating %s storage pool is in libvirt" % poolname)
-                if check_pool_create_OS(stgobj, poolname, logger):
+                if check_pool_create_OS(poolobj, logger):
                     logger.info("creating %s storage pool is SUCCESSFUL!!!" % poolname)
                     return 0
                 else:
@@ -142,9 +123,9 @@ def create_fs_pool(params):
                 logger.info("creating %s storage pool is \
                              UNSUCCESSFUL in libvirt!!!" % poolname)
                 return 1
-        except LibvirtAPI, e:
-            logger.error("API error message: %s, error code is %s" % \
-                         (e.response()['message'], e.response()['code']))
+        except libvirtError, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.message, e.get_error_code()))
             return 1
     finally:
         conn.close()

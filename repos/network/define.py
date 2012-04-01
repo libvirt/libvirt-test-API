@@ -3,22 +3,16 @@
    a network from xml
 """
 
-__author__ = 'Alex Jia: ajia@redhat.com'
-__date__ = 'Mon Feb 9, 2010'
-__version__ = '0.1.0'
-__credits__ = 'Copyright (C) 2009 Red Hat, Inc.'
-__all__ = ['usage', 'check_define_network', 'define']
-
 import time
 import os
 import re
 import sys
 
-from lib import connectAPI
-from lib import networkAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
 from utils.Python import xmlbuilder
-from exception import LibvirtAPI
 
 def usage(params):
     """Verify inputing parameter dictionary"""
@@ -63,13 +57,7 @@ def define(params):
     util = utils.Utils()
     uri = params['uri']
 
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
-
-    caps = conn.get_caps()
-    logger.debug(caps)
-
-    netobj = networkAPI.NetworkAPI(conn)
+    conn = libvirt.open(uri)
 
     if check_network_define(networkname, logger):
         logger.error("%s network is defined" % networkname)
@@ -81,33 +69,27 @@ def define(params):
     netxml = xmlobj.build_network(params)
     logger.debug("network xml:\n%s" % netxml)
 
-    net_num1 = netobj.get_define_number()
+    net_num1 = conn.numOfDefinedNetworks()
     logger.info("original network define number: %s" % net_num1)
 
     try:
         try:
-            netobj.define(netxml)
-            net_num2 = netobj.get_define_number()
+            conn.networkDefineXML(netxml)
+            net_num2 = conn.numOfDefinedNetworks()
             if check_network_define(networkname, logger) and net_num2 > net_num1:
                 logger.info("current network define number: %s" % net_num2)
                 logger.info("define %s network is successful" % networkname)
-                test_result = True
             else:
                 logger.error("%s network is undefined" % networkname)
-                test_result = False
                 return 1
-        except LibvirtAPI, e:
+        except libvirtError, e:
             logger.error("API error message: %s, error code is %s" \
-                         % (e.response()['message'], e.response()['code']))
+                         % (e.message, e.get_error_code()))
             logger.error("define a network from xml: \n%s" % netxml)
-            test_result = False
             return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")
 
     time.sleep(3)
-    if test_result:
-        return 0
-    else:
-        return 1
+    return 0

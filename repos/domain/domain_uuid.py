@@ -2,28 +2,27 @@
 """testing "virsh domuuid" function
 """
 
-__author__ = "Guannan Ren <gren@redhat.com>"
-__date__ = "Tue Jan 18, 2011"
-__version__ = "0.1.0"
-__credits__ = "Copyright (C) 2011 Red Hat, Inc."
-__all__ = ['domuuid']
-
 import os
 import sys
 import re
 import commands
 
-from lib import connectAPI
-from lib import domainAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
-from exception import LibvirtAPI
 
 VIRSH_DOMUUID = "virsh domuuid"
 
-def check_domain_exists(domobj, guestname, logger):
+def check_domain_exists(conn, guestname, logger):
     """ check if the domain exists, may or may not be active """
-    guest_names = domobj.get_list()
-    guest_names += domobj.get_defined_list()
+    guest_names = []
+    ids = conn.listDomainsID()
+    for id in ids:
+        obj = conn.lookupByID(id)
+        guest_names.append(obj.name())
+
+    guest_names += conn.listDefinedDomains()
 
     if guestname not in guest_names:
         logger.error("%s doesn't exist" % guestname)
@@ -61,22 +60,22 @@ def domuuid(params):
 
     util = utils.Utils()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
+    conn = libvirt.open(uri)
 
     logger.info("the uri is %s" % uri)
-    domobj = domainAPI.DomainAPI(conn)
 
-    if not check_domain_exists(domobj, guestname, logger):
-        logger.error("need a defined guest, may or may not be active")
+    if not check_domain_exists(conn, guestname, logger):
+        logger.error("need a defined guest")
         conn.close()
         logger.info("closed hypervisor connection")
         return 1
 
+    domobj = conn.lookupByName(guestname)
+
     try:
         try:
             logger.info("get the UUID string of %s" % guestname)
-            UUIDString = domobj.get_uuid_string(guestname)
+            UUIDString = domobj.UUIDString()
             if check_domain_uuid(guestname, UUIDString, logger):
                 logger.info("UUIDString from API is the same as the one from virsh")
                 logger.info("UUID String is %s" % UUIDString)
@@ -84,10 +83,12 @@ def domuuid(params):
             else:
                 logger.error("UUIDString from API is not the same as the one from virsh")
                 return 1
-        except LibvirtAPI, e:
-            logger.error("API error message: %s, error code is %s" % \
-                         (e.response()['message'], e.response()['code']))
+        except libvirtError, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.message, e.get_error_code()))
             return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")
+
+    return 0

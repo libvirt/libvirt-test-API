@@ -19,12 +19,6 @@
                        type: define|create
 """
 
-__author__ = "Guannan Ren <gren@redhat.com>"
-__date__ = "Wed Apr 07 2010"
-__version__ = "0.1.0"
-__credits__ = "Copyright (C) 2010, 2012 Red Hat, Inc."
-__all__ = ['install_linux', 'usage']
-
 import os
 import sys
 import re
@@ -34,12 +28,12 @@ import commands
 import shutil
 import urllib
 
-from lib import connectAPI
-from lib import domainAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
 from utils.Python import env_parser
 from utils.Python import xmlbuilder
-from exception import LibvirtAPI
 
 VIRSH_QUIET_LIST = "virsh --quiet list --all|awk '{print $2}'|grep \"^%s$\""
 VM_STAT = "virsh --quiet list --all| grep \"\\b%s\\b\"|grep off"
@@ -47,6 +41,7 @@ VM_DESTROY = "virsh destroy %s"
 VM_UNDEFINE = "virsh undefine %s"
 
 BOOT_DIR = "/var/lib/libvirt/boot/"
+HOME_PATH = os.getcwd()
 
 def return_close(conn, logger, ret):
     conn.close()
@@ -125,14 +120,15 @@ def prepare_boot_guest(domobj, dict, logger, installtype):
     guestxml = xmlobj.build_domain(domain)
 
     if installtype != 'create':
-        domobj.undefine(guestname)
+        domobj.undefine()
         logger.info("undefine %s : \n" % guestname)
 
     try:
-        domobj.define(guestxml)
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" %
-                     (e.response()['message'], e.response()['code']))
+        conn = domobj._conn
+        domobj = conn.defineXML(guestxml)
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
         logger.error("fail to define domain %s" % guestname)
         return 1
 
@@ -143,10 +139,10 @@ def prepare_boot_guest(domobj, dict, logger, installtype):
     logger.info('boot guest up ...')
 
     try:
-        domobj.start(guestname)
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" %
-                     (e.response()['message'], e.response()['code']))
+        domobj.create()
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
         logger.error("fail to start domain %s" % guestname)
         return 1
 
@@ -159,7 +155,7 @@ def prepare_cdrom(*args):
     ostree, ks, guestname, logger = args
     ks_name = os.path.basename(ks)
 
-    new_dir = os.path.join(homepath, guestname)
+    new_dir = os.path.join(HOME_PATH, guestname)
     logger.info("creating a new folder for customizing custom.iso file in it")
 
     if os.path.exists(new_dir):
@@ -266,7 +262,7 @@ def install_linux_net(params):
 
 
     logger.info("get system environment information")
-    envfile = os.path.join(homepath, 'env.cfg')
+    envfile = os.path.join(HOME_PATH, 'env.cfg')
     logger.info("the environment file is %s" % envfile)
 
     envparser = env_parser.Envparser(envfile)
@@ -310,7 +306,7 @@ def install_linux_net(params):
         logger.debug("initrd file is located in /var/lib/libvirt/boot")
     elif guesttype == 'xenfv':
         params['bootcd'] = '%s/custom.iso' % \
-                           (os.path.join(homepath, guestname))
+                           (os.path.join(HOME_PATH, guestname))
         logger.debug("the bootcd path is %s" % params['bootcd'])
         logger.info("begin to customize the custom.iso file")
         prepare_cdrom(ostree, ks, guestname, logger)
@@ -323,36 +319,34 @@ def install_linux_net(params):
     logger.debug('dump installation guest xml:\n%s' % guestxml)
 
     #start installation
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
-    domobj = domainAPI.DomainAPI(conn)
+    conn = libvirt.open(uri)
     installtype = params.get('type')
     if installtype == None or installtype == 'define':
         logger.info('define guest from xml description')
         try:
-            domobj.define(guestxml)
-        except LibvirtAPI, e:
-            logger.error("API error message: %s, error code is %s" %
-                         (e.response()['message'], e.response()['code']))
+            domobj = conn.defineXML(guestxml)
+        except libvirtError, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.message, e.get_error_code()))
             logger.error("fail to define domain %s" % guestname)
             return return_close(conn, logger, 1)
 
         logger.info('start installation guest ...')
 
         try:
-            domobj.start(guestname)
-        except LibvirtAPI, e:
-            logger.error("API error message: %s, error code is %s" %
-                         (e.response()['message'], e.response()['code']))
+            domobj.create()
+        except libvirtError, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.message, e.get_error_code()))
             logger.error("fail to start domain %s" % guestname)
             return return_close(conn, logger, 1)
     elif installtype == 'create':
         logger.info('create guest from xml description')
         try:
-            domobj.create(guestxml)
-        except LibvirtAPI, e:
-            logger.error("API error message: %s, error code is %s" %
-                         (e.response()['message'], e.response()['code']))
+            domobj = conn.createXML(guestxml, 0)
+        except libvirtError, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.message, e.get_error_code()))
             logger.error("fail to define domain %s" % guestname)
             return return_close(conn, logger, 1)
 
@@ -364,7 +358,7 @@ def install_linux_net(params):
             time.sleep(10)
             interval += 10
 
-        domobj.destroy(guestname)
+        domobj.destroy()
         ret =  prepare_boot_guest(domobj, params, logger, installtype)
 
         if ret:
@@ -377,8 +371,8 @@ def install_linux_net(params):
         while(interval < 3600):
             time.sleep(10)
             if installtype == None or installtype == 'define':
-                state = domobj.get_state(guestname)
-                if(state == "shutoff"):
+                state = domobj.info()[0]
+                if(state == libvirt.VIR_DOMAIN_SHUTOFF):
                     logger.info("guest installaton of define type is complete")
                     logger.info("boot guest vm off harddisk")
                     ret  = prepare_boot_guest(domobj, params, logger, \
@@ -391,10 +385,14 @@ def install_linux_net(params):
                     interval += 10
                     logger.info('%s seconds passed away...' % interval)
             elif installtype == 'create':
-                dom_name_list = domobj.get_list()
-                if guestname not in dom_name_list:
-                    logger.info(
-                    "guest installation of create type is complete")
+                guest_names = []
+                ids = conn.listDomainsID()
+                for id in ids:
+                    obj = conn.lookupByID(id)
+                    guest_names.append(obj.name())
+
+                if guestname not in guest_names:
+                    logger.info("guest installation of create type is complete")
                     logger.info("define the vm and boot it up")
                     ret = prepare_boot_guest(domobj, params, logger, \
                                              installtype)
@@ -482,6 +480,6 @@ def install_linux_net_clean(params):
         if os.path.exists(initrd):
             os.remove(initrd)
     elif guesttype == 'xenfv':
-        guest_dir = os.path.join(homepath, guestname)
+        guest_dir = os.path.join(HOME_PATH, guestname)
         if os.path.exists(guest_dir):
             shutil.rmtree(guest_dir)

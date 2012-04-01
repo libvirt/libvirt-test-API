@@ -3,22 +3,16 @@
    mandatory arguments: guestname, username, password
 """
 
-__author__ = "Guannan Ren <gren@redhat.com>"
-__date__ = "Sat Feb 19, 2011"
-__version__ = "0.1.0"
-__credits__ = "Copyright (C) 2011 Red Hat, Inc."
-__all__ = ['file_flag', 'check_params', 'check_domain_running']
-
 import os
 import sys
 import re
 import time
 
-from lib import connectAPI
-from lib import domainAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
 from utils.Python import check
-from exception import LibvirtAPI
 
 FLAG_FILE = "snapshot_flag"
 MAKE_FLAG = "rm -f /tmp/%s; touch /tmp/%s " % (FLAG_FILE, FLAG_FILE)
@@ -39,9 +33,13 @@ def check_params(params):
 
     return 0
 
-def check_domain_running(domobj, guestname, logger):
+def check_domain_running(conn, guestname, logger):
     """ check if the domain exists and in running state as well """
-    guest_names = domobj.get_list()
+    guest_names = []
+    ids = conn.listDomainsID()
+    for id in ids:
+        obj = conn.lookupByID(id)
+        guest_names.append(obj.name())
 
     if guestname not in guest_names:
         logger.error("%s is not running or does not exist" % guestname)
@@ -78,13 +76,11 @@ def file_flag(params):
     util = utils.Utils()
     chk = check.Check()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
+    conn = libvirt.open(uri)
 
     logger.info("the uri is %s" % uri)
-    domobj = domainAPI.DomainAPI(conn)
 
-    if not check_domain_running(domobj, guestname, logger):
+    if not check_domain_running(conn, guestname, logger):
         logger.error("need a running guest")
         return return_close(conn, logger, 1)
 
@@ -118,6 +114,4 @@ def file_flag(params):
 def file_flag_clean(params):
     """ clean testing environment """
     util = utils.Utils()
-
-    util.clean_ssh()
     return 0

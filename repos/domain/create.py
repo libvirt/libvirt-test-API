@@ -16,22 +16,16 @@
                        flags
 """
 
-__author__ = 'Guannan Ren: gren@redhat.com'
-__date__ = 'Wed March 24, 2010'
-__version__ = '0.1.0'
-__credits__ = 'Copyright (C) 2010 Red Hat, Inc.'
-__all__ = ['usage', 'create']
-
 import os
 import re
 import sys
 import time
 
-from lib import connectAPI
-from lib import domainAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
 from utils.Python import xmlbuilder
-from exception import LibvirtAPI
 
 NONE = 0
 START_PAUSED = 1
@@ -89,14 +83,8 @@ def create(params):
     # Connect to local hypervisor connection URI
     util = utils.Utils()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
+    conn = libvirt.open(uri)
 
-    caps = conn.get_caps()
-    logger.debug(caps)
-
-    # Generate domain xml
-    domobj = domainAPI.DomainAPI(conn)
     xmlobj = xmlbuilder.XmlBuilder()
     domain = xmlobj.add_domain(params)
     xmlobj.add_disk(params, domain)
@@ -107,20 +95,20 @@ def create(params):
     # Create domain from xml
     try:
         if not flags or flags == "none":
-            domobj.create(domxml, NONE)
+            domobj = conn.createXML(domxml, NONE)
         elif flags == "start_paused":
-            domobj.create(domxml, START_PAUSED)
+            domobj = conn.createXML(domxml, START_PAUSED)
         else:
             logger.error("flags error")
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" %
-                      (e.response()['message'], e.response()['code']))
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
         logger.error("fail to create domain %s" % guestname)
         return return_close(conn, logger, 1)
 
     if flags == "start_paused":
-        state = domobj.get_state(guestname)
-        if state == "paused":
+        state = domobj.info()[0]
+        if state == libvirt.VIR_DOMAIN_PAUSED:
             logger.info("guest start with state paused successfully")
             return return_close(conn, logger, 0)
         else:

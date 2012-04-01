@@ -12,20 +12,14 @@
            enable|disable
 """
 
-__author__ = 'Wayne Sun: gsun@redhat.com'
-__date__ = 'Mon Jul 25, 2011'
-__version__ = '0.1.0'
-__credits__ = 'Copyright (C) 2011 Red Hat, Inc.'
-__all__ = ['ownership_test']
-
 import os
 import re
 import sys
 
-from lib import connectAPI
-from lib import domainAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
-from exception import LibvirtAPI
 
 QEMU_CONF = "/etc/libvirt/qemu.conf"
 SAVE_FILE = "/mnt/test.save"
@@ -47,9 +41,13 @@ def check_params(params):
             return 1
     return 0
 
-def check_domain_running(domobj, guestname, logger):
+def check_domain_running(conn, guestname, logger):
     """ check if the domain exists, may or may not be active """
-    guest_names = domobj.get_list()
+    guest_names = []
+    ids = conn.listDomainsID()
+    for id in ids:
+        obj = conn.lookupByID(id)
+        guest_names.append(obj.name())
 
     if guestname not in guest_names:
         logger.error("%s doesn't exist or not running" % guestname)
@@ -211,26 +209,24 @@ def ownership_test(params):
 
     # Connect to local hypervisor connection URI
     uri = params['uri']
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
+    conn = libvirt.open(uri)
 
     # save domain to the file
     logger.info("save domain %s to the file %s" % (guestname, SAVE_FILE))
-    domobj = domainAPI.DomainAPI(conn)
 
     logger.info("check the domain state")
-    ret = check_domain_running(domobj, guestname, logger)
+    ret = check_domain_running(conn, guestname, logger)
     if ret:
         return return_close(conn, logger, 1)
 
+    domobj = conn.lookupByName(guestname)
+
     try:
-        domobj.save(guestname, SAVE_FILE)
+        domobj.save(SAVE_FILE)
         logger.info("Success save domain %s to %s" % (guestname, SAVE_FILE))
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % \
-                      (e.response()['message'], e.response()['code']))
-        logger.error("Error: fail to save domain %s to %s" % \
-                      (guestname, SAVE_FILE))
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
         return return_close(conn, logger, 1)
 
     logger.info("check the ownership of %s after save" % SAVE_FILE)
@@ -261,12 +257,12 @@ def ownership_test(params):
     # restore domain from file
     logger.info("restore the domain from the file")
     try:
-        domobj.restore(guestname, SAVE_FILE)
+        conn.restore(SAVE_FILE)
         logger.info("Success restore domain %s from %s" % \
                      (guestname, SAVE_FILE))
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % \
-                      (e.response()['message'], e.response()['code']))
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
         logger.error("Error: fail to restore domain %s from %s" % \
                       (guestname, SAVE_FILE))
         return return_close(conn, logger, 1)

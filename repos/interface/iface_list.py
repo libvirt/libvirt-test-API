@@ -2,12 +2,6 @@
 """testing "virsh iface-list" function
 """
 
-__author__ = "Guannan Ren <gren@redhat.com>"
-__date__ = "Thu Jan 20, 2011"
-__version__ = "0.1.0"
-__credits__ = "Copyright (C) 2011 Red Hat, Inc."
-__all__ = ['iface_list', 'check_ifacename','check_ifacestate',
-           'check_ifacemac', 'get_option_list']
 
 import os
 import sys

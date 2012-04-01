@@ -3,22 +3,16 @@
    virtual network start automatically capability
 """
 
-__author__ = 'Guannan Ren: gren@redhat.com'
-__date__ = 'Tue Mar 30, 2010'
-__version__ = '0.1.0'
-__credits__ = 'Copyright (C) 2010 Red Hat, Inc.'
-__all__ = ['usage', 'check_network_autostart', 'autostart']
-
 import time
 import os
 import re
 import sys
 import commands
 
-from lib import connectAPI
-from lib import networkAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
-from exception import LibvirtAPI
 
 def check_params(params):
     """Verify inputing parameter dictionary"""
@@ -71,9 +65,7 @@ def autostart(params):
     networkname = params['networkname']
     autostart = params['autostart']
 
-    test_result = False
     flag = -1
-
     if autostart == "enable":
         flag = 1
     elif autostart == "disable":
@@ -87,13 +79,8 @@ def autostart(params):
 
     logger.info("uri address is %s" % uri)
 
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
-
-    caps = conn.get_caps()
-    logger.debug(caps)
-
-    netobj = networkAPI.NetworkAPI(conn)
+    conn = libvirt.open(uri)
+    netobj = conn.networkLookupByName(networkname)
 
     logger.debug("before setting autostart to virtual network, check status:")
     shell_cmd = "virsh net-list --all"
@@ -102,25 +89,23 @@ def autostart(params):
 
     try:
         try:
-            netobj.setnetAutostart(networkname, flag)
+            netobj.setAutostart(flag)
             if check_network_autostart(networkname,
                                        "qemu",
                                        flag,
                                        logger):
                 logger.info("current virtual network %s autostart: %s" % \
-                             (networkname, netobj.get_autostart(networkname)))
+                             (networkname, netobj.autostart()))
                 logger.info("executing autostart operation is successful")
-                test_result = True
             else:
                 logger.error("Error: fail to check autostart status of \
                               virtual network %s" % networkname)
-                test_result = False
-        except LibvirtAPI, e:
-            logger.error("API error message: %s, error code is %s" % \
-                         (e.response()['message'], e.response()['code']))
+                return 1
+        except libvirtError, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.message, e.get_error_code()))
             logger.error("Error: fail to autostart virtual network %s " % \
                           networkname)
-            test_result = False
             return 1
     finally:
         conn.close()
@@ -131,7 +116,4 @@ def autostart(params):
     (status, text) = commands.getstatusoutput(shell_cmd)
     logger.debug("the output of 'virsh net-list --all' is %s" % text)
     time.sleep(3)
-    if test_result:
-        return 0
-    else:
-        return 1
+    return 0

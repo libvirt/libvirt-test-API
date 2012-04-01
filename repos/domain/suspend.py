@@ -8,19 +8,10 @@ import sys
 import re
 import time
 
-from lib import connectAPI
-from lib import domainAPI
-from utils.Python import utils
+import libvirt
+from libvirt import libvirtError
 
-__author__ = "Osier Yang <jyang@redhat.com>"
-__date__ = "Tue Oct 27, 2009"
-__version__ = "0.1.0"
-__credits__ = "Copyright (C) 2009 Red Hat, Inc."
-__all__ = ['suspend',
-          'check_params',
-          'parse_opts',
-          'usage',
-          'version']
+from utils.Python import utils
 
 def return_close(conn, logger, ret):
     conn.close()
@@ -65,22 +56,22 @@ def suspend(params):
     # Connect to local hypervisor connection URI
     util = utils.Utils()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
+    conn = libvirt.open(uri)
+
+    domobj = conn.lookupByName(domname)
 
     # Suspend domain
-    domobj = domainAPI.DomainAPI(conn)
     logger.info('suspend domain')
     try:
-        domobj.suspend(domname)
-    except Exception, e:
-        logger.error(str(e))
-        logger.error("suspend failed")
+        domobj.suspend()
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
         return return_close(conn, logger, 1)
     time.sleep(1)
-    state = domobj.get_state(domname)
+    state = domobj.info()[0]
 
-    if state != "paused":
+    if state != libvirt.VIR_DOMAIN_PAUSED:
         logger.error('The domain state is not equal to "paused"')
         return return_close(conn, logger, 1)
 

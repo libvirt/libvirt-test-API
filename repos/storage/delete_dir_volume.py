@@ -3,22 +3,14 @@
    a volume from dir type storage pool
 """
 
-__author__ = 'Alex Jia: ajia@redhat.com'
-__date__ = 'Tue May 18, 2010'
-__version__ = '0.1.0'
-__credits__ = 'Copyright (C) 2010 Red Hat, Inc.'
-__all__ = ['usage', 'check_volume_delete', 'check_pool_inactive', \
-           'get_storage_volume_number', 'display_volume_info', \
-           'delete_dir_volume']
-
 import os
 import re
 import sys
 
-from lib import connectAPI
-from lib import storageAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
-from exception import LibvirtAPI
 
 def usage(params):
     """Verify inputing parameter dictionary"""
@@ -35,30 +27,16 @@ def usage(params):
         else:
             return True
 
-def display_volume_info(stg, poolname):
+def display_volume_info(poolobj):
     """Display current storage volume information"""
     logger.debug("current storage volume list: %s" \
-% stg.get_volume_list(poolname))
+% poolobj.listVolumes())
 
-def get_storage_volume_number(stgobj, poolname):
+def get_storage_volume_number(poolobj):
     """Get storage volume number"""
-    vol_num = stgobj.get_volume_number(poolname)
+    vol_num = poolobj.numOfVolumes()
     logger.info("current storage volume number: %s" % vol_num)
     return vol_num
-
-def check_pool_active(stgobj, poolname):
-    """Check to make sure that the pool is active"""
-    pool_names = stgobj.defstorage_pool_list()
-    pool_names = stgobj.storage_pool_list()
-    if poolname in pool_names:
-        if stgobj.isActive_pool(poolname):
-            return True
-        else:
-            logger.error("%s pool is inactive" % poolname)
-            return False
-    else:
-        logger.error("%s pool don't exist" % poolname)
-        return False
 
 def check_volume_delete(volkey):
     """Check storage volume result, volname {volkey} will don't exist
@@ -85,41 +63,45 @@ def delete_dir_volume(params):
     util = utils.Utils()
     uri = params['uri']
 
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
+    conn = libvirt.open(uri)
+    pool_names = conn.listDefinedStoragePools()
+    pool_names += conn.listStoragePools()
 
-    caps = conn.get_caps()
-    logger.debug(caps)
+    if poolname in pool_names:
+        poolobj = conn.storagePoolLookupByName(poolname)
+    else:
+        logger.error("%s not found\n" % poolname);
+        conn.close()
+        return 1
 
-    stgobj = storageAPI.StorageAPI(conn)
-
-    if not check_pool_active(stgobj, poolname):
+    if not poolobj.isActive():
         logger.error("can't delete volume from inactive %s pool" % poolname)
         conn.close()
         logger.info("closed hypervisor connection")
         return 1
 
-    volkey = stgobj.get_volume_key(poolname, volname)
+    volobj = poolobj.storageVolLookupByName(volname)
+    volkey = volobj.key()
     logger.debug("volume key: %s" % volkey)
 
-    vol_num1 = get_storage_volume_number(stgobj, poolname)
-    display_volume_info(stgobj, poolname)
+    vol_num1 = get_storage_volume_number(poolobj)
+    display_volume_info(poolobj)
 
     try:
         try:
             logger.info("delete %s storage volume" % volname)
-            stgobj.delete_volume(poolname, volname)
-            vol_num2 = get_storage_volume_number(stgobj, poolname)
-            display_volume_info(stgobj, poolname)
+            volobj.delete(0)
+            vol_num2 = get_storage_volume_number(poolobj)
+            display_volume_info(poolobj)
             if check_volume_delete(volkey) and vol_num1 > vol_num2:
                 logger.info("delete %s storage volume is successful" % volname)
                 return 0
             else:
                 logger.error("%s storage volume is undeleted" % volname)
                 return 1
-        except LibvirtAPI, e:
+        except libvirtError, e:
             logger.error("API error message: %s, error code is %s" \
-                         % (e.response()['message'], e.response()['code']))
+                         % (e.message, e.get_error_code()))
             return 1
     finally:
         conn.close()

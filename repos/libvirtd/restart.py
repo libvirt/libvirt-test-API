@@ -7,18 +7,13 @@
             #GUESTNAME#
 """
 
-__author__ = 'Wayne Sun: gsun@redhat.com'
-__date__ = 'Thu Aug 4, 2011'
-__version__ = '0.1.0'
-__credits__ = 'Copyright (C) 2011 Red Hat, Inc.'
-__all__ = ['restart']
-
 import os
 import re
 import sys
 
-from lib import connectAPI
-from lib import domainAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
 
 VIRSH_LIST = "virsh list --all"
@@ -34,9 +29,13 @@ def check_params(params):
             return 1
     return 0
 
-def check_domain_running(domobj, guestname, logger):
+def check_domain_running(conn, guestname, logger):
     """ check if the domain exists, may or may not be active """
-    guest_names = domobj.get_list()
+    guest_names = []
+    ids = conn.listDomainsID()
+    for id in ids:
+        obj = conn.lookupByID(id)
+        guest_names.append(obj.name())
 
     if guestname not in guest_names:
         logger.error("%s doesn't exist or not running" % guestname)
@@ -92,12 +91,10 @@ def restart(params):
     util = utils.Utils()
     uri = params['uri']
 
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
-    domobj = domainAPI.DomainAPI(conn)
+    conn = libvirt.open(uri)
 
     logger.info("check the domain state")
-    ret = check_domain_running(domobj, guestname, logger)
+    ret = check_domain_running(conn, guestname, logger)
     if ret:
         return 1
 

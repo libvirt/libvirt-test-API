@@ -2,21 +2,14 @@
 """testing "virsh domid" function
 """
 
-__author__ = "Guannan Ren <gren@redhat.com>"
-__date__ = "Tue Jan 18, 2011"
-__version__ = "0.1.0"
-__credits__ = "Copyright (C) 2011 Red Hat, Inc."
-__all__ = ['domid']
-
 import os
 import sys
 import re
 import commands
 
-from lib import connectAPI
-from lib import domainAPI
+import libvirt
+
 from utils.Python import utils
-from exception import LibvirtAPI
 
 VIRSH_DOMID = "virsh domid"
 VIRSH_IDS = "virsh --quiet list |awk '{print $1}'"
@@ -36,9 +29,13 @@ def get_output(logger, command):
         logger.error(ret)
     return status, ret
 
-def check_domain_exists(domobj, guestname, logger):
+def check_domain_exists(conn, guestname, logger):
     """ check if the domain exists, may or may not be active """
-    guest_names = domobj.get_list()
+    guest_names = []
+    ids = conn.listDomainsID()
+    for id in ids:
+        obj = conn.lookupByID(id)
+        guest_names.append(obj.name())
 
     if guestname not in guest_names:
         logger.error("%s is not running or does not exist" % guestname)
@@ -67,14 +64,12 @@ def domid(params):
 
     util = utils.Utils()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
+    conn = libvirt.open(uri)
 
     logger.info("the uri is %s" % uri)
-    domobj = domainAPI.DomainAPI(conn)
 
     for dom in doms:
-        if not check_domain_exists(domobj, dom, logger):
+        if not check_domain_exists(conn, dom, logger):
             return return_close(conn, logger, 1)
 
     status, ids_ret = get_output(logger, VIRSH_IDS)

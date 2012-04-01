@@ -4,23 +4,15 @@
     Xml is built by this testcase by using the parameters.
 """
 
-__author__   = 'Gurhan Ozen: gozen@redhat.com'
-__date__     = 'Fri April 30, 2010'
-__version__  = '0.1.0'
-__credits__  = 'Copyright (C) 2010 Red Hat, Inc.'
-__all__      = ['usage', 'check_pool_exists',
-                'check_pool_create',
-                'create_iscsi_pool']
-
 import os
 import re
 import sys
 
-from lib import connectAPI
-from lib import storageAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
 from utils.Python import xmlbuilder
-from exception import LibvirtAPI
 
 def usage(params):
     """ Verifies the params dictionary for the required arguments """
@@ -44,21 +36,9 @@ def usage(params):
         logger.error("pooltype parameter must be iscsi")
         logger.error("it is: %s" % params['pooltype'])
 
-
-def check_pool_exists(stgobj, poolname, logger):
-    """ check if the pool exists, may or may not be active """
-    pool_names = stgobj.storage_pool_list()
-    pool_names += stgobj.defstorage_pool_list()
-
-    if poolname in pool_names:
-        logger.info("%s already exists!!" % poolname)
-        return True
-    else:
-        return False
-
-def check_pool_create(stgobj, poolname, logger):
+def check_pool_create(conn, poolname, logger):
     """Check the result of create storage pool.  """
-    pool_names = stgobj.storage_pool_list()
+    pool_names = conn.listStoragePools()
     logger.info("poolnames is: %s " % pool_names)
     # check thru libvirt that it's really created..
     if poolname in pool_names:
@@ -68,10 +48,10 @@ def check_pool_create(stgobj, poolname, logger):
                      poolname)
         return False
 
-def display_pool_info(stg, logger):
+def display_pool_info(conn, logger):
     """Display current storage pool information"""
-    logger.debug("current define storage pool: %s" % stg.defstorage_pool_list())
-    logger.debug("current active storage pool: %s" % stg.storage_pool_list())
+    logger.debug("current define storage pool: %s" % conn.listDefinedStoragePools())
+    logger.debug("current active storage pool: %s" % conn.listStoragePools())
 
 def create_iscsi_pool(params):
     """ Create a iscsi type storage pool from xml"""
@@ -88,13 +68,11 @@ def create_iscsi_pool(params):
     util = utils.Utils()
     uri  = params['uri']
 
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
-    caps = conn.get_caps()
-    logger.debug(caps)
-    stgobj = storageAPI.StorageAPI(conn)
+    conn = libvirt.open(uri)
+    pool_names = conn.listDefinedStoragePools()
+    pool_names += conn.listStoragePools()
 
-    if check_pool_exists(stgobj, poolname, logger):
+    if poolname in pool_names:
         logger.error("%s storage pool has already been created" % poolname)
         conn.close()
         logger.info("closed hypervisor connection")
@@ -107,18 +85,17 @@ def create_iscsi_pool(params):
     try:
         try:
             logger.info("Creating %s storage pool" % poolname)
-            stgobj.create_pool(poolxml)
-            display_pool_info(stgobj,logger)
-            if check_pool_create(stgobj, poolname,logger):
+            conn.storagePoolCreateXML(poolxml, 0)
+            display_pool_info(conn,logger)
+            if check_pool_create(conn, poolname,logger):
                 logger.info("creating %s storage pool is SUCCESSFUL!!!" % poolname)
                 return 0
             else:
                 logger.info("creating %s storage pool is UNSUCCESSFUL!!!" % poolname)
                 return 1
-        except LibvirtAPI, e:
-            logger.error("API error message: %s, error code is %s" % \
-                         (e.response()['message'], e.response()['code']))
-            return 1
+        except libvirtError, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.message, e.get_error_code()))
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

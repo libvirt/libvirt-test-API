@@ -1,21 +1,15 @@
 #!/usr/bin/evn python
 """this test case is used for testing destroy network"""
 
-__author__ = 'Alex Jia: ajia@redhat.com'
-__date__ = 'Tue Mar 30, 2010'
-__version__ = '0.1.0'
-__credits__ = 'Copyright (C) 2009 Red Hat, Inc.'
-__all__ = ['usage', 'destroy', 'check_network_status']
-
 import time
 import os
 import re
 import sys
 
-from lib import connectAPI
-from lib import networkAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
-from exception import LibvirtAPI
 
 def usage(params):
     """Verify inputing parameter dictionary"""
@@ -35,9 +29,9 @@ def check_network_status(*args):
     """Check current network status, it will return True if
        current network is active, otherwise, return False
     """
-    (networkname, netobj, logger) = args
+    (networkname, conn, logger) = args
 
-    net_list = netobj.network_list()
+    net_list = conn.listNetworks()
     logger.debug("current active network list:")
     logger.debug(net_list)
     if networkname in net_list:
@@ -57,48 +51,37 @@ def destroy(params):
     util = utils.Utils()
     uri = params['uri']
 
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
+    conn = libvirt.open(uri)
 
-    caps = conn.get_caps()
-    logger.debug(caps)
-
-    netobj = networkAPI.NetworkAPI(conn)
-
-    if not check_network_status(networkname, netobj, logger):
+    if not check_network_status(networkname, conn, logger):
         logger.error("the %s network is inactive" % networkname)
         conn.close()
         logger.info("closed hypervisor connection")
         return 1
 
-    net_num1 = netobj.get_number()
+    netobj = conn.networkLookupByName(networkname)
+    net_num1 = conn.numOfNetworks()
     logger.info("original network active number: %s" % net_num1)
 
     try:
         try:
-            netobj.destroy(networkname)
-            net_num2 = netobj.get_number()
-            if not check_network_status(networkname, netobj, logger) and \
+            netobj.destroy()
+            net_num2 = conn.numOfNetworks()
+            if not check_network_status(networkname, conn, logger) and \
                 net_num1 > net_num2:
                 logger.info("current network active number: %s\n" % net_num2)
                 logger.info("destroy %s network successful" % networkname)
-                test_result = True
             else:
                 logger.error("the %s network is still running" % networkname)
-                test_result = False
                 return 1
-        except LibvirtAPI, e:
+        except libvirtError, e:
             logger.error("API error message: %s, error code is %s" \
-                         % (e.response()['message'], e.response()['code']))
+                         % (e.message, e.get_error_code()))
             logger.error("fail to destroy %s network" % networkname)
-            test_result = False
             return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")
 
     time.sleep(3)
-    if test_result:
-        return 0
-    else:
-        return 1
+    return 0

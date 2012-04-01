@@ -2,13 +2,6 @@
 """This test case is used for testing vHBA creating with npiv.
 """
 
-__author__ = 'Neil Zhang: nzhang@redhat.com'
-__date__ = 'Thu May 27, 2010'
-__version__ = '0.1.0'
-__credits__ = 'Copyright (C) 2010 Red Hat, Inc.'
-__all__ = ['usage', 'check_nodedev_create', 'check_nodedev_parent',
-           'create_virtual_hba']
-
 import os
 import sys
 import re
@@ -16,10 +9,10 @@ import commands
 import xml.dom.minidom
 from utils.Python import xmlbuilder
 
-from lib import connectAPI
-from lib import nodedevAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
-from exception import LibvirtAPI
 
 def usage(params):
     """Verify input parameters"""
@@ -52,10 +45,10 @@ def check_nodedev_create(wwpn, device_name):
             logger.info("No any virtual HBA was created")
             return False
 
-def check_nodedev_parent(nodedev, device_parent, device_name):
+def check_nodedev_parent(nodedev_obj, device_parent, device_name):
     """Check created vHBA if its parent is correct. It's a bug 593995."""
 
-    current_parent = nodedev.get_parent(device_name)
+    current_parent = nodedev_obj.parent()
     if device_parent == current_parent:
         logger.info("The parent of node device '%s' is %s" \
                     % (device_name, current_parent))
@@ -78,17 +71,13 @@ def create_virtual_hba(params):
     util = utils.Utils()
     uri = params['uri']
 
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
+    conn = libvirt.open(uri)
 
-    caps = conn.get_caps()
-    logger.debug(caps)
-
-    nodedev = nodedevAPI.NodedevAPI(conn)
-    scsi_list = nodedev.lists('scsi_host')
+    scsi_list = conn.listDevices('scsi_host', 0)
 
     for fc_name in scsi_list:
-        fc_xml = nodedev.dumpxml(fc_name)
+        nodedev = conn.nodeDeviceLookupByName(fc_name)
+        fc_xml = nodedev.XMLDesc(0)
         fc_cap = re.search('vport_ops', fc_xml)
         if fc_cap:
             params['parent'] = fc_name
@@ -107,11 +96,11 @@ def create_virtual_hba(params):
     try:
         try:
             logger.info("creating a virtual HBA ...")
-            nodedev_obj = nodedev.create(nodedev_xml)
-            dev_name = nodedev.get_name(nodedev_obj)
+            nodedev_obj = conn.nodeDeviceCreateXML(nodedev_xml, 0)
+            dev_name = nodedev_obj.name()
 
             if check_nodedev_create(wwpn, dev_name) and \
-                check_nodedev_parent(nodedev, params['parent'], dev_name):
+                check_nodedev_parent(nodedev_obj, params['parent'], dev_name):
                 logger.info("the virtual HBA '%s' was created successfully" \
                             % dev_name)
                 return 0
@@ -119,9 +108,9 @@ def create_virtual_hba(params):
                 logger.error("fail to create the virtual HBA '%s'" \
                              % dev_name)
                 return 1
-        except LibvirtAPI, e:
+        except libvirtError, e:
             logger.error("API error message: %s, error code is %s" \
-                         % (e.response()['message'], e.response()['code']))
+                         % (e.message, e.get_error_code()))
             logger.error("Error: fail to create %s virtual hba" % dev_name)
             return 1
     finally:

@@ -3,24 +3,15 @@
    undefine a specific interface
 """
 
-__author__ = 'Alex Jia: ajia@redhat.com'
-__date__ = 'Tue Apr 13, 2010'
-__version__ = '0.1.0'
-__credits__ = 'Copyright (C) 2009 Red Hat, Inc.'
-__all__ = ['usage', 'check_undefine_interface',
-           'display_current_interface', 'undefine']
-
-
 import os
 import re
 import sys
-#import commands
 
-from lib import connectAPI
-from lib import interfaceAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
 from utils.Python import xmlbuilder
-from exception import LibvirtAPI
 
 def usage(params):
     """Verify inputing parameter dictionary"""
@@ -35,17 +26,6 @@ def usage(params):
             return 1
         else:
             pass
-
-def display_current_interface(ifaceobj):
-    """Display current host interface information"""
-    logger.debug("current active host interface number: %s " \
-% ifaceobj.get_active_number())
-    logger.debug("current active host interface list: %s " \
-% ifaceobj.get_active_list())
-    logger.debug("current defined host interface number: %s " \
-% ifaceobj.get_defined_number())
-    logger.debug("current defined host interface list: %s " \
-% ifaceobj.get_defined_list())
 
 def check_undefine_interface(ifacename):
     """Check undefining interface result, if undefine interface is successful,
@@ -71,11 +51,7 @@ def undefine(params):
     util = utils.Utils()
     uri = params['uri']
 
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
-
-    caps = conn.get_caps()
-    logger.debug(caps)
+    conn = libvirt.open(uri)
 
     if check_undefine_interface(ifacename):
         logger.error("interface %s have been undefined" % ifacename)
@@ -83,24 +59,22 @@ def undefine(params):
         logger.info("closed hypervisor connection")
         return 1
 
-    ifaceobj = interfaceAPI.InterfaceAPI(conn)
+    ifaceobj = conn.interfaceLookupByName(ifacename)
 
     try:
         try:
-            ifaceobj.undefine(ifacename)
-            if  check_undefine_interface(ifacename):
+            ifaceobj.undefine()
+            if check_undefine_interface(ifacename):
                 logger.info("undefine a interface form xml is successful")
                 test_result = True
             else:
                 logger.error("fail to check undefine interface")
                 test_result = False
-                return 1
-        except LibvirtAPI, e:
+        except libvirtError, e:
             logger.error("API error message: %s, error code is %s" \
-                         % (e.response()['message'], e.response()['code']))
+                         % (e.message, e.get_error_code()))
             logger.error("fail to undefine a interface from xml")
             test_result = False
-            return 1
     finally:
         conn.close()
         logger.info("closed hypervisor connection")

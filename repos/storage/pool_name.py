@@ -2,36 +2,18 @@
 """testing "virsh pool-name" function
 """
 
-__author__ = "Guannan Ren <gren@redhat.com>"
-__date__ = "Web Jan 19, 2011"
-__version__ = "0.1.0"
-__credits__ = "Copyright (C) 2011 Red Hat, Inc."
-__all__ = ['pool_name', 'check_pool_uuid',
-           'check_pool_exists']
-
 import os
 import sys
 import re
 import time
 import commands
 
-from lib import connectAPI
-from lib import storageAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
-from exception import LibvirtAPI
 
 VIRSH_POOLNAME = "virsh pool-name"
-
-def check_pool_exists(stgobj, poolname, logger):
-    """ check if the pool exists, may or may not be active """
-    pool_names = stgobj.storage_pool_list()
-    pool_names += stgobj.defstorage_pool_list()
-
-    if poolname not in pool_names:
-        logger.error("%s doesn't exist" % poolname)
-        return False
-    else:
-        return True
 
 def check_pool_uuid(poolname, UUIDString, logger):
     """ check the output of virsh pool-name """
@@ -63,21 +45,23 @@ def pool_name(params):
 
     util = utils.Utils()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
+    conn = libvirt.open(uri)
 
     logger.info("the uri is %s" % uri)
-    stgobj = storageAPI.StorageAPI(conn)
 
-    if not check_pool_exists(stgobj, poolname, logger):
-        logger.error("need a defined pool, may or may not be active")
+    pool_names = conn.listDefinedStoragePools()
+    pool_names += conn.listStoragePools()
+
+    if poolname in pool_names:
+        poolobj = conn.storagePoolLookupByName(poolname)
+    else:
+        logger.error("%s not found\n" % poolname);
         conn.close()
-        logger.info("closed hypervisor connection")
         return 1
 
     try:
         try:
-            UUIDString = stgobj.get_pool_uuidstring(poolname)
+            UUIDString = poolobj.UUIDString()
             logger.info("the UUID string of pool %s is %s" % (poolname, UUIDString))
             if check_pool_uuid(poolname, UUIDString, logger):
                 logger.info(VIRSH_POOLNAME + " test succeeded.")
@@ -85,9 +69,9 @@ def pool_name(params):
             else:
                 logger.error(VIRSH_POOLNAME + " test failed.")
                 return 1
-        except LibvirtAPI, e:
-            logger.error("API error message: %s, error code is %s" % \
-                         (e.response()['message'], e.response()['code']))
+        except libvirtError, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.message, e.get_error_code()))
             return 1
     finally:
         conn.close()

@@ -3,22 +3,16 @@
    a virtual network
 """
 
-__author__ = 'Guannan Ren: gren@redhat.com'
-__date__ = 'Tue Mar 30, 2010'
-__version__ = '0.1.0'
-__credits__ = 'Copyright (C) 2010 Red Hat, Inc.'
-__all__ = ['usage', 'check_activated_network', 'start']
-
 import time
 import os
 import re
 import sys
 import commands
 
-from lib import connectAPI
-from lib import networkAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
-from exception import LibvirtAPI
 
 def return_close(conn, logger, ret):
     conn.close()
@@ -56,35 +50,30 @@ def start(params):
 
     logger.info("uri address is %s" % uri)
 
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
+    conn = libvirt.open(uri)
 
-    caps = conn.get_caps()
-    logger.debug(caps)
-
-    netobj = networkAPI.NetworkAPI(conn)
-
-    net_defined_list = netobj.defined_list()
+    net_defined_list = conn.listDefinedNetworks()
 
     if networkname not in net_defined_list:
         logger.error("virtual network %s doesn't exist \
                       or is active already." % networkname)
         return return_close(conn, logger, 1)
     else:
-        netxmldesc = netobj.netxml_dump(networkname)
+        netobj = conn.networkLookupByName(networkname)
+        netxmldesc = netobj.XMLDesc(0)
         logger.debug("the xml description of the virtual network is %s" % \
                       netxmldesc)
 
     try:
         logger.info("begin to activate virtual network %s" % networkname)
-        netobj.start(networkname)
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % \
-                      (e.response()['message'], e.response()['code']))
+        netobj.create()
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
         logger.error("fail to destroy domain")
         return return_close(conn, logger, 1)
 
-    net_activated_list = netobj.network_list()
+    net_activated_list = conn.listNetworks()
 
     if networkname not in net_activated_list:
         logger.error("virtual network %s failed to be activated." % networkname)

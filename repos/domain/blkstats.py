@@ -4,20 +4,14 @@
    mandatory arguments: guestname
 """
 
-__author__ = 'Alex Jia: ajia@redhat.com'
-__date__ = 'Wed Jan 27, 2010'
-__version__ = '0.1.0'
-__credits__ = 'Copyright (C) 2009 Red Hat, Inc.'
-__all__ = ['usage', 'check_guest_status', 'check_blkstats',
-           'blkstats']
-
 import os
 import sys
 import time
+import libxml2
 
-import exception
-from lib import connectAPI
-from lib import domainAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
 
 def usage(params):
@@ -29,10 +23,10 @@ def usage(params):
             logger.error("%s is required" %key)
             return 1
 
-def check_guest_status(guestname, domobj):
+def check_guest_status(domobj):
     """Check guest current status"""
-    state = domobj.get_state(guestname)
-    if state == "shutoff" or state == "shutdown":
+    state = domobj.info()[0]
+    if state == libvirt.VIR_DOMAIN_SHUTOFF or state == libvirt.VIR_DOMAIN_SHUTDOWN:
     # add check function
         return False
     else:
@@ -53,24 +47,27 @@ def blkstats(params):
     # Connect to local hypervisor connection URI
     util = utils.Utils()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
+    conn = libvirt.open(uri)
 
-    caps = conn.get_caps()
-    logger.debug(caps)
+    domobj = conn.lookupByName(guestname)
 
     # Check domain block status
-    domobj = domainAPI.DomainAPI(conn)
-    if check_guest_status(guestname, domobj):
+    if check_guest_status(domobj):
         pass
     else:
-        domobj.start(guestname)
+        domobj.create()
         time.sleep(90)
     try:
         try:
-            (blkstats, path) = domobj.get_block_stats(guestname)
-        except exception.LibvirtAPI, e:
-            logger.error("libvirt error: error code - %s; error message - %s" %(e.code, e.message))
+            xml = domobj.XMLDesc(0)
+            doc = libxml2.parseDoc(xml)
+            cont = doc.xpathNewContext()
+            devs = cont.xpathEval("/domain/devices/disk/target/@dev")
+            path = devs[0].content
+            blkstats = domobj.blockStats(path)
+        except libvirtError, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.message, e.get_error_code()))
             return 1;
     finally:
         conn.close()

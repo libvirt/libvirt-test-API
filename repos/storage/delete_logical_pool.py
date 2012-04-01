@@ -3,22 +3,15 @@
    a logical type storage pool
 """
 
-__author__ = 'Johnny Liu: jialiu@redhat.com'
-__date__ = 'Jun 13, 2010'
-__version__ = '0.1.0'
-__credits__ = 'Copyright (C) 2009 Red Hat, Inc.'
-__all__ = ['usage', 'check_delete_pool', 'delete_logical_pool', \
-           'display_pool_info', 'display_physical_volume']
-
 import os
 import re
 import sys
 import commands
 
-from lib import connectAPI
-from lib import storageAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
-from exception import LibvirtAPI
 
 def usage(params):
     """Verify inputing parameter dictionary"""
@@ -35,12 +28,12 @@ def usage(params):
         else:
             return True
 
-def display_pool_info(stgobj):
+def display_pool_info(conn):
     """Display current storage pool information"""
     logger.debug("current define storage pool: %s" \
-                 % stgobj.defstorage_pool_list())
+                 % conn.listDefinedStoragePools())
     logger.debug("current active storage pool: %s" \
-                 % stgobj.storage_pool_list())
+                 % conn.listStoragePools())
 
 def display_physical_volume():
     """Display volume group and physical volume information"""
@@ -85,13 +78,7 @@ def delete_logical_pool(params):
     util = utils.Utils()
     uri = params['uri']
 
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
-
-    caps = conn.get_caps()
-    logger.debug(caps)
-
-    stgobj = storageAPI.StorageAPI(conn)
+    conn = libvirt.open(uri)
 
     if check_delete_pool(poolname):
         logger.debug("%s storage pool is deleted" % poolname)
@@ -99,14 +86,15 @@ def delete_logical_pool(params):
         logger.info("closed hypervisor connection")
         return 1
 
-    display_pool_info(stgobj)
+    display_pool_info(conn)
     display_physical_volume()
 
     try:
         try:
             logger.info("delete %s storage pool" % poolname)
-            stgobj.delete_pool(poolname)
-            display_pool_info(stgobj)
+            poolobj = conn.storagePoolLookupByName(poolname)
+            poolobj.delete(0)
+            display_pool_info(conn)
             display_physical_volume()
 
             if check_delete_pool(poolname):
@@ -115,9 +103,9 @@ def delete_logical_pool(params):
             else:
                 logger.error("fail to delete %s storage pool" % poolname)
                 return 1
-        except LibvirtAPI, e:
+        except libvirtError, e:
             logger.error("API error message: %s, error code is %s" \
-                         % (e.response()['message'], e.response()['code']))
+                         % (e.message, e.get_error_code()))
             return 1
     finally:
         conn.close()

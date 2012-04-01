@@ -3,21 +3,14 @@
    mandatory arguments: guestname snapshotname
 """
 
-__author__ = "Guannan Ren <gren@redhat.com>"
-__date__ = "Sat Feb 19, 2011"
-__version__ = "0.1.0"
-__credits__ = "Copyright (C) 2011 Red Hat, Inc."
-__all__ = ['revert', 'check_params', 'check_domain_state']
-
 import os
 import sys
 import re
 
-from lib import connectAPI
-from lib import snapshotAPI
-from lib import domainAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
-from exception import LibvirtAPI
 
 def check_params(params):
     """Verify the input parameter"""
@@ -30,9 +23,9 @@ def check_params(params):
 
     return 0
 
-def check_domain_state(domobj, guestname, logger):
+def check_domain_state(conn, guestname, logger):
     """ check if the domain exists and in shutdown state as well """
-    guest_names = domobj.get_defined_list()
+    guest_names = conn.listDefinedDomains()
 
     if guestname not in guest_names:
         logger.error("%s is running or does not exist" % guestname)
@@ -55,15 +48,12 @@ def revert(params):
 
     util = utils.Utils()
     uri = params['uri']
-    conn = connectAPI.ConnectAPI(uri)
-    conn.open()
+    conn = libvirt.open(uri)
 
     logger.info("the uri is %s" % uri)
-    domobj = domainAPI.DomainAPI(conn)
-    snap_obj = snapshotAPI.SnapshotAPI(conn)
 
     logger.info("checking if the guest is poweroff")
-    if not check_domain_state(domobj, guestname, logger):
+    if not check_domain_state(conn, guestname, logger):
         logger.error("checking failed")
         conn.close()
         logger.info("closed hypervisor connection")
@@ -72,11 +62,13 @@ def revert(params):
     try:
         try:
             logger.info("revert a snapshot for %s" % guestname)
-            snap_obj.revertToSnapshot(guestname, snapshotname)
+            domobj = conn.lookupByName(guestname)
+            snap = domobj.snapshotLookupByName(snapshotname, 0)
+            domobj.revertToSnapshot(snap, 0)
             logger.info("revert snapshot succeeded")
-        except LibvirtAPI, e:
-            logger.error("API error message: %s, error code is %s" % \
-                          (e.response()['message'], e.response()['code']))
+        except libvirtError, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.message, e.get_error_code()))
             return 1
     finally:
         conn.close()

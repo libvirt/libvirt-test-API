@@ -13,19 +13,14 @@
             none|sasl
 """
 
-__author__ = 'Guannan Ren: gren@redhat.com'
-__date__ = 'Sun Aug 7, 2011'
-__version__ = '0.1.0'
-__credits__ = 'Copyright (C) 2011 Red Hat, Inc.'
-__all__ = ['tcp_setup', 'tcp_libvirtd_set', 'hypervisor_connecting_test']
-
 import os
 import re
 import sys
 
-from lib import connectAPI
+import libvirt
+from libvirt import libvirtError
+
 from utils.Python import utils
-from exception import LibvirtAPI
 
 SASLPASSWD2 = "/usr/sbin/saslpasswd2"
 LIBVIRTD_CONF = "/etc/libvirt/libvirtd.conf"
@@ -107,12 +102,12 @@ def tcp_libvirtd_set(target_machine, username, password,
 
 def request_credentials(credentials, user_data):
     for credential in credentials:
-        if credential[0] == connectAPI.VIR_CRED_AUTHNAME:
+        if credential[0] == libvirt.VIR_CRED_AUTHNAME:
             credential[4] = user_data[0]
 
             if len(credential[4]) == 0:
                 credential[4] = credential[3]
-        elif credential[0] == connectAPI.VIR_CRED_PASSPHRASE:
+        elif credential[0] == libvirt.VIR_CRED_PASSPHRASE:
             credential[4] = user_data[1]
         else:
             return -1
@@ -124,20 +119,18 @@ def hypervisor_connecting_test(uri, auth_tcp, username,
     """ connect remote server """
     ret = 1
     try:
-        conn = connectAPI.ConnectAPI(uri)
         if auth_tcp == 'none':
-            conn.open()
+            conn = libvirt.open(uri)
         elif auth_tcp == 'sasl':
             user_data = [username, password]
-            auth = [[connectAPI.VIR_CRED_AUTHNAME, connectAPI.VIR_CRED_PASSPHRASE], request_credentials, user_data]
-            conn.openAuth(auth, 0)
+            auth = [[libvirt.VIR_CRED_AUTHNAME, libvirt.VIR_CRED_PASSPHRASE], request_credentials, user_data]
+            conn = libvirt.openAuth(uri, auth, 0)
 
         ret = 0
         conn.close()
-    except LibvirtAPI, e:
-        logger.error("API error message: %s, error code is %s" % \
-                     (e.response()['message'], e.response()['code']))
-
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
         ret = 1
         conn.close()
 
