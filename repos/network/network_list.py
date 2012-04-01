@@ -11,7 +11,6 @@ import libvirt
 from libvirt import libvirtError
 
 from utils.Python import utils
-from exception import LibvirtAPI
 
 VIRSH_QUIET_NETLIST = "virsh --quiet net-list %s|awk '{print $1}'"
 VIRSH_NETLIST = "virsh net-list %s"
@@ -105,9 +104,9 @@ def check_inactive_option(conn, util, logger):
             else:
                 logger.error("network %s is not inactive, wrong" % network)
                 return 1
-        except LibvirtAPI, e:
-            logger.error("API error message: %s, error code is %s" % \
-                         (e.response()['message'], e.response()['code']))
+        except libvirtError, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.message, e.get_error_code()))
             return 1
 
     return 0
@@ -137,9 +136,9 @@ def check_default_option(conn, util, logger):
             else:
                 logger.error("network %s has no ip or fails to ping" % network)
                 return 1
-        except LibvirtAPI, e:
-            logger.error("API error message: %s, error code is %s" % \
-                         (e.response()['message'], e.response()['code']))
+        except libvirtError, e:
+            logger.error("API error message: %s, error code is %s" \
+                         % (e.message, e.get_error_code()))
             return 1
 
     return 0

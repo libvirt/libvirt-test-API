@@ -52,10 +52,6 @@ class SectionExist(LibvirtException):
     code = 204
     message = "Section exists"
 
-class LibvirtAPI(LibvirtException):
-    code = 205
-    message = "API Error"
-
 class NoTestRunFound(LibvirtException):
     code = 206
     message = "No testrun found in xmllog file"
