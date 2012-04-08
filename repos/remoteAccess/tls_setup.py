@@ -27,7 +27,7 @@ import shutil
 import libvirt
 from libvirt import libvirtError
 
-from utils.Python import utils
+from utils import utils
 
 CERTTOOL = "/usr/bin/certtool"
 CP = "/bin/cp"

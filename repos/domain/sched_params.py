@@ -15,7 +15,7 @@ import commands
 
 import libvirt
 
-from utils.Python import utils
+from utils import utils
 
 def return_close(conn, logger, ret):
     conn.close()

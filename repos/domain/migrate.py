@@ -42,8 +42,8 @@ import commands
 import libvirt
 from libvirt import libvirtError
 
-from utils.Python import utils
-from utils.Python import xmlbuilder
+from utils import utils
+from utils import xmlbuilder
 
 SSH_KEYGEN = "ssh-keygen -t rsa"
 SSH_COPY_ID = "ssh-copy-id"

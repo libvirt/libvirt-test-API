@@ -12,7 +12,7 @@ import time
 import libvirt
 from libvirt import libvirtError
 
-from utils.Python import utils
+from utils import utils
 
 NONE = 0
 START_PAUSED = 1

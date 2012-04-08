@@ -11,8 +11,8 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
-from utils.Python import utils
-from utils.Python import xmlbuilder
+from utils import utils
+from utils import xmlbuilder
 
 def usage(params):
     """Verify inputing parameter dictionary"""

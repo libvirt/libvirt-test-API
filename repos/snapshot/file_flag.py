@@ -11,8 +11,8 @@ import time
 import libvirt
 from libvirt import libvirtError
 
-from utils.Python import utils
-from utils.Python import check
+from utils import utils
+from utils import check
 
 FLAG_FILE = "snapshot_flag"
 MAKE_FLAG = "rm -f /tmp/%s; touch /tmp/%s " % (FLAG_FILE, FLAG_FILE)

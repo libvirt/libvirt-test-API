@@ -10,7 +10,7 @@ import commands
 import libvirt
 from libvirt import libvirtError
 
-from utils.Python import utils
+from utils import utils
 
 VIRSH_NETUUID = "virsh net-uuid"
 

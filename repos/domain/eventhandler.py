@@ -15,7 +15,7 @@ import threading
 import libvirt
 from libvirt import libvirtError
 
-from utils.Python import utils
+from utils import utils
 
 LoopThread = None
 looping = True

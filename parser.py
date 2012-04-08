@@ -23,7 +23,7 @@ import copy
 import exception
 import string
 
-from utils.Python import env_parser
+from utils import env_parser
 
 class CaseFileParser(object):
     """ Parser the case configuration file to generate a data list.

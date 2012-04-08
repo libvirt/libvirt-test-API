@@ -12,8 +12,8 @@ import commands
 import libvirt
 from libvirt import libvirtError
 
-from utils.Python import utils
-from utils.Python import xmlbuilder
+from utils import utils
+from utils import xmlbuilder
 
 QEMU_IMAGE_FORMAT = "qemu-img info %s |grep format |awk -F': ' '{print $2}'"
 

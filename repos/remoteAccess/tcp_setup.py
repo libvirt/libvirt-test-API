@@ -20,7 +20,7 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
-from utils.Python import utils
+from utils import utils
 
 SASLPASSWD2 = "/usr/sbin/saslpasswd2"
 LIBVIRTD_CONF = "/etc/libvirt/libvirtd.conf"

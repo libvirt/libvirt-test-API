@@ -10,7 +10,7 @@ import commands
 import libvirt
 from libvirt import libvirtError
 
-from utils.Python import utils
+from utils import utils
 
 GET_DOMBLKINFO_MAC = "virsh domblkinfo %s %s | awk '{print $2}'"
 GET_CAPACITY = "du -b %s | awk '{print $1}'"

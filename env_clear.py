@@ -18,7 +18,7 @@
 #
 
 import mapper
-from utils.Python import log
+from utils import log
 
 class EnvClear(object):
     """ Generate a callable class of executing clearing function in

@@ -31,9 +31,9 @@ import urllib
 import libvirt
 from libvirt import libvirtError
 
-from utils.Python import utils
-from utils.Python import env_parser
-from utils.Python import xmlbuilder
+from utils import utils
+from utils import env_parser
+from utils import xmlbuilder
 
 VIRSH_QUIET_LIST = "virsh --quiet list --all|awk '{print $2}'|grep \"^%s$\""
 VM_STAT = "virsh --quiet list --all| grep \"\\b%s\\b\"|grep off"

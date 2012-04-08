@@ -23,7 +23,7 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
-from utils.Python import utils
+from utils import utils
 from shutil import copy
 
 QEMU_CONF = "/etc/libvirt/qemu.conf"

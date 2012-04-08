@@ -14,8 +14,8 @@ import commands
 import libvirt
 from libvirt import libvirtError
 
-from utils.Python import utils
-from utils.Python import check
+from utils import utils
+from utils import check
 
 def return_close(conn, logger, ret):
     conn.close()

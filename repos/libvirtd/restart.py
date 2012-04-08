@@ -14,7 +14,7 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
-from utils.Python import utils
+from utils import utils
 
 VIRSH_LIST = "virsh list --all"
 RESTART_CMD = "service libvirtd restart"

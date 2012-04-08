@@ -9,7 +9,7 @@ import commands
 
 import libvirt
 
-from utils.Python import utils
+from utils import utils
 
 VIRSH_DOMID = "virsh domid"
 VIRSH_IDS = "virsh --quiet list |awk '{print $1}'"

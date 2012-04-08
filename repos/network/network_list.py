@@ -10,7 +10,7 @@ import commands
 import libvirt
 from libvirt import libvirtError
 
-from utils.Python import utils
+from utils import utils
 
 VIRSH_QUIET_NETLIST = "virsh --quiet net-list %s|awk '{print $1}'"
 VIRSH_NETLIST = "virsh net-list %s"

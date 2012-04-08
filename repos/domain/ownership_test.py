@@ -19,7 +19,7 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
-from utils.Python import utils
+from utils import utils
 
 QEMU_CONF = "/etc/libvirt/qemu.conf"
 SAVE_FILE = "/mnt/test.save"

@@ -25,9 +25,9 @@ import math
 import libvirt
 from libvirt import libvirtError
 
-from utils.Python import utils
-from utils.Python import check
-from utils.Python import env_parser
+from utils import utils
+from utils import check
+from utils import env_parser
 
 HOME_PATH = os.getcwd()
 

@@ -7,12 +7,12 @@ import sys
 import re
 import commands
 import xml.dom.minidom
-from utils.Python import xmlbuilder
+from utils import xmlbuilder
 
 import libvirt
 from libvirt import libvirtError
 
-from utils.Python import utils
+from utils import utils
 
 def usage(params):
     """Verify input parameters"""

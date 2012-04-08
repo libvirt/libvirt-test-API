@@ -7,7 +7,7 @@ import re
 import sys
 import time
 
-from utils.Python import utils
+from utils import utils
 from shutil import copy
 
 VIRSH_LIST = "virsh list --all"

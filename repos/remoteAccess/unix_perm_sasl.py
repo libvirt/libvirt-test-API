@@ -18,7 +18,7 @@ from pwd import getpwnam
 import libvirt
 from libvirt import libvirtError
 
-from utils.Python import utils
+from utils import utils
 
 TESTING_USER = 'testapi'
 LIBVIRTD_CONF = "/etc/libvirt/libvirtd.conf"

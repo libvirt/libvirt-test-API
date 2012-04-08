@@ -13,7 +13,7 @@ import libxml2
 import libvirt
 from libvirt import libvirtError
 
-from utils.Python import utils
+from utils import utils
 
 def usage(params):
     """Verify inputing parameter dictionary"""

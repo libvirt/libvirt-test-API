@@ -26,7 +26,7 @@ import proxy
 import generator
 import env_clear
 import process
-from utils.Python import log
+from utils import log
 from logxmlparser import LogXMLParser
 
 def usage():

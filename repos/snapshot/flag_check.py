@@ -11,8 +11,8 @@ import time
 import libvirt
 from libvirt import libvirtError
 
-from utils.Python import utils
-from utils.Python import check
+from utils import utils
+from utils import check
 
 FLAG_FILE = "/tmp/snapshot_flag"
 FLAG_CHECK = "ls %s" % FLAG_FILE

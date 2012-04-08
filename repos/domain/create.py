@@ -24,8 +24,8 @@ import time
 import libvirt
 from libvirt import libvirtError
 
-from utils.Python import utils
-from utils.Python import xmlbuilder
+from utils import utils
+from utils import xmlbuilder
 
 NONE = 0
 START_PAUSED = 1

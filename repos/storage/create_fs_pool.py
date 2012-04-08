@@ -11,9 +11,9 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
-from utils.Python import utils
-from utils.Python import xmlbuilder
-from utils.Python import XMLParser
+from utils import utils
+from utils import xmlbuilder
+from utils import XMLParser
 
 def usage(params):
     """ Verifies the params dictionary for the required arguments """

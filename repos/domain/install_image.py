@@ -24,9 +24,9 @@ import urllib
 import libvirt
 from libvirt import libvirtError
 
-from utils.Python import utils
-from utils.Python import env_parser
-from utils.Python import xmlbuilder
+from utils import utils
+from utils import env_parser
+from utils import xmlbuilder
 
 HOME_PATH = os.getcwd()
 

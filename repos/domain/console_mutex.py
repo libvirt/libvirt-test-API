@@ -6,7 +6,7 @@ import libvirt
 from libvirt import libvirtError
 from exception import TestError
 
-from utils.Python import utils
+from utils import utils
 
 def usage(params):
     """Verify parameter dictionary"""

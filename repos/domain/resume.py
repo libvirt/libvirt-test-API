@@ -10,7 +10,7 @@ import re
 import libvirt
 from libvirt import libvirtError
 
-from utils.Python import utils
+from utils import utils
 
 def return_close(conn, logger, ret):
     conn.close()
