@@ -30,6 +30,13 @@ SERVERCERT = os.path.join(TEMP_TLS_FOLDER, 'servercert.pem')
 CLIENTKEY = os.path.join(TEMP_TLS_FOLDER, 'clientkey.pem')
 CLIENTCERT = os.path.join(TEMP_TLS_FOLDER, 'clientcert.pem')
 
+required_params = ('listen_tls',
+                   'auth_tls',
+                   'target_machine',
+                   'username',
+                   'password')
+optional_params = ()
+
 def check_params(params):
     """check out the arguments requried for migration"""
     logger = params['logger']

@@ -10,6 +10,9 @@ import libvirt
 from libvirt import libvirtError
 
 
+required_params = ('networkname')
+optional_params = ()
+
 def check_network_status(*args):
     """Check current network status, it will return True if
        current network is active, otherwise, return False

@@ -8,6 +8,9 @@ import libvirt
 from libvirt import libvirtError
 
 
+required_params = ('guestname')
+optional_params = ()
+
 def check_undefine_domain(guestname):
     """Check undefine domain result, if undefine domain is successful,
        guestname.xml will don't exist under /etc/libvirt/qemu/

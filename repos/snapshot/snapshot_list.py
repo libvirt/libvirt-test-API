@@ -8,6 +8,9 @@ import commands
 SNAPSHOT_DIR = "/var/lib/libvirt/qemu/snapshot"
 SNAPSHOT_LIST = "virsh snapshot-list %s |sed -n '3,$'p|awk '{print $1}'"
 
+required_params = ('guestname')
+optional_params = ()
+
 def check_params(params):
     """Verify the input parameter"""
     logger = params['logger']

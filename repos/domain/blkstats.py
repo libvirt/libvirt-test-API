@@ -10,6 +10,9 @@ import libvirt
 from libvirt import libvirtError
 
 
+required_params = ('guestname')
+optional_params = ()
+
 def check_guest_status(domobj):
     """Check guest current status"""
     state = domobj.info()[0]

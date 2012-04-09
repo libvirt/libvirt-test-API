@@ -10,6 +10,9 @@ from libvirt import libvirtError
 
 from utils import utils
 
+required_params = ('guestname')
+optional_params = ()
+
 def check_params(params):
     """Verify the input parameter"""
     args_required = ['guestname']

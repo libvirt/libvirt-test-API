@@ -15,6 +15,9 @@ from utils import utils
 VIRSH_LIST = "virsh list --all"
 RESTART_CMD = "service libvirtd restart"
 
+required_params = ('guestname')
+optional_params = ()
+
 def check_params(params):
     """Verify inputing parameter dictionary"""
     logger = params['logger']

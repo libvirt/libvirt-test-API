@@ -9,6 +9,9 @@ from libvirt import libvirtError
 
 from utils import xmlbuilder
 
+required_params = ('ifacename', 'ifacetype')
+optional_params = ()
+
 def check_define_interface(ifacename):
     """Check defining interface result, if define interface is successful,
        ifcfg-ifacename will exist under /etc/sysconfig/network-scripts/

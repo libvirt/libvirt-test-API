@@ -11,6 +11,15 @@ from libvirt import libvirtError
 
 from utils import xmlbuilder
 
+required_params = ('networkname',
+                   'bridgename',
+                   'bridgeip',
+                   'bridgenetmask',
+                   'netstart',
+                   'netend',
+                   'netmode')
+optional_params = ()
+
 def check_network_define(networkname, logger):
     """Check define network result, if define network is successful,
        networkname.xml will exist under /etc/libvirt/qemu/networks/

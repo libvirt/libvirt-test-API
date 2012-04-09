@@ -10,6 +10,9 @@ import libvirt
 from libvirt import libvirtError
 
 
+required_params = ('networkname')
+optional_params = ()
+
 def check_network_undefine(networkname):
     """Check undefine network result, if undefine network is successful,
        networkname.xml willn't exist under /etc/libvirt/qemu/networks/,

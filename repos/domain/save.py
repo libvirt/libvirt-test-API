@@ -10,6 +10,9 @@ from libvirt import libvirtError
 
 from utils import utils
 
+required_params = ('guestname', 'filepath')
+optional_params = ()
+
 def get_guest_ipaddr(*args):
     """Get guest ip address"""
     (guestname, util, logger) = args

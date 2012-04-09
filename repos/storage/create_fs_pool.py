@@ -11,6 +11,9 @@ from libvirt import libvirtError
 from utils import xmlbuilder
 from utils import XMLParser
 
+required_params = ('poolname', 'sourcepath', 'pooltype')
+optional_params = ('sourceformat')
+
 def usage(params):
     """ Verifies the params dictionary for the required arguments """
     logger = params['logger']

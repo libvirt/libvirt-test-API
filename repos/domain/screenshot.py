@@ -7,6 +7,9 @@ import mimetypes
 
 import libvirt
 
+required_params = ('guestname', 'screen', 'filename')
+optional_params = ()
+
 def check_params(params):
     """Verify input parameters"""
     for key in ('guestname', 'screen', 'filename'):

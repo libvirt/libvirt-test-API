@@ -12,6 +12,9 @@ from libvirt import libvirtError
 
 from utils import xmlbuilder
 
+required_params = ('poolname', 'volname', 'volformat', 'capacity')
+optional_params = ()
+
 def check_params(params):
     """Verify inputing parameter dictionary"""
 

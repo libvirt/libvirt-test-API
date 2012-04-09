@@ -13,6 +13,9 @@ from libvirt import libvirtError
 from utils import utils
 from utils import check
 
+required_params = ('guestname', 'file')
+optional_params = ()
+
 def return_close(conn, logger, ret):
     conn.close()
     logger.info("closed hypervisor connection")

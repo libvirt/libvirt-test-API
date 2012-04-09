@@ -6,6 +6,9 @@ from libvirt import libvirtError
 from exception import TestError
 
 
+required_params = ('guestname')
+optional_params = ('device')
+
 def console_mutex(params):
     """Attach to console"""
     usage(params);

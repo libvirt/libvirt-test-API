@@ -9,6 +9,9 @@ import libvirt
 from libvirt import libvirtError
 
 
+required_params = ('guestname', 'autostart')
+optional_params = ()
+
 def check_guest_autostart(*args):
     """Check domain start automatically result, if setting domain is
        successful, guestname.xml will exist under

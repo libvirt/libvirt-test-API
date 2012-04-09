@@ -24,6 +24,12 @@ def return_close(conn, logger, ret):
     logger.info("closed hypervisor connection")
     return ret
 
+required_params = ('guestname',
+                   'dynamic_ownership',
+                   'virt_use_nfs',
+                   'root_squash')
+optional_params = ()
+
 def check_params(params):
     """Verify inputing parameter dictionary"""
     logger = params['logger']

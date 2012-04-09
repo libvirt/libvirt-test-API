@@ -10,6 +10,9 @@ import libvirt
 from libvirt import libvirtError
 
 
+required_params = ('poolname', 'volname')
+optional_params = ()
+
 def display_volume_info(poolobj):
     """Display current storage volume information"""
     logger.info("current storage volume list: %s" \

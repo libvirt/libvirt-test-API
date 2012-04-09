@@ -11,6 +11,9 @@ import libvirt
 from libvirt import libvirtError
 
 
+required_params = ('networkname', 'autostart')
+optional_params = ()
+
 def check_params(params):
     """Verify inputing parameter dictionary"""
 

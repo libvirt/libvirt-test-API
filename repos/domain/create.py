@@ -15,6 +15,9 @@ from utils import xmlbuilder
 NONE = 0
 START_PAUSED = 1
 
+required_params = ('guestname', 'guesttype')
+optional_params = ()
+
 def return_close(conn, logger, ret):
     conn.close()
     logger.info("closed hypervisor connection")

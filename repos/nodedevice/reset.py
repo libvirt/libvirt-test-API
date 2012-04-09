@@ -11,6 +11,9 @@ from libvirt import libvirtError
 
 from utils import utils
 
+required_params = ('pciaddress')
+optional_params = ()
+
 def check_node_reset():
     """Check node device reset result, I have no idea how to check it now"""
     pass

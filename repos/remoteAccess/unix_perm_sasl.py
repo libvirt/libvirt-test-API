@@ -15,6 +15,9 @@ TESTING_USER = 'testapi'
 LIBVIRTD_CONF = "/etc/libvirt/libvirtd.conf"
 SASLPASSWD2 = "/usr/sbin/saslpasswd2"
 
+required_params = ('auth_unix_ro', 'auth_unix_rw')
+optional_params = ()
+
 def check_params(params):
     """check out the arguments requried for the testcase"""
     logger = params['logger']

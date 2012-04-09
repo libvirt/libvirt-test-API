@@ -10,6 +10,9 @@ from libvirt import libvirtError
 
 from utils import utils
 
+required_params = ('guestname')
+optional_params = ()
+
 def check_params(params_given):
     """Checking the arguments required"""
     args_required = ['guestname']

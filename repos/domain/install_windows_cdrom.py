@@ -25,6 +25,21 @@ FLOOPY_IMG = "/tmp/floppy.img"
 ISO_MOUNT_POINT = "/mnt/libvirt_windows"
 HOME_PATH = os.getcwd()
 
+required_params = ('guestname', 'guesttype', 'guestos', 'guestarch')
+optional_params = ('uuid',
+                   'memory',
+                   'vcpu',
+                   'disksize',
+                   'imagepath',
+                   'hdmodel',
+                   'nicmodel',
+                   'macaddr',
+                   'ifacetype',
+                   'source',
+                   'type',
+                   'volumepath',
+                   'imagetype')
+
 def return_close(conn, logger, ret):
     conn.close()
     logger.info("closed hypervisor connection")

@@ -20,6 +20,9 @@ from utils import xmlbuilder
 IMAG_PATH = "/var/lib/libvirt/images/"
 DISK_DD = "dd if=/dev/zero of=%s bs=1 count=1 seek=6G"
 
+required_params = ('guestos', 'guestarch', 'guesttype', 'guestnum')
+optional_params = ()
+
 def check_params(params):
     """Checking the arguments required"""
 

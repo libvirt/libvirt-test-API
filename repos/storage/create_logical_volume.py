@@ -13,6 +13,9 @@ from libvirt import libvirtError
 from utils import utils
 from utils import xmlbuilder
 
+required_params = ('poolname', 'pooltype', 'volname', 'capacity')
+optional_params = ()
+
 def get_pool_path(poolobj):
     """ Get pool target path """
     poolxml = poolobj.XMLDesc(0)

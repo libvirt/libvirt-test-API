@@ -11,6 +11,9 @@ from libvirt import libvirtError
 
 from utils import utils
 
+required_params = ('pciaddress')
+optional_params = ()
+
 def check_node_detach(pciaddress):
     """Check node device detach result, if detachment is successful, the
        device host driver should be hided and the device should be bound

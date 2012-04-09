@@ -16,6 +16,15 @@ from utils import xmlbuilder
 
 HOME_PATH = os.getcwd()
 
+required_params = ('guestname', 'guesttype', 'guestos', 'guestarch')
+optional_params = ('uuid',
+                   'memory',
+                   'vcpu',
+                   'imagepath',
+                   'imagetype',
+                   'hdmodel',
+                   'nicmodel')
+
 def return_close(conn, logger, ret):
     conn.close()
     logger.info("closed hypervisor connection")

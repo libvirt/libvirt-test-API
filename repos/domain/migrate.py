@@ -15,6 +15,20 @@ from utils import xmlbuilder
 SSH_KEYGEN = "ssh-keygen -t rsa"
 SSH_COPY_ID = "ssh-copy-id"
 
+required_params = ('transport',
+                   'target_machine',
+                   'username',
+                   'password',
+                   'guestname',
+                   'prestate',
+                   'poststate',
+                   'presrcconfig',
+                   'postsrcconfig',
+                   'predstconfig',
+                   'postdstconfig',
+                   'flags')
+
+optional_params = ()
 def get_state(state):
     dom_state = ''
     if state == libvirt.VIR_DOMAIN_NOSTATE:

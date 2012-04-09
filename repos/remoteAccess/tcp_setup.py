@@ -14,6 +14,13 @@ SASLPASSWD2 = "/usr/sbin/saslpasswd2"
 LIBVIRTD_CONF = "/etc/libvirt/libvirtd.conf"
 SYSCONFIG_LIBVIRTD = "/etc/sysconfig/libvirtd"
 
+required_params = ('target_machine',
+                   'username',
+                   'password',
+                   'listen_tcp',
+                   'auth_tcp')
+optional_params = ()
+
 def check_params(params):
     """check out the arguments requried for this testcases"""
     logger = params['logger']

@@ -14,6 +14,9 @@ from utils import xmlbuilder
 
 QEMU_IMAGE_FORMAT = "qemu-img info %s |grep format |awk -F': ' '{print $2}'"
 
+required_params = ('guestname')
+optional_params = ()
+
 def check_params(params):
     """Verify the input parameter"""
     logger = params['logger']

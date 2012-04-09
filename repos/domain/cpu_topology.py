@@ -12,6 +12,14 @@ from libvirt import libvirtError
 
 from utils import utils
 
+required_params = ('guestname',
+                   'username',
+                   'password',
+                   'sockets',
+                   'cores',
+                   'threads')
+optional_params = ()
+
 def check_params(params):
     """check out the arguments requried for testing"""
     logger = params['logger']

@@ -16,6 +16,9 @@ POOL_STAT = "virsh --quiet pool-list --all|grep \"^%s\\b\" |grep \"inactive\""
 POOL_DESTROY = "virsh pool-destroy %s"
 POOL_UNDEFINE = "virsh pool-undefine %s"
 
+required_params = ('poolname', 'pooltype')
+optional_params = ()
+
 def display_pool_info(conn, logger):
     """Display current storage pool information"""
     logger.debug("current define storage pool: %s" % conn.listDefinedStoragePools())

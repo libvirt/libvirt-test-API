@@ -11,6 +11,9 @@ from libvirt import libvirtError
 
 from utils import xmlbuilder
 
+required_params = ('poolname', 'volname', 'volformat', 'capacity')
+optional_params = ()
+
 def return_close(conn, logger, ret):
     conn.close()
     logger.info("closed hypervisor connection")

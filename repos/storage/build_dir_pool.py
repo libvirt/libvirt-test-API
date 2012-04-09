@@ -11,6 +11,9 @@ import libvirt
 from libvirt import libvirtError
 
 
+required_params = ('poolname')
+optional_params = ()
+
 def display_pool_info(conn):
     """Display current storage pool information"""
     logger.debug("current define storage pool: %s" \

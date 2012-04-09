@@ -15,6 +15,9 @@ GET_CAPACITY = "du -b %s | awk '{print $1}'"
 GET_PHYSICAL_K = " du -B K %s | awk '{print $1}'"
 VIRSH_DOMBLKINFO = "virsh domblkinfo %s %s"
 
+required_params = ('guestname', 'blockdev')
+optional_params = ()
+
 def return_close(conn, logger, ret):
     conn.close()
     logger.info("closed hypervisor connection")

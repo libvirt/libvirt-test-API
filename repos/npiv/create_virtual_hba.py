@@ -12,6 +12,9 @@ import libvirt
 from libvirt import libvirtError
 
 
+required_params = ('wwpn')
+optional_params = ()
+
 def check_nodedev_create(wwpn, device_name):
     """Check if the node device vHBA was created. Can search created
        vport name in all FC list, to see if it exists.

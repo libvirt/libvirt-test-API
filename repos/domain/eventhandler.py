@@ -15,6 +15,9 @@ LoopThread = None
 looping = True
 STATE = None
 
+required_params = ('guestname')
+optional_params = ()
+
 def eventToString(event):
     eventStrings = ( "Defined",
                      "Undefined",

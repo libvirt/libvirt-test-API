@@ -14,6 +14,9 @@ from utils import check
 FLAG_FILE = "/tmp/snapshot_flag"
 FLAG_CHECK = "ls %s" % FLAG_FILE
 
+required_params = ('guestname', 'username', 'password')
+optional_params = ()
+
 def return_close(conn, logger, ret):
     conn.close()
     logger.info("closed hypervisor connection")

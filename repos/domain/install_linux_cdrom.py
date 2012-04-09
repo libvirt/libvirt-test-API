@@ -25,6 +25,22 @@ VM_UNDEFINE = "virsh undefine %s"
 BOOT_DIR = "/var/lib/libvirt/boot/"
 HOME_PATH = os.getcwd()
 
+required_params = ('guestname', 'guesttype', 'guestos', 'guestarch')
+# FIXEME: There must be default value for these params.
+optional_params = ('uuid',
+                   'memory',
+                   'vcpu',
+                   'disksize',
+                   'imagepath',
+                   'hdmodel',
+                   'nicmodel',
+                   'macaddr',
+                   'ifacetype',
+                   'source',
+                   'type',
+                   'volumepath',
+                   'imagetype')
+
 def return_close(conn, logger, ret):
     conn.close()
     logger.info("closed hypervisor connection")

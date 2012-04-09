@@ -11,6 +11,15 @@ from libvirt import libvirtError
 
 from utils import xmlbuilder
 
+required_params = ('networkname',
+                   'bridgename',
+                   'bridgeip',
+                   'bridgenetmask',
+                   'netstart',
+                   'netend',
+                   'netmode')
+optional_params = ()
+
 def usage(params):
     """Verify inputing parameter dictionary"""
     logger = params['logger']

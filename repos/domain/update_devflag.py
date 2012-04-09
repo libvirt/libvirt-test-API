@@ -13,6 +13,9 @@ from libvirt import libvirtError
 from utils import utils
 from utils import xmlbuilder
 
+required_params = ('guestname', 'devtype', 'username', 'password')
+optional_params = ()
+
 def check_params(params):
     """Verify inputing parameter dictionary"""
     logger = params['logger']

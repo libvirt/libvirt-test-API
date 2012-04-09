@@ -11,6 +11,9 @@ from libvirt import libvirtError
 from utils import utils
 from utils import xmlbuilder
 
+required_params = ('ifacename')
+optional_params = ()
+
 def display_current_interface(conn):
     """Display current host interface information"""
     logger.debug("current active host interface number: %s " \

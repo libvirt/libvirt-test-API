@@ -8,6 +8,9 @@ import libvirt
 from libvirt import libvirtError
 
 
+required_params = ('guestname', 'snapshotname')
+optional_params = ()
+
 def check_params(params):
     """Verify the input parameter"""
     logger = params['logger']

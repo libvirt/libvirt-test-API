@@ -15,6 +15,9 @@ from utils import check
 FLAG_FILE = "snapshot_flag"
 MAKE_FLAG = "rm -f /tmp/%s; touch /tmp/%s " % (FLAG_FILE, FLAG_FILE)
 
+required_params = ('guestname', 'username', 'password')
+optional_params = ()
+
 def return_close(conn, logger, ret):
     conn.close()
     logger.info("closed hypervisor connection")

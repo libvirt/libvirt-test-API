@@ -17,6 +17,9 @@ QEMU_CONF = "/etc/libvirt/qemu.conf"
 SAVE_FILE = "/mnt/test.save"
 TEMP_FILE = "/tmp/test.save"
 
+required_params = ('guestname', 'dynamic_ownership', 'use_nfs')
+optional_params = ()
+
 def return_close(conn, logger, ret):
     """close hypervisor connection and return the given value"""
     conn.close()

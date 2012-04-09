@@ -13,6 +13,13 @@ from libvirt import libvirtError
 from utils import utils
 from utils import xmlbuilder
 
+required_params = ('guestname',
+                   'guesttype',
+                   'imagename',
+                   'imagesize',
+                   'hdmodel')
+optional_params = ()
+
 def create_image(name, size, logger):
     """Create a image file"""
     disk = "/var/lib/libvirt/images/%s.img" % name

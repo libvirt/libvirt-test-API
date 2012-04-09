@@ -17,6 +17,17 @@ from utils import env_parser
 
 HOME_PATH = os.getcwd()
 
+required_params = ('guestname', 'guesttype', 'hdmodel', 'nicmodel')
+optional_params = ('disksize',
+                   'memory',
+                   'vcpu',
+                   'guesttype',
+                   'imagepath',
+                   'ifacetype',
+                   'netmethod',
+                   'source',
+                   'type')
+
 def check_params(params):
     """Checking the arguments required"""
     params_given = copy.deepcopy(params)

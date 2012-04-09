@@ -10,6 +10,9 @@ from libvirt import libvirtError
 
 from utils import xmlbuilder
 
+required_params = ('poolname', 'pooltype', 'sourcename')
+optional_params = ('targetpath')
+
 def check_params(params):
     """Verify inputing parameter dictionary"""
     #targetpath and sourceformat are optional arguments

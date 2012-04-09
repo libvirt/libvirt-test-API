@@ -10,6 +10,9 @@ from libvirt import libvirtError
 
 from utils import xmlbuilder
 
+required_params = ('poolname', 'pooltype', 'sourcename', 'sourcepath')
+optional_params = ()
+
 def display_pool_info(conn, logger):
     """Display current storage pool information"""
     logger.debug("current define storage pool: %s" % conn.listDefinedStoragePools())

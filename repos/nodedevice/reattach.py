@@ -11,6 +11,9 @@ from libvirt import libvirtError
 
 from utils import utils
 
+required_params = ('pciaddress')
+optional_params = ()
+
 def check_node_reattach(pciaddress):
     """Check node device reattach result, if reattachment is successful, the
        device will be removed from pci-stub driver and return original driver
