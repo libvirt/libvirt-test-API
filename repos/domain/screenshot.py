@@ -1,11 +1,6 @@
 #!/usr/bin/env python
-"""This test is used for creating a screenshot of a domain and saving
-   it in a file. The Screenshot format is hypervisor specific.
-
-   mandatory arguments: guestname
-                        screen
-                        filename
-"""
+# To test domain screenshot, the screenshot format is
+# hypervisor specific.
 
 import os
 import mimetypes

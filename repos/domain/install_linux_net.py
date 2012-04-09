@@ -1,23 +1,5 @@
 #! /usr/bin/env python
-"""The test script is for installing a new guest virtual machine
-   via calling libvirt python bindings API.
-   mandatory arguments:guesttype
-                       guestname
-                       guestos
-                       guestarch
-                       netmethod
-   optional arguments: uuid
-                       memory
-                       vcpu
-                       disksize
-                       imagetype
-                       imagepath
-                       hdmodel
-                       nicmodel
-                       ifacetype
-                       source
-                       type: define|create
-"""
+# Install a linux domain from network
 
 import os
 import sys
@@ -47,25 +29,6 @@ def return_close(conn, logger, ret):
     conn.close()
     logger.info("closed hypervisor connection")
     return ret
-
-def usage():
-    print '''usage: mandatory arguments:guesttype
-                           guestname
-                           guestos
-                           guestarch
-                           netmethod
-       optional arguments: uuid
-                           memory
-                           vcpu
-                           disksize
-                           imagetype
-                           imagepath
-                           hdmodel
-                           nicmodel
-                           ifacetype
-                           source
-                           type: define|create
-          '''
 
 def check_params(params):
     """Checking the arguments required"""

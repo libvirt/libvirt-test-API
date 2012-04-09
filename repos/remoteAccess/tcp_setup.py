@@ -1,17 +1,5 @@
 #!/usr/bin/env python
-""" Configure and test libvirt tcp connection
-    remoteAccess:tcp_setup
-        target_machine
-            xx.xx.xx.xx
-        username
-            root
-        password
-            xxxxxx
-        listen_tcp
-            enable|disable
-        auth_tcp
-            none|sasl
-"""
+# To test connection via tcp protocol
 
 import os
 import re

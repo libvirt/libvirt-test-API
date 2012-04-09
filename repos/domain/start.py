@@ -1,8 +1,4 @@
 #!/usr/bin/env python
-"""for testing the start function of domain
-   mandatory arguments: guestname
-   optional arguments: flags
-"""
 
 import os
 import sys
@@ -16,11 +12,6 @@ from utils import utils
 
 NONE = 0
 START_PAUSED = 1
-
-def usage():
-    print '''usage: mandatory arguments: guestname
-       optional arguments: flags
-          '''
 
 def return_close(conn, logger, ret):
     conn.close()

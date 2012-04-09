@@ -1,7 +1,5 @@
 #!/usr/bin/env python
-"""this test case is used for creating volume of
-   a partition type storage pool from xml
-"""
+# Create volume for storage pool of partition type
 
 import os
 import re
@@ -12,16 +10,6 @@ import libvirt
 from libvirt import libvirtError
 
 from utils import xmlbuilder
-
-def usage():
-    """usage infomation"""
-    print """mandatory options:
-              poolname: The name of pool under which the volume to be created
-              volname: Name of the volume to be created
-              volformat:  the format types of volume like \
-                          'none,linux,fat16,fat32,linux-lvm...'
-              capacity: the size of the volume with optional k,M,G,T suffix, \
-                        for example '10G' """
 
 def return_close(conn, logger, ret):
     conn.close()

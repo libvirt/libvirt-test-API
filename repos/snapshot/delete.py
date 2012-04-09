@@ -1,7 +1,4 @@
 #!/usr/bin/env python
-""""virsh snapshot-delete" testing
-   mandatory arguments: guestname snapshotname
-"""
 
 import os
 import sys

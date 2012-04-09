@@ -1,9 +1,5 @@
 #!/usr/bin/env python
-"""this test case is used for testing
-   restore domain from a disk save image
-   mandatory arguments: guestname
-                        filepath
-"""
+# Restore domain from a saved statefile
 
 import os
 import re
@@ -18,20 +14,6 @@ def return_close(conn, logger, ret):
     conn.close()
     logger.info("closed hypervisor connection")
     return ret
-
-def usage(params):
-    """Verify inputing parameter dictionary"""
-    logger = params['logger']
-    keys = ['guestname', 'filepath' ]
-    for key in keys:
-        if key not in params:
-            logger.error("%s is required" % key)
-            return 1
-        elif len(params[key]) == 0:
-            logger.error("%s value is empty, please inputting a value" % key)
-            return 1
-        else:
-            pass
 
 def get_guest_ipaddr(*args):
     """Get guest ip address"""

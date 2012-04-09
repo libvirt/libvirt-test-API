@@ -1,7 +1,5 @@
 #!/usr/bin/evn python
-"""this test case is used for testing define
-   a network from xml
-"""
+# Define a network
 
 import time
 import os
@@ -12,21 +10,6 @@ import libvirt
 from libvirt import libvirtError
 
 from utils import xmlbuilder
-
-def usage(params):
-    """Verify inputing parameter dictionary"""
-    logger = params['logger']
-    keys = ['networkname', 'bridgename', 'bridgeip', 'bridgenetmask', \
-'netstart', 'netend', 'netmode']
-    for key in keys:
-        if key not in params:
-            logger.error("%s is required" %key)
-            return 1
-        elif len(params[key]) == 0:
-            logger.error("%s value is empty, please inputting a value" %key)
-            return 1
-        else:
-            pass
 
 def check_network_define(networkname, logger):
     """Check define network result, if define network is successful,

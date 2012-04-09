@@ -1,7 +1,5 @@
 #!/usr/bin/env python
-"""this test case is used for testing
-   reattach a specific node device
-"""
+# Re-attach a node device to host
 
 import os
 import re
@@ -12,19 +10,6 @@ import libvirt
 from libvirt import libvirtError
 
 from utils import utils
-
-def usage(params):
-    """Verify inputing parameter dictionary"""
-    keys = ['pciaddress']
-    for key in keys:
-        if key not in params:
-            logger.error("%s is required" %key)
-            return 1
-        elif len(params[key]) == 0:
-            logger.error("%s value is empty, please inputting a value" %key)
-            return 1
-        else:
-            pass
 
 def check_node_reattach(pciaddress):
     """Check node device reattach result, if reattachment is successful, the

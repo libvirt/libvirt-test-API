@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-"""testing "virsh iface-mac" function
-"""
 
 import os
 import sys

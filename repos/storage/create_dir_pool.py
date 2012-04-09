@@ -1,8 +1,5 @@
 #!/usr/bin/env python
-"""
-    Testcase to create a storage pool from an xml.
-    Xml is built by this testcase by using the parameters.
-"""
+# Create a storage pool of 'dir' type
 
 import os
 import re
@@ -12,33 +9,6 @@ import libvirt
 from libvirt import libvirtError
 
 from utils import xmlbuilder
-
-def usage(params):
-    """ Verifies the params dictionary for the required arguments """
-    logger = params['logger']
-    # pooltype is optional, defaulted to "dir"
-    # targetpath is optional, defaulted to /var/lib/libvirt/images
-    keys = ['poolname']
-    for key in keys:
-        if key not in params:
-            logger.error("%s parameter is required. \
-                          Please set it to a value" % key)
-            return False
-        elif len(params[key]) == 0:
-            logger.error("%s key is empty, set it to a value" % key)
-            return False
-
-    #optional keys:
-    if "pooltype" not in params:
-        params['pooltype'] = 'dir'
-
-    # sanity check pooltype value:
-    if params['pooltype'] == "dir":
-        return True
-    else:
-        logger.error("pooltype parameter must be dir")
-        logger.error("it is: %s" % params['pooltype'])
-
 
 def check_pool_create(conn, poolname, logger):
     """Check the result of create storage pool.

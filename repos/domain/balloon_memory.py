@@ -1,9 +1,5 @@
 #!/usr/bin/env python
-"""The test scripts will test the balloon memory feature of libvirt for
-   virtual machine through calling libvirt python bindings API.
-   mandatory arguments: guestname
-                        memorypair
-"""
+# To test domain memory ballooning
 
 import os
 import sys

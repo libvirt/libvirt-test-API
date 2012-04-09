@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-"""testing "virsh domname" function
-"""
+# To test "virsh domname" command
 
 import os
 import sys

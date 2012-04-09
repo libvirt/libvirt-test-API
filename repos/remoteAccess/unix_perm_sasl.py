@@ -1,13 +1,4 @@
 #!/usr/bin/env python
-""" testing for permission and authentication of unix domain socket
-    remoteAccess:unix_perm_sasl
-        auth_unix_ro
-            none|sasl
-        auth_unix_rw
-            none|sasl
-        unix_sock_group(optional)
-            libvirt
-"""
 
 import os
 import re

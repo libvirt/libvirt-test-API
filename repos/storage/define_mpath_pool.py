@@ -1,7 +1,4 @@
 #!/usr/bin/env python
-"""this test case is used for testing define
-   a mpath type storage pool from xml
-"""
 
 import os
 import re
@@ -11,13 +8,6 @@ import libvirt
 from libvirt import libvirtError
 
 from utils import xmlbuilder
-
-def usage():
-    "usage infomation"
-    print """mandatory options:
-              poolname: Name of the pool to be created
-              pooltype: Type of the pool, which in this case must be 'disk'
-              targetpath: the default is /dev/mapper"""
 
 def check_params(params):
     """Verify inputing parameter dictionary"""

@@ -1,7 +1,4 @@
 #!/usr/bin/env python
-"""this test case is used for deleting volume of
-   a partition type storage pool from xml
-"""
 
 import os
 import re
@@ -12,12 +9,6 @@ import libvirt
 from libvirt import libvirtError
 
 from utils import xmlbuilder
-
-def usage():
-    """usage infomation"""
-    print """mandatory options:
-              poolname: The name of pool under which the volume to be created
-              volname: Name of the volume to be created"""
 
 def return_close(conn, logger, ret):
     conn.close()

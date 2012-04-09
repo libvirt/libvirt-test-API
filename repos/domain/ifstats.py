@@ -1,8 +1,5 @@
 #!/usr/bin/evn python
-"""this test case is used for testing domain interface
-   statistics
-   mandatory arguments: guestname
-"""
+# To get domain interface statistics
 
 import os
 import re
@@ -14,15 +11,6 @@ import libvirt
 from libvirt import libvirtError
 
 from utils import utils
-
-def usage(params):
-    """Verify inputing parameter dictionary"""
-    logger = params['logger']
-    keys = ['guestname']
-    for key in keys:
-        if key not in params:
-            logger.error("%s is required" % key)
-            return 1
 
 def check_guest_status(domobj):
     """Check guest current status"""

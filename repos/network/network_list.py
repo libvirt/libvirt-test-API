@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-"""testing "virsh net-list" function
-"""
+# To test "virsh net-list" command
 
 import os
 import sys

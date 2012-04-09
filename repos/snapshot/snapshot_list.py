@@ -1,7 +1,4 @@
 #!/usr/bin/env python
-""""virsh snapshot-list" testing
-   mandatory arguments: guestname
-"""
 
 import os
 import sys

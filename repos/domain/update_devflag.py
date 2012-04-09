@@ -1,15 +1,5 @@
 #!/usr/bin/env python
-"""Update virtual device to guest from an XML file
-   domain:update_devflag
-       guestname
-           xxx
-       devtype
-           cdrom|floppy
-       username
-           xxx
-       password
-           xxx
-"""
+# To test domain device updating
 
 import os
 import re

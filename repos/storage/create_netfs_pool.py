@@ -1,8 +1,5 @@
 #!/usr/bin/env python
-"""
-    Testcase to create a netfs storage pool from an xml.
-    Xml is built by this testcase by using the parameters.
-"""
+# Create a netfs storage pool
 
 import os
 import re
@@ -13,37 +10,6 @@ from libvirt import libvirtError
 
 from utils import xmlbuilder
 from utils import XMLParser
-
-def usage(params):
-    """
-       Verifies the params dictionary for the argument. Required arguments are
-       poolname, pooltype, sourcename and sourcepath.
-    """
-
-    logger = params['logger']
-
-    # targetpath is optional, defaulted to /dev/disk/by-path
-    keys = ['poolname', 'sourcename', 'sourcepath']
-    for key in keys:
-        if key not in params:
-            logger.error("%s parameter is required. \
-                          Please set it to a value" % key)
-            return False
-        elif len(params[key]) == 0:
-            logger.error("%s key is empty, set it to a value" % key)
-            return False
-
-    #optional keys:
-    if "pooltype" not in params:
-        params['pooltype'] = 'netfs'
-
-    # sanity check pooltype value:
-    if params['pooltype'] == "netfs":
-        return True
-    else:
-        logger.error("pooltype parameter must be either netfs")
-        logger.error("it is: %s" % params['pooltype'])
-
 
 def check_pool_create_libvirt(conn, poolname, logger):
     """Check the result of create storage pool inside libvirt """

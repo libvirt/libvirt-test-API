@@ -1,37 +1,5 @@
 #!/usr/bin/env python
-"""this script is for migration testing
-   domain:migrate
-       transport
-           tcp|tls|ssh
-       target_machine
-           10.66.5.5
-       username
-           root
-       password
-           redhat
-       guestname
-           rhel6
-       prestate
-           running
-       poststate
-           running
-       presrcconfig
-           false
-       postsrcconfig
-           false
-       predstconfig
-           false
-       postdstconfig
-           false
-       flags
-           0|live
 
-prestate and poststate is the domain state: <running|paused>
-presrconfig, postsrconfig, predstconfig, postdstconfig is <true|false>
-flags is the migration flags combination <0|peer2peer|tunnelled|live|paused \
-                                         |persist_dest|undefine_source|>
-
-"""
 import os
 import re
 import sys

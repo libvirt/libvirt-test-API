@@ -1,7 +1,5 @@
 #!/usr/bin/env python
-"""this test case is used for testing define
-   a disk type storage pool from xml
-"""
+# Define a storage pool of 'disk' type
 
 import os
 import re
@@ -11,17 +9,6 @@ import libvirt
 from libvirt import libvirtError
 
 from utils import xmlbuilder
-
-def usage():
-    "usage infomation"
-    print """mandatory options:
-              poolname: Name of the pool to be created
-              pooltype: Type of the pool, which in this case must be 'disk'
-              sourcepath: Name of the harddisk like '/dev/sdb'
-optional options:
-              sourceformat: Pool format types of the pool, representing the common patition tables types
-                            dos, dvh, gpt, mac, bsd, pc98, sun
-              targetpath: the default is /dev"""
 
 def check_params(params):
     """Verify inputing parameter dictionary"""

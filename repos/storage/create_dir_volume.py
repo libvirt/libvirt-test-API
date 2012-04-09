@@ -1,7 +1,5 @@
 #!/usr/bin/env python
-"""this test case is used for creating volume of
-   a dir type storage pool from xml
-"""
+# Creat volume for storage pool of 'dir' type
 
 import os
 import re
@@ -13,15 +11,6 @@ import libvirt
 from libvirt import libvirtError
 
 from utils import xmlbuilder
-
-def usage():
-    """usage infomation"""
-    print """mandatory options:
-              poolname: The name of pool under which the volume to be created
-              volname: Name of the volume to be created
-              volformat:  the format types of volume like 'raw, qcow, qcow2'
-              capacity: the size of the volume with optional k,M,G,T suffix,
-              for example '10G' """
 
 def check_params(params):
     """Verify inputing parameter dictionary"""

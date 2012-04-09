@@ -1,7 +1,5 @@
 #!/usr/bin/evn python
-"""this test case is used for testing undefine
-   the network
-"""
+# undefine a network
 
 import time
 import os
@@ -11,20 +9,6 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
-
-def usage(params):
-    """Verify inputing parameter dictionary"""
-    logger = params['logger']
-    keys = ['networkname']
-    for key in keys:
-        if key not in params:
-            logger.error("%s is required" %key)
-            return 1
-        elif len(params[key]) == 0:
-            logger.error("%s value is empty, please inputting a value" %key)
-            return 1
-        else:
-            pass
 
 def check_network_undefine(networkname):
     """Check undefine network result, if undefine network is successful,

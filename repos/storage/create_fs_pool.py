@@ -1,8 +1,5 @@
 #!/usr/bin/env python
-"""
-    Testcase to create a filesystem based storage pool from an xml.
-    Xml is built by this testcase by using the parameters.
-"""
+# Create a storage pool of 'fs' type.
 
 import os
 import re

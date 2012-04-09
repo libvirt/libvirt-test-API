@@ -1,7 +1,4 @@
 #!/usr/bin/env python
-"""this test case is used for testing of building
-   a disk type storage pool
-"""
 
 import os
 import re
@@ -13,11 +10,6 @@ from xml.dom import minidom
 import libvirt
 from libvirt import libvirtError
 
-
-def usage():
-    """usage information"""
-    print """options:
-              poolname: Name of pool to be built"""
 
 def check_params(params):
     """Verify inputing parameter dictionary"""

@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-"""testing "virsh hostname" function
-"""
+# To test "virsh hostname" command
 
 import os
 import sys

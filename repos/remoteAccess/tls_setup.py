@@ -1,20 +1,4 @@
 #!/usr/bin/env python
-""" Setup tls authentication between two hosts and configure libvirt
-    to use it for connection.
-    remoteAccess:tls_setup
-        target_machine
-            xx.xx.xx.xx
-        username
-            root
-        password
-            xxxxxx
-        listen_tls
-            enable|disable
-        auth_tls
-            none|sasl
-        pkipath(optional)
-            /tmp/pkipath
-"""
 
 import os
 import re

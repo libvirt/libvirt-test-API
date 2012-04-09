@@ -1,8 +1,4 @@
 #!/usr/bin/env python
-"""
-    Testcase to create an iscsi storage pool from an xml.
-    Xml is built by this testcase by using the parameters.
-"""
 
 import os
 import re
@@ -12,28 +8,6 @@ import libvirt
 from libvirt import libvirtError
 
 from utils import xmlbuilder
-
-def usage(params):
-    """ Verifies the params dictionary for the required arguments """
-    logger = params['logger']
-    # pooltype is optional, defaulted to "iscsi"
-    # targetpath is optional, defaulted to /dev/disk/by-path
-    keys = ['poolname', 'sourcename', 'sourcepath', 'pooltype']
-    for key in keys:
-        if key not in params:
-            logger.error("%s parameter is required. \
-                          Please set it to a value" % key)
-            return False
-        elif len(params[key]) == 0:
-            logger.error("%s key is empty, set it to a value" % key)
-            return False
-
-    # sanity check pooltype value:
-    if params['pooltype'] == "iscsi":
-        return True
-    else:
-        logger.error("pooltype parameter must be iscsi")
-        logger.error("it is: %s" % params['pooltype'])
 
 def check_pool_create(conn, poolname, logger):
     """Check the result of create storage pool.  """

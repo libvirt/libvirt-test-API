@@ -1,7 +1,4 @@
 #!/usr/bin/env python
-"""this test case is used for testing undefine
-   a specific name storage pool
-"""
 
 import os
 import re
@@ -10,21 +7,6 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
-
-def usage(params):
-    """Verify inputing parameter dictionary"""
-    keys = ['poolname']
-    for key in keys:
-        if key not in params:
-            logger.error("%s is required" %key)
-            logger.info("please input the following argument:")
-            logger.info(keys)
-            return False
-        elif len(params[key]) == 0:
-            logger.error("%s value is empty, please inputting a value" %key)
-            return False
-        else:
-            return True
 
 def display_pool_info(conn):
     """Display current storage pool information"""

@@ -1,19 +1,5 @@
 #!/usr/bin/env python
-""" To test guest cpu topology
-    domain:cpu_topology
-        guestname
-            xxx
-        username
-            root
-        password
-            xxxxxx
-        sockets
-            2
-        cores
-            1
-        threads
-            2
-"""
+# To test domain cpu topology
 
 import os
 import re

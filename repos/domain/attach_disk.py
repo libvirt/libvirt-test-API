@@ -1,12 +1,5 @@
 #!/usr/bin/env python
-"""this test case is used for testing attach
-   the disk to domain from xml
-   mandatory arguments:guestname
-                       guesttype
-                       imagename
-                       imagesize
-                       hdmodel
-"""
+# Attach a disk device to domain
 
 import os
 import re
@@ -19,15 +12,6 @@ from libvirt import libvirtError
 
 from utils import utils
 from utils import xmlbuilder
-
-def usage(params):
-    """Verify inputing parameter dictionary"""
-    logger = params['logger']
-    keys = ['guestname', 'guesttype', 'imagename', 'imagesize', 'hdmodel']
-    for key in keys:
-        if key not in params:
-            logger.error("%s is required" %key)
-            return 1
 
 def create_image(name, size, logger):
     """Create a image file"""

@@ -1,7 +1,5 @@
 #!/usr/bin/env python
-"""this test case is used for testing define
-   a dir type storage pool from xml
-"""
+# Define storage pool of 'dir' type
 
 import os
 import re
@@ -17,23 +15,6 @@ VIRSH_POOLLIST = "virsh --quiet pool-list --all|awk '{print $1}'|grep \"^%s$\""
 POOL_STAT = "virsh --quiet pool-list --all|grep \"^%s\\b\" |grep \"inactive\""
 POOL_DESTROY = "virsh pool-destroy %s"
 POOL_UNDEFINE = "virsh pool-undefine %s"
-
-def usage(params):
-    """Verify inputing parameter dictionary"""
-    logger = params['logger']
-    #targetpath is optional argument
-    keys = ['poolname', 'pooltype']
-    for key in keys:
-        if key not in params:
-            logger.error("%s is required, targetpath is optional argument" %key)
-            logger.info("please input the following argument:")
-            logger.info(keys)
-            return 1
-        elif len(params[key]) == 0:
-            logger.error("%s value is empty, please inputting a value" %key)
-            return 1
-        else:
-            pass
 
 def display_pool_info(conn, logger):
     """Display current storage pool information"""

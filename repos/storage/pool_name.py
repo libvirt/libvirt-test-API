@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-"""testing "virsh pool-name" function
-"""
 
 import os
 import sys

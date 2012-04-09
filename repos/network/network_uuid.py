@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-"""testing "virsh net-uuid" function
-"""
+# To test "virsh net-uuid" command
 
 import os
 import sys

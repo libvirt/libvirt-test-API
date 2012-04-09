@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-"""Test to activate an inactivate storage pool in libvirtd """
 
 import os
 import re
@@ -10,21 +9,6 @@ import libvirt
 from libvirt import libvirtError
 
 from utils import xmlbuilder
-
-def usage(params):
-    """Verify inputing parameter dictionary"""
-    logger = params['logger']
-
-    if 'poolname' not in params:
-        logger.error("poolname parameter is required")
-        logger.info("Please provide poolname parameter")
-        return False
-    elif len(params['poolname']) == 0:
-        logger.error("poolname parameter is empty.")
-        logger.error("Please set poolname parameter to a value.")
-        return False
-    else:
-        return True
 
 def display_pool_info(stg, logger):
     """Display current storage pool information"""

@@ -1,9 +1,5 @@
 #!/usr/bin/env python
-"""this test case is used for testing dumpping the core of
-   a domain on a given file for analysis.
-   mandatory arguments: guestname
-                        file
-"""
+# To test core dump of a domain
 
 import os
 import re
@@ -21,15 +17,6 @@ def return_close(conn, logger, ret):
     conn.close()
     logger.info("closed hypervisor connection")
     return ret
-
-def usage(params):
-    """Verify inputing parameter dictsionary"""
-    logger = params['logger']
-    keys = ['guestname', 'file']
-    for key in keys:
-        if key not in params:
-            logger.error("%s is required" %key)
-            return 1
 
 def check_guest_status(*args):
     """Check guest current status"""

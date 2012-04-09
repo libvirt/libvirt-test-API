@@ -1,11 +1,5 @@
 #!/usr/bin/env python
-"""this test case is used for testing attach
-   the interface to domain from xml
-   mandatory arguments:guestname
-                       ifacetype
-                       source
-   optional arguments: hdmodel
-"""
+# Attach interface to domain
 
 import os
 import re
@@ -16,16 +10,6 @@ from libvirt import libvirtError
 
 from utils import utils
 from utils import xmlbuilder
-
-def usage(params):
-    """Verify inputing parameter dictionary"""
-    logger = params['logger']
-    keys = ['guestname', 'ifacetype', 'source']
-    optional_keys = ['hdmodel']
-    for key in keys:
-        if key not in params:
-            logger.error("%s is required" %key)
-            return 1
 
 def check_guest_status(guestname, domobj):
     """Check guest current status"""

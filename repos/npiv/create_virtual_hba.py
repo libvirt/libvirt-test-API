@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-"""This test case is used for testing vHBA creating with npiv.
-"""
+# To test vHBA creating with npiv.
 
 import os
 import sys
@@ -12,20 +11,6 @@ from utils import xmlbuilder
 import libvirt
 from libvirt import libvirtError
 
-
-def usage(params):
-    """Verify input parameters"""
-
-    keys = ['wwpn']
-    for key in keys:
-        if key not in params:
-            logger.error("%s is required" %key)
-            return False
-        elif len(params[key]) == 0:
-            logger.error("%s value is empty, please input a value" %key)
-            return False
-        else:
-            return True
 
 def check_nodedev_create(wwpn, device_name):
     """Check if the node device vHBA was created. Can search created

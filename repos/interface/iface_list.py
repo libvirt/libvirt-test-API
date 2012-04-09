@@ -1,7 +1,4 @@
 #!/usr/bin/env python
-"""testing "virsh iface-list" function
-"""
-
 
 import os
 import sys

@@ -1,9 +1,5 @@
 #!/usr/bin/env python
-"""The test scripts will test the function of vcpu affinity of libvirt for
-   virtual machine through calling libvirt python bindings API.
-   mandatory arguments: guestname
-                        vcpu
-"""
+# To test domain CPU affinity
 
 import os
 import sys

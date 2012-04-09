@@ -1,7 +1,5 @@
 #!/usr/bin/evn python
-"""this test case is used for testing create
-   a network from xml
-"""
+# Create a network
 
 import time
 import os

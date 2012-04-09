@@ -1,7 +1,5 @@
 #!/usr/bin/env python
-"""this test case is used for testing delete
-   a volume from netfs type storage pool
-"""
+# Delete a volume from netfs type storage pool
 
 import os
 import re
@@ -10,21 +8,6 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
-
-def usage(params):
-    """Verify inputing parameter dictionary"""
-    keys = ['poolname', 'volname']
-    for key in keys:
-        if key not in params:
-            logger.error("%s is required" %key)
-            logger.info("please input the following argument:")
-            logger.info(keys)
-            return False
-        elif len(params[key]) == 0:
-            logger.error("%s value is empty, please inputting a value" %key)
-            return False
-        else:
-            return True
 
 def display_volume_info(poolobj):
     """Display current storage volume information"""

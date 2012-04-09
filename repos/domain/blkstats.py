@@ -1,8 +1,5 @@
 #!/usr/bin/evn python
-"""this test case is used for testing domain block
-   device statistics
-   mandatory arguments: guestname
-"""
+# To test domain block device statistics
 
 import os
 import sys
@@ -12,15 +9,6 @@ import libxml2
 import libvirt
 from libvirt import libvirtError
 
-
-def usage(params):
-    """Verify inputing parameter dictionary"""
-    logger = params['logger']
-    keys = ['guestname']
-    for key in keys:
-        if key not in params:
-            logger.error("%s is required" %key)
-            return 1
 
 def check_guest_status(domobj):
     """Check guest current status"""

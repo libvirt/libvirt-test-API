@@ -1,24 +1,5 @@
 #!/usr/bin/env python
-"""The test script is for installing a new windows guest virtual machine
-   via calling libvirt python bindings API.
-   mandatory arguments:guesttype
-                       guestname
-                       guestos
-                       guestarch
-   optional arguments: uuid
-                       memory
-                       vcpu
-                       disksize
-                       imagetype
-                       imagepath
-                       hdmodel
-                       nicmodel
-                       macaddr
-                       ifacetype
-                       source
-                       volumepath
-                       type: define|create
-"""
+# Install a Windows domain
 
 import os
 import sys
@@ -43,26 +24,6 @@ VM_UNDEFINE = "virsh undefine %s"
 FLOOPY_IMG = "/tmp/floppy.img"
 ISO_MOUNT_POINT = "/mnt/libvirt_windows"
 HOME_PATH = os.getcwd()
-
-def usage():
-    print '''usage: mandatory arguments:guesttype
-                           guestname
-                           guestos
-                           guestarch
-       optional arguments: uuid
-                           memory
-                           vcpu
-                           disksize
-                           imagetype
-                           imagepath
-                           hdmodel
-                           nicmodel
-                           macaddr
-                           ifacetype
-                           source
-                           volumepath
-                           type: define|create
-          '''
 
 def return_close(conn, logger, ret):
     conn.close()

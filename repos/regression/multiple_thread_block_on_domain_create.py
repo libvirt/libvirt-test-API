@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-"""testing https://bugzilla.redhat.com/show_bug.cgi?id=672226
-"""
+# To test RHBZ 672226
 
 import os
 import sys

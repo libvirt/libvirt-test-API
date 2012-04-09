@@ -1,18 +1,4 @@
 #!/usr/bin/env python
-"""The test script is for installing a new windows guest virtual machine
-   via calling libvirt python bindings API.
-   mandatory arguments:guesttype
-                       guestname
-                       guestos
-                       guestarch
-   optional arguments: uuid
-                       memory
-                       vcpu
-                       imagepath
-                       imagetype
-                       hdmodel
-                       nicmodel
-"""
 
 import os
 import sys

@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-"""testing "virsh list" function
-"""
+# To test "virsh list" command
 
 import os
 import sys

@@ -1,20 +1,5 @@
 #!/usr/bin/env python
-"""this test case is used for testing
-   create domain from xml
-   mandatory arguments:guesttype
-                       guestname
-   optional arguments: uuid
-                       memory
-                       vcpu
-                       disksize
-                       imagepath
-                       imagetype
-                       hdmodel
-                       nicmodel
-                       ifacetype
-                       source
-                       flags
-"""
+# Create domain from xml
 
 import os
 import re
@@ -29,22 +14,6 @@ from utils import xmlbuilder
 
 NONE = 0
 START_PAUSED = 1
-
-def usage():
-    print '''usage: mandatory arguments:guesttype
-                           guestname
-       optional arguments: uuid
-                           memory
-                           vcpu
-                           disksize
-                           imagepath
-                           imagetype
-                           hdmodel
-                           nicmodel
-                           ifacetype
-                           source
-                           flags
-          '''
 
 def return_close(conn, logger, ret):
     conn.close()
@@ -61,7 +30,6 @@ def check_params(params):
             usage()
             return 1
     return 0
-
 
 def create(params):
     """create a domain from xml"""

@@ -1,12 +1,5 @@
 #!/usr/bin/evn python
-"""this test case is used for testing domain
-   scheduler parameters
-   mandatory arguments for xen :guestname
-                                weight
-                                cap
-   mandatory arguments for kvm :guestname
-                                cpushares
-"""
+# To test domain scheduler parameters
 
 import os
 import sys
@@ -21,21 +14,6 @@ def return_close(conn, logger, ret):
     conn.close()
     logger.info("closed hypervisor connection")
     return ret
-
-def usage(params, hypervisor):
-    """Verify inputing parameter dictionary"""
-    logger = params['logger']
-    if 'xen' in hypervisor:
-        keys = ['guestname', 'weight', 'cap']
-    elif 'kvm' in hypervisor:
-        keys = ['guestname','cpushares']
-    else:
-        logger.error("unsupported hypervisor type: %s" % hypervisor)
-        return 1
-    for key in keys:
-        if key not in params:
-            logger.error("%s is required" % key)
-            return 1
 
 def check_guest_status(domobj):
     """Check guest current status"""

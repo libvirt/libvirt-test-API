@@ -1,7 +1,5 @@
 #!/usr/bin/evn python
-"""this test case is used for testing to activate
-   a virtual network
-"""
+# Start a network
 
 import time
 import os

@@ -1,8 +1,4 @@
 #!/usr/bin/evn python
-"""this test case is used for testing
-   undefine domain
-   mandatory arguments: guestname
-"""
 
 import os
 import re
@@ -11,15 +7,6 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
-
-def usage(params):
-    """Verify inputing parameter dictionary"""
-    logger = params['logger']
-    keys = ['guestname']
-    for key in keys:
-        if key not in params:
-            logger.error("%s is required" %key)
-            return 1
 
 def check_undefine_domain(guestname):
     """Check undefine domain result, if undefine domain is successful,

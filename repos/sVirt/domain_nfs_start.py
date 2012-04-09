@@ -1,20 +1,10 @@
 #!/usr/bin/env python
-"""This test is for start a guest with img file on nfs storage.
-   Under SElinux boolean virt_use_nfs on or off, combine with
-   setting the dynamic_ownership in /etc/libvirt/qemu.conf,
-   check whether the guest can be started or not. The nfs could
-   be root_squash or no_root_squash. SElinux should be enabled
-   and enforcing on host.
-   sVirt:domain_nfs_start
-       guestname
-           #GUESTNAME#
-       dynamic_ownership
-           enable|disable
-       virt_use_nfs
-           on|off
-       root_squash
-           yes|no
-"""
+# This test is for start a guest with img file on nfs storage.
+# Under SElinux boolean virt_use_nfs on or off, combine with
+# setting the dynamic_ownership in /etc/libvirt/qemu.conf,
+# check whether the guest can be started or not. The nfs could
+# be root_squash or no_root_squash. SElinux should be enabled
+# and enforcing on host.
 
 import os
 import re

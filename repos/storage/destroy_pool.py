@@ -1,9 +1,4 @@
 #!/usr/bin/env python
-"""
-    Testcase to destroy a storage pool. It'll take a poolname and try to destroy
-    it. The sanity checking will only be done to see if the a pool with the
-    given poolname exists or not. It won't check if the pool is active or not.
-"""
 
 import os
 import re
@@ -18,19 +13,6 @@ def return_close(conn, logger, ret):
     conn.close()
     logger.info("closed hypervisor connection")
     return ret
-
-def usage(params):
-    """Does a sanity check on the parameters given"""
-    logger = params['logger']
-    # poolname is the only required parameter
-    if 'poolname' not in params:
-        logger.error("poolname argument is needed. Please provide one")
-        return False
-    elif len(params['poolname']) == 0:
-        logger.error("poolname parameter is empty. Please set it")
-        return False
-
-    return True
 
 def check_pool_destroy(conn, poolname, logger):
     """

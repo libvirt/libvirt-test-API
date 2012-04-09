@@ -1,11 +1,5 @@
 #!/usr/bin/env python
-"""this test case is used for testing detach
-   the interface to domain from xml
-   mandatory arguments: guestname
-                        ifacetype
-                        source
-                        nicmodel
-"""
+# Detach interface from domain
 
 import os
 import re
@@ -17,15 +11,6 @@ from libvirt import libvirtError
 
 from utils import utils
 from utils import xmlbuilder
-
-def usage(params):
-    """Verify inputing parameter dictionary"""
-    logger = params['logger']
-    keys = ['guestname', 'ifacetype', 'source', 'nicmodel']
-    for key in keys:
-        if key not in params:
-            logger.error("%s is required" %key)
-            return 1
 
 def check_guest_status(domobj):
     """Check guest current status"""

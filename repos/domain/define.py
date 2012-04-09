@@ -1,20 +1,4 @@
 #!/usr/bin/evn python
-"""This test case is used for testing
-   define domain from xml
-   mandatory arguments:guesttype
-                       guestname
-   optional arguments: uuid
-                       memory
-                       vcpu
-                       disksize
-                       fullimagepath
-                       imagetype
-                       hdmodel
-                       nicmodel
-                       macaddr
-                       ifacetype
-                       source
-"""
 
 import os
 import re
@@ -28,22 +12,6 @@ from libvirt import libvirtError
 
 from utils import utils
 from utils import xmlbuilder
-
-def usage():
-    print '''usage: mandatory arguments:guesttype
-                           guestname
-       optional arguments: uuid
-                           memory
-                           vcpu
-                           disksize
-                           fullimagepath
-                           imagetype
-                           hdmodel
-                           nicmode
-                           macaddr
-                           ifacetype
-                           source
-          '''
 
 def check_params(params):
     """Verify inputing parameter dictionary"""

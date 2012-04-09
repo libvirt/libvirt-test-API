@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-"""testing "virsh pool-uuid" function
-"""
 
 import os
 import sys

@@ -1,10 +1,5 @@
 #!/usr/bin/env python
-""" To test domain event handler feature through operating a certain
-    guest then, do the checking.
-    domain:eventhandler
-        guestname
-            xxx
-"""
+# To test domain events
 
 import os
 import re

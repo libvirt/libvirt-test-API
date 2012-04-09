@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-"""testing "virsh domblkinfo" function
-"""
+# To test "virsh domblkinfo" command
 
 import os
 import sys

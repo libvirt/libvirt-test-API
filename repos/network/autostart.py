@@ -1,7 +1,5 @@
 #!/usr/bin/evn python
-"""this test case is used for testing
-   virtual network start automatically capability
-"""
+# To test network autostarting
 
 import time
 import os

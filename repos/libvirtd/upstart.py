@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-"""Upstart libvirtd testing
-"""
+# Upstart libvirtd testing
 
 import os
 import re

@@ -1,8 +1,4 @@
 #!/usr/bin/env python
-"""for testing the suspend function of domain
-   mandatory arguments: guestname
-"""
-
 import os
 import sys
 import re

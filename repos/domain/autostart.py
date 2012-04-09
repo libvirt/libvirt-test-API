@@ -1,9 +1,5 @@
 #!/usr/bin/evn python
-"""this test case is used for testing
-   domain start automatically capability
-   mandatory arguments:guestname
-                       autostart
-"""
+# To test domain autostart
 
 import os
 import re
@@ -12,15 +8,6 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
-
-def usage(params):
-    """Verify inputing parameter dictionary"""
-    logger = params['logger']
-    keys = ['guestname', 'autostart']
-    for key in keys:
-        if key not in params:
-            logger.error("%s is required" % key)
-            return 1
 
 def check_guest_autostart(*args):
     """Check domain start automatically result, if setting domain is

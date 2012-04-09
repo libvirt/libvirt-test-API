@@ -1,7 +1,5 @@
 #!/usr/bin/env python
-""" create a flag file in the guest OS
-   mandatory arguments: guestname, username, password
-"""
+# Create a flag file in the guest OS
 
 import os
 import sys

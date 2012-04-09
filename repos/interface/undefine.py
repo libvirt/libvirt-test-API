@@ -1,7 +1,4 @@
 #!/usr/bin/env python
-"""this test case is used for testing
-   undefine a specific interface
-"""
 
 import os
 import re
@@ -11,20 +8,6 @@ import libvirt
 from libvirt import libvirtError
 
 from utils import xmlbuilder
-
-def usage(params):
-    """Verify inputing parameter dictionary"""
-    keys = ['ifacename']
-    logger.info("inputting argument dictionary: %s" % params)
-    for key in keys:
-        if key not in params:
-            logger.error("%s is required" %key)
-            return 1
-        elif len(params[key]) == 0:
-            logger.error("%s value is empty, please inputting a value" %key)
-            return 1
-        else:
-            pass
 
 def check_undefine_interface(ifacename):
     """Check undefining interface result, if undefine interface is successful,

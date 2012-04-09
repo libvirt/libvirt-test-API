@@ -1,7 +1,4 @@
 #!/usr/bin/env python
-"""for testing the shutdown function of domain
-   mandatory arguments: guestname
-"""
 
 import os
 import sys

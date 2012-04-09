@@ -1,8 +1,4 @@
 #!/usr/bin/env python
-"""The test scripts will test the reboot function of libvirt for
-   virtual machine through calling libvirt python bindings API.
-   mandatory arguments: guestname
-"""
 
 import os
 import sys

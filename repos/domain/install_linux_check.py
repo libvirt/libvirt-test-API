@@ -1,19 +1,5 @@
 #!/usr/bin/env python
-"""The test script is for installing a new guest virtual machine
-   via calling libvirt python bindings API.
-   mandatory arguments:guesttype
-                       guestname
-                       netmethod
-   optional arguments: memory
-                       vcpu
-                       disksize
-                       imagepath
-                       hdmodel
-                       nicmodel
-                       ifacetype
-                       source
-                       type: define|create
-"""
+# Checking method for linux domain installation.
 
 import os
 import sys
@@ -30,22 +16,6 @@ from utils import check
 from utils import env_parser
 
 HOME_PATH = os.getcwd()
-
-def usage():
-    print '''usage: mandatory arguments:guestname
-                           guesttype
-                           hdmodel
-                           nicmodel
-       optional arguments: disksize
-                           memory
-                           vcpu
-                           guesttype
-                           imagepath
-                           ifacetype
-                           netmethod
-                           source
-                           type
-          '''
 
 def check_params(params):
     """Checking the arguments required"""

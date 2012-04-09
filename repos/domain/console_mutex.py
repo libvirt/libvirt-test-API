@@ -1,20 +1,10 @@
 #!/usr/bin/env python
-""" A test case to test console mutual exclusivity
-    mandatory arguments: guestname
-"""
+# To test console mutual exclusivity
+
 import libvirt
 from libvirt import libvirtError
 from exception import TestError
 
-
-def usage(params):
-    """Verify parameter dictionary"""
-    logger = params['logger']
-    keys = ['guestname']
-    for key in keys:
-        if key not in params:
-            logger.error("%s is required" %key)
-            return 1
 
 def console_mutex(params):
     """Attach to console"""

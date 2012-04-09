@@ -1,7 +1,5 @@
 #!/usr/bin/env python
-"""
-   This is a testcase used to define an iscsi based storage pool.
-"""
+# Define a storage pool of 'iscsi' type
 
 import os
 import re
@@ -11,28 +9,6 @@ import libvirt
 from libvirt import libvirtError
 
 from utils import xmlbuilder
-
-def usage(params):
-    """Verify inputing parameter dictionary"""
-    logger = params['logger']
-    #targetpath is optional argument
-    keys = ['poolname', 'pooltype', 'sourcename', 'sourcepath']
-    for key in keys:
-        if key not in params:
-            logger.error("%s is required, targetpath is optional argument" %key)
-            logger.info("please input the following argument:")
-            logger.info(keys)
-            return False
-        elif len(params[key]) == 0:
-            logger.error("%s value is empty, please inputting a value" %key)
-            return False
-
-    if params['pooltype'] == "iscsi":
-        return True
-    else:
-        logger.error("pooltype param must be iscsi")
-        logger.error("it is: %s" % params['pooltype'])
-        return False
 
 def display_pool_info(conn, logger):
     """Display current storage pool information"""

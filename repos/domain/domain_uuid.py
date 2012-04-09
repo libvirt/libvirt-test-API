@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-"""testing "virsh domuuid" function
-"""
+# To test "virsh domuuid" command
 
 import os
 import sys
