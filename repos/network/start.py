@@ -12,7 +12,6 @@ import commands
 import libvirt
 from libvirt import libvirtError
 
-from utils import utils
 
 def return_close(conn, logger, ret):
     conn.close()

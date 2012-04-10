@@ -10,7 +10,6 @@ import commands
 import libvirt
 from libvirt import libvirtError
 
-from utils import utils
 
 VIRSH_DOMUUID = "virsh domuuid"
 

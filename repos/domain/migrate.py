@@ -42,7 +42,6 @@ import commands
 import libvirt
 from libvirt import libvirtError
 
-from utils import utils
 from utils import xmlbuilder
 
 SSH_KEYGEN = "ssh-keygen -t rsa"

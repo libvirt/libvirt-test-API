@@ -10,7 +10,6 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
-from utils import utils
 from utils import xmlbuilder
 
 def usage():

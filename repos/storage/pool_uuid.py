@@ -11,7 +11,6 @@ import commands
 import libvirt
 from libvirt import libvirtError
 
-from utils import utils
 
 VIRSH_POOLUUID = "virsh pool-uuid"
 

@@ -10,7 +10,6 @@ import re
 import libvirt
 from libvirt import libvirtError
 
-from utils import utils
 
 def check_params(params):
     """Verify the input parameter"""
