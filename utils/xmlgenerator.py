@@ -208,7 +208,7 @@ def domain_xml(params, install = False):
     devices_element = domain.createElement('devices')
 #    if params['guesttype'] == 'xenfv':
 #        emulator_element = domain.createElement('emulator')
-#        host_arch = utils.Utils().get_host_arch()
+#        host_arch = utils.get_host_arch()
 #        if host_arch == 'i386' or host_arch == 'ia64':
 #            emulator_node = domain.createTextNode('/usr/lib/xen/bin/qemu-dm')
 #        elif host_arch == 'x86_64':
@@ -307,7 +307,7 @@ def disk_xml(params, cdrom = False):
         sys.exit(1)
 
     ### Get image path ###
-    hypertype = utils.Utils().get_hypervisor()
+    hypertype = utils.get_hypervisor()
     if not params.has_key('fullimagepath'):
         if hypertype == 'kvm':
             params['imagepath'] = '/var/lib/libvirt/images'
@@ -431,7 +431,7 @@ def interface_xml(params):
     # <model>
     # Network device model: ne2k_isa i82551 i82557b i82559er ne2k_pci
     # pcnet rtl8139 e1000 virtio
-    host_release = utils.Utils().get_host_kernel_version()
+    host_release = utils.get_host_kernel_version()
     if 'el6' in host_release:
         if params.has_key('nicmodel'):
             model_element = interface.createElement('model')
@@ -439,7 +439,7 @@ def interface_xml(params):
             interface_element.appendChild(model_element)
 
     # <mac>
-    MacAddr = utils.Utils().get_rand_mac()
+    MacAddr = utils.get_rand_mac()
     if params.has_key('macaddr'):
         mac_element = interface.createElement('mac')
         mac_element.setAttribute('address', params['macaddr'])
@@ -556,9 +556,9 @@ def pool_xml(params):
     ### Get image path ###
     if not params.has_key('targetpath'):
         if params['pooltype'] == 'netfs' or params['pooltype'] == 'dir':
-            if utils.Utils().get_hypervisor() == 'kvm':
+            if utils.get_hypervisor() == 'kvm':
                 params['targetpath'] = '/var/lib/libvirt/images'
-            elif utils.Utils().get_hypervisor() == 'xen':
+            elif utils.get_hypervisor() == 'xen':
                 params['targetpath'] = '/var/lib/xen/images'
             else:
                 print 'NOT supported hypervisor.'

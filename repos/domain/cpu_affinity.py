@@ -152,7 +152,7 @@ def vcpu_affinity_check(domain_name, vcpu, expected_pinned_cpu, hypervisor):
     """check the task in the process of the running virtual machine
        grep Cpus_allowed_list /proc/PID/task/*/status
     """
-    host_kernel_version = utils.Utils().get_host_kernel_version()
+    host_kernel_version = utils.get_host_kernel_version()
     if 'qemu' in hypervisor:
         get_pid_cmd = "cat /var/run/libvirt/qemu/%s.pid" % domain_name
         status, pid = commands.getstatusoutput(get_pid_cmd)
