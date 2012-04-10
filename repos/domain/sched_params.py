@@ -74,7 +74,7 @@ def sched_params(params):
        to verify validity of the result
     """
     uri = params['uri']
-    hypervisor = util.get_hypervisor()
+    hypervisor = utils.get_hypervisor()
     usage(params, hypervisor)
 
     logger = params['logger']

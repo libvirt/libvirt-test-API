@@ -225,9 +225,9 @@ def unix_perm_sasl_clean(params):
 
     clean_libvirtd_conf = "sed -i -e :a -e '$d;N;2,3ba' -e 'P;D' %s" % \
                           LIBVIRTD_CONF
-    util.exec_cmd(clean_libvirtd_conf, shell=True)
+    utils.exec_cmd(clean_libvirtd_conf, shell=True)
 
     cmd = "service libvirtd restart"
-    util.exec_cmd(cmd, shell=True)
+    utils.exec_cmd(cmd, shell=True)
 
     return 0

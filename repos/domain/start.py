@@ -119,12 +119,12 @@ def start(params):
 
     # Get domain ip and ping ip to check domain's status
     if not "noping" in flags:
-        mac = util.get_dom_mac_addr(domname)
+        mac = utils.get_dom_mac_addr(domname)
         logger.info("get ip by mac address")
-        ip = util.mac_to_ip(mac, 180)
+        ip = utils.mac_to_ip(mac, 180)
 
         logger.info('ping guest')
-        if not util.do_ping(ip, 300):
+        if not utils.do_ping(ip, 300):
             logger.error('Failed on ping guest, IP: ' + str(ip))
             return return_close(conn, logger, 1)
 

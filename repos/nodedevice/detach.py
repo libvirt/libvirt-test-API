@@ -63,8 +63,8 @@ def detach(params):
 
     uri = params['uri']
 
-    kernel_version = util.get_host_kernel_version()
-    hypervisor = util.get_hypervisor()
+    kernel_version = utils.get_host_kernel_version()
+    hypervisor = utils.get_hypervisor()
     pciback = ''
     if hypervisor == 'kvm':
         pciback = 'pci-stub'

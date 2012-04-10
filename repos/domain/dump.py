@@ -51,10 +51,10 @@ def check_guest_kernel(*args):
 
     chk = check.Check()
 
-    mac = util.get_dom_mac_addr(guestname)
+    mac = utils.get_dom_mac_addr(guestname)
     logger.debug("guest mac address: %s" %mac)
 
-    ipaddr = util.mac_to_ip(mac, 15)
+    ipaddr = utils.mac_to_ip(mac, 15)
     if ipaddr == None:
         logger.error("can't get guest ip")
         return None

@@ -160,7 +160,7 @@ def prepare_cdrom(*args):
 
     if os.path.exists(new_dir):
         logger.info("the folder exists, remove it")
-        shutil.rmtree(new_dir)
+        shutils.rmtree(new_dir)
 
     os.makedirs(new_dir)
     logger.info("the directory is %s" % new_dir)
@@ -174,7 +174,7 @@ def prepare_cdrom(*args):
     urllib.urlretrieve(ks, '%s/%s' % (new_dir, ks_name))[0]
     logger.info("the url of kickstart is %s" % ks)
 
-    shutil.copy('utils/ksiso.sh', new_dir)
+    shutils.copy('utils/ksiso.sh', new_dir)
     src_path = os.getcwd()
 
     logger.info("enter into the workshop folder: %s" % new_dir)
@@ -216,8 +216,8 @@ def install_linux_net(params):
     logger.info("the type of guest is %s" % guesttype)
     logger.info("the installation method is %s" % installmethod)
 
-    hypervisor = util.get_hypervisor()
-    macaddr = util.get_rand_mac()
+    hypervisor = utils.get_hypervisor()
+    macaddr = utils.get_rand_mac()
 
     logger.info("the macaddress is %s" % macaddr)
     logger.info("the type of hypervisor is %s" % hypervisor)
@@ -410,7 +410,7 @@ def install_linux_net(params):
             logger.info("guest is booting up")
 
     logger.info("get the mac address of vm %s" % guestname)
-    mac = util.get_dom_mac_addr(guestname)
+    mac = utils.get_dom_mac_addr(guestname)
     logger.info("the mac address of vm %s is %s" % (guestname, mac))
 
     timeout = 300
@@ -418,7 +418,7 @@ def install_linux_net(params):
         time.sleep(10)
         timeout -= 10
 
-        ip = util.mac_to_ip(mac, 180)
+        ip = utils.mac_to_ip(mac, 180)
 
         if not ip:
             logger.info(str(timeout) + "s left")
@@ -439,7 +439,7 @@ def install_linux_net_clean(params):
     guestname = params.get('guestname')
     guesttype = params.get('guesttype')
 
-    hypervisor = util.get_hypervisor()
+    hypervisor = utils.get_hypervisor()
     if hypervisor == 'xen':
         imgfullpath = os.path.join('/var/lib/xen/images', guestname)
     elif hypervisor == 'kvm':
@@ -480,4 +480,4 @@ def install_linux_net_clean(params):
     elif guesttype == 'xenfv':
         guest_dir = os.path.join(HOME_PATH, guestname)
         if os.path.exists(guest_dir):
-            shutil.rmtree(guest_dir)
+            shutils.rmtree(guest_dir)

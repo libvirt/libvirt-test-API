@@ -60,14 +60,14 @@ def nfs_setup(util, logger):
     """
     logger.info("set nfs service")
     cmd = "echo /tmp *\(rw,root_squash\) >> /etc/exports"
-    ret, out = util.exec_cmd(cmd, shell=True)
+    ret, out = utils.exec_cmd(cmd, shell=True)
     if ret:
         logger.error("failed to config nfs export")
         return 1
 
     logger.info("restart nfs service")
     cmd = "service nfs restart"
-    ret, out = util.exec_cmd(cmd, shell=True)
+    ret, out = utils.exec_cmd(cmd, shell=True)
     if ret:
         logger.error("failed to restart nfs service")
         return 1
@@ -85,7 +85,7 @@ def chown_file(util, filepath, logger):
 
     touch_cmd = "touch %s" % filepath
     logger.info(touch_cmd)
-    ret, out = util.exec_cmd(touch_cmd, shell=True)
+    ret, out = utils.exec_cmd(touch_cmd, shell=True)
     if ret:
         logger.error("failed to touch a new file")
         logger.error(out[0])
@@ -93,14 +93,14 @@ def chown_file(util, filepath, logger):
 
     logger.info("set chown of %s as 107:107" % filepath)
     chown_cmd = "chown 107:107 %s" % filepath
-    ret, out = util.exec_cmd(chown_cmd, shell=True)
+    ret, out = utils.exec_cmd(chown_cmd, shell=True)
     if ret:
         logger.error("failed to set the ownership of %s" % filepath)
         return 1
 
     logger.info("set %s mode as 664" % filepath)
     cmd = "chmod 664 %s" % filepath
-    ret, out = util.exec_cmd(cmd, shell=True)
+    ret, out = utils.exec_cmd(cmd, shell=True)
     if ret:
         logger.error("failed to set the mode of %s" % filepath)
         return 1
@@ -123,14 +123,14 @@ def prepare_env(util, dynamic_ownership, use_nfs, logger):
                 (QEMU_CONF, d_ownership))
     set_cmd = "echo dynamic_ownership = %s >> %s" % \
                (d_ownership, QEMU_CONF)
-    ret, out = util.exec_cmd(set_cmd, shell=True)
+    ret, out = utils.exec_cmd(set_cmd, shell=True)
     if ret:
         logger.error("failed to set dynamic ownership")
         return 1
 
     logger.info("restart libvirtd")
     restart_cmd = "service libvirtd restart"
-    ret, out = util.exec_cmd(restart_cmd, shell=True)
+    ret, out = utils.exec_cmd(restart_cmd, shell=True)
     if ret:
         logger.error("failed to restart libvirtd")
         return 1
@@ -157,14 +157,14 @@ def prepare_env(util, dynamic_ownership, use_nfs, logger):
 
         cmd = "setsebool virt_use_nfs 1"
         logger.info(cmd)
-        ret, out = util.exec_cmd(cmd, shell=True)
+        ret, out = utils.exec_cmd(cmd, shell=True)
         if ret:
             logger.error("Failed to setsebool virt_use_nfs")
             return 1
 
         logger.info("mount the nfs path to /mnt")
         mount_cmd = "mount -o vers=3 127.0.0.1:/tmp /mnt"
-        ret, out = util.exec_cmd(mount_cmd, shell=True)
+        ret, out = utils.exec_cmd(mount_cmd, shell=True)
         if ret:
             logger.error("Failed to mount the nfs path")
             for i in range(len(out)):
@@ -286,14 +286,14 @@ def ownership_test_clean(params):
     if use_nfs == 'enable':
         if os.path.ismount("/mnt"):
             umount_cmd = "umount /mnt"
-            ret, out = util.exec_cmd(umount_cmd, shell=True)
+            ret, out = utils.exec_cmd(umount_cmd, shell=True)
             if ret:
                 logger.error("Failed to unmount the nfs path")
                 for i in range(len(out)):
                     logger.error(out[i])
 
         clean_nfs_conf = "sed -i '$d' /etc/exports"
-        util.exec_cmd(clean_nfs_conf, shell=True)
+        utils.exec_cmd(clean_nfs_conf, shell=True)
 
         filepath = TEMP_FILE
     elif use_nfs == 'disable':
@@ -303,9 +303,9 @@ def ownership_test_clean(params):
         os.remove(filepath)
 
     clean_qemu_conf = "sed -i '$d' %s" % QEMU_CONF
-    util.exec_cmd(clean_qemu_conf, shell=True)
+    utils.exec_cmd(clean_qemu_conf, shell=True)
 
     cmd = "service libvirtd restart"
-    util.exec_cmd(cmd, shell=True)
+    utils.exec_cmd(cmd, shell=True)
 
     return 0

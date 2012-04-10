@@ -75,12 +75,12 @@ def resume(params):
         logger.error('The domain state is not equal to "paused"')
         return return_close(conn, logger, 1)
 
-    mac = util.get_dom_mac_addr(domname)
+    mac = utils.get_dom_mac_addr(domname)
     logger.info("get ip by mac address")
-    ip = util.mac_to_ip(mac, 120)
+    ip = utils.mac_to_ip(mac, 120)
 
     logger.info('ping guest')
-    if not util.do_ping(ip, 300):
+    if not utils.do_ping(ip, 300):
         logger.error('Failed on ping guest, IP: ' + str(ip))
         return return_close(conn, logger, 1)
 

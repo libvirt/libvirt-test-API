@@ -84,12 +84,12 @@ def file_flag(params):
         return return_close(conn, logger, 1)
 
     logger.info("get the mac address of vm %s" % guestname)
-    mac = util.get_dom_mac_addr(guestname)
+    mac = utils.get_dom_mac_addr(guestname)
     logger.info("the mac address of vm %s is %s" % (guestname, mac))
 
     timeout = 300
     while timeout:
-        ipaddr = util.mac_to_ip(mac, 180)
+        ipaddr = utils.mac_to_ip(mac, 180)
         if not ipaddr:
             logger.info(str(timeout) + "s left")
             time.sleep(10)

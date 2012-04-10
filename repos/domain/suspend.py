@@ -74,16 +74,16 @@ def suspend(params):
         logger.error('The domain state is not equal to "paused"')
         return return_close(conn, logger, 1)
 
-    mac = util.get_dom_mac_addr(domname)
+    mac = utils.get_dom_mac_addr(domname)
 
     time.sleep(3)
     logger.info("get ip by mac address")
-    ip = util.mac_to_ip(mac, 10)
+    ip = utils.mac_to_ip(mac, 10)
 
     time.sleep(10)
 
     logger.info('ping guest')
-    if util.do_ping(ip, 20):
+    if utils.do_ping(ip, 20):
         logger.error('The guest is still active, IP: ' + str(ip))
         return return_close(conn, logger, 1)
 

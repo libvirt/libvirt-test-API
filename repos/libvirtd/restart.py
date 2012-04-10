@@ -47,7 +47,7 @@ def libvirtd_check(util, logger):
     """check libvirtd status
     """
     cmd = "service libvirtd status"
-    ret, out = util.exec_cmd(cmd, shell=True)
+    ret, out = utils.exec_cmd(cmd, shell=True)
     if ret != 0:
         logger.error("failed to get libvirtd status")
         return 1
@@ -55,7 +55,7 @@ def libvirtd_check(util, logger):
         logger.info(out[0])
 
     logger.info(VIRSH_LIST)
-    ret, out = util.exec_cmd(VIRSH_LIST, shell=True)
+    ret, out = utils.exec_cmd(VIRSH_LIST, shell=True)
     if ret != 0:
         logger.error("failed to get virsh list result")
         return 1
@@ -69,7 +69,7 @@ def get_domain_pid(util, logger, guestname):
     """get the pid of running domain"""
     logger.info("get the pid of running domain %s"  % guestname)
     get_pid_cmd = "cat /var/run/libvirt/qemu/%s.pid" % guestname
-    ret, pid = util.exec_cmd(get_pid_cmd, shell=True)
+    ret, pid = utils.exec_cmd(get_pid_cmd, shell=True)
     if ret:
         logger.error("fail to get the pid of runnings domain %s" % \
                      guestname)
@@ -106,15 +106,15 @@ def restart(params):
 
     # Get domain ip
     logger.info("get the mac address of domain %s" % guestname)
-    mac = util.get_dom_mac_addr(guestname)
+    mac = utils.get_dom_mac_addr(guestname)
     logger.info("the mac address of domain %s is %s" % (guestname, mac))
     logger.info("get ip by mac address")
-    ip = util.mac_to_ip(mac, 180)
+    ip = utils.mac_to_ip(mac, 180)
     logger.info("the ip address of domain %s is %s" % (guestname, ip))
 
 
     logger.info("ping to domain %s" % guestname)
-    if util.do_ping(ip, 0):
+    if utils.do_ping(ip, 0):
         logger.info("Success ping domain %s" % guestname)
     else:
         logger.error("fail to ping domain %s" % guestname)
@@ -125,7 +125,7 @@ def restart(params):
         return 1
 
     logger.info("restart libvirtd service:")
-    ret, out = util.exec_cmd(RESTART_CMD, shell=True)
+    ret, out = utils.exec_cmd(RESTART_CMD, shell=True)
     if ret != 0:
         logger.error("failed to restart libvirtd")
         for i in range(len(out)):
@@ -141,7 +141,7 @@ def restart(params):
         return 1
 
     logger.info("ping to domain %s again" % guestname)
-    if util.do_ping(ip, 0):
+    if utils.do_ping(ip, 0):
         logger.info("Success ping domain %s" % guestname)
     else:
         logger.error("fail to ping domain %s" % guestname)

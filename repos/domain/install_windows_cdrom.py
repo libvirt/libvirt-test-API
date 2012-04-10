@@ -148,7 +148,7 @@ def prepare_floppy_image(guestname, guestos, guestarch,
     floppy_mount = "/mnt/libvirt_floppy"
     if os.path.exists(floppy_mount):
         logger.info("the floppy mount point folder exists, remove it")
-        shutil.rmtree(floppy_mount)
+        shutils.rmtree(floppy_mount)
 
     logger.info("create mount point %s" % floppy_mount)
     os.makedirs(floppy_mount)
@@ -171,7 +171,7 @@ def prepare_floppy_image(guestname, guestos, guestarch,
             setup_file = 'winnt.bat'
             setup_file_path = os.path.join(windows_unattended_path, setup_file)
             setup_file_dest = os.path.join(floppy_mount, setup_file)
-            shutil.copyfile(setup_file_path, setup_file_dest)
+            shutils.copyfile(setup_file_path, setup_file_dest)
             source = os.path.join(windows_unattended_path, "%s_%s.sif" %
                                   (guestos, guestarch))
 
@@ -270,10 +270,10 @@ def install_windows_cdrom(params):
     logger.info("the name of guest is %s" % guestname)
     logger.info("the type of guest is %s" % guesttype)
 
-    hypervisor = util.get_hypervisor()
+    hypervisor = utils.get_hypervisor()
 
     if not params.has_key('macaddr'):
-        macaddr = util.get_rand_mac()
+        macaddr = utils.get_rand_mac()
         params['macaddr'] = macaddr
 
     logger.info("the macaddress is %s" % params['macaddr'])
@@ -431,7 +431,7 @@ def install_windows_cdrom(params):
         logger.info("guest is booting up")
 
     logger.info("get the mac address of vm %s" % guestname)
-    mac = util.get_dom_mac_addr(guestname)
+    mac = utils.get_dom_mac_addr(guestname)
     logger.info("the mac address of vm %s is %s" % (guestname, mac))
 
     timeout = 600
@@ -440,7 +440,7 @@ def install_windows_cdrom(params):
         time.sleep(10)
         timeout -= 10
 
-        ip = util.mac_to_ip(mac, 0)
+        ip = utils.mac_to_ip(mac, 0)
 
         if not ip:
             logger.info(str(timeout) + "s left")
@@ -464,7 +464,7 @@ def install_windows_cdrom_clean(params):
     guestname = params.get('guestname')
     guesttype = params.get('guesttype')
 
-    hypervisor = util.get_hypervisor()
+    hypervisor = utils.get_hypervisor()
     if hypervisor == 'xen':
         imgfullpath = os.path.join('/var/lib/xen/images', guestname)
     elif hypervisor == 'kvm':

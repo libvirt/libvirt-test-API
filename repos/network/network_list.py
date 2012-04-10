@@ -130,7 +130,7 @@ def check_default_option(conn, util, logger):
             netobj = conn.networkLookupByName(network)
             bridgename = netobj.bridgeName()
             status, ip = get_output(logger, GET_BRIDGE_IP % bridgename, 0)
-            if not status and util.do_ping(ip, 0):
+            if not status and utils.do_ping(ip, 0):
                 logger.info("network %s is active as we expected" % network)
                 logger.debug("%s has ip: %s" % (bridgename, ip))
             else:

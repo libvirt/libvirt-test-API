@@ -57,14 +57,14 @@ def nfs_setup(util, root_squash, logger):
         return 1
 
     cmd = "echo /tmp *\(rw,%s\) >> /etc/exports" % option
-    ret, out = util.exec_cmd(cmd, shell=True)
+    ret, out = utils.exec_cmd(cmd, shell=True)
     if ret:
         logger.error("failed to config nfs export")
         return 1
 
     logger.info("restart nfs service")
     cmd = "service nfs restart"
-    ret, out = util.exec_cmd(cmd, shell=True)
+    ret, out = utils.exec_cmd(cmd, shell=True)
     if ret:
         logger.error("failed to restart nfs service")
         return 1
@@ -81,7 +81,7 @@ def prepare_env(util, d_ownership, virt_use_nfs, guestname, root_squash, \
     """
     logger.info("set virt_use_nfs selinux boolean")
     cmd = "setsebool virt_use_nfs %s" % virt_use_nfs
-    ret, out = util.exec_cmd(cmd, shell=True)
+    ret, out = utils.exec_cmd(cmd, shell=True)
     if ret:
         logger.error("failed to set virt_use_nfs SElinux boolean")
         return 1
@@ -98,14 +98,14 @@ def prepare_env(util, d_ownership, virt_use_nfs, guestname, root_squash, \
 
     set_cmd = "echo dynamic_ownership = %s >> %s" % \
                (option, QEMU_CONF)
-    ret, out = util.exec_cmd(set_cmd, shell=True)
+    ret, out = utils.exec_cmd(set_cmd, shell=True)
     if ret:
         logger.error("failed to set dynamic ownership")
         return 1
 
     logger.info("restart libvirtd")
     restart_cmd = "service libvirtd restart"
-    ret, out = util.exec_cmd(restart_cmd, shell=True)
+    ret, out = utils.exec_cmd(restart_cmd, shell=True)
     if ret:
         logger.error("failed to restart libvirtd")
         for i in range(len(out)):
@@ -130,7 +130,7 @@ def prepare_env(util, d_ownership, virt_use_nfs, guestname, root_squash, \
 
     logger.info("mount nfs to img dir path")
     mount_cmd = "mount -o vers=3 127.0.0.1:/tmp %s" % img_dir
-    ret, out = util.exec_cmd(mount_cmd, shell=True)
+    ret, out = utils.exec_cmd(mount_cmd, shell=True)
     if ret:
         logger.error("Failed to mount the nfs path")
         for i in range(len(out)):
@@ -181,7 +181,7 @@ def domain_nfs_start(params):
     logger.info("get guest img file path")
     try:
         dom_xml = domobj.XMLDesc(0)
-        disk_file = util.get_disk_path(dom_xml)
+        disk_file = utils.get_disk_path(dom_xml)
         logger.info("%s disk file path is %s" % (guestname, disk_file))
         img_dir = os.path.dirname(disk_file)
     except libvirtError, e:
@@ -331,7 +331,7 @@ def domain_nfs_start(params):
     filepath = "/tmp/%s" % file_name
     logger.info("set chown of %s as 107:107" % filepath)
     chown_cmd = "chown 107:107 %s" % filepath
-    ret, out = util.exec_cmd(chown_cmd, shell=True)
+    ret, out = utils.exec_cmd(chown_cmd, shell=True)
     if ret:
         logger.error("failed to chown %s to qemu:qemu" % filepath)
         return return_close(conn, logger, 1)
@@ -447,14 +447,14 @@ def domain_nfs_start_clean(params):
         domobj.destroy()
 
     dom_xml = domobj.XMLDesc(0)
-    disk_file = util.get_disk_path(dom_xml)
+    disk_file = utils.get_disk_path(dom_xml)
     img_dir = os.path.dirname(disk_file)
     file_name = os.path.basename(disk_file)
     temp_file = "/tmp/%s" % file_name
 
     if os.path.ismount(img_dir):
         umount_cmd = "umount -f %s" % img_dir
-        ret, out = util.exec_cmd(umount_cmd, shell=True)
+        ret, out = utils.exec_cmd(umount_cmd, shell=True)
         if ret:
             logger.error("failed to umount %s" % img_dir)
 
@@ -464,12 +464,12 @@ def domain_nfs_start_clean(params):
     conn.close()
 
     clean_nfs_conf = "sed -i '$d' /etc/exports"
-    util.exec_cmd(clean_nfs_conf, shell=True)
+    utils.exec_cmd(clean_nfs_conf, shell=True)
 
     clean_qemu_conf = "sed -i '$d' %s" % QEMU_CONF
-    util.exec_cmd(clean_qemu_conf, shell=True)
+    utils.exec_cmd(clean_qemu_conf, shell=True)
 
     cmd = "service libvirtd restart"
-    util.exec_cmd(cmd, shell=True)
+    utils.exec_cmd(cmd, shell=True)
 
     return 0

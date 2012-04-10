@@ -43,7 +43,7 @@ def check_create_interface(ifacename, util):
     """Check creating interface result, it will can ping itself
        if create interface is successful.
     """
-    hostip = util.get_ip_address(ifacename)
+    hostip = utils.get_ip_address(ifacename)
     logger.debug("interface %s ip address: %s" % (ifacename, hostip))
     ping_cmd = "ping -c 4 -q %s" % hostip
     stat, ret = commands.getstatusoutput(ping_cmd)
@@ -71,7 +71,7 @@ def create(params):
 
     uri = params['uri']
     try:
-        hostip = util.get_ip_address(ifacename)
+        hostip = utils.get_ip_address(ifacename)
         logger.error("interface %s is running" % ifacename)
         logger.debug("interface %s ip address: %s" % (ifacename, hostip))
         return 1

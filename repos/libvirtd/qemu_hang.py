@@ -47,7 +47,7 @@ def libvirtd_check(util, logger):
     """check libvirtd status
     """
     cmd = "service libvirtd status"
-    ret, out = util.exec_cmd(cmd, shell=True)
+    ret, out = utils.exec_cmd(cmd, shell=True)
     if ret != 0:
         logger.error("failed to get libvirtd status")
         return 1
@@ -55,7 +55,7 @@ def libvirtd_check(util, logger):
         logger.info(out[0])
 
     logger.info(VIRSH_LIST)
-    ret, out = util.exec_cmd(VIRSH_LIST, shell=True)
+    ret, out = utils.exec_cmd(VIRSH_LIST, shell=True)
     if ret != 0:
         logger.error("failed to get virsh list result")
         return 1
@@ -69,7 +69,7 @@ def get_domain_pid(util, logger, guestname):
     """get the pid of running domain"""
     logger.info("get the pid of running domain %s"  % guestname)
     get_pid_cmd = "cat /var/run/libvirt/qemu/%s.pid" % guestname
-    ret, pid = util.exec_cmd(get_pid_cmd, shell=True)
+    ret, pid = utils.exec_cmd(get_pid_cmd, shell=True)
     if ret:
         logger.error("fail to get the pid of runnings domain %s" % \
                      guestname)
@@ -110,7 +110,7 @@ def qemu_hang(params):
 
     cmd = "kill -STOP %s" % pid
     logger.info(cmd)
-    ret, out = util.exec_cmd(cmd, shell=True)
+    ret, out = utils.exec_cmd(cmd, shell=True)
     if ret:
         logger.error("failed to stop qemu process of %s" % guestname)
         return 1
@@ -129,7 +129,7 @@ def qemu_hang_clean(params):
 
     ret = get_domain_pid(util, logger, guestname)
     cmd = "kill -CONT %s" % ret[1]
-    ret = util.exec_cmd(cmd, shell=True)
+    ret = utils.exec_cmd(cmd, shell=True)
     if ret[0]:
         logger.error("failed to resume qemu process of %s" % guestname)
 

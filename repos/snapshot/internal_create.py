@@ -37,7 +37,7 @@ def check_domain_image(domobj, util, guestname, logger):
        and its disk image is the type of qcow2
     """
     dom_xml = domobj.XMLDesc(0)
-    disk_path = util.get_disk_path(dom_xml)
+    disk_path = utils.get_disk_path(dom_xml)
     status, ret = commands.getstatusoutput(QEMU_IMAGE_FORMAT % disk_path)
     if status:
         logger.error("executing "+ "\"" + QEMU_IMAGE_FORMAT % guestname + "\"" + " failed")

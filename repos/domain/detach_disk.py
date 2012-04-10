@@ -65,7 +65,7 @@ def detach_disk(params):
     diskxml = xmlobj.build_disk(params)
     logger.debug("disk xml:\n%s" %diskxml)
 
-    disk_num1 = util.dev_num(guestname, "disk")
+    disk_num1 = utils.dev_num(guestname, "disk")
     logger.debug("original disk number: %s" %disk_num1)
 
     if disktype == "virtio":
@@ -78,7 +78,7 @@ def detach_disk(params):
     try:
         try:
             domobj.detachDevice(diskxml)
-            disk_num2 = util.dev_num(guestname, "disk")
+            disk_num2 = utils.dev_num(guestname, "disk")
             logger.debug("update disk number to %s" %disk_num2)
             if  check_detach_disk(disk_num1, disk_num2):
                 logger.info("current disk number: %s\n" %disk_num2)

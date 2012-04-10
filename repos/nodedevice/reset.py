@@ -41,7 +41,7 @@ def reset(params):
 
     uri = params['uri']
 
-    kernel_version = util.get_host_kernel_version()
+    kernel_version = utils.get_host_kernel_version()
 
     if 'el5' in kernel_version:
         vendor_product_get = "lspci -n |grep %s|awk '{print $3}'" % pciaddress

@@ -76,9 +76,9 @@ def destroy(params):
 
     if not "noping" in flags:
         # Get domain ip
-        mac = util.get_dom_mac_addr(guestname)
+        mac = utils.get_dom_mac_addr(guestname)
         logger.info("get ip by mac address")
-        ip = util.mac_to_ip(mac, 180)
+        ip = utils.mac_to_ip(mac, 180)
         logger.info("the ip address of guest is %s" % ip)
 
     # Destroy domain
@@ -103,7 +103,7 @@ def destroy(params):
 
             logger.info('ping guest')
 
-            if util.do_ping(ip, 30):
+            if utils.do_ping(ip, 30):
                 logger.error('The guest is still active, IP: ' + str(ip))
                 return 1
             else:

@@ -61,9 +61,9 @@ def shutdown(params):
 
     timeout = 600
     logger.info('shutdown domain')
-    mac = util.get_dom_mac_addr(domname)
+    mac = utils.get_dom_mac_addr(domname)
     logger.info("get ip by mac address")
-    ip = util.mac_to_ip(mac, 180)
+    ip = utils.mac_to_ip(mac, 180)
     logger.info("the ip address of guest is %s" % ip)
 
     # Shutdown domain
@@ -90,7 +90,7 @@ def shutdown(params):
         return return_close(conn, logger, 1)
 
     logger.info('ping guest')
-    if util.do_ping(ip, 300):
+    if utils.do_ping(ip, 300):
         logger.error('The guest is still active, IP: ' + str(ip))
         return return_close(conn, logger, 1)
     else:

@@ -106,7 +106,7 @@ def guest_start(domobj, guestname, util, logger):
     """start guest"""
     timeout = 600
     ip = ''
-    mac = util.get_dom_mac_addr(guestname)
+    mac = utils.get_dom_mac_addr(guestname)
 
     try:
         logger.info("start guest")
@@ -121,7 +121,7 @@ def guest_start(domobj, guestname, util, logger):
         time.sleep(10)
         timeout -= 10
 
-        ip = util.mac_to_ip(mac, 180)
+        ip = utils.mac_to_ip(mac, 180)
 
         if not ip:
             logger.info(str(timeout) + "s left")
@@ -142,7 +142,7 @@ def cpu_topology_check(ip, username, password,
     lscpu = "lscpu"
     # sleep for 5 seconds
     time.sleep(40)
-    ret, output = util.remote_exec_pexpect(ip, username, password, lscpu)
+    ret, output = utils.remote_exec_pexpect(ip, username, password, lscpu)
     logger.debug("lscpu:")
     logger.debug(output)
     if ret:

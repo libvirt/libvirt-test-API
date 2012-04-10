@@ -69,7 +69,7 @@ def destroy(params):
 
     uri = params['uri']
     try:
-        hostip = util.get_ip_address(ifacename)
+        hostip = utils.get_ip_address(ifacename)
         logger.info("interface %s is active" % ifacename)
         logger.debug("interface %s ip address: %s" % (ifacename, hostip))
     except:

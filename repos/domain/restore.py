@@ -37,13 +37,13 @@ def get_guest_ipaddr(*args):
     """Get guest ip address"""
     (guestname, util, logger) = args
 
-    mac = util.get_dom_mac_addr(guestname)
+    mac = utils.get_dom_mac_addr(guestname)
     logger.debug("guest mac address: %s" % mac)
 
-    ipaddr = util.mac_to_ip(mac, 15)
+    ipaddr = utils.mac_to_ip(mac, 15)
     logger.debug("guest ip address: %s" % ipaddr)
 
-    if util.do_ping(ipaddr, 20) == 1:
+    if utils.do_ping(ipaddr, 20) == 1:
         logger.info("ping current guest successfull")
         return ipaddr
     else:

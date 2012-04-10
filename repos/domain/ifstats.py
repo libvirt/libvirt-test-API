@@ -64,12 +64,12 @@ def ifstats(params):
             logger.info("closed hypervisor connection")
             return 1
 
-    mac = util.get_dom_mac_addr(guestname)
+    mac = utils.get_dom_mac_addr(guestname)
     logger.info("get ip by mac address")
-    ip = util.mac_to_ip(mac, 180)
+    ip = utils.mac_to_ip(mac, 180)
 
     logger.info('ping guest')
-    if not util.do_ping(ip, 300):
+    if not utils.do_ping(ip, 300):
         logger.error('Failed on ping guest, IP: ' + str(ip))
         conn.close()
         logger.info("closed hypervisor connection")

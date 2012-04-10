@@ -42,7 +42,7 @@ def reboot(params):
 
     # Connect to local hypervisor connection URI
     uri = params['uri']
-    hypervisor = util.get_hypervisor()
+    hypervisor = utils.get_hypervisor()
     if hypervisor == "kvm":
         logger.info("kvm hypervisor doesn't support the funtion now")
         return 0
@@ -52,10 +52,10 @@ def reboot(params):
 
     # Get domain ip
     logger.info("get the mac address of vm %s" % domain_name)
-    mac = util.get_dom_mac_addr(domain_name)
+    mac = utils.get_dom_mac_addr(domain_name)
     logger.info("the mac address of vm %s is %s" % (domain_name, mac))
     logger.info("get ip by mac address")
-    ip = util.mac_to_ip(mac, 180)
+    ip = utils.mac_to_ip(mac, 180)
     logger.info("the ip address of vm %s is %s" % (domain_name, ip))
     timeout = 600
     logger.info('reboot vm %s now' % domain_name)
@@ -79,7 +79,7 @@ def reboot(params):
     while timeout:
         time.sleep(10)
         timeout -= 10
-        if util.do_ping(ip, 0):
+        if utils.do_ping(ip, 0):
             logger.info(str(timeout) + "s left")
         else:
             logger.info("vm %s power off successfully" % domain_name)
@@ -94,7 +94,7 @@ def reboot(params):
     while timeout:
         time.sleep(10)
         timeout -= 10
-        if not util.do_ping(ip, 0):
+        if not utils.do_ping(ip, 0):
             logger.info(str(timeout) + "s left")
         else:
             logger.info("vm %s power on successfully")

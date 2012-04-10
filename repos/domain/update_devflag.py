@@ -39,14 +39,14 @@ def create_image(params, util, img_name):
 
     if params['devtype'] == 'cdrom':
         cmd1 = "uuidgen|cut -d- -f1"
-        ret1, out1 = util.exec_cmd(cmd1, shell=True)
+        ret1, out1 = utils.exec_cmd(cmd1, shell=True)
         if ret1:
             logger.error("random code generated fail.")
             return False
 
         cmd2 = "mkdir /tmp/%s && touch /tmp/%s/$(uuidgen|cut -d- -f1)" \
                                                    % (out1, out1)
-        ret2, out2 = util.exec_cmd(cmd2, shell=True)
+        ret2, out2 = utils.exec_cmd(cmd2, shell=True)
         if ret2:
             logger.error("fail to create files for iso image: \n %s" % out1)
             return False
@@ -54,7 +54,7 @@ def create_image(params, util, img_name):
             logger.info("prepare files for iso image creation.")
 
         cmd3 = "genisoimage -o %s /tmp/%s" % (img_name, out1)
-        ret3, out3 = util.exec_cmd(cmd3, shell=True)
+        ret3, out3 = utils.exec_cmd(cmd3, shell=True)
         if ret3:
             logger.error("iso file creation fail: \n %s" % out1)
             return False
@@ -63,7 +63,7 @@ def create_image(params, util, img_name):
 
     elif params['devtype'] == 'floppy':
         cmd1 = "dd if=/dev/zero of=%s bs=1440k count=1" % img_name
-        ret1, out1 = util.exec_cmd(cmd1, shell=True)
+        ret1, out1 = utils.exec_cmd(cmd1, shell=True)
         if ret1:
             logger.error("floppy image creation fail: \n %s" % out1)
             return False
@@ -71,7 +71,7 @@ def create_image(params, util, img_name):
             logger.info("create an image for floppy use: %s" % img_name)
 
         cmd2 = "mkfs.msdos -s 1 %s" % img_name
-        ret2, out2 = util.exec_cmd(cmd2, shell=True)
+        ret2, out2 = utils.exec_cmd(cmd2, shell=True)
         if ret2:
             logger.error("fail to format image: \n %s" % out2)
             return False
@@ -80,7 +80,7 @@ def create_image(params, util, img_name):
 
         cmd3 = "mount -o loop %s /mnt && touch /mnt/$(uuidgen|cut -d- -f1) \
                                       && umount -l /mnt" % img_name
-        ret3, out3 = util.exec_cmd(cmd3, shell=True)
+        ret3, out3 = utils.exec_cmd(cmd3, shell=True)
         if ret3:
             logger.error("fail to write file to floppy image: \n %s" % out3)
             return False
@@ -105,7 +105,7 @@ def check_device_in_guest(params, util, guestip):
         logger.error("it's not a cdrom or floppy device.")
         return False, None
 
-    ret, output = util.remote_exec_pexpect(guestip, params['username'], \
+    ret, output = utils.remote_exec_pexpect(guestip, params['username'], \
                                                params['password'], cmd)
     logger.debug(output)
     if ret:
@@ -114,7 +114,7 @@ def check_device_in_guest(params, util, guestip):
 
     time.sleep(5)
 
-    ret, output = util.remote_exec_pexpect(guestip, params['username'], \
+    ret, output = utils.remote_exec_pexpect(guestip, params['username'], \
                                            params['password'], "umount /media")
     logger.debug(output)
     if ret:
@@ -123,7 +123,7 @@ def check_device_in_guest(params, util, guestip):
 
     time.sleep(5)
 
-    ret, output = util.remote_exec_pexpect(guestip, params['username'], \
+    ret, output = utils.remote_exec_pexpect(guestip, params['username'], \
                                            params['password'], "ls /media")
     logger.debug(output)
     if ret:
@@ -194,8 +194,8 @@ def update_devflag(params):
 
     # Connect to local hypervisor connection URI
     uri = params['uri']
-    mac = util.get_dom_mac_addr(guestname)
-    guestip = util.mac_to_ip(mac, 180)
+    mac = utils.get_dom_mac_addr(guestname)
+    guestip = utils.mac_to_ip(mac, 180)
     logger.debug("ip address: %s" % guestip)
 
     conn = libvirt.open(uri)

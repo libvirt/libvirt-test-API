@@ -90,7 +90,7 @@ def install_image(params):
     logger.info("the arch of guest is %s" % guestarch)
 
     # Connect to local hypervisor connection URI
-    hypervisor = util.get_hypervisor()
+    hypervisor = utils.get_hypervisor()
 
     logger.info("the type of hypervisor is %s" % hypervisor)
     logger.debug("the uri to connect is %s" % uri)
@@ -150,7 +150,7 @@ def install_image(params):
 
 
     logger.info("get the mac address of vm %s" % guestname)
-    mac = util.get_dom_mac_addr(guestname)
+    mac = utils.get_dom_mac_addr(guestname)
     logger.info("the mac address of vm %s is %s" % (guestname, mac))
 
     timeout = 600
@@ -159,7 +159,7 @@ def install_image(params):
         time.sleep(10)
         timeout -= 10
 
-        ip = util.mac_to_ip(mac, 180)
+        ip = utils.mac_to_ip(mac, 180)
 
         if not ip:
             logger.info(str(timeout) + "s left")

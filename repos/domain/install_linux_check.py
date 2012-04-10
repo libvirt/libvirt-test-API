@@ -99,7 +99,7 @@ def install_linux_check(params):
     logger.info("the name of guest is %s" % guestname)
 
     # Connect to local hypervisor connection URI
-    hypervisor = util.get_hypervisor()
+    hypervisor = utils.get_hypervisor()
 
     logger.info("the type of hypervisor is %s" % hypervisor)
     logger.debug("the uri to connect is %s" % uri)
@@ -115,12 +115,12 @@ def install_linux_check(params):
         return 1
 
     logger.info("get the mac address of vm %s" % guestname)
-    mac = util.get_dom_mac_addr(guestname)
+    mac = utils.get_dom_mac_addr(guestname)
     logger.info("the mac address of vm %s is %s" % (guestname, mac))
 
     timeout = 300
     while timeout:
-        ipaddr = util.mac_to_ip(mac, 180)
+        ipaddr = utils.mac_to_ip(mac, 180)
         if not ipaddr:
             logger.info(str(timeout) + "s left")
             time.sleep(10)
@@ -145,7 +145,7 @@ def install_linux_check(params):
 
     # Ping guest from host
     logger.info("check point1: ping guest from host")
-    if util.do_ping(ipaddr, 20) == 1:
+    if utils.do_ping(ipaddr, 20) == 1:
         logger.info("ping current guest successfull")
     else:
         logger.error("Error: can't ping current guest")
@@ -170,7 +170,7 @@ def install_linux_check(params):
     # Check whether vcpu equals the value set in geust config xml
     logger.info("check point3: check cpu number in guest equals to \
                  the value set in domain config xml")
-    vcpunum_expect = int(util.get_num_vcpus(domain_name))
+    vcpunum_expect = int(utils.get_num_vcpus(domain_name))
     logger.info("vcpu number in domain config xml - %s is %s" % \
                  (domain_name, vcpunum_expect))
     vcpunum_actual = int(chk.get_remote_vcpus(ipaddr, "root", "redhat"))
@@ -188,7 +188,7 @@ def install_linux_check(params):
     # Check whether mem in guest is equal to the value set in domain config xml
     logger.info("check point4: check whether mem in guest is equal to \
                  the value set in domain config xml")
-    mem_expect = util.get_size_mem(domain_name)
+    mem_expect = utils.get_size_mem(domain_name)
     logger.info("current mem size in domain config xml - %s is %s" %
                  (domain_name, mem_expect))
     mem_actual = chk.get_remote_memory(ipaddr, "root", "redhat")

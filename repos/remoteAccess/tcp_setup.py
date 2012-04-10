@@ -40,7 +40,7 @@ def sasl_user_add(target_machine, username, password, util, logger):
     """ execute saslpasswd2 to add sasl user """
     logger.info("add sasl user on server side")
     saslpasswd2_add = "echo %s | %s -a libvirt %s" % (password, SASLPASSWD2, username)
-    ret, output = util.remote_exec_pexpect(target_machine, username,
+    ret, output = utils.remote_exec_pexpect(target_machine, username,
                                     password, saslpasswd2_add)
     if ret:
         logger.error("failed to add sasl user")
@@ -54,7 +54,7 @@ def tcp_libvirtd_set(target_machine, username, password,
     logger.info("setting libvirtd.conf on libvirt server")
     # open libvirtd --listen option
     listen_open_cmd = "echo 'LIBVIRTD_ARGS=\"--listen\"' >> %s" % SYSCONFIG_LIBVIRTD
-    ret, output = util.remote_exec_pexpect(target_machine, username,
+    ret, output = utils.remote_exec_pexpect(target_machine, username,
                                     password, listen_open_cmd)
     if ret:
         logger.error("failed to uncomment --listen in %s" % SYSCONFIG_LIBVIRTD)
@@ -63,7 +63,7 @@ def tcp_libvirtd_set(target_machine, username, password,
     # set listen_tls
     logger.info("set listen_tls to 0 in %s" % LIBVIRTD_CONF)
     listen_tls_disable = "echo \"listen_tls = 0\" >> %s" % LIBVIRTD_CONF
-    ret, output = util.remote_exec_pexpect(target_machine, username,
+    ret, output = utils.remote_exec_pexpect(target_machine, username,
                                     password, listen_tls_disable)
     if ret:
         logger.error("failed to set listen_tls to 0 in %s" % LIBVIRTD_CONF)
@@ -73,7 +73,7 @@ def tcp_libvirtd_set(target_machine, username, password,
     if listen_tcp == 'enable':
         logger.info("enable listen_tcp = 1 in %s" % LIBVIRTD_CONF)
         listen_tcp_set = "echo 'listen_tcp = 1' >> %s" % LIBVIRTD_CONF
-        ret, output = util.remote_exec_pexpect(target_machine, username,
+        ret, output = utils.remote_exec_pexpect(target_machine, username,
                                         password, listen_tcp_set)
         if ret:
             logger.error("failed to set listen_tcp in %s" % LIBVIRTD_CONF)
@@ -82,7 +82,7 @@ def tcp_libvirtd_set(target_machine, username, password,
     # set auth_tcp
     logger.info("set auth_tcp to \"%s\" in %s" % (auth_tcp, LIBVIRTD_CONF))
     auth_tcp_set = "echo 'auth_tcp = \"%s\"' >> %s" % (auth_tcp, LIBVIRTD_CONF)
-    ret, output = util.remote_exec_pexpect(target_machine, username,
+    ret, output = utils.remote_exec_pexpect(target_machine, username,
                                        password, auth_tcp_set)
     if ret:
         logger.error("failed to set auth_tcp in %s" % LIBVIRTD_CONF)
@@ -91,7 +91,7 @@ def tcp_libvirtd_set(target_machine, username, password,
     # restart remote libvirtd service
     libvirtd_restart_cmd = "service libvirtd restart"
     logger.info("libvirtd restart")
-    ret, output = util.remote_exec_pexpect(target_machine, username,
+    ret, output = utils.remote_exec_pexpect(target_machine, username,
                                     password, libvirtd_restart_cmd)
     if ret:
         logger.error("failed to restart libvirtd service")
@@ -169,7 +169,7 @@ def tcp_setup(params):
     logger.info("the value of listen_tcp is %s" % listen_tcp)
     logger.info("the value of auth_tcp is %s" % auth_tcp)
 
-    if not util.do_ping(target_machine, 0):
+    if not utils.do_ping(target_machine, 0):
         logger.error("failed to ping host %s" % target_machine)
         return 1
 
@@ -205,18 +205,18 @@ def tcp_setup_clean(params):
 
     if auth_tcp == 'sasl':
         saslpasswd2_delete = "%s -a libvirt -d %s" % (SASLPASSWD2, username)
-        ret, output = util.remote_exec_pexpect(target_machine, username,
+        ret, output = utils.remote_exec_pexpect(target_machine, username,
                                         password, saslpasswd2_delete)
         if ret:
             logger.error("failed to delete sasl user")
     libvirtd_conf_retore = "sed -i -n '/^[ #]/p' %s" % LIBVIRTD_CONF
-    ret, output = util.remote_exec_pexpect(target_machine, username,
+    ret, output = utils.remote_exec_pexpect(target_machine, username,
                                     password, libvirtd_conf_retore)
     if ret:
         logger.error("failed to restore %s" % LIBVIRTD_CONF)
 
     sysconfig_libvirtd_restore = "sed -i -n '/^[ #]/p' %s" % SYSCONFIG_LIBVIRTD
-    ret, output = util.remote_exec_pexpect(target_machine, username,
+    ret, output = utils.remote_exec_pexpect(target_machine, username,
                                     password, sysconfig_libvirtd_restore)
     if ret:
         logger.error("failed to restore %s" % SYSCONFIG_LIBVIRTD)

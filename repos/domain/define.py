@@ -71,7 +71,7 @@ def check_define_domain(guestname, guesttype, hostname, username, \
 
     if hostname:
         cmd = "ls %s" % path
-        ret, output = util.remote_exec_pexpect(hostname, username, \
+        ret, output = utils.remote_exec_pexpect(hostname, username, \
                                                password, cmd)
         if ret:
             logger.error("guest %s xml file doesn't exsits" % guestname)
@@ -96,7 +96,7 @@ def define(params):
     test_result = False
 
     uri = params['uri']
-    hostname = util.parser_uri(uri)[1]
+    hostname = utils.parser_uri(uri)[1]
 
     username = params['username']
     password = params['password']

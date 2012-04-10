@@ -102,7 +102,7 @@ def guest_power_on(domobj, domname, mac):
         time.sleep(10)
         timeout -= 10
 
-        ip = util.mac_to_ip(mac, 180)
+        ip = utils.mac_to_ip(mac, 180)
 
         if not ip:
             logger.info(str(timeout) + "s left")
@@ -164,7 +164,7 @@ def balloon_memory(params):
     uri = params['uri']
 
     logger.info("get the mac address of vm %s" % domname)
-    mac = util.get_dom_mac_addr(domname)
+    mac = utils.get_dom_mac_addr(domname)
     logger.info("the mac address of vm %s is %s" % (domname, mac))
 
     conn = libvirt.open(uri)
@@ -222,7 +222,7 @@ def balloon_memory(params):
         return return_close(conn, logger, 1)
 
     time.sleep(10)
-    ip = util.mac_to_ip(mac, 180)
+    ip = utils.mac_to_ip(mac, 180)
     current_memory = get_mem_size(ip)
 
     logger.info("the current memory size is %s" % current_memory)

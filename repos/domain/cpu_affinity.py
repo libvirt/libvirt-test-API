@@ -64,11 +64,11 @@ def set_vcpus(util, domobj, domain_name, vcpu):
     logger.info('destroy domain')
 
     logger.info("get the mac address of vm %s" % domain_name)
-    mac = util.get_dom_mac_addr(domain_name)
+    mac = utils.get_dom_mac_addr(domain_name)
     logger.info("the mac address of vm %s is %s" % (domain_name, mac))
 
     logger.info("get ip by mac address")
-    ip = util.mac_to_ip(mac, 180)
+    ip = utils.mac_to_ip(mac, 180)
     logger.info("the ip address of vm %s is %s" % (domain_name, ip))
 
     try:
@@ -86,7 +86,7 @@ def set_vcpus(util, domobj, domain_name, vcpu):
 
         logger.info('ping guest')
 
-        if util.do_ping(ip, 30):
+        if utils.do_ping(ip, 30):
             logger.error('The guest is still active, IP: ' + str(ip))
         else:
             logger.info("domain %s is destroied successfully" % domain_name)
@@ -133,7 +133,7 @@ def set_vcpus(util, domobj, domain_name, vcpu):
         time.sleep(10)
         timeout -= 10
 
-        ip = util.mac_to_ip(mac, 180)
+        ip = utils.mac_to_ip(mac, 180)
 
         if not ip:
             logger.info(str(timeout) + "s left")
@@ -242,7 +242,7 @@ def cpu_affinity(params):
 
     domobj = conn.lookupByName(domain_name)
 
-    vcpunum = util.get_num_vcpus(domain_name)
+    vcpunum = utils.get_num_vcpus(domain_name)
     logger.info("the current vcpu number of guest %s is %s" % \
                 (domain_name, vcpunum))
 
@@ -252,12 +252,12 @@ def cpu_affinity(params):
         if ret != 0:
             return return_close(conn, logger, 1)
 
-    vcpunum_after_set = util.get_num_vcpus(domain_name)
+    vcpunum_after_set = utils.get_num_vcpus(domain_name)
     logger.info("after setting, the current vcpu number the guest is %s" % \
                  vcpunum_after_set)
     vcpu_list = range(int(vcpunum_after_set))
 
-    physical_cpu_num = util.get_host_cpus()
+    physical_cpu_num = utils.get_host_cpus()
     logger.info("in the host, we have %s physical cpu" % physical_cpu_num)
 
     cpu_affinity = ()

@@ -62,14 +62,14 @@ def attach_interface(params):
     interfacexml = xmlobj.build_interface(params)
     logger.debug("interface xml:\n%s" %interfacexml)
 
-    iface_num1 = util.dev_num(guestname, "interface")
+    iface_num1 = utils.dev_num(guestname, "interface")
     logger.debug("original interface number: %s" %iface_num1)
 
     # Attach interface to domain
     try:
         try:
             domobj.attachDeviceFlags(interfacexml, 0)
-            iface_num2 = util.dev_num(guestname, "interface")
+            iface_num2 = utils.dev_num(guestname, "interface")
             logger.debug("update interface number to %s" %iface_num2)
             if  check_attach_interface(iface_num1, iface_num2):
                 logger.info("current interface number: %s" %iface_num2)

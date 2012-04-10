@@ -55,7 +55,7 @@ def detach_interface(params):
 
     # Connect to local hypervisor connection URI
     uri = params['uri']
-    macs = util.get_dom_mac_addr(guestname)
+    macs = utils.get_dom_mac_addr(guestname)
     mac_list = macs.split("\n")
     logger.debug("mac address: \n%s" % macs)
     params['macaddr'] = mac_list[-1]
@@ -67,7 +67,7 @@ def detach_interface(params):
     ifacexml = xmlobj.build_interface(params)
     logger.debug("interface xml:\n%s" % ifacexml)
 
-    iface_num1 = util.dev_num(guestname, "interface")
+    iface_num1 = utils.dev_num(guestname, "interface")
     logger.debug("original interface number: %s" % iface_num1)
 
     if check_guest_status(domobj):
@@ -79,7 +79,7 @@ def detach_interface(params):
     try:
         try:
             domobj.detachDevice(ifacexml)
-            iface_num2 = util.dev_num(guestname, "interface")
+            iface_num2 = utils.dev_num(guestname, "interface")
             logger.debug("update interface number to %s" % iface_num2)
             if  check_detach_interface(iface_num1, iface_num2):
                 logger.info("current interface number: %s" % iface_num2)

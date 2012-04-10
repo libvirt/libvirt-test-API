@@ -75,7 +75,7 @@ class guest_install(Thread):
         guest_params['guesttype'] = self.type
         guest_params['guestname'] = self.name
         guest_params['kickstart'] = self.ks
-        macaddr = self.util.get_rand_mac()
+        macaddr = self.utils.get_rand_mac()
         guest_params['macaddr'] = macaddr
 
 	# prepare disk image file
@@ -124,7 +124,7 @@ def multiple_thread_block_on_domain_create(params):
     logger.info("the type of guest is %s" % type)
     logger.info("the number of guest we are going to install is %s" % num)
 
-    hypervisor = util.get_hypervisor()
+    hypervisor = utils.get_hypervisor()
     uri = params['uri']
 
     auth = [[libvirt.VIR_CRED_AUTHNAME, libvirt.VIR_CRED_PASSPHRASE], request_credentials, None]
