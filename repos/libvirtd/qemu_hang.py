@@ -88,7 +88,6 @@ def qemu_hang(params):
 
     logger = params['logger']
     guestname = params['guestname']
-    util = utils.Utils()
     uri = params['uri']
 
     conn = libvirt.open(uri)
@@ -127,7 +126,6 @@ def qemu_hang_clean(params):
     """ clean testing environment """
     logger = params['logger']
     guestname = params['guestname']
-    util = utils.Utils()
 
     ret = get_domain_pid(util, logger, guestname)
     cmd = "kill -CONT %s" % ret[1]

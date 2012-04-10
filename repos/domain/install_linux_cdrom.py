@@ -232,7 +232,6 @@ def install_linux_cdrom(params):
     logger.info("the name of guest is %s" % guestname)
     logger.info("the type of guest is %s" % guesttype)
 
-    util = utils.Utils()
     hypervisor = util.get_hypervisor()
     conn = libvirt.open(uri)
 
@@ -445,7 +444,6 @@ def install_linux_cdrom_clean(params):
     guestname = params.get('guestname')
     guesttype = params.get('guesttype')
 
-    util = utils.Utils()
     hypervisor = util.get_hypervisor()
     if hypervisor == 'xen':
         imgfullpath = os.path.join('/var/lib/xen/images', guestname)

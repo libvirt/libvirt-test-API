@@ -73,7 +73,6 @@ def file_flag(params):
     username = params['username']
     password = params['password']
 
-    util = utils.Utils()
     chk = check.Check()
     uri = params['uri']
     conn = libvirt.open(uri)
@@ -113,5 +112,4 @@ def file_flag(params):
 
 def file_flag_clean(params):
     """ clean testing environment """
-    util = utils.Utils()
     return 0

@@ -93,7 +93,6 @@ def create_logical_volume(params):
     volname = params['volname']
     capacity = params['capacity']
 
-    util = utils.Utils()
     dicts = util.get_capacity_suffix_size(capacity)
 
     params['capacity'] = dicts['capacity']

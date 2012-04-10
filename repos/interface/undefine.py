@@ -48,7 +48,6 @@ def undefine(params):
 
     ifacename = params['ifacename']
 
-    util = utils.Utils()
     uri = params['uri']
 
     conn = libvirt.open(uri)

@@ -382,7 +382,6 @@ def tls_setup(params):
     if pkipath:
         uri += "?pkipath=%s" % pkipath
 
-    util = utils.Utils()
     local_machine = util.get_local_hostname()
 
     logger.info("the hostname of server is %s" % target_machine)
@@ -446,7 +445,6 @@ def tls_setup_clean(params):
     listen_tls = params['listen_tls']
     auth_tls = params['auth_tls']
 
-    util = utils.Utils()
     cacert_rm = "rm -f %s/cacert.pem" % CA_FOLDER
     ret, output = util.remote_exec_pexpect(target_machine, username,
                                     password, cacert_rm)

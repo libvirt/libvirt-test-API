@@ -196,7 +196,6 @@ def cpu_topology(params):
     logger.info("cores is %s" % cores)
     logger.info("threads is %s" % threads)
 
-    util = utils.Utils()
     uri = params['uri']
 
     logger.info("the uri is %s" % uri)

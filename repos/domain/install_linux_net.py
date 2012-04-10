@@ -216,7 +216,6 @@ def install_linux_net(params):
     logger.info("the type of guest is %s" % guesttype)
     logger.info("the installation method is %s" % installmethod)
 
-    util = utils.Utils()
     hypervisor = util.get_hypervisor()
     macaddr = util.get_rand_mac()
 
@@ -440,7 +439,6 @@ def install_linux_net_clean(params):
     guestname = params.get('guestname')
     guesttype = params.get('guesttype')
 
-    util = utils.Utils()
     hypervisor = util.get_hypervisor()
     if hypervisor == 'xen':
         imgfullpath = os.path.join('/var/lib/xen/images', guestname)

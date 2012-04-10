@@ -124,7 +124,6 @@ def multiple_thread_block_on_domain_create(params):
     logger.info("the type of guest is %s" % type)
     logger.info("the number of guest we are going to install is %s" % num)
 
-    util = utils.Utils()
     hypervisor = util.get_hypervisor()
     uri = params['uri']
 

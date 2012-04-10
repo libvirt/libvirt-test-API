@@ -41,7 +41,6 @@ def reboot(params):
     domain_name = params['guestname']
 
     # Connect to local hypervisor connection URI
-    util = utils.Utils()
     uri = params['uri']
     hypervisor = util.get_hypervisor()
     if hypervisor == "kvm":

@@ -99,7 +99,6 @@ def install_linux_check(params):
     logger.info("the name of guest is %s" % guestname)
 
     # Connect to local hypervisor connection URI
-    util = utils.Utils()
     hypervisor = util.get_hypervisor()
 
     logger.info("the type of hypervisor is %s" % hypervisor)

@@ -58,7 +58,6 @@ def domuuid(params):
         guestname = params['guestname']
         logger.info("guest name is %s" % guestname)
 
-    util = utils.Utils()
     uri = params['uri']
     conn = libvirt.open(uri)
 

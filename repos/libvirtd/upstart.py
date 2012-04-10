@@ -43,7 +43,6 @@ def libvirtd_check(util, logger):
 def upstart(params):
     """Set libvirtd upstart"""
     logger = params['logger']
-    util = utils.Utils()
 
     logger.info("chkconfig libvirtd off:")
     cmd = "chkconfig libvirtd off"
@@ -159,7 +158,6 @@ def upstart(params):
 def upstart_clean(params):
     """clean testing environment"""
     logger = params['logger']
-    util = utils.Utils()
 
     if os.path.exists(INITCTL_CMD):
         cmd = "initctl stop libvirtd"

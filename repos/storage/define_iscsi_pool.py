@@ -78,7 +78,6 @@ def define_iscsi_pool(params):
     srcname = params['sourcename']
     srcpath = params['sourcepath']
 
-    util = utils.Utils()
     uri = params['uri']
 
     conn = libvirt.open(uri)

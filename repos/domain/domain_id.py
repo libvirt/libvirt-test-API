@@ -62,7 +62,6 @@ def domid(params):
         logger.info("no running guest available")
         return 1
 
-    util = utils.Utils()
     uri = params['uri']
     conn = libvirt.open(uri)
 

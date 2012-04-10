@@ -60,7 +60,6 @@ def reattach(params):
     original_driver = check_node_reattach(pciaddress)
     logger.info("original device driver: %s" % original_driver)
 
-    util = utils.Utils()
     uri = params['uri']
 
     kernel_version = util.get_host_kernel_version()

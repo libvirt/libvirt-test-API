@@ -39,7 +39,6 @@ def reset(params):
     logger = params['logger']
     pciaddress = params['pciaddress']
 
-    util = utils.Utils()
     uri = params['uri']
 
     kernel_version = util.get_host_kernel_version()

@@ -43,7 +43,6 @@ def pool_uuid(params):
     else:
         poolname = params['poolname']
 
-    util = utils.Utils()
     uri = params['uri']
     conn = libvirt.open(uri)
     logger.info("the uri is %s" % uri)

@@ -80,7 +80,6 @@ def build_logical_pool(params):
 
     poolname = params['poolname']
 
-    util = utils.Utils()
     uri = params['uri']
 
     conn = libvirt.open(uri)

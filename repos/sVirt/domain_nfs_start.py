@@ -152,7 +152,6 @@ def domain_nfs_start(params):
     virt_use_nfs = params['virt_use_nfs']
     root_squash = params['root_squash']
 
-    util = utils.Utils()
 
     # Connect to local hypervisor connection URI
     uri = params['uri']
@@ -438,7 +437,6 @@ def domain_nfs_start_clean(params):
     logger = params['logger']
     guestname = params['guestname']
 
-    util = utils.Utils()
 
     # Connect to local hypervisor connection URI
     uri = params['uri']

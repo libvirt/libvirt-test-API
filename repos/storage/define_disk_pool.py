@@ -84,7 +84,6 @@ def define_disk_pool(params):
     logger.info("the poolname is %s, pooltype is %s, sourcepath is %s" % \
                  (poolname, pooltype, sourcepath))
 
-    util = utils.Utils()
     uri = params['uri']
 
     conn = libvirt.open(uri)

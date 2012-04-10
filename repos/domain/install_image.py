@@ -90,7 +90,6 @@ def install_image(params):
     logger.info("the arch of guest is %s" % guestarch)
 
     # Connect to local hypervisor connection URI
-    util = utils.Utils()
     hypervisor = util.get_hypervisor()
 
     logger.info("the type of hypervisor is %s" % hypervisor)

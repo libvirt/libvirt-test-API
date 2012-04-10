@@ -198,7 +198,6 @@ def ownership_test(params):
     dynamic_ownership = params['dynamic_ownership']
     use_nfs = params['use_nfs']
 
-    util = utils.Utils()
 
     # set env
     logger.info("prepare the environment")
@@ -283,7 +282,6 @@ def ownership_test_clean(params):
     logger = params['logger']
     use_nfs = params['use_nfs']
 
-    util = utils.Utils()
 
     if use_nfs == 'enable':
         if os.path.ismount("/mnt"):

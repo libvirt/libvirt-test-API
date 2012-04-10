@@ -158,7 +158,6 @@ def check_updated_device(params, output, util, guestip, domobj, srcfile):
 
 def update_devflag(params):
     """Update virtual device to a domain from xml"""
-    util = utils.Utils()
 
     # Initiate and check parameters
     params_check_result = check_params(params)

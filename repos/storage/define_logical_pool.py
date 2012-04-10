@@ -56,7 +56,6 @@ def define_logical_pool(params):
     logger = params['logger']
     poolname = params['poolname']
 
-    util = utils.Utils()
     uri = params['uri']
 
     conn = libvirt.open(uri)

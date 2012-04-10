@@ -53,7 +53,6 @@ def destroy(params):
         flags = params['flags']
 
     # Connect to local hypervisor connection URI
-    util = utils.Utils()
     uri = params['uri']
     conn = libvirt.open(uri)
 

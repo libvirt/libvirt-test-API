@@ -103,7 +103,6 @@ def create_netfs_pool(params):
 
     poolname = params['poolname']
 
-    util = utils.Utils()
     uri  = params['uri']
 
     conn = libvirt.open(uri)

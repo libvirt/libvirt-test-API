@@ -77,7 +77,6 @@ def define_mpath_pool(params):
 
     logger.info("the poolname is %s, pooltype is %s" % (poolname, pooltype))
 
-    util = utils.Utils()
     uri = params['uri']
 
     conn = libvirt.open(uri)

@@ -82,7 +82,6 @@ def define_scsi_pool(params):
     logger.info("the poolname is %s, pooltype is %s, sourcename is %s" % \
                 (poolname, pooltype, sourcename))
 
-    util = utils.Utils()
     uri = params['uri']
 
     conn = libvirt.open(uri)

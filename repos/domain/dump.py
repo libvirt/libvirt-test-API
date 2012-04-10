@@ -49,7 +49,6 @@ def check_guest_kernel(*args):
     """Check guest kernel version"""
     (guestname, logger) = args
 
-    util = utils.Utils()
     chk = check.Check()
 
     mac = util.get_dom_mac_addr(guestname)
@@ -144,7 +143,6 @@ def dump(params):
     test_result = False
 
     # Connect to local hypervisor connection URI
-    util = utils.Utils()
     uri = params['uri']
     conn = libvirt.open(uri)
     domobj = conn.lookupByName(guestname)

@@ -73,7 +73,6 @@ def sched_params(params):
        keys, by assigning different value to 'weight' and 'cap'
        to verify validity of the result
     """
-    util = utils.Utils()
     uri = params['uri']
     hypervisor = util.get_hypervisor()
     usage(params, hypervisor)

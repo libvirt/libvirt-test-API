@@ -45,7 +45,6 @@ def undefine(params):
     logger = params['logger']
     networkname = params['networkname']
 
-    util = utils.Utils()
     uri = params['uri']
 
     conn = libvirt.open(uri)

@@ -109,7 +109,6 @@ def domblkinfo(params):
     logger.info("the name of guest is %s" % guestname)
     logger.info("the block device is %s" % blockdev)
 
-    util = utils.Utils()
     uri = params['uri']
     conn = libvirt.open(uri)
 

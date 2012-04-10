@@ -164,7 +164,6 @@ def tcp_setup(params):
 
     uri = "qemu+tcp://%s/system" % target_machine
 
-    util = utils.Utils()
 
     logger.info("the hostname of server is %s" % target_machine)
     logger.info("the value of listen_tcp is %s" % listen_tcp)
@@ -203,7 +202,6 @@ def tcp_setup_clean(params):
     listen_tcp = params['listen_tcp']
     auth_tcp = params['auth_tcp']
 
-    util = utils.Utils()
 
     if auth_tcp == 'sasl':
         saslpasswd2_delete = "%s -a libvirt -d %s" % (SASLPASSWD2, username)

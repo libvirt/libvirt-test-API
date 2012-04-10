@@ -60,7 +60,6 @@ def delete_dir_volume(params):
     poolname = params['poolname']
     volname = params['volname']
 
-    util = utils.Utils()
     uri = params['uri']
 
     conn = libvirt.open(uri)

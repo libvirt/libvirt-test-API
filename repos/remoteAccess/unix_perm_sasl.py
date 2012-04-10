@@ -196,7 +196,6 @@ def unix_perm_sasl(params):
 def unix_perm_sasl_clean(params):
     """clean testing environment"""
     logger = params['logger']
-    util = utils.Utils()
 
     auth_unix_ro = params['auth_unix_ro']
     auth_unix_rw = params['auth_unix_rw']

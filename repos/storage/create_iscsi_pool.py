@@ -65,7 +65,6 @@ def create_iscsi_pool(params):
     poolname = params['poolname']
     pooltype = params['pooltype']
 
-    util = utils.Utils()
     uri  = params['uri']
 
     conn = libvirt.open(uri)

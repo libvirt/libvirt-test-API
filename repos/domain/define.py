@@ -95,7 +95,6 @@ def define(params):
     guesttype = params['guesttype']
     test_result = False
 
-    util = utils.Utils()
     uri = params['uri']
     hostname = util.parser_uri(uri)[1]
 

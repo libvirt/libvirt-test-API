@@ -66,7 +66,6 @@ def autostart(params):
         return 1
 
     # Connect to local hypervisor connection URI
-    util = utils.Utils()
     uri = params['uri']
     conn = libvirt.open(uri)
 

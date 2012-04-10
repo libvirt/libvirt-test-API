@@ -117,7 +117,6 @@ def create_netfs_volume(params):
                  volfomat is %s, capacity is %s" % \
                  (poolname, volname, volformat, capacity))
 
-    util = utils.Utils()
     uri = params['uri']
 
     conn = libvirt.open(uri)

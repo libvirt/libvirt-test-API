@@ -59,7 +59,6 @@ def destroy_pool(params):
         return 1
 
     poolname = params['poolname']
-    util = utils.Utils()
     uri = params['uri']
     conn = libvirt.open(uri)
 

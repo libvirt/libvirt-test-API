@@ -159,7 +159,6 @@ def network_list(params):
     if ret:
         return 1
 
-    util = utils.Utils()
     uri = params['uri']
     conn = libvirt.open(uri)
 

@@ -88,7 +88,6 @@ def restart(params):
 
     logger = params['logger']
     guestname = params['guestname']
-    util = utils.Utils()
     uri = params['uri']
 
     conn = libvirt.open(uri)

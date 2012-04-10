@@ -62,7 +62,6 @@ def delete(params):
     guestname = params['guestname']
     snapshotname = params['snapshotname']
 
-    util = utils.Utils()
     uri = params['uri']
     conn = libvirt.open(uri)
 

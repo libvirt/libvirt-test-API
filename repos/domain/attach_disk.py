@@ -68,7 +68,6 @@ def attach_disk(params):
     test_result = False
 
     # Connect to local hypervisor connection URI
-    util = utils.Utils()
     uri = params['uri']
     conn = libvirt.open(uri)
 

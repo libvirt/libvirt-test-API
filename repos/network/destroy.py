@@ -48,7 +48,6 @@ def destroy(params):
 
     test_result = False
 
-    util = utils.Utils()
     uri = params['uri']
 
     conn = libvirt.open(uri)

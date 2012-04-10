@@ -24,7 +24,6 @@ def console_mutex(params):
     guest = params['guestname']
     device = params.get('device', 'serial0')
 
-    util = utils.Utils()
     uri = params['uri']
 
     try:

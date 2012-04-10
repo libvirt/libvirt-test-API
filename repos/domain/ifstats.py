@@ -45,7 +45,6 @@ def ifstats(params):
     guestname = params['guestname']
     test_result = False
 
-    util = utils.Utils()
     uri = params['uri']
 
     conn = libvirt.open(uri)

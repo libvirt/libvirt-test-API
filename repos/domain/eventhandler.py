@@ -235,7 +235,6 @@ def eventhandler(params):
     loop_start()
 
     # Connect to local hypervisor connection URI
-    util = utils.Utils()
     uri = params['uri']
     conn = libvirt.open(uri)
 

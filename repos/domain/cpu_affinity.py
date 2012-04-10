@@ -224,7 +224,6 @@ def cpu_affinity(params):
     logger.info("the vcpu given is %s" % vcpu)
 
     # Connect to local hypervisor connection URI
-    util = utils.Utils()
     uri = params['uri']
     conn = libvirt.open(uri)
     hypervisor = uri.split(':')[0]

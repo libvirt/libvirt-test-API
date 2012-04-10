@@ -43,7 +43,6 @@ def pool_name(params):
     else:
         poolname = params['poolname']
 
-    util = utils.Utils()
     uri = params['uri']
     conn = libvirt.open(uri)
 

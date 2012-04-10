@@ -229,7 +229,6 @@ def migrate(params):
     dsturi = "qemu+%s://%s/system" % (transport, target_machine)
 
     # Connect to local hypervisor connection URI
-    util = utils.Utils()
     srcconn = libvirt.open(srcuri)
     dstconn = libvirt.open(dsturi)
 

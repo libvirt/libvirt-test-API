@@ -50,7 +50,6 @@ def define(params):
     ifacename = params['ifacename']
     params['dhcp'] = 'yes'
 
-    util = utils.Utils()
     uri = params['uri']
 
     conn = libvirt.open(uri)

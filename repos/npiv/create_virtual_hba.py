@@ -68,7 +68,6 @@ def create_virtual_hba(params):
     if not usage(params):
         return 1
 
-    util = utils.Utils()
     uri = params['uri']
 
     conn = libvirt.open(uri)

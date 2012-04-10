@@ -63,7 +63,6 @@ def flag_check(params):
     else:
         expected_result = "exist"
 
-    util = utils.Utils()
     chk = check.Check()
     uri = params['uri']
     conn = libvirt.open(uri)

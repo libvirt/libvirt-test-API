@@ -72,7 +72,6 @@ def create_dir_pool(params):
     poolname = params['poolname']
     pooltype = params['pooltype']
 
-    util = utils.Utils()
     uri  = params['uri']
 
     conn = libvirt.open(uri)

@@ -55,7 +55,6 @@ def shutdown(params):
     logger = params['logger']
 
     # Connect to local hypervisor connection URI
-    util = utils.Utils()
     uri = params['uri']
     conn = libvirt.open(uri)
     domobj = conn.lookupByName(domname)

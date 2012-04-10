@@ -45,7 +45,6 @@ def start(params):
     logger.info("the name of virtual network to be activated is %s" % \
                  networkname)
 
-    util = utils.Utils()
     uri = params['uri']
 
     logger.info("uri address is %s" % uri)

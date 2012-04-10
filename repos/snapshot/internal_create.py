@@ -67,7 +67,6 @@ def internal_create(params):
     if not params.has_key('snapshotname'):
         params['snapshotname'] = str(int(time.time()))
 
-    util = utils.Utils()
     uri = params['uri']
     logger.info("the uri is %s" % uri)
 

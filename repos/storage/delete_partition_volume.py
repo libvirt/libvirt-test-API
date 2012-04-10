@@ -85,7 +85,6 @@ def delete_partition_volume(params):
 
     logger.info("the poolname is %s, volname is %s" % (poolname, volname))
 
-    util = utils.Utils()
     uri = params['uri']
 
     conn = libvirt.open(uri)

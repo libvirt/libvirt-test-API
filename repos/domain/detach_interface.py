@@ -54,7 +54,6 @@ def detach_interface(params):
     test_result = False
 
     # Connect to local hypervisor connection URI
-    util = utils.Utils()
     uri = params['uri']
     macs = util.get_dom_mac_addr(guestname)
     mac_list = macs.split("\n")

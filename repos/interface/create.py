@@ -69,7 +69,6 @@ def create(params):
 
     ifacename = params['ifacename']
 
-    util = utils.Utils()
     uri = params['uri']
     try:
         hostip = util.get_ip_address(ifacename)

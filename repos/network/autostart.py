@@ -74,7 +74,6 @@ def autostart(params):
         logger.error("Error: autostart value is invalid")
         return 1
 
-    util = utils.Utils()
     uri = params['uri']
 
     logger.info("uri address is %s" % uri)
