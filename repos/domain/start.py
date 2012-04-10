@@ -52,7 +52,7 @@ def start(params):
         Argument is a dictionary with two keys:
         {'logger': logger, 'guestname': guestname}
 
-        logger -- an object of utils/Python/log.py
+        logger -- an object of utils/log.py
         mandatory arguments : guestname -- same as the domain name
         optional arguments : flags -- domain create flags <none|start_paused|noping>
 

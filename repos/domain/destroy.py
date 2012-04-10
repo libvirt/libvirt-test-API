@@ -32,7 +32,7 @@ def destroy(params):
        Argument is a dictionary with two keys:
        {'guestname': guestname}
 
-       logger -- an object of utils/Python/log.py
+       logger -- an object of utils/log.py
        guestname -- the domain name
        flags -- optional arguments:
                   noping: Don't do the ping test

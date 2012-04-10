@@ -43,7 +43,7 @@ def shutdown(params):
         Argument is a dictionary with two keys:
         {'logger': logger, 'guestname': guestname}
 
-        logger -- an object of utils/Python/log.py
+        logger -- an object of utils/log.py
         guestname -- same as the domain name
 
         Return 0 on SUCCESS or 1 on FAILURE
