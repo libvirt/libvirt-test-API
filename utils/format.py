@@ -73,4 +73,3 @@ class Format(object):
         self.write_log(msgs)
         separator = '\n' + '-' * 128 + '\n'
         self.write_log(separator)
-

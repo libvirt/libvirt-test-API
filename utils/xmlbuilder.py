@@ -389,4 +389,3 @@ if __name__ == "__main__":
     params['wwnn'] = '2001001b32a9f25b'
     params['wwpn'] = '2101001b32a90001'
     nodedev_xml = xmlobj.build_nodedev(params)
-

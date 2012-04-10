@@ -168,4 +168,3 @@ class XMLParser(object):
                     thedict[key] = newval
             if type(thedict[key]) == dict:
                 self.keyfindandset(thedict[key], thekey, thenode)
-

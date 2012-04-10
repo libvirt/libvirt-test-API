@@ -393,4 +393,3 @@ class Check(object):
         else:
             logger.info("lspci and lsmod return nothing")
             return 1
-

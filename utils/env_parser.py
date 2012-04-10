@@ -118,4 +118,3 @@ class Envparser(object):
                 "In env.conf, the option %s is nonexist" % option)
         raise exception.SectionDoesNotExist(
         "In env.conf, the section %s is nonexist" % section)
-

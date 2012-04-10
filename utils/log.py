@@ -111,5 +111,3 @@ class EnvLog(Log):
         self.console.setFormatter(console_formatter)
         self.logger.addHandler(self.console)
         return self.logger
-
-

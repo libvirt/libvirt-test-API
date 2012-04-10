@@ -920,4 +920,3 @@ def nodedev_xml(params):
     capability1_element.appendChild(wwpn_element)
 
     return nodedev
-
