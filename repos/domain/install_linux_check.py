@@ -15,8 +15,6 @@ from utils import utils
 from utils import check
 from utils import env_parser
 
-HOME_PATH = os.getcwd()
-
 required_params = ('guestname', 'guesttype', 'hdmodel', 'nicmodel')
 optional_params = ('disksize',
                    'memory',
@@ -28,51 +26,17 @@ optional_params = ('disksize',
                    'source',
                    'type')
 
-def check_params(params):
-    """Checking the arguments required"""
-    params_given = copy.deepcopy(params)
-    mandatory_args = ['guestname', 'guesttype', 'hdmodel', 'nicmodel']
-    optional_args = ['disksize', 'memory', 'vcpu', 'guesttype',
-                     'imagepath', 'ifacetype', 'netmethod', 'source', 'type']
-
-    for arg in mandatory_args:
-        if arg not in params_given.keys():
-            logger.error("Argument %s is required." % arg)
-            usage()
-            return 1
-        elif not params_given[arg]:
-            logger.error("value of argument %s is empty." % arg)
-            usage()
-            return 1
-
-        params_given.pop(arg)
-
-    if len(params_given) == 0:
-        return 0
-
-    for arg in params_given.keys():
-        if arg not in optional_args:
-            logger.error("Argument %s could not be recognized." % arg)
-            return 1
-
-    return 0
+HOME_PATH = os.getcwd()
 
 def install_linux_check(params):
     """check guest status after installation, including network ping,
        read/write option in guest. return value: 0 - ok; 1 - bad
     """
-    # Initiate and check parameters
     global logger
     logger = params['logger']
     params.pop('logger')
     uri = params['uri']
     params.pop('uri')
-    logger.info("Checking the validation of arguments provided.")
-    params_check_result = check_params(params)
-    if params_check_result:
-        return 1
-
-    logger.info("Arguments checkup finished.")
 
     guestname = params.get('guestname')
     guesttype = params.get('guesttype')

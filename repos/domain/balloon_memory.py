@@ -22,21 +22,6 @@ def return_close(conn, logger, ret):
     logger.info("closed hypervisor connection")
     return ret
 
-def check_params(params_given):
-    """Checking the arguments required"""
-
-    args_required = ['guestname', 'memorypair']
-
-    for arg in args_required:
-        if arg not in params_given.keys():
-            logger.error("Argument %s is required." % arg)
-            return 1
-        elif not params_given[arg]:
-            logger.error("value of argument %s is empty" % arg)
-            return 1
-
-    return 0
-
 def get_mem_size(ip):
     """ get current memory size in guest virtual machine"""
 
@@ -144,13 +129,9 @@ def balloon_memory(params):
     """testing balloon memory for guest virtual machine
        Return 0 on SUCCESS or 1 on FAILURE
     """
-    # Initiate and check parameters
     global logger
     logger = params['logger']
     params.pop('logger')
-    params_check_result = check_params(params)
-    if params_check_result:
-        return 1
     domname = params['guestname']
     memorypair = params['memorypair']
     minmem = int(memorypair.split(',')[0]) * 1024

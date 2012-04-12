@@ -22,12 +22,6 @@ def display_pool_info(stg, logger):
 def activate_pool(params):
     """Undefine a storage pool that's been defined and inactive"""
     logger = params['logger']
-    if usage(params):
-        logger.info("Params are right")
-    else:
-        logger.info("Params are wrong")
-        return 1
-
     poolname = params['poolname']
 
     uri = params['uri']

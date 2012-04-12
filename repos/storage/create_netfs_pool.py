@@ -63,12 +63,6 @@ def display_pool_info(conn, logger):
 def create_netfs_pool(params):
     """ Create a network FS type storage pool from xml"""
     logger = params['logger']
-    if usage(params):
-        logger.info("Params are right")
-    else:
-        logger.info("Params are wrong")
-        return 1
-
     poolname = params['poolname']
 
     uri  = params['uri']

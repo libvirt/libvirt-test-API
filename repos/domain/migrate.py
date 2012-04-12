@@ -12,9 +12,6 @@ from libvirt import libvirtError
 
 from utils import xmlbuilder
 
-SSH_KEYGEN = "ssh-keygen -t rsa"
-SSH_COPY_ID = "ssh-copy-id"
-
 required_params = ('transport',
                    'target_machine',
                    'username',
@@ -27,8 +24,11 @@ required_params = ('transport',
                    'predstconfig',
                    'postdstconfig',
                    'flags')
-
 optional_params = ()
+
+SSH_KEYGEN = "ssh-keygen -t rsa"
+SSH_COPY_ID = "ssh-copy-id"
+
 def get_state(state):
     dom_state = ''
     if state == libvirt.VIR_DOMAIN_NOSTATE:
@@ -86,17 +86,6 @@ def env_clean(srcconn, dstconn, target_machine, guestname, logger):
     if status:
         logger.error("failed to remove local ssh key")
 
-
-def check_params(params):
-    """check out the arguments requried for migration"""
-    logger = params['logger']
-    keys = ['transport', 'target_machine', 'username', 'password', 'guestname', 'flags']
-    for key in keys:
-        if key not in params:
-            logger.error("Argument %s is required" % key)
-            return 1
-    return 0
-
 def ssh_keygen(logger):
     """using pexpect to generate RSA"""
     logger.info("generate ssh RSA \"%s\"" % SSH_KEYGEN)
@@ -153,9 +142,6 @@ def ssh_tunnel(hostname, username, password, logger):
 def migrate(params):
     """ migrate a guest back and forth between two machines"""
     logger = params['logger']
-    params_check_result = check_params(params)
-    if params_check_result:
-        return 1
 
     transport = params['transport']
     target_machine = params['target_machine']

@@ -35,8 +35,6 @@ def check_detach_disk(num1, num2):
 
 def detach_disk(params):
     """Detach a disk to domain from xml"""
-     # Initiate and check parameters
-    usage(params)
     logger = params['logger']
     guestname = params['guestname']
     imagename = params['imagename']

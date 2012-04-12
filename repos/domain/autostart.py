@@ -8,7 +8,6 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
-
 required_params = ('guestname', 'autostart')
 optional_params = ()
 
@@ -39,8 +38,6 @@ def check_guest_autostart(*args):
 
 def autostart(params):
     """Set domain autostart capability"""
-    # Initiate and check parameters
-    usage(params)
     logger = params['logger']
     guestname = params['guestname']
     autostart = params['autostart']

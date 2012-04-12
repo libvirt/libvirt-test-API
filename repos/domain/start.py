@@ -10,35 +10,16 @@ from libvirt import libvirtError
 
 from utils import utils
 
-NONE = 0
-START_PAUSED = 1
-
 required_params = ('guestname')
 optional_params = ()
+
+NONE = 0
+START_PAUSED = 1
 
 def return_close(conn, logger, ret):
     conn.close()
     logger.info("closed hypervisor connection")
     return ret
-
-def check_params(params):
-    """Verify the input parameter"""
-    if 'logger' not in params:
-        print "key 'logger' is required, and it's value should \
-               be an instance of logging.Logger"
-        return 1
-
-    logger = params['logger']
-
-    keys = ['guestname', 'logger']
-    for key in keys:
-        if key not in params:
-            logger.error("key '%s' is required" % key)
-            usage()
-
-    if params['guestname'] == "":
-        logger.error("value of guestname is empty")
-        usage()
 
 def start(params):
     """Start domain
@@ -52,9 +33,7 @@ def start(params):
 
         Return 0 on SUCCESS or 1 on FAILURE
     """
-    # Initiate and check parameters
     is_fail = True
-    check_params(params)
     domname = params['guestname']
     logger = params['logger']
     flags = params.get('flags', '')

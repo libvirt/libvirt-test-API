@@ -7,7 +7,6 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
-
 required_params = ('poolname')
 optional_params = ()
 
@@ -30,11 +29,6 @@ def check_pool_undefine(poolname):
 def undefine_pool(params):
     """Undefine a specific name storage pool"""
     global logger
-    logger = params['logger']
-
-    if not usage(params):
-        return 1
-
     logger = params['logger']
     poolname = params['poolname']
 

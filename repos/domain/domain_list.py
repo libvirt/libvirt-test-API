@@ -6,6 +6,9 @@ import sys
 import re
 import commands
 
+required_params = ('listopt')
+optional_params = ()
+
 CONFIG_DIR = '/etc/libvirt/qemu'
 RUNNING_DIR = '/var/run/libvirt/qemu'
 VIRSH_QUIET_LIST = "virsh --quiet list %s|awk '{print $2}'"
@@ -17,11 +20,7 @@ def get_option_list(params):
     logger = params['logger']
     option_list=[]
 
-    if 'listopt' not in params:
-        logger.error("option listopt is required")
-        return 1, option_list
-    else:
-        value = params['listopt']
+    value = params['listopt']
 
     if value == 'all':
         option_list = [' ', '--all', '--inactive']

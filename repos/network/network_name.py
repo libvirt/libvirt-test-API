@@ -9,6 +9,8 @@ import commands
 import libvirt
 from libvirt import libvirtError
 
+required_params = ('networkname')
+optional_params = ()
 
 VIRSH_NETNAME = "virsh net-name"
 
@@ -45,11 +47,7 @@ def netname(params):
         then check it
     """
     logger = params['logger']
-    if 'networkname' not in params:
-        logger.error("the option networkname is required")
-        return 1
-    else:
-        networkname = params['networkname']
+    networkname = params['networkname']
 
     uri = params['uri']
     conn = libvirt.open(uri)

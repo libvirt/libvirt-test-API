@@ -49,8 +49,6 @@ def check_attach_disk(num1, num2):
 
 def attach_disk(params):
     """Attach a disk to domain from xml"""
-    # Initiate and check parameters
-    usage(params)
     logger = params['logger']
     guestname = params['guestname']
     imagename = params['imagename']

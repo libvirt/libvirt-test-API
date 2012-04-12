@@ -32,8 +32,6 @@ def check_attach_interface(num1, num2):
 
 def attach_interface(params):
     """Attach a interface to domain from xml"""
-    # Initiate and check parameters
-    usage(params)
     logger = params['logger']
     guestname = params['guestname']
     test_result = False

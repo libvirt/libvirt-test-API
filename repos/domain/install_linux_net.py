@@ -17,14 +17,6 @@ from utils import utils
 from utils import env_parser
 from utils import xmlbuilder
 
-VIRSH_QUIET_LIST = "virsh --quiet list --all|awk '{print $2}'|grep \"^%s$\""
-VM_STAT = "virsh --quiet list --all| grep \"\\b%s\\b\"|grep off"
-VM_DESTROY = "virsh destroy %s"
-VM_UNDEFINE = "virsh undefine %s"
-
-BOOT_DIR = "/var/lib/libvirt/boot/"
-HOME_PATH = os.getcwd()
-
 required_params = ('guestname', 'guesttype', 'guestos', 'guestarch','netmethod')
 optional_params = ('uuid',
                    'memory',
@@ -38,44 +30,18 @@ optional_params = ('uuid',
                    'source',
                    'type')
 
+VIRSH_QUIET_LIST = "virsh --quiet list --all|awk '{print $2}'|grep \"^%s$\""
+VM_STAT = "virsh --quiet list --all| grep \"\\b%s\\b\"|grep off"
+VM_DESTROY = "virsh destroy %s"
+VM_UNDEFINE = "virsh undefine %s"
+
+BOOT_DIR = "/var/lib/libvirt/boot/"
+HOME_PATH = os.getcwd()
+
 def return_close(conn, logger, ret):
     conn.close()
     logger.info("closed hypervisor connection")
     return ret
-
-def check_params(params):
-    """Checking the arguments required"""
-    params_given = copy.deepcopy(params)
-
-    mandatory_args = ['guestname', 'guesttype', 'guestos',
-                      'guestarch','netmethod']
-
-    optional_args = ['uuid', 'memory', 'vcpu', 'disksize',
-                     'imagepath', 'hdmodel', 'nicmodel',
-                     'ifacetype', 'imagetype', 'source',
-                     'type']
-
-    for arg in mandatory_args:
-        if arg not in params_given.keys():
-            logger.error("Argument %s is required." % arg)
-            usage()
-            return 1
-        elif not params_given[arg]:
-            logger.error("value of argument %s is empty." % arg)
-            usage()
-            return 1
-
-        params_given.pop(arg)
-
-    if len(params_given) == 0:
-        return 0
-
-    for arg in params_given.keys():
-        if arg not in optional_args:
-            logger.error("Argument %s could not be recognized." % arg)
-            return 1
-
-    return 0
 
 def prepare_boot_guest(domobj, dict, logger, installtype):
     """After guest installation is over, undefine the guest with
@@ -173,14 +139,6 @@ def install_linux_net(params):
     params.pop('logger')
     uri = params['uri']
     params.pop('uri')
-
-    logger.info("Checking the validation of arguments provided.")
-    params_check_result = check_params(params)
-
-    if params_check_result:
-        return 1
-
-    logger.info("Arguments checkup finished.")
 
     guestname = params.get('guestname')
     guesttype = params.get('guesttype')

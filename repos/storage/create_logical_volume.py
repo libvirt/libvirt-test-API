@@ -70,10 +70,6 @@ def create_logical_volume(params):
     """Create a logical type storage volume from xml"""
     global logger
     logger = params['logger']
-
-    if not usage(params):
-        return 1
-
     poolname = params['poolname']
     volname = params['volname']
     capacity = params['capacity']

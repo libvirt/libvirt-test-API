@@ -7,22 +7,10 @@ import re
 import libvirt
 from libvirt import libvirtError
 
-
-SNAPSHOT_DIR = "/var/lib/libvirt/qemu/snapshot"
-
 required_params = ('guestname', 'snapshotname')
 optional_params = ()
 
-def check_params(params):
-    """Verify the input parameter"""
-    logger = params['logger']
-    args_required = ['guestname', 'snapshotname']
-    for arg in args_required:
-        if arg not in params:
-            logger.error("Argument '%s' is required" % arg)
-            return 1
-
-    return 0
+SNAPSHOT_DIR = "/var/lib/libvirt/qemu/snapshot"
 
 def check_domain_state(conn, guestname, logger):
     """ check if the domain exists and in shutdown state as well """
@@ -54,10 +42,6 @@ def delete(params):
         check the functionality of snapshot
     """
     logger = params['logger']
-    params_check_result = check_params(params)
-    if params_check_result:
-        return 1
-
     guestname = params['guestname']
     snapshotname = params['snapshotname']
 

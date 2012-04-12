@@ -13,28 +13,18 @@ from libvirt import libvirtError
 
 from utils import utils
 
+required_params = ('guestname', 'dynamic_ownership', 'use_nfs')
+optional_params = ()
+
 QEMU_CONF = "/etc/libvirt/qemu.conf"
 SAVE_FILE = "/mnt/test.save"
 TEMP_FILE = "/tmp/test.save"
-
-required_params = ('guestname', 'dynamic_ownership', 'use_nfs')
-optional_params = ()
 
 def return_close(conn, logger, ret):
     """close hypervisor connection and return the given value"""
     conn.close()
     logger.info("closed hypervisor connection")
     return ret
-
-def check_params(params):
-    """Verify inputing parameter dictionary"""
-    logger = params['logger']
-    keys = ['guestname', 'dynamic_ownership', 'use_nfs']
-    for key in keys:
-        if key not in params:
-            logger.error("%s is required" %key)
-            return 1
-    return 0
 
 def check_domain_running(conn, guestname, logger):
     """ check if the domain exists, may or may not be active """
@@ -183,16 +173,10 @@ def ownership_test(params):
     """Save a domain to a file, check the ownership of
        the file after save and restore
     """
-    # Initiate and check parameters
-    params_check_result = check_params(params)
-    if params_check_result:
-        return 1
-
     logger = params['logger']
     guestname = params['guestname']
     dynamic_ownership = params['dynamic_ownership']
     use_nfs = params['use_nfs']
-
 
     # set env
     logger.info("prepare the environment")

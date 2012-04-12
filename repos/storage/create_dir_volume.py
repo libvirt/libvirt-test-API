@@ -15,22 +15,6 @@ from utils import xmlbuilder
 required_params = ('poolname', 'volname', 'volformat', 'capacity')
 optional_params = ()
 
-def check_params(params):
-    """Verify inputing parameter dictionary"""
-
-    mandatory_params = ['poolname', 'volname', 'volformat', 'capacity']
-
-    for param in mandatory_params:
-        if param not in params:
-            logger.error("%s is required" % param)
-            usage()
-            return 1
-        elif len(params[param]) == 0:
-            logger.error("%s value is empty, please inputting a value" % param)
-            return 1
-        else:
-            pass
-
 def get_pool_path(poolobj):
     """ get pool xml description """
     poolxml = poolobj.XMLDesc(0)
@@ -92,14 +76,7 @@ def create_dir_volume(params):
 
     global logger
     logger = params['logger']
-
     params.pop('logger')
-
-    params_check_result = check_params(params)
-
-    if params_check_result:
-        return 1
-
     poolname = params.pop('poolname')
     volname = params['volname']
     volformat = params['volformat']

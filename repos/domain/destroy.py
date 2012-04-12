@@ -11,21 +11,7 @@ from libvirt import libvirtError
 from utils import utils
 
 required_params = ('guestname')
-optional_params = ()
-
-def check_params(params):
-    """Verify the input parameter"""
-    args_required = ['guestname']
-    for arg in args_required:
-        if arg not in params:
-            logger.error("Argument '%s' is required" % arg)
-            return 1
-
-    if params['guestname'] == "":
-        logger.error("value of guestname is empty")
-        return 1
-
-    return 0
+optional_params = ('flags')
 
 def destroy(params):
     """destroy domain
@@ -44,9 +30,6 @@ def destroy(params):
     global logger
     logger = params['logger']
     params.pop('logger')
-    params_check_result = check_params(params)
-    if params_check_result:
-        return 1
     guestname = params['guestname']
     flags = ""
     if params.has_key('flags'):

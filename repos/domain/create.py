@@ -16,30 +16,25 @@ NONE = 0
 START_PAUSED = 1
 
 required_params = ('guestname', 'guesttype')
-optional_params = ()
+optional_params = ('uuid',
+                   'memory',
+                   'vcpu',
+                   'disksize',
+                   'imagepath',
+                   'imagetype',
+                   'hdmodel',
+                   'nicmodel',
+                   'ifacetype',
+                   'source',
+                   'flag')
 
 def return_close(conn, logger, ret):
     conn.close()
     logger.info("closed hypervisor connection")
     return ret
 
-def check_params(params):
-    """Verify inputing parameter dictionary"""
-    logger = params['logger']
-    keys = ['guestname', 'guesttype']
-    for key in keys:
-        if key not in params:
-            logger.error("%s is required" %key)
-            usage()
-            return 1
-    return 0
-
 def create(params):
     """create a domain from xml"""
-    # Initiate and check parameters
-    params_check_result = check_params(params)
-    if params_check_result:
-        return 1
     logger = params['logger']
     guestname = params['guestname']
     test_result = False

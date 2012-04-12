@@ -35,8 +35,6 @@ def check_detach_interface(num1, num2):
 
 def detach_interface(params):
     """Detach a interface to domain from xml"""
-    # Initiate and check parameters
-    usage(params)
     logger = params['logger']
     guestname = params['guestname']
     test_result = False

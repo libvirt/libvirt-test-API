@@ -14,32 +14,6 @@ from utils import XMLParser
 required_params = ('poolname', 'sourcepath', 'pooltype')
 optional_params = ('sourceformat')
 
-def usage(params):
-    """ Verifies the params dictionary for the required arguments """
-    logger = params['logger']
-    # targetpath is optional
-    keys = ['poolname', 'sourcepath', 'pooltype']
-    for key in keys:
-        if key not in params:
-            logger.error("%s parameter is required. \
-                          Please set it to a value" % key)
-            return False
-        elif len(params[key]) == 0:
-            logger.error("%s key is empty, set it to a value" % key)
-            return False
-
-    # inform the tester about the default format value...
-    if "sourceformat" not in params:
-        logger.info("The sourceformat parameter is not given. Default value of \
-                     ext3 will be used")
-
-    # sanity check pooltype value:
-    if params['pooltype'] == "fs":
-        return True
-    else:
-        logger.error("pooltype parameter must be fs")
-        logger.error("it is: %s" % params['pooltype'])
-
 def check_pool_create_libvirt(conn, poolname, logger):
     """Check the result of create storage pool on libvirt level.  """
     pool_names = conn.listStoragePools()
@@ -79,12 +53,6 @@ def display_pool_info(conn, logger):
 def create_fs_pool(params):
     """ Create a fs type storage pool from xml"""
     logger = params['logger']
-    if usage(params):
-        logger.info("Params are right")
-    else:
-        logger.info("Params are wrong")
-        return 1
-
     poolname = params['poolname']
 
     uri  = params['uri']

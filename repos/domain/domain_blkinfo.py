@@ -9,7 +9,6 @@ import commands
 import libvirt
 from libvirt import libvirtError
 
-
 GET_DOMBLKINFO_MAC = "virsh domblkinfo %s %s | awk '{print $2}'"
 GET_CAPACITY = "du -b %s | awk '{print $1}'"
 GET_PHYSICAL_K = " du -B K %s | awk '{print $1}'"
@@ -22,15 +21,6 @@ def return_close(conn, logger, ret):
     conn.close()
     logger.info("closed hypervisor connection")
     return ret
-
-def check_params(params):
-    """Verify inputing parameter dictionary"""
-    logger = params['logger']
-    options = ['guestname', 'blockdev']
-    for option in options:
-        if option not in params:
-            logger.error("option %s is required" % option)
-            return 1
 
 def get_output(command, logger):
     """execute shell command
@@ -95,15 +85,6 @@ def domblkinfo(params):
         in the output of virsh domblkinfo
     """
     logger = params['logger']
-
-    logger.info("Checking the validation of arguments provided.")
-    params_check_result = check_params(params)
-
-    if params_check_result:
-        return 1
-
-    logger.info("Arguments checkup completed.")
-
     guestname = params.get('guestname')
     blockdev = params.get('blockdev')
 

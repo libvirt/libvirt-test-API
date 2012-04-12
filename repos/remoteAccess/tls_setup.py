@@ -13,6 +13,13 @@ from libvirt import libvirtError
 
 from utils import utils
 
+required_params = ('listen_tls',
+                   'auth_tls',
+                   'target_machine',
+                   'username',
+                   'password')
+optional_params = ()
+
 CERTTOOL = "/usr/bin/certtool"
 CP = "/bin/cp"
 MKDIR = "/bin/mkdir"
@@ -29,23 +36,6 @@ SERVERKEY = os.path.join(TEMP_TLS_FOLDER, 'serverkey.pem')
 SERVERCERT = os.path.join(TEMP_TLS_FOLDER, 'servercert.pem')
 CLIENTKEY = os.path.join(TEMP_TLS_FOLDER, 'clientkey.pem')
 CLIENTCERT = os.path.join(TEMP_TLS_FOLDER, 'clientcert.pem')
-
-required_params = ('listen_tls',
-                   'auth_tls',
-                   'target_machine',
-                   'username',
-                   'password')
-optional_params = ()
-
-def check_params(params):
-    """check out the arguments requried for migration"""
-    logger = params['logger']
-    keys = ['listen_tls', 'auth_tls', 'target_machine', 'username', 'password']
-    for key in keys:
-        if key not in params:
-            logger.error("Argument %s is required" % key)
-            return 1
-    return 0
 
 def CA_setting_up(util, logger):
     """ setting up a Certificate Authority """
@@ -351,10 +341,6 @@ def hypervisor_connecting_test(uri, auth_tls, username,
 def tls_setup(params):
     """ generate tls certificates and configure libvirt """
     logger = params['logger']
-    params_check_result = check_params(params)
-    if params_check_result:
-        return 1
-
     target_machine = params['target_machine']
     username = params['username']
     password = params['password']

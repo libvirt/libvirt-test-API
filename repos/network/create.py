@@ -20,15 +20,6 @@ required_params = ('networkname',
                    'netmode')
 optional_params = ()
 
-def usage(params):
-    """Verify inputing parameter dictionary"""
-    logger = params['logger']
-    keys = ['networkname', 'bridgename', 'bridgeip', 'bridgenetmask', \
-'netstart', 'netend', 'netmode']
-    for key in keys:
-        if key not in params:
-            logger.error("%s is required" %key)
-            return 1
 def check_network_status(*args):
     """Check current network status, it will return True if
        current network is inactive, otherwise, return False
@@ -45,8 +36,6 @@ def check_network_status(*args):
 
 def create(params):
     """Create a network from xml"""
-    usage(params)
-
     logger = params['logger']
     networkname = params['networkname']
 

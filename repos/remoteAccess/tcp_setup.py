@@ -10,10 +10,6 @@ from libvirt import libvirtError
 
 from utils import utils
 
-SASLPASSWD2 = "/usr/sbin/saslpasswd2"
-LIBVIRTD_CONF = "/etc/libvirt/libvirtd.conf"
-SYSCONFIG_LIBVIRTD = "/etc/sysconfig/libvirtd"
-
 required_params = ('target_machine',
                    'username',
                    'password',
@@ -21,15 +17,9 @@ required_params = ('target_machine',
                    'auth_tcp')
 optional_params = ()
 
-def check_params(params):
-    """check out the arguments requried for this testcases"""
-    logger = params['logger']
-    keys = ['target_machine', 'username', 'password', 'listen_tcp', 'auth_tcp']
-    for key in keys:
-        if key not in params:
-            logger.error("Argument %s is required" % key)
-            return 1
-    return 0
+SASLPASSWD2 = "/usr/sbin/saslpasswd2"
+LIBVIRTD_CONF = "/etc/libvirt/libvirtd.conf"
+SYSCONFIG_LIBVIRTD = "/etc/sysconfig/libvirtd"
 
 def sasl_user_add(target_machine, username, password, util, logger):
     """ execute saslpasswd2 to add sasl user """
@@ -147,10 +137,6 @@ def hypervisor_connecting_test(uri, auth_tcp, username,
 def tcp_setup(params):
     """ configure libvirt and connect to it through TCP socket"""
     logger = params['logger']
-    params_check_result = check_params(params)
-    if params_check_result:
-        return 1
-
     target_machine = params['target_machine']
     username = params['username']
     password = params['password']

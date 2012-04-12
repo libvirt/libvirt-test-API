@@ -16,16 +16,6 @@ from utils import xmlbuilder
 required_params = ('guestname', 'devtype', 'username', 'password')
 optional_params = ()
 
-def check_params(params):
-    """Verify inputing parameter dictionary"""
-    logger = params['logger']
-    keys = ['guestname', 'devtype', 'username', 'password']
-    for key in keys:
-        if key not in params:
-            logger.error("%s is required" %key)
-            return 1
-    return 0
-
 def create_image(params, util, img_name):
     """Create an image file"""
     logger = params['logger']
@@ -151,11 +141,6 @@ def check_updated_device(params, output, util, guestip, domobj, srcfile):
 
 def update_devflag(params):
     """Update virtual device to a domain from xml"""
-
-    # Initiate and check parameters
-    params_check_result = check_params(params)
-    if params_check_result:
-        return 1
 
     logger = params['logger']
     guestname = params['guestname']

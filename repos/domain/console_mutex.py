@@ -5,13 +5,11 @@ import libvirt
 from libvirt import libvirtError
 from exception import TestError
 
-
 required_params = ('guestname')
 optional_params = ('device')
 
 def console_mutex(params):
     """Attach to console"""
-    usage(params);
     logger = params['logger']
     guest = params['guestname']
     device = params.get('device', 'serial0')

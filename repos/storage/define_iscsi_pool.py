@@ -45,12 +45,6 @@ def define_iscsi_pool(params):
     pooltype, poolname, sourcename, sourcepath and targetpath.
     """
     logger = params['logger']
-    if usage(params):
-        logger.info("params are right")
-    else:
-        logger.info("params are wrong")
-        return 1
-
     poolname = params['poolname']
     pooltype = params['pooltype']
     srcname = params['sourcename']

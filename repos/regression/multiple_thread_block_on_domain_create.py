@@ -23,19 +23,6 @@ DISK_DD = "dd if=/dev/zero of=%s bs=1 count=1 seek=6G"
 required_params = ('guestos', 'guestarch', 'guesttype', 'guestnum')
 optional_params = ()
 
-def check_params(params):
-    """Checking the arguments required"""
-
-    logger = params['logger']
-    mandatory_args = ['guestos','guestarch','guesttype','guestnum']
-
-    for arg in mandatory_args:
-        if arg not in params:
-            logger.error("Argument %s is required." % arg)
-            return 1
-
-    return 0
-
 def request_credentials(credentials, user_data):
     for credential in credentials:
         if credential[0] == libvirt.VIR_CRED_AUTHNAME:
@@ -108,14 +95,6 @@ def multiple_thread_block_on_domain_create(params):
         check the return status of calling create API
     """
     logger = params['logger']
-    logger.info("start checking arguments")
-    params_check_result = check_params(params)
-
-    if params_check_result:
-        return 1
-
-    logger.info("Arguments checkup finished.")
-
     guestos = params.get('guestos')
     arch = params.get('guestarch')
     type = params.get('guesttype')

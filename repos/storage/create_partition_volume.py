@@ -19,22 +19,6 @@ def return_close(conn, logger, ret):
     logger.info("closed hypervisor connection")
     return ret
 
-def check_params(params):
-    """Verify inputing parameter dictionary"""
-
-    mandatory_params = ['poolname', 'volname', 'volformat', 'capacity']
-
-    for param in mandatory_params:
-        if param not in params:
-            logger.error("%s is required" % param)
-            usage()
-            return 1
-        elif len(params[param]) == 0:
-            logger.error("%s value is empty, please inputting a value" % param)
-            return 1
-        else:
-            return 0
-
 def partition_volume_check(poolobj, volname):
     """check the new created volume, the way of checking is to get
        the path of the newly created volume, then grep /proc/partitions
@@ -70,17 +54,7 @@ def create_partition_volume(params):
 
     global logger
     logger = params['logger']
-
     params.pop('logger')
-
-    params_check_result = check_params(params)
-
-    if not params_check_result:
-        logger.info("Params are right")
-    else:
-        logger.error("Params are wrong")
-        return 1
-
     poolname = params.pop('poolname')
     volname = params['volname']
     volformat = params['volformat']

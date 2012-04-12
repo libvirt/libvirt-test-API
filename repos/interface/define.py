@@ -28,9 +28,6 @@ def define(params):
     test_result = False
     global logger
     logger = params['logger']
-
-    usage(params)
-
     ifacename = params['ifacename']
     params['dhcp'] = 'yes'
 

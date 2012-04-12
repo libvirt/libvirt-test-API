@@ -5,32 +5,17 @@ import sys
 import re
 import commands
 
-SNAPSHOT_DIR = "/var/lib/libvirt/qemu/snapshot"
-SNAPSHOT_LIST = "virsh snapshot-list %s |sed -n '3,$'p|awk '{print $1}'"
-
 required_params = ('guestname')
 optional_params = ()
 
-def check_params(params):
-    """Verify the input parameter"""
-    logger = params['logger']
-    args_required = ['guestname']
-    for arg in args_required:
-        if arg not in params:
-            logger.error("Argument '%s' is required" % arg)
-            return 1
-
-    return 0
+SNAPSHOT_DIR = "/var/lib/libvirt/qemu/snapshot"
+SNAPSHOT_LIST = "virsh snapshot-list %s |sed -n '3,$'p|awk '{print $1}'"
 
 def snapshot_list(params):
     """check the output of snapshot_list through examining
        the files under /var/lib/libvirt/qemu/snapshot folder
     """
     logger = params['logger']
-    params_check_result = check_params(params)
-    if params_check_result:
-        return 1
-
     guestname = params['guestname']
 
     snapshot_list = []

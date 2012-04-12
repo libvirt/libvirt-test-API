@@ -38,10 +38,7 @@ def reattach(params):
        and includes 'pciaddress' key, whose value
        uniquely identify a pci address of the node device
     """
-    usage(params)
-
     global logger
-
     logger = params['logger']
     pciaddress = params['pciaddress']
 

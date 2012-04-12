@@ -28,8 +28,6 @@ def check_blkstats():
 
 def blkstats(params):
     """Domain block device statistic"""
-    # Initiate and check parameters
-    usage(params)
     logger = params['logger']
     guestname = params['guestname']
     test_result = False

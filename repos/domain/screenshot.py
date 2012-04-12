@@ -10,15 +10,6 @@ import libvirt
 required_params = ('guestname', 'screen', 'filename')
 optional_params = ()
 
-def check_params(params):
-    """Verify input parameters"""
-    for key in ('guestname', 'screen', 'filename'):
-        if key not in params:
-            raise KeyError('Missing key %s required for screenshot test' % key)
-
-    params['screen'] = int(params['screen'])
-    params['filename'] = os.path.abspath(params['filename'])
-
 def saver(stream, data, file_):
     return file_.write(data)
 
@@ -28,8 +19,6 @@ def screenshot(params):
     ret = 1
     try:
         logger = params['logger']
-
-        check_params(params)
 
         conn = libvirt.open(params['uri'])
         dom = conn.lookupByName(params['guestname'])

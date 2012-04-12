@@ -16,6 +16,12 @@ from libvirt import libvirtError
 from utils import utils
 from shutil import copy
 
+required_params = ('guestname',
+                   'dynamic_ownership',
+                   'virt_use_nfs',
+                   'root_squash')
+optional_params = ()
+
 QEMU_CONF = "/etc/libvirt/qemu.conf"
 
 def return_close(conn, logger, ret):
@@ -23,22 +29,6 @@ def return_close(conn, logger, ret):
     conn.close()
     logger.info("closed hypervisor connection")
     return ret
-
-required_params = ('guestname',
-                   'dynamic_ownership',
-                   'virt_use_nfs',
-                   'root_squash')
-optional_params = ()
-
-def check_params(params):
-    """Verify inputing parameter dictionary"""
-    logger = params['logger']
-    keys = ['guestname', 'dynamic_ownership', 'virt_use_nfs', 'root_squash']
-    for key in keys:
-        if key not in params:
-            logger.error("%s is required" %key)
-            return 1
-    return 0
 
 def nfs_setup(util, root_squash, logger):
     """setup nfs on localhost
@@ -137,17 +127,11 @@ def prepare_env(util, d_ownership, virt_use_nfs, guestname, root_squash, \
 
 def domain_nfs_start(params):
     """start domain with img on nfs"""
-    # Initiate and check parameters
-    params_check_result = check_params(params)
-    if params_check_result:
-        return 1
-
     logger = params['logger']
     guestname = params['guestname']
     dynamic_ownership = params['dynamic_ownership']
     virt_use_nfs = params['virt_use_nfs']
     root_squash = params['root_squash']
-
 
     # Connect to local hypervisor connection URI
     uri = params['uri']

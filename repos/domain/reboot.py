@@ -13,19 +13,6 @@ from utils import utils
 required_params = ('guestname')
 optional_params = ()
 
-def check_params(params_given):
-    """Checking the arguments required"""
-    args_required = ['guestname']
-    for arg in args_required:
-        if arg not in params_given.keys():
-            logger.error("Argument %s is required." % arg)
-            return 1
-        elif not params_given[arg]:
-            logger.error("value of argument %s is empty" % arg)
-            return 1
-
-    return 0
-
 def reboot(params):
     """Reboot virtual machine
        Return 0 on SUCCESS or 1 on FAILURE
@@ -34,9 +21,6 @@ def reboot(params):
     global logger
     logger = params['logger']
     params.pop('logger')
-    params_check_result = check_params(params)
-    if params_check_result:
-        return 1
     domain_name = params['guestname']
 
     # Connect to local hypervisor connection URI

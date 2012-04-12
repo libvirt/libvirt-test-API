@@ -50,9 +50,6 @@ def create(params):
     test_result = False
     global logger
     logger = params['logger']
-
-    usage(params)
-
     ifacename = params['ifacename']
 
     uri = params['uri']

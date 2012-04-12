@@ -43,8 +43,6 @@ def check_pool_define(poolname, logger):
 
 def define_dir_pool(params):
     """Define a dir type storage pool from xml"""
-    usage(params)
-
     logger = params['logger']
     poolname = params['poolname']
 

@@ -12,25 +12,10 @@ from libvirt import libvirtError
 from utils import utils
 from utils import xmlbuilder
 
-QEMU_IMAGE_FORMAT = "qemu-img info %s |grep format |awk -F': ' '{print $2}'"
-
 required_params = ('guestname')
-optional_params = ()
+optional_params = ('snapshotname')
 
-def check_params(params):
-    """Verify the input parameter"""
-    logger = params['logger']
-    args_required = ['guestname']
-    for arg in args_required:
-        if arg not in params:
-            logger.error("Argument '%s' is required" % arg)
-            return 1
-
-    if params['guestname'] == "":
-        logger.error("value of guestname is empty")
-        return 1
-
-    return 0
+QEMU_IMAGE_FORMAT = "qemu-img info %s |grep format |awk -F': ' '{print $2}'"
 
 def check_domain_image(domobj, util, guestname, logger):
     """ensure that the state of guest is poweroff
@@ -59,9 +44,6 @@ def internal_create(params):
         check the functionality of snapshot
     """
     logger = params['logger']
-    params_check_result = check_params(params)
-    if params_check_result:
-        return 1
     guestname = params['guestname']
 
     if not params.has_key('snapshotname'):

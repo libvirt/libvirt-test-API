@@ -14,17 +14,6 @@ from libvirt import libvirtError
 required_params = ('networkname', 'autostart')
 optional_params = ()
 
-def check_params(params):
-    """Verify inputing parameter dictionary"""
-
-    keys = ['networkname', 'autostart']
-    for key in keys:
-        if key not in params:
-            logger.error("%s is required" % key)
-            return 1
-
-    return 0
-
 def check_network_autostart(*args):
     """Check network start automatically result, if setting network is
        successful, networkname.xml will exist under
@@ -54,14 +43,7 @@ def autostart(params):
 
     global logger
     logger = params['logger']
-
     params.pop('logger')
-
-    params_check_result = check_params(params)
-
-    if params_check_result:
-        return 1
-
     networkname = params['networkname']
     autostart = params['autostart']
 

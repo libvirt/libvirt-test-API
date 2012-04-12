@@ -11,7 +11,6 @@ from utils import xmlbuilder
 import libvirt
 from libvirt import libvirtError
 
-
 required_params = ('wwpn')
 optional_params = ()
 
@@ -47,13 +46,9 @@ def check_nodedev_parent(nodedev_obj, device_parent, device_name):
 
 def create_virtual_hba(params):
     """Create a vHBA with NPIV supported FC HBA."""
-
     global logger
     logger = params['logger']
     wwpn = params['wwpn']
-
-    if not usage(params):
-        return 1
 
     uri = params['uri']
 

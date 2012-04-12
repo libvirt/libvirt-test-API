@@ -36,12 +36,6 @@ def check_pool_destroy(conn, poolname, logger):
 def destroy_pool(params):
     """Function to actually destroy the pool"""
     logger = params['logger']
-    if usage(params):
-        logger.info("Params are right")
-    else:
-        logger.info("Params are wrong")
-        return 1
-
     poolname = params['poolname']
     uri = params['uri']
     conn = libvirt.open(uri)

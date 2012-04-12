@@ -22,19 +22,6 @@ def return_close(conn, logger, ret):
     logger.info("closed hypervisor connection")
     return ret
 
-def check_params(params_given):
-    """Checking the arguments required"""
-    args_required = ['guestname', 'vcpu']
-    for arg in args_required:
-        if arg not in params_given.keys():
-            logger.error("Argument %s is required." % arg)
-            return 1
-        elif not params_given[arg]:
-            logger.error("value of argument %s is empty" % arg)
-            return 1
-
-    return 0
-
 def redefine_vcpu_number(domobj, domain_name, vcpu):
     """dump domain xml description to change the vcpu number,
        then, define the domain again
@@ -209,13 +196,9 @@ def cpu_affinity(params):
        call libvirt API function to set cpu affinity
        check the result after cpupin
     """
-    # Initiate and check parameters
     global logger
     logger = params['logger']
     params.pop('logger')
-    params_check_result = check_params(params)
-    if params_check_result:
-        return 1
     domain_name = params['guestname']
     vcpu = params['vcpu']
 

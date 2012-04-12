@@ -11,22 +11,12 @@ from libvirt import libvirtError
 
 from utils import utils
 
-TESTING_USER = 'testapi'
-LIBVIRTD_CONF = "/etc/libvirt/libvirtd.conf"
-SASLPASSWD2 = "/usr/sbin/saslpasswd2"
-
 required_params = ('auth_unix_ro', 'auth_unix_rw')
 optional_params = ()
 
-def check_params(params):
-    """check out the arguments requried for the testcase"""
-    logger = params['logger']
-    keys = ['auth_unix_ro', 'auth_unix_rw']
-    for key in keys:
-        if key not in params:
-            logger.error("Argument %s is required" % key)
-            return 1
-    return 0
+TESTING_USER = 'testapi'
+LIBVIRTD_CONF = "/etc/libvirt/libvirtd.conf"
+SASLPASSWD2 = "/usr/sbin/saslpasswd2"
 
 def get_output(command, flag, logger):
     """execute shell command
@@ -162,9 +152,6 @@ def hypervisor_connecting_test(uri, auth_unix_ro, auth_unix_rw, logger):
 def unix_perm_sasl(params):
     """ test unix socket group function and sasl authentication"""
     logger = params['logger']
-    params_check_result = check_params(params)
-    if params_check_result:
-        return 1
 
     auth_unix_ro = params['auth_unix_ro']
     auth_unix_rw = params['auth_unix_rw']

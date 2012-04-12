@@ -8,7 +8,6 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
-
 required_params = ('poolname', 'volname')
 optional_params = ()
 
@@ -38,10 +37,6 @@ def delete_netfs_volume(params):
     """Delete a netfs type storage volume"""
     global logger
     logger = params['logger']
-
-    if not usage(params):
-        return 1
-
     poolname = params['poolname']
     volname = params['volname']
 

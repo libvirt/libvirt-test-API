@@ -10,7 +10,6 @@ from xml.dom import minidom
 import libvirt
 from libvirt import libvirtError
 
-
 required_params = ('poolname')
 optional_params = ()
 
@@ -47,10 +46,6 @@ def build_dir_pool(params):
     """Build a storage pool"""
     global logger
     logger = params['logger']
-
-    if not usage(params):
-        return 1
-
     poolname = params['poolname']
 
     uri = params['uri']

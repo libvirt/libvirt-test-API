@@ -30,8 +30,6 @@ def check_interface_stats():
 
 def ifstats(params):
     """Domain interface statistic"""
-    usage(params)
-
     logger = params['logger']
     guestname = params['guestname']
     test_result = False

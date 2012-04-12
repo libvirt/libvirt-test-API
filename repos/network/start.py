@@ -10,7 +10,6 @@ import commands
 import libvirt
 from libvirt import libvirtError
 
-
 required_params = ('networkname')
 optional_params = ()
 
@@ -19,28 +18,12 @@ def return_close(conn, logger, ret):
     logger.info("closed hypervisor connection")
     return ret
 
-def check_params(params):
-    """Verify inputing parameter dictionary"""
-
-    keys = ['networkname']
-    for key in keys:
-        if key not in params:
-            logger.error("Argument %s is required" %key)
-            return 1
-
 def start(params):
     """activate a defined network"""
 
     global logger
     logger = params['logger']
-
     params.pop('logger')
-
-    params_check_result = check_params(params)
-
-    if params_check_result:
-        return 1
-
     networkname = params['networkname']
     logger.info("the name of virtual network to be activated is %s" % \
                  networkname)

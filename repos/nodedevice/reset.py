@@ -20,10 +20,7 @@ def check_node_reset():
 
 def reset(params):
     """Reset a specific node device and return clean & certain status to it"""
-    usage(params)
-
     global logger
-
     logger = params['logger']
     pciaddress = params['pciaddress']
 

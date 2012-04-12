@@ -35,12 +35,6 @@ def display_pool_info(conn, logger):
 def create_dir_pool(params):
     """ Create a dir type storage pool from xml"""
     logger = params['logger']
-    if usage(params):
-        logger.info("Params are right")
-    else:
-        logger.info("Params are wrong")
-        return 1
-
     poolname = params['poolname']
     pooltype = params['pooltype']
 

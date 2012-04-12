@@ -12,21 +12,11 @@ from libvirt import libvirtError
 
 from utils import utils
 
-VIRSH_LIST = "virsh list --all"
-RESTART_CMD = "service libvirtd restart"
-
 required_params = ('guestname')
 optional_params = ()
 
-def check_params(params):
-    """Verify inputing parameter dictionary"""
-    logger = params['logger']
-    keys = ['guestname']
-    for key in keys:
-        if key not in params:
-            logger.error("%s is required" %key)
-            return 1
-    return 0
+VIRSH_LIST = "virsh list --all"
+RESTART_CMD = "service libvirtd restart"
 
 def check_domain_running(conn, guestname, logger):
     """ check if the domain exists, may or may not be active """
@@ -80,11 +70,6 @@ def get_domain_pid(util, logger, guestname):
 
 def restart(params):
     """restart libvirtd test"""
-    # Initiate and check parameters
-    params_check_result = check_params(params)
-    if params_check_result:
-        return 1
-
     logger = params['logger']
     guestname = params['guestname']
     uri = params['uri']

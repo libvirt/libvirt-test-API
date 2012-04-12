@@ -11,6 +11,9 @@ from libvirt import libvirtError
 
 from utils import utils
 
+required_params = ('netlistopt')
+optional_params = ()
+
 VIRSH_QUIET_NETLIST = "virsh --quiet net-list %s|awk '{print $1}'"
 VIRSH_NETLIST = "virsh net-list %s"
 GET_BRIDGE_IP = "/sbin/ifconfig %s | grep 'inet addr:' | cut -d: -f2 | awk '{print $1}'"
@@ -27,11 +30,7 @@ def get_option_list(params):
     logger = params['logger']
     option_list=[]
 
-    if 'netlistopt' not in params:
-        logger.error("option listopt is required")
-        return 1, option_list
-    else:
-        value = params['netlistopt']
+    value = params['netlistopt']
 
     if value == 'all':
         option_list = [' ', '--all', '--inactive']

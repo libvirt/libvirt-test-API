@@ -125,8 +125,6 @@ def dump(params):
        for analysis. Note that for remote Xen Daemon the file path
        will be interpreted in the remote host.
     """
-    # Initiate and check parameters
-    usage(params)
     logger = params['logger']
     guestname = params['guestname']
     file = params['file']

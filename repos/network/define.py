@@ -39,8 +39,6 @@ def check_network_define(networkname, logger):
 
 def define(params):
     """Define a network from xml"""
-    usage(params)
-
     logger = params['logger']
     networkname = params['networkname']
     test_result = False

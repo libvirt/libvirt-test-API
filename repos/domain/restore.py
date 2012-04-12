@@ -63,8 +63,6 @@ def check_guest_restore(*args):
 
 def restore(params):
     """Save domain to a disk file"""
-    # Initiate and check parameters
-    usage(params)
     logger = params['logger']
     guestname = params['guestname']
     filepath = params['filepath']

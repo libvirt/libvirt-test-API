@@ -5,6 +5,9 @@ import sys
 import re
 import commands
 
+required_params = ('ifaceopt')
+optional_params = ()
+
 VIRSH_QUIET_IFACE_LIST = "virsh --quiet iface-list %s | awk '{print ""$%s""}'"
 NETWORK_CONFIG = "/etc/sysconfig/network-scripts/"
 IFCONFIG_DRIVER = "ifconfig %s | sed 's/[ \t].*//;/^$/d'"
@@ -21,11 +24,7 @@ def get_option_list(params):
     logger = params['logger']
     option_list=[]
 
-    if 'ifaceopt' not in params:
-        logger.error("option ifaceopt is required")
-        return 1, option_list
-    else:
-        value = params['ifaceopt']
+    value = params['ifaceopt']
 
     if value == 'all':
         option_list = [' ', '--all', '--inactive']

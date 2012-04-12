@@ -14,7 +14,6 @@ from utils import utils
 from utils import xmlbuilder
 
 required_params = ('guestname', 'guesttype')
-# but it will be in seperate patch.
 optional_params = ('uuid',
                    'memory',
                    'vcpu',
@@ -26,17 +25,6 @@ optional_params = ('uuid',
                    'macaddr',
                    'ifacetype',
                    'source')
-
-def check_params(params):
-    """Verify inputing parameter dictionary"""
-    logger = params['logger']
-    keys = ['guestname', 'guesttype']
-    for key in keys:
-        if key not in params:
-            logger.error("%s is required" %key)
-            usage()
-            return 1
-    return 0
 
 def check_define_domain(guestname, guesttype, hostname, username, \
                         password, util, logger):
@@ -68,10 +56,6 @@ def check_define_domain(guestname, guesttype, hostname, username, \
 
 def define(params):
     """Define a domain from xml"""
-    # Initiate and check parameters
-    params_check_result = check_params(params)
-    if params_check_result:
-        return 1
     logger = params['logger']
     guestname = params['guestname']
     guesttype = params['guesttype']

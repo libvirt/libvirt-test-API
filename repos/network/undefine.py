@@ -9,7 +9,6 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
-
 required_params = ('networkname')
 optional_params = ()
 
@@ -26,8 +25,6 @@ def check_network_undefine(networkname):
 
 def undefine(params):
     """Undefine a network"""
-    usage(params)
-
     logger = params['logger']
     networkname = params['networkname']
 

@@ -6,6 +6,9 @@ import sys
 import re
 import commands
 
+required_params = ()
+optional_params = ()
+
 VIRSH_DOMNAME = "virsh domname"
 VIRSH_IDS = "virsh --quiet list |awk '{print $1}'"
 VIRSH_DOMS = "virsh --quiet list |awk '{print $2}'"

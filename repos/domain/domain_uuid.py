@@ -9,6 +9,8 @@ import commands
 import libvirt
 from libvirt import libvirtError
 
+required_params = ()
+optional_params = ()
 
 VIRSH_DOMUUID = "virsh domuuid"
 
@@ -48,13 +50,8 @@ def domuuid(params):
     """check virsh domuuid command
     """
     logger = params['logger']
-
-    if 'guestname' not in params:
-        logger.error("option guestname is required")
-        return 1
-    else:
-        guestname = params['guestname']
-        logger.info("guest name is %s" % guestname)
+    guestname = params['guestname']
+    logger.info("guest name is %s" % guestname)
 
     uri = params['uri']
     conn = libvirt.open(uri)

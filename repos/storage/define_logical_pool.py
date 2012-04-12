@@ -33,9 +33,6 @@ def check_pool_define(poolname, logger):
 
 def define_logical_pool(params):
     """Define a logical type storage pool from xml"""
-    if not usage(params):
-        return 1
-
     logger = params['logger']
     poolname = params['poolname']
 

@@ -56,7 +56,6 @@ def sched_params(params):
     """
     uri = params['uri']
     hypervisor = utils.get_hypervisor()
-    usage(params, hypervisor)
 
     logger = params['logger']
     guestname = params['guestname']

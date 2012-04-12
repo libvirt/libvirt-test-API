@@ -11,27 +11,16 @@ from libvirt import libvirtError
 from utils import utils
 from utils import check
 
-FLAG_FILE = "/tmp/snapshot_flag"
-FLAG_CHECK = "ls %s" % FLAG_FILE
-
 required_params = ('guestname', 'username', 'password')
 optional_params = ()
+
+FLAG_FILE = "/tmp/snapshot_flag"
+FLAG_CHECK = "ls %s" % FLAG_FILE
 
 def return_close(conn, logger, ret):
     conn.close()
     logger.info("closed hypervisor connection")
     return ret
-
-def check_params(params):
-    """Verify the input parameter"""
-    logger = params['logger']
-    args_required = ['guestname', 'username', 'password']
-    for arg in args_required:
-        if arg not in params:
-            logger.error("Argument '%s' is required" % arg)
-            return 1
-
-    return 0
 
 def check_domain_running(conn, guestname, logger):
     """ check if the domain exists and in running state as well """
@@ -50,10 +39,6 @@ def check_domain_running(conn, guestname, logger):
 def flag_check(params):
     """ check if the flag file is present or not"""
     logger = params['logger']
-    params_check_result = check_params(params)
-    if params_check_result:
-        return 1
-
     guestname = params['guestname']
     username = params['username']
     password = params['password']

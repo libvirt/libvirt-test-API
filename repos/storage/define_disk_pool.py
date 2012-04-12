@@ -13,25 +13,6 @@ from utils import xmlbuilder
 required_params = ('poolname', 'pooltype', 'sourcepath')
 optional_params = ('sourceformat', 'targetpath')
 
-def check_params(params):
-    """Verify inputing parameter dictionary"""
-    #targetpath and sourceformat are optional arguments
-    #the default targetpath is /dev
-    #the sourceformat is 'dos'
-    mandatory_params = ['poolname', 'pooltype', 'sourcepath']
-    optional_params = ['sourceformat', 'targetpath']
-
-    for param in mandatory_params:
-        if param not in params:
-            logger.error("%s is required" % param)
-            usage()
-            return 1
-        elif len(params[param]) == 0:
-            logger.error("%s value is empty, please inputting a value" % param)
-            return 1
-        else:
-            pass
-
 def display_pool_info(conn):
     """Display current storage pool information"""
     logger.debug("current define storage pool: %s" % \
@@ -58,14 +39,7 @@ def define_disk_pool(params):
 
     global logger
     logger = params['logger']
-
     params.pop('logger')
-
-    params_check_result = check_params(params)
-
-    if params_check_result:
-        return 1
-
     poolname = params['poolname']
     pooltype = params['pooltype']
     sourcepath = params['sourcepath']

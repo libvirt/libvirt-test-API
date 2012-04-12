@@ -9,6 +9,8 @@ import commands
 import libvirt
 from libvirt import libvirtError
 
+required_params = ('poolname')
+optional_params = ()
 
 VIRSH_POOLUUID = "virsh pool-uuid"
 
@@ -34,11 +36,7 @@ def pool_uuid(params):
         virsh pool-uuid
     """
     logger = params['logger']
-    if 'poolname' not in params:
-        logger.error("the option poolname is required")
-        return 1
-    else:
-        poolname = params['poolname']
+    poolname = params['poolname']
 
     uri = params['uri']
     conn = libvirt.open(uri)

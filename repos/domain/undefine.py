@@ -7,7 +7,6 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
-
 required_params = ('guestname')
 optional_params = ()
 
@@ -23,8 +22,6 @@ def check_undefine_domain(guestname):
 
 def undefine(params):
     """Undefine a domain"""
-    # Initiate and check parameters
-    usage(params)
     logger = params['logger']
     guestname = params['guestname']
     test_result = False

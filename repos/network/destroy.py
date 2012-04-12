@@ -29,8 +29,6 @@ def check_network_status(*args):
 
 def destroy(params):
     """destroy network"""
-    usage(params)
-
     logger = params['logger']
     networkname = params['networkname']
 

@@ -20,17 +20,6 @@ required_params = ('guestname',
                    'threads')
 optional_params = ()
 
-def check_params(params):
-    """check out the arguments requried for testing"""
-    logger = params['logger']
-    keys = ['guestname', 'username', 'password',
-            'sockets', 'cores', 'threads']
-    for key in keys:
-        if key not in params:
-            logger.error("Argument %s is required" % key)
-            return 1
-    return 0
-
 def check_domain_running(conn, guestname, logger):
     """check if the domain exists"""
     defined_guest_names = conn.listDefinedDomains()
@@ -174,10 +163,6 @@ def cpu_topology(params):
         and login to the guest to check the results
     """
     logger = params['logger']
-    params_check_result = check_params(params)
-    if params_check_result:
-        return 1
-
     guestname = params['guestname']
     username = params['username']
     password = params['password']

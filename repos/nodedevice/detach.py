@@ -38,13 +38,9 @@ def detach(params):
        'params' is a dictionary type and includes 'pciaddress' key, whose value
        uniquely identify a pci address of the node device
     """
-    usage(params)
-
     global logger
-
     logger = params['logger']
     pciaddress = params['pciaddress']
-
 
     original_driver = check_node_detach(pciaddress)
     logger.info("original device driver: %s" % original_driver)

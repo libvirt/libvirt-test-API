@@ -10,7 +10,6 @@ import threading
 import libvirt
 from libvirt import libvirtError
 
-
 LoopThread = None
 looping = True
 STATE = None
@@ -39,16 +38,6 @@ def detailToString(event, detail):
         ( "Finished", )
         )
     return eventStrings[event][detail]
-
-def check_params(params):
-    """check out the arguments requried for testing"""
-    logger = params['logger']
-    keys = ['guestname']
-    for key in keys:
-        if key not in params:
-            logger.error("Argument %s is required" % key)
-            return 1
-    return 0
 
 def check_domain_running(conn, guestname, logger):
     """ check if the domain exists, may or may not be active """
@@ -222,10 +211,6 @@ def eventhandler(params):
         by using domain event handler.
     """
     logger = params['logger']
-    params_check_result = check_params(params)
-    if params_check_result:
-        return 1
-
     guestname = params['guestname']
     logger.info("the guestname is %s" % guestname)
 
