@@ -79,3 +79,7 @@ class MissingVariable(LibvirtException):
 class TestError(LibvirtException):
     code = 211
     message = "Test failed"
+
+class TestCaseError(LibvirtException):
+    code = 212
+    message = "Testcase Error"

@@ -20,77 +20,119 @@
 
 import exception
 
-
 class Proxy(object):
     """ The Proxy class is used for getting real function call reference """
 
     def __init__(self, testcases_names):
         """ Argument case_list is test case list """
         self.testcases_names = testcases_names
+        self.testcase_ref_dict = {}
+
+        for testcase_name in self.testcases_names:
+            elements = testcase_name.split(':')
+
+            # we just want to __import__ testcase.py
+            # so ignore the rest of elements in the list
+            module = elements[0]
+            casename = elements[1]
+
+            casemod_ref = self.get_call_dict(module, casename)
+            self.testcase_ref_dict[testcase_name] = casemod_ref
 
     def get_func_call_dict(self):
         """Return running function reference dictionary """
-        self.func_dict = dict()
+        func_dict = {}
         for testcase_name in self.testcases_names:
-            # Get programming package, casename
-            elements = testcase_name.split(":")
-            package = elements[0]
+            # Get module, casename
+            elements = testcase_name.split(':')
+            module = elements[0]
             casename = elements[1]
             func = casename
 
             if len(elements) == 3:
-                keyword = elements[2]
-                func = casename + keyword
+                # flag is like "_clean" in testcases_names
+                # this func is for _clean function in testcase
+                flag = elements[2]
+                func = casename + flag
 
-            # Dispatch functions
-            funcs = getattr(self, "get_call_dict")
-            func_ref = None
-            func_ref = funcs(package, casename, func)
+            casemod_ref = self.testcase_ref_dict[testcase_name]
+            var_func_names = dir(casemod_ref)
 
-            # Construct function call dictionary
-            key = package + ":" + casename + ":" + func
-            self.func_dict[key] = func_ref
-        return self.func_dict
+            key = module + ':' + casename + ':' + func
+            if func in var_func_names:
+                func_ref = getattr(casemod_ref, func)
+                func_dict[key] = func_ref
+            else:
+                raise exception.TestCaseError("function %s not found in %s" % \
+                                              (func, testcase_name))
+        return func_dict
 
     def get_clearfunc_call_dict(self):
         """ Return a clearing function reference dictionary. """
-        self.func_dict = dict()
+        func_dict = {}
         for testcase_name in self.testcases_names:
-            # Get programming package, casename
-            elements = testcase_name.split(":")
+            # Get module, casename
+            elements = testcase_name.split(':')
 
             if len(elements) == 3:
                 continue
 
-            package = testcase_name.split(":")[0]
-            casename = testcase_name.split(":")[1]
+            module = elements[0]
+            casename = elements[1]
+            func = casename + '_clean'
 
-            # According to language kind to dispatch function
-            funcs = getattr(self, "get_call_dict")
-            func_ref = None
-            func = casename + "_clean"
+            casemod_ref = self.testcase_ref_dict[testcase_name]
+            var_func_names = dir(casemod_ref)
 
-            func_ref = funcs(package, casename, func)
+            key = module + ':' + casename + ':' + func
+            if func in var_func_names:
+                func_ref = getattr(casemod_ref, func)
+                func_dict[key] = func_ref
+            else:
+                raise exception.TestCaseError("clean function not found in %s" % \
+                                              (func, testcase_name))
+        return func_dict
 
-            # Construct function call dictionary
-            key = package + ":" + casename + ":" + func
-            self.func_dict[key] = func_ref
-        return self.func_dict
+    def get_params_variables(self):
+        """ Return the reference to global variable 'required_params'
+            in testcase
+        """
+        case_params = {}
+        for testcase_name in self.testcases_names:
+            elements = testcase_name.split(':')
 
-    def get_call_dict(self, *args):
+            if len(elements) == 3:
+                continue
+
+            module = elements[0]
+            casename = elements[1]
+
+            casemod_ref = self.testcase_ref_dict[testcase_name]
+            var_func_names = dir(casemod_ref)
+
+            if 'required_params' in var_func_names \
+               and 'optional_params' in var_func_names:
+                case_params[testcase_name] = \
+                    [casemod_ref.required_params, casemod_ref.optional_params]
+            else:
+                raise exception.TestCaseError\
+                      ("required_params or optional_params not found in %s" % testcase_name)
+        return case_params
+
+    def get_call_dict(self, module, casename, func = None):
         """ Return testing function reference dictionary """
-        (package, casename, func) = args
-        case_abs_path = '%s.%s.%s' % ('repos', package, casename)
+        case_abs_path = '%s.%s.%s' % ('repos', module, casename)
 
-        # Main function name is the same as casename here
-        case_mod = __import__(case_abs_path)
+        # import tescase file
+        casemod_ref = __import__(case_abs_path)
         components = case_abs_path.split('.')
 
         # Import recursively module
         for component in components[1:]:
-            if component == "":
-                raise exception.CaseConfigfileError("Missing module name after \":\"")
-            case_mod = getattr(case_mod, component)
-        main_function_ref = getattr(case_mod, func)
-        return main_function_ref
+            casemod_ref = getattr(casemod_ref, component)
 
+        if func:
+            main_function_ref = getattr(casemod_ref, func)
+            return main_function_ref
+
+        return casemod_ref

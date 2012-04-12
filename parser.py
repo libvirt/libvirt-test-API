@@ -327,6 +327,8 @@ class CaseFileParser(object):
 
                 tripped_caselist = casestring.strip().split()
                 tripped_casename = tripped_caselist[0]
+                if not re.match(".+:.+", tripped_casename):
+                    raise exception.CaseConfigfileError("casename line format error!")
 
                 if self.debug:
                     self.debug_print("we begin to handle the case",
