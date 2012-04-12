@@ -28,6 +28,8 @@ import env_clear
 import process
 from utils import log
 from logxmlparser import LogXMLParser
+from activityfilter import Filter
+from casecfgcheck import CaseCfgCheck
 
 def usage():
     print "Usage: libvirt_test_api.py <OPTIONS> <ARGUS>"
@@ -58,7 +60,7 @@ def append_path():
     else:
         sys.path.append(pwd)
 
-class LibvirtTestAPI(object):
+class Main(object):
     """ The class provides methods to run a new test and manage
         testing log and records
     """
@@ -104,28 +106,22 @@ class LibvirtTestAPI(object):
             times = int(options_list[0]['options']["times"])
             activities_list = activities_list * times
 
-        # extract the string of combination of
-        # language, package, testname of a testcase.
-        all_testcases_names = []
-        prev_casename = ''
-        for activity in activities_list:
-            for testcase in activity:
-                testcases_names = testcase.keys()
-                if 'sleep' in testcases_names:
-                    testcases_names.remove('sleep')
-                if not cmp('clean', testcases_names[0]):
-                    all_testcases_names += [prev_casename + ":_clean"]
-                    continue
+        filterobj = Filter(activities_list)
 
-                prev_casename = testcases_names[0]
-                all_testcases_names += testcases_names
+        unique_testcases = filterobj.unique_testcases()
 
+        # check the options to each testcase in case config file
+        casechk = CaseCfgCheck(unique_testcases, activities_list)
+        if casechk.check():
+            return 1
 
-        unique_testcases_names = list(set(all_testcases_names))
+        # get a list of unique testcase
+        # with 'clean' flag appended to its previous testcase
+        unique_testcase_keys = filterobj.unique_testcase_cleansuffix()
 
         # call and initilize proxy component to
         # get a list of reference of testcases
-        proxy_obj = proxy.Proxy(unique_testcases_names)
+        proxy_obj = proxy.Proxy(unique_testcase_keys)
 
         cases_func_ref_dict = proxy_obj.get_func_call_dict()
 
@@ -216,8 +212,7 @@ class LibvirtTestAPI(object):
 
         if failnum:
             return 1
-        else:
-            return 0
+        return 0
 
     def remove_log(self, testrunid, testid = None):
         """  to remove log item in the log xmlfile """
@@ -310,16 +305,16 @@ if __name__ == "__main__":
                 usage()
                 sys.exit(1)
 
-            libvirt_test_api = LibvirtTestAPI(casefile, logxml, loglevel, bugstxt)
-            libvirt_test_api.remove_log(testrunid, testid)
+            main = Main(casefile, logxml, loglevel, bugstxt)
+            main.remove_log(testrunid, testid)
             sys.exit(0)
         if o == "-m" or o == "--merge":
             if len(args) == 2:
                 logxml_one = args[0]
                 logxml_two = args[1]
 
-                libvirt_test_api = LibvirtTestAPI(casefile, logxml_one, loglevel, bugstxt)
-                libvirt_test_api.merge_logxmls(logxml_two)
+                main = Main(casefile, logxml_one, loglevel, bugstxt)
+                main.merge_logxmls(logxml_two)
                 sys.exit(0)
             else:
                 usage()
@@ -334,15 +329,14 @@ if __name__ == "__main__":
                 for testid in args[1:]:
                     testid = int(testid)
                     testid_list.append(testid)
-                libvirt_test_api = LibvirtTestAPI(casefile, logxml, loglevel, bugstxt)
-                libvirt_test_api.rerun(testrunid, testid_list)
+                main = Main(casefile, logxml, loglevel, bugstxt)
+                main.rerun(testrunid, testid_list)
                 sys.exit(0)
 
     # Add root path of libvirt-test-API into sys.path
     append_path()
 
-    libvirt_test_api = LibvirtTestAPI(casefile, logxml, loglevel, bugstxt)
-    if libvirt_test_api.run():
+    main = Main(casefile, logxml, loglevel, bugstxt)
+    if main.run():
         sys.exit(1)
-    else:
-        sys.exit(0)
+    sys.exit(0)
