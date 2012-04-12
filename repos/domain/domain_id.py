@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# To test "virsh domid" command 
+# To test "virsh domid" command
 
 import os
 import sys
