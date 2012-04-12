@@ -22,7 +22,7 @@ class CaseCfgCheck(object):
         self.unique_testcases = unique_testcases
 
         # XXX to check the first testcase list in activities_list
-        self.activitie = activities_list[0]
+        self.activity = activities_list[0]
 
         proxy_obj = proxy.Proxy(self.unique_testcases)
         self.case_params = proxy_obj.get_params_variables()
@@ -32,7 +32,7 @@ class CaseCfgCheck(object):
         case_number = 0
         error_flag = 0
         passed_testcase = []
-        for testcase in self.activitie:
+        for testcase in self.activity:
             case_number += 1
             if testcase in passed_testcase:
                 continue
