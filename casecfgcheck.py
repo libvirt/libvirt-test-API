@@ -33,14 +33,18 @@ class CaseCfgCheck(object):
         error_flag = 0
         passed_testcase = []
         for testcase in self.activity:
-            case_number += 1
             if testcase in passed_testcase:
                 continue
 
             testcase_name = testcase.keys()[0]
-            actual_params = testcase.values()[0]
+            if testcase_name == 'clean' or \
+               testcase_name == 'sleep':
+                continue
 
+            actual_params = testcase.values()[0]
             required_params, optional_params = self.case_params[testcase_name]
+
+            case_number += 1
             ret = self._check_params(required_params, optional_params, actual_params)
             if ret:
                 error_flag = 1
