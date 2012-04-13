@@ -327,8 +327,6 @@ class CaseFileParser(object):
 
                 tripped_caselist = casestring.strip().split()
                 tripped_casename = tripped_caselist[0]
-                if not re.match(".+:.+", tripped_casename):
-                    raise exception.CaseConfigfileError("casename line format error!")
 
                 if self.debug:
                     self.debug_print("we begin to handle the case",
@@ -415,6 +413,9 @@ class CaseFileParser(object):
                         option_case[0]['options'][optionkey] = optionvalue
                     list.append(option_case)
                     continue
+
+                if not re.match(".+:.+", tripped_casename):
+                    raise exception.CaseConfigfileError("%s line format error!" % tripped_casename)
 
                 for caselist in list:
                     newdict = {}
