@@ -11,8 +11,8 @@ from libvirt import libvirtError
 from utils import xmlbuilder
 from utils import XMLParser
 
-required_params = ('poolname', 'sourcepath', 'pooltype')
-optional_params = ('sourceformat')
+required_params = ('poolname', 'sourcepath', 'pooltype',)
+optional_params = ('sourceformat',)
 
 def check_pool_create_libvirt(conn, poolname, logger):
     """Check the result of create storage pool on libvirt level.  """

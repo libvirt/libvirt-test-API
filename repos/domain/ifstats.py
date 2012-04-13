@@ -12,7 +12,7 @@ from libvirt import libvirtError
 
 from utils import utils
 
-required_params = ('guestname')
+required_params = ('guestname',)
 optional_params = ()
 
 def check_guest_status(domobj):

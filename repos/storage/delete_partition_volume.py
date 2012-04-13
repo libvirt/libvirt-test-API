@@ -10,7 +10,7 @@ from libvirt import libvirtError
 
 from utils import xmlbuilder
 
-required_params = ('poolname', 'volname')
+required_params = ('poolname', 'volname',)
 optional_params = ()
 
 def return_close(conn, logger, ret):

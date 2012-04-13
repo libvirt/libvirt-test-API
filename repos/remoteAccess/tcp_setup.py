@@ -14,7 +14,7 @@ required_params = ('target_machine',
                    'username',
                    'password',
                    'listen_tcp',
-                   'auth_tcp')
+                   'auth_tcp',)
 optional_params = ()
 
 SASLPASSWD2 = "/usr/sbin/saslpasswd2"

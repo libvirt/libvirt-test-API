@@ -8,7 +8,7 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
-required_params = ('guestname', 'autostart')
+required_params = ('guestname', 'autostart',)
 optional_params = ()
 
 def check_guest_autostart(*args):

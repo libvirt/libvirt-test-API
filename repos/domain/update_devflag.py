@@ -13,7 +13,7 @@ from libvirt import libvirtError
 from utils import utils
 from utils import xmlbuilder
 
-required_params = ('guestname', 'devtype', 'username', 'password')
+required_params = ('guestname', 'devtype', 'username', 'password',)
 optional_params = ()
 
 def create_image(params, util, img_name):

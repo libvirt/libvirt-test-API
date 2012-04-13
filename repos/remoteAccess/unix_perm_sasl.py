@@ -11,8 +11,8 @@ from libvirt import libvirtError
 
 from utils import utils
 
-required_params = ('auth_unix_ro', 'auth_unix_rw')
-optional_params = ()
+required_params = ('auth_unix_ro', 'auth_unix_rw',)
+optional_params = ('unix_sock_group',)
 
 TESTING_USER = 'testapi'
 LIBVIRTD_CONF = "/etc/libvirt/libvirtd.conf"

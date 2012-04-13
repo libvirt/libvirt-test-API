@@ -25,7 +25,7 @@ FLOOPY_IMG = "/tmp/floppy.img"
 ISO_MOUNT_POINT = "/mnt/libvirt_windows"
 HOME_PATH = os.getcwd()
 
-required_params = ('guestname', 'guesttype', 'guestos', 'guestarch')
+required_params = ('guestname', 'guesttype', 'guestos', 'guestarch',)
 optional_params = ('uuid',
                    'memory',
                    'vcpu',
@@ -38,7 +38,7 @@ optional_params = ('uuid',
                    'source',
                    'type',
                    'volumepath',
-                   'imagetype')
+                   'imagetype',)
 
 def return_close(conn, logger, ret):
     conn.close()

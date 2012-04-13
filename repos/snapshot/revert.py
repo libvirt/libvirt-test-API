@@ -7,7 +7,7 @@ import re
 import libvirt
 from libvirt import libvirtError
 
-required_params = ('guestname', 'snapshotname')
+required_params = ('guestname', 'snapshotname',)
 optional_params = ()
 
 def check_domain_state(conn, guestname, logger):

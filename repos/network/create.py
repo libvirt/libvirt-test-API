@@ -17,7 +17,7 @@ required_params = ('networkname',
                    'bridgenetmask',
                    'netstart',
                    'netend',
-                   'netmode')
+                   'netmode',)
 optional_params = ()
 
 def check_network_status(*args):

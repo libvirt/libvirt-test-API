@@ -9,7 +9,7 @@ import commands
 import libvirt
 from libvirt import libvirtError
 
-required_params = ('networkname')
+required_params = ('networkname',)
 optional_params = ()
 
 VIRSH_NETNAME = "virsh net-name"

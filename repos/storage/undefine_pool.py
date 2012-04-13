@@ -7,7 +7,7 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
-required_params = ('poolname')
+required_params = ('poolname',)
 optional_params = ()
 
 def display_pool_info(conn):

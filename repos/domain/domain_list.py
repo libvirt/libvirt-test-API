@@ -6,7 +6,7 @@ import sys
 import re
 import commands
 
-required_params = ('listopt')
+required_params = ('listopt',)
 optional_params = ()
 
 CONFIG_DIR = '/etc/libvirt/qemu'

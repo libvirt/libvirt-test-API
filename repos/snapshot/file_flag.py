@@ -12,7 +12,7 @@ from libvirt import libvirtError
 from utils import utils
 from utils import check
 
-required_params = ('guestname', 'username', 'password')
+required_params = ('guestname', 'username', 'password',)
 optional_params = ()
 
 FLAG_FILE = "snapshot_flag"

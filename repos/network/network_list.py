@@ -11,7 +11,7 @@ from libvirt import libvirtError
 
 from utils import utils
 
-required_params = ('netlistopt')
+required_params = ('netlistopt',)
 optional_params = ()
 
 VIRSH_QUIET_NETLIST = "virsh --quiet net-list %s|awk '{print $1}'"

@@ -9,7 +9,7 @@ import commands
 import libvirt
 from libvirt import libvirtError
 
-required_params = ('guestname', 'blockdev')
+required_params = ('guestname', 'blockdev',)
 optional_params = ()
 
 GET_DOMBLKINFO_MAC = "virsh domblkinfo %s %s | awk '{print $2}'"

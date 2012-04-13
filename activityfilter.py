@@ -44,7 +44,6 @@ class Filter(object):
         """
         keylist = []
         for key in self.testcase_keys:
-            key = key.lower()
             if key == 'clean' or key == 'sleep':
                 continue
 
@@ -60,7 +59,6 @@ class Filter(object):
         prev_casename = ''
 
         for key in self.testcase_keys:
-            key = key.lower()
             if key == 'sleep':
                 continue
 

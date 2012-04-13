@@ -5,7 +5,7 @@ import sys
 import re
 import commands
 
-required_params = ('guestname')
+required_params = ('guestname',)
 optional_params = ()
 
 SNAPSHOT_DIR = "/var/lib/libvirt/qemu/snapshot"

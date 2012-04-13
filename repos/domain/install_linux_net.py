@@ -17,7 +17,7 @@ from utils import utils
 from utils import env_parser
 from utils import xmlbuilder
 
-required_params = ('guestname', 'guesttype', 'guestos', 'guestarch','netmethod')
+required_params = ('guestname', 'guesttype', 'guestos', 'guestarch','netmethod',)
 optional_params = ('uuid',
                    'memory',
                    'vcpu',
@@ -28,7 +28,7 @@ optional_params = ('uuid',
                    'ifacetype',
                    'imagetype',
                    'source',
-                   'type')
+                   'type',)
 
 VIRSH_QUIET_LIST = "virsh --quiet list --all|awk '{print $2}'|grep \"^%s$\""
 VM_STAT = "virsh --quiet list --all| grep \"\\b%s\\b\"|grep off"

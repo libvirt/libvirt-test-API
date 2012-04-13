@@ -6,7 +6,7 @@ import re
 import commands
 
 required_params = ()
-optional_params = ('macaddr')
+optional_params = ('macaddr',)
 
 VIRSH_QUIET_IFACE_LIST = "virsh --quiet iface-list --all | awk '{print ""$%s""}'"
 GET_MAC = "ip link show %s |sed -n '2p'| awk '{print $2}'"

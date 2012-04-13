@@ -12,8 +12,8 @@ from libvirt import libvirtError
 from utils import utils
 from utils import xmlbuilder
 
-required_params = ('guestname')
-optional_params = ('snapshotname')
+required_params = ('guestname',)
+optional_params = ('snapshotname',)
 
 QEMU_IMAGE_FORMAT = "qemu-img info %s |grep format |awk -F': ' '{print $2}'"
 

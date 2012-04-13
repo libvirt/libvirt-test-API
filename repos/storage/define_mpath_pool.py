@@ -9,8 +9,8 @@ from libvirt import libvirtError
 
 from utils import xmlbuilder
 
-required_params = ('poolname', 'pooltype')
-optional_params = ('targetpath')
+required_params = ('poolname', 'pooltype',)
+optional_params = ('targetpath',)
 
 def display_pool_info(conn):
     """Display current storage pool information"""

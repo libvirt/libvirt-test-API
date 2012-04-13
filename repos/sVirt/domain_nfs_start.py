@@ -19,7 +19,7 @@ from shutil import copy
 required_params = ('guestname',
                    'dynamic_ownership',
                    'virt_use_nfs',
-                   'root_squash')
+                   'root_squash',)
 optional_params = ()
 
 QEMU_CONF = "/etc/libvirt/qemu.conf"

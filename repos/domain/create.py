@@ -15,7 +15,7 @@ from utils import xmlbuilder
 NONE = 0
 START_PAUSED = 1
 
-required_params = ('guestname', 'guesttype')
+required_params = ('guestname', 'guesttype',)
 optional_params = ('uuid',
                    'memory',
                    'vcpu',
@@ -26,7 +26,7 @@ optional_params = ('uuid',
                    'nicmodel',
                    'ifacetype',
                    'source',
-                   'flag')
+                   'flag',)
 
 def return_close(conn, logger, ret):
     conn.close()

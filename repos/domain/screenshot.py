@@ -7,7 +7,7 @@ import mimetypes
 
 import libvirt
 
-required_params = ('guestname', 'screen', 'filename')
+required_params = ('guestname', 'screen', 'filename',)
 optional_params = ()
 
 def saver(stream, data, file_):

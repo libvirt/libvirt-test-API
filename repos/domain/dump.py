@@ -13,7 +13,7 @@ from libvirt import libvirtError
 from utils import utils
 from utils import check
 
-required_params = ('guestname', 'file')
+required_params = ('guestname', 'file',)
 optional_params = ()
 
 def return_close(conn, logger, ret):

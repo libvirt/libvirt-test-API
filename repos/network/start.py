@@ -10,7 +10,7 @@ import commands
 import libvirt
 from libvirt import libvirtError
 
-required_params = ('networkname')
+required_params = ('networkname',)
 optional_params = ()
 
 def return_close(conn, logger, ret):

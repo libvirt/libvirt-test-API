@@ -11,7 +11,7 @@ from utils import xmlbuilder
 import libvirt
 from libvirt import libvirtError
 
-required_params = ('wwpn')
+required_params = ('wwpn',)
 optional_params = ()
 
 def check_nodedev_create(wwpn, device_name):

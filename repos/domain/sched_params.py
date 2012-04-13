@@ -10,7 +10,7 @@ import libvirt
 
 from utils import utils
 
-required_params = ('guestname', 'capshares')
+required_params = ('guestname', 'capshares',)
 optional_params = ()
 
 def return_close(conn, logger, ret):

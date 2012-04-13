@@ -10,7 +10,7 @@ from xml.dom import minidom
 import libvirt
 from libvirt import libvirtError
 
-required_params = ('poolname')
+required_params = ('poolname',)
 optional_params = ()
 
 def get_pool_devicename_type(poolobj):

@@ -9,7 +9,7 @@ import commands
 import libvirt
 from libvirt import libvirtError
 
-required_params = ('poolname')
+required_params = ('poolname',)
 optional_params = ()
 
 VIRSH_POOLNAME = "virsh pool-name"

@@ -13,7 +13,7 @@ from libvirt import libvirtError
 from utils import utils
 from utils import xmlbuilder
 
-required_params = ('guestname', 'guesttype')
+required_params = ('guestname', 'guesttype',)
 optional_params = ('uuid',
                    'memory',
                    'vcpu',
@@ -21,10 +21,10 @@ optional_params = ('uuid',
                    'fullimagepath',
                    'imagetype',
                    'hdmodel',
-                   'nicmode',
+                   'nicmodel',
                    'macaddr',
                    'ifacetype',
-                   'source')
+                   'source',)
 
 def check_define_domain(guestname, guesttype, hostname, username, \
                         password, util, logger):

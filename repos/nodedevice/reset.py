@@ -11,7 +11,7 @@ from libvirt import libvirtError
 
 from utils import utils
 
-required_params = ('pciaddress')
+required_params = ('pciaddress',)
 optional_params = ()
 
 def check_node_reset():

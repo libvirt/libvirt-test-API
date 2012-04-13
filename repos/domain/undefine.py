@@ -7,7 +7,7 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
-required_params = ('guestname')
+required_params = ('guestname',)
 optional_params = ()
 
 def check_undefine_domain(guestname):

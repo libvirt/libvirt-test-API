@@ -10,7 +10,7 @@ import libvirt
 from libvirt import libvirtError
 
 
-required_params = ('networkname')
+required_params = ('networkname',)
 optional_params = ()
 
 def check_network_status(*args):

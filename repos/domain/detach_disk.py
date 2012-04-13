@@ -12,7 +12,7 @@ from libvirt import libvirtError
 from utils import utils
 from utils import xmlbuilder
 
-required_params = ('guestname', 'guesttype', 'imagename', 'hdmodel')
+required_params = ('guestname', 'guesttype', 'imagename', 'hdmodel',)
 optional_params = ()
 
 def check_guest_status(domobj):

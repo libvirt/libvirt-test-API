@@ -11,7 +11,7 @@ from libvirt import libvirtError
 
 from utils import xmlbuilder
 
-required_params = ('poolname', 'volname', 'volformat', 'capacity')
+required_params = ('poolname', 'volname', 'volformat', 'capacity',)
 optional_params = ()
 
 def return_close(conn, logger, ret):

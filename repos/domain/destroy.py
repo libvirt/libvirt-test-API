@@ -10,8 +10,8 @@ from libvirt import libvirtError
 
 from utils import utils
 
-required_params = ('guestname')
-optional_params = ('flags')
+required_params = ('guestname',)
+optional_params = ('flags',)
 
 def destroy(params):
     """destroy domain

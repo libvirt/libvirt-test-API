@@ -9,7 +9,7 @@ import commands
 import libvirt
 from libvirt import libvirtError
 
-required_params = ('poolname', 'volname')
+required_params = ('poolname', 'volname',)
 optional_params = ()
 
 def display_volume_info(poolobj):

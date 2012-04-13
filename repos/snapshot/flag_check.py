@@ -11,8 +11,8 @@ from libvirt import libvirtError
 from utils import utils
 from utils import check
 
-required_params = ('guestname', 'username', 'password')
-optional_params = ()
+required_params = ('guestname', 'username', 'password',)
+optional_params = ('expectedret')
 
 FLAG_FILE = "/tmp/snapshot_flag"
 FLAG_CHECK = "ls %s" % FLAG_FILE

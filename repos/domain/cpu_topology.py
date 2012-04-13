@@ -17,7 +17,7 @@ required_params = ('guestname',
                    'password',
                    'sockets',
                    'cores',
-                   'threads')
+                   'threads',)
 optional_params = ()
 
 def check_domain_running(conn, guestname, logger):

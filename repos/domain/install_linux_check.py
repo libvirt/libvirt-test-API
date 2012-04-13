@@ -15,7 +15,7 @@ from utils import utils
 from utils import check
 from utils import env_parser
 
-required_params = ('guestname', 'guesttype', 'hdmodel', 'nicmodel')
+required_params = ('guestname', 'guesttype', 'hdmodel', 'nicmodel',)
 optional_params = ('disksize',
                    'memory',
                    'vcpu',
@@ -24,7 +24,7 @@ optional_params = ('disksize',
                    'ifacetype',
                    'netmethod',
                    'source',
-                   'type')
+                   'type',)
 
 HOME_PATH = os.getcwd()
 

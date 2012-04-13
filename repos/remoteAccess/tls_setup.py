@@ -17,7 +17,7 @@ required_params = ('listen_tls',
                    'auth_tls',
                    'target_machine',
                    'username',
-                   'password')
+                   'password',)
 optional_params = ()
 
 CERTTOOL = "/usr/bin/certtool"

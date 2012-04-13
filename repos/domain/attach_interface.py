@@ -11,8 +11,8 @@ from libvirt import libvirtError
 from utils import utils
 from utils import xmlbuilder
 
-required_params = ('guestname', 'ifacetype', 'source')
-optional_params = ('hdmodel')
+required_params = ('guestname', 'ifacetype', 'source',)
+optional_params = ('hdmodel',)
 
 def check_guest_status(guestname, domobj):
     """Check guest current status"""

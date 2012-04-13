@@ -13,7 +13,7 @@ from libvirt import libvirtError
 
 from utils import utils
 
-required_params = ('guestname', 'dynamic_ownership', 'use_nfs')
+required_params = ('guestname', 'dynamic_ownership', 'use_nfs',)
 optional_params = ()
 
 QEMU_CONF = "/etc/libvirt/qemu.conf"

@@ -11,7 +11,7 @@ import libvirt
 from libvirt import libvirtError
 
 
-required_params = ('networkname', 'autostart')
+required_params = ('networkname', 'autostart',)
 optional_params = ()
 
 def check_network_autostart(*args):

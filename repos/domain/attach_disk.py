@@ -17,7 +17,7 @@ required_params = ('guestname',
                    'guesttype',
                    'imagename',
                    'imagesize',
-                   'hdmodel')
+                   'hdmodel',)
 optional_params = ()
 
 def create_image(name, size, logger):

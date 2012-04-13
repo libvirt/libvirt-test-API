@@ -23,7 +23,7 @@ required_params = ('transport',
                    'postsrcconfig',
                    'predstconfig',
                    'postdstconfig',
-                   'flags')
+                   'flags',)
 optional_params = ()
 
 SSH_KEYGEN = "ssh-keygen -t rsa"

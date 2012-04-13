@@ -9,7 +9,7 @@ from libvirt import libvirtError
 
 from utils import xmlbuilder
 
-required_params = ('ifacename')
+required_params = ('ifacename',)
 optional_params = ()
 
 def check_undefine_interface(ifacename):
