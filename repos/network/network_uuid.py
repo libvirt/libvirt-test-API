@@ -9,6 +9,8 @@ import commands
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
+
 required_params = ('networkname',)
 optional_params = ()
 
@@ -49,36 +51,27 @@ def netuuid(params):
     logger = params['logger']
     networkname = params['networkname']
 
-    uri = params['uri']
-    conn = libvirt.open(uri)
-
-    logger.info("the uri is %s" % uri)
+    conn = sharedmod.libvirtobj['conn']
 
     if not check_network_exists(conn, networkname, logger):
         logger.error("need a defined network")
-        conn.close()
-        logger.info("closed hypervisor connection")
         return 1
 
     netobj = conn.networkLookupByName(networkname)
 
     try:
-        try:
-            UUIDString = netobj.UUIDString()
-            logger.info("the UUID string of network %s is %s" % (networkname, UUIDString))
+        UUIDString = netobj.UUIDString()
+        logger.info("the UUID string of network %s is %s" % (networkname, UUIDString))
 
-            if check_network_uuid(networkname, UUIDString, logger):
-                logger.info(VIRSH_NETUUID + " test succeeded.")
-                return 0
-            else:
-                logger.error(VIRSH_NETUUID + " test failed.")
-                return 1
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
-                         % (e.message, e.get_error_code()))
+        if check_network_uuid(networkname, UUIDString, logger):
+            logger.info(VIRSH_NETUUID + " test succeeded.")
+            return 0
+        else:
+            logger.error(VIRSH_NETUUID + " test failed.")
             return 1
-    finally:
-        conn.close()
-        logger.info("closed hypervisor connection")
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
+        return 1
 
     return 0

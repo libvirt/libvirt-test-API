@@ -13,6 +13,7 @@ from threading import Thread
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import utils
 from utils import env_parser
 from utils import xmlbuilder
@@ -20,7 +21,7 @@ from utils import xmlbuilder
 IMAG_PATH = "/var/lib/libvirt/images/"
 DISK_DD = "dd if=/dev/zero of=%s bs=1 count=1 seek=6G"
 
-required_params = ('guestos', 'guestarch', 'guesttype', 'guestnum',)
+required_params = ('guestos', 'guestarch', 'guesttype', 'guestnum', 'uri')
 optional_params = ()
 
 def request_credentials(credentials, user_data):

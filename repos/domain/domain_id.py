@@ -7,6 +7,7 @@ import re
 import commands
 
 import libvirt
+import sharedmod
 
 required_params = ()
 optional_params = ('guestname',)
@@ -14,11 +15,6 @@ optional_params = ('guestname',)
 VIRSH_DOMID = "virsh domid"
 VIRSH_IDS = "virsh --quiet list |awk '{print $1}'"
 VIRSH_DOMS = "virsh --quiet list |awk '{print $2}'"
-
-def return_close(conn, logger, ret):
-    conn.close()
-    logger.info("closed hypervisor connection")
-    return ret
 
 def get_output(logger, command):
     """execute shell command
@@ -62,26 +58,23 @@ def domid(params):
         logger.info("no running guest available")
         return 1
 
-    uri = params['uri']
-    conn = libvirt.open(uri)
-
-    logger.info("the uri is %s" % uri)
+    conn = sharedmod.libvirtobj['conn']
 
     for dom in doms:
         if not check_domain_exists(conn, dom, logger):
-            return return_close(conn, logger, 1)
+            return 1
 
     status, ids_ret = get_output(logger, VIRSH_IDS)
     if not status:
         ids_list = ids_ret.split('\n')
     else:
-        return return_close(conn, logger, 1)
+        return 1
 
     status, doms_ret = get_output(logger, VIRSH_DOMS)
     if not status:
         doms_list = doms_ret.split('\n')
     else:
-        return return_close(conn, logger, 1)
+        return 1
 
     domname_id = {}
     for dom  in doms_list:
@@ -91,12 +84,12 @@ def domid(params):
     for dom in doms:
         status, domid_ret = get_output(logger, VIRSH_DOMID + " %s" % dom)
         if status:
-            return return_close(conn, logger, 1)
+            return 1
         domid = domid_ret[:-1]
         if domname_id[dom] == domid:
             logger.info("domname %s corresponds to id %s" % (dom, domid))
         else:
             logger.error("domname %s fails to match id %s" % (dom, domid))
-            return return_close(conn, logger, 1)
+            return 1
 
-    return return_close(conn, logger, 0)
+    return 0

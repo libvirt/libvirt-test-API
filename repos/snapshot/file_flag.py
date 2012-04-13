@@ -9,6 +9,7 @@ import time
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import utils
 from utils import check
 
@@ -17,11 +18,6 @@ optional_params = ()
 
 FLAG_FILE = "snapshot_flag"
 MAKE_FLAG = "rm -f /tmp/%s; touch /tmp/%s " % (FLAG_FILE, FLAG_FILE)
-
-def return_close(conn, logger, ret):
-    conn.close()
-    logger.info("closed hypervisor connection")
-    return ret
 
 def check_domain_running(conn, guestname, logger):
     """ check if the domain exists and in running state as well """
@@ -60,14 +56,11 @@ def file_flag(params):
     password = params['password']
 
     chk = check.Check()
-    uri = params['uri']
-    conn = libvirt.open(uri)
-
-    logger.info("the uri is %s" % uri)
+    conn = sharedmod.libvirtobj['conn']
 
     if not check_domain_running(conn, guestname, logger):
         logger.error("need a running guest")
-        return return_close(conn, logger, 1)
+        return 1
 
     logger.info("get the mac address of vm %s" % guestname)
     mac = utils.get_dom_mac_addr(guestname)
@@ -86,15 +79,15 @@ def file_flag(params):
 
     if timeout == 0:
         logger.info("vm %s failed to get ip address" % guestname)
-        return return_close(conn, logger, 1)
+        return 1
 
     if not make_flag(chk, ipaddr, username, password, logger):
         logger.error("making flag in guest %s failed" % guestname)
-        return return_close(conn, logger, 1)
+        return 1
     else:
         logger.info("making flag in guest %s succeeded" % guestname)
 
-    return return_close(conn, logger, 0)
+    return 0
 
 def file_flag_clean(params):
     """ clean testing environment """

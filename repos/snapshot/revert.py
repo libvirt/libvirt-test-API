@@ -7,6 +7,8 @@ import re
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
+
 required_params = ('guestname', 'snapshotname',)
 optional_params = ()
 
@@ -29,32 +31,23 @@ def revert(params):
     guestname = params['guestname']
     snapshotname = params['snapshotname']
 
-    uri = params['uri']
-    conn = libvirt.open(uri)
-
-    logger.info("the uri is %s" % uri)
+    conn = sharedmod.libvirtobj['conn']
 
     logger.info("checking if the guest is poweroff")
     if not check_domain_state(conn, guestname, logger):
         logger.error("checking failed")
-        conn.close()
-        logger.info("closed hypervisor connection")
         return 1
 
     try:
-        try:
-            logger.info("revert a snapshot for %s" % guestname)
-            domobj = conn.lookupByName(guestname)
-            snap = domobj.snapshotLookupByName(snapshotname, 0)
-            domobj.revertToSnapshot(snap, 0)
-            logger.info("revert snapshot succeeded")
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
-                         % (e.message, e.get_error_code()))
-            return 1
-    finally:
-        conn.close()
-        logger.info("closed hypervisor connection")
+        logger.info("revert a snapshot for %s" % guestname)
+        domobj = conn.lookupByName(guestname)
+        snap = domobj.snapshotLookupByName(snapshotname, 0)
+        domobj.revertToSnapshot(snap, 0)
+        logger.info("revert snapshot succeeded")
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
+        return 1
 
     return 0
 

@@ -10,16 +10,12 @@ import commands
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import utils
 from utils import check
 
 required_params = ('guestname', 'file',)
 optional_params = ()
-
-def return_close(conn, logger, ret):
-    conn.close()
-    logger.info("closed hypervisor connection")
-    return ret
 
 def check_guest_status(*args):
     """Check guest current status"""
@@ -128,42 +124,34 @@ def dump(params):
     logger = params['logger']
     guestname = params['guestname']
     file = params['file']
-    test_result = False
+    conn = sharedmod.libvirtobj['conn']
 
-    # Connect to local hypervisor connection URI
-    uri = params['uri']
-    conn = libvirt.open(uri)
     domobj = conn.lookupByName(guestname)
 
     if check_guest_status(guestname, domobj, logger):
         kernel = check_guest_kernel(guestname, logger)
         if kernel == None:
             logger.error("can't get guest kernel version")
-            test_result = False
-            return return_close(conn, logger, 1)
+            return 1
 
         logger.info("dump the core of %s to file %s\n" %(guestname, file))
 
-        try:
-            domobj.coreDump(file, 0)
-            retval = check_dump1(file, logger)
+    try:
+        domobj.coreDump(file, 0)
+        retval = check_dump1(file, logger)
 
-            if retval == 0:
-                test_result = True
-                logger.info("check core dump: %d\n" %retval)
-            else:
-                test_result = False
-                logger.error("check core dump: %d\n" %retval)
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
-                         % (e.message, e.get_error_code()))
-            logger.error("Error: fail to core dump %s domain" %guestname)
-            test_result = False
+        if retval == 0:
+            logger.info("check core dump: %d\n" %retval)
+        else:
+            logger.error("check core dump: %d\n" %retval)
+            return 1
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
+        logger.error("Error: fail to core dump %s domain" %guestname)
+        return 1
 
-    if test_result:
-        return return_close(conn, logger, 0)
-    else:
-        return return_close(conn, logger, 1)
+    return 0
 
 def dump_clean(params):
     """ clean testing environment """

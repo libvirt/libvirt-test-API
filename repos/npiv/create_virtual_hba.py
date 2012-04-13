@@ -11,6 +11,8 @@ from utils import xmlbuilder
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
+
 required_params = ('wwpn',)
 optional_params = ()
 
@@ -50,9 +52,7 @@ def create_virtual_hba(params):
     logger = params['logger']
     wwpn = params['wwpn']
 
-    uri = params['uri']
-
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
 
     scsi_list = conn.listDevices('scsi_host', 0)
 
@@ -75,27 +75,23 @@ def create_virtual_hba(params):
     logger.debug("node device xml:\n%s" % nodedev_xml)
 
     try:
-        try:
-            logger.info("creating a virtual HBA ...")
-            nodedev_obj = conn.nodeDeviceCreateXML(nodedev_xml, 0)
-            dev_name = nodedev_obj.name()
+        logger.info("creating a virtual HBA ...")
+        nodedev_obj = conn.nodeDeviceCreateXML(nodedev_xml, 0)
+        dev_name = nodedev_obj.name()
 
-            if check_nodedev_create(wwpn, dev_name) and \
-                check_nodedev_parent(nodedev_obj, params['parent'], dev_name):
-                logger.info("the virtual HBA '%s' was created successfully" \
-                            % dev_name)
-                return 0
-            else:
-                logger.error("fail to create the virtual HBA '%s'" \
-                             % dev_name)
-                return 1
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
-                         % (e.message, e.get_error_code()))
-            logger.error("Error: fail to create %s virtual hba" % dev_name)
+        if check_nodedev_create(wwpn, dev_name) and \
+            check_nodedev_parent(nodedev_obj, params['parent'], dev_name):
+            logger.info("the virtual HBA '%s' was created successfully" \
+                        % dev_name)
+            return 0
+        else:
+            logger.error("fail to create the virtual HBA '%s'" \
+                         % dev_name)
             return 1
-    finally:
-        conn.close()
-        logger.info("closed hypervisor connection")
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
+        logger.error("Error: fail to create %s virtual hba" % dev_name)
+        return 1
 
     return 0

@@ -8,15 +8,11 @@ import time
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import utils
 
 required_params = ('guestname',)
 optional_params = ()
-
-def return_close(conn, logger, ret):
-    conn.close()
-    logger.info("closed hypervisor connection")
-    return ret
 
 def shutdown(params):
     """Shutdown domain
@@ -29,14 +25,10 @@ def shutdown(params):
 
         Return 0 on SUCCESS or 1 on FAILURE
     """
-    # Initiate and check parameters
-    is_fail = True
     domname = params['guestname']
     logger = params['logger']
 
-    # Connect to local hypervisor connection URI
-    uri = params['uri']
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
     domobj = conn.lookupByName(domname)
 
     timeout = 600
@@ -53,7 +45,7 @@ def shutdown(params):
         logger.error("API error message: %s, error code is %s" \
                      % (e.message, e.get_error_code()))
         logger.error("shutdown failed")
-        return return_close(conn, logger, 1)
+        return 1
 
     # Check domain status by ping ip
     while timeout:
@@ -67,16 +59,16 @@ def shutdown(params):
 
     if timeout <= 0:
         logger.error('The domain state is not equal to "shutoff"')
-        return return_close(conn, logger, 1)
+        return 1
 
     logger.info('ping guest')
     if utils.do_ping(ip, 300):
         logger.error('The guest is still active, IP: ' + str(ip))
-        return return_close(conn, logger, 1)
+        return 1
     else:
         logger.info("domain %s shutdown successfully" % domname)
 
-    return return_close(conn, logger, 0)
+    return 0
 
 def shutdown_clean(params):
     """ clean the testing environment """

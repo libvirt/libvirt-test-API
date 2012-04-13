@@ -8,6 +8,7 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import utils
 
 required_params = ('guestname', 'filepath',)
@@ -64,11 +65,8 @@ def save(params):
     logger = params['logger']
     guestname = params['guestname']
     filepath = params['filepath']
-    test_result = False
 
-    # Connect to local hypervisor connection URI
-    uri = params['uri']
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
     domobj = conn.lookupByName(guestname)
 
     # Save domain
@@ -76,39 +74,26 @@ def save(params):
 
     if not check_guest_status(domobj, logger):
         logger.error("Error: current guest status is shutoff")
-        conn.close()
-        logger.info("closed hypervisor connection")
         return 1
 
     if not ipaddr:
         logger.error("Error: can't get guest ip address")
-        conn.close()
-        logger.info("closed hypervisor connection")
         return 1
-    try:
-        try:
-            domobj.save(filepath)
-            if check_guest_save(guestname, domobj, util, logger):
-                logger.info("save %s domain successful" %guestname)
-                test_result = True
-            else:
-                logger.error("Error: fail to check save domain")
-                test_result = False
-                return 1
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
-                         % (e.message, e.get_error_code()))
-            logger.error("Error: fail to save %s domain" %guestname)
-            test_result = False
-            return 1
-    finally:
-        conn.close()
-        logger.info("closed hypervisor connection")
 
-    if test_result:
-        return 0
-    else:
+    try:
+        domobj.save(filepath)
+        if check_guest_save(guestname, domobj, util, logger):
+            logger.info("save %s domain successful" %guestname)
+        else:
+            logger.error("Error: fail to check save domain")
+            return 1
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
+        logger.error("Error: fail to save %s domain" %guestname)
         return 1
+
+    return 0
 
 def save_clean(params):
     """ clean testing environment """

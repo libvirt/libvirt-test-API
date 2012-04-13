@@ -9,6 +9,7 @@ import time
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import utils
 from utils import xmlbuilder
 
@@ -28,16 +29,10 @@ optional_params = ('uuid',
                    'source',
                    'flag',)
 
-def return_close(conn, logger, ret):
-    conn.close()
-    logger.info("closed hypervisor connection")
-    return ret
-
 def create(params):
     """create a domain from xml"""
     logger = params['logger']
     guestname = params['guestname']
-    test_result = False
 
     flags = None
     if params.has_key('flags'):
@@ -46,9 +41,7 @@ def create(params):
             logger.error("flags value either \"none\" or \"start_paused\"");
             return 1
 
-    # Connect to local hypervisor connection URI
-    uri = params['uri']
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
 
     xmlobj = xmlbuilder.XmlBuilder()
     domain = xmlobj.add_domain(params)
@@ -69,16 +62,16 @@ def create(params):
         logger.error("API error message: %s, error code is %s" \
                      % (e.message, e.get_error_code()))
         logger.error("fail to create domain %s" % guestname)
-        return return_close(conn, logger, 1)
+        return 1
 
     if flags == "start_paused":
         state = domobj.info()[0]
         if state == libvirt.VIR_DOMAIN_PAUSED:
             logger.info("guest start with state paused successfully")
-            return return_close(conn, logger, 0)
+            return 0
         else:
             logger.error("guest state error")
-            return return_close(conn, logger, 1)
+            return 1
 
     logger.info("get the mac address of vm %s" % guestname)
     mac = utils.get_dom_mac_addr(guestname)
@@ -97,15 +90,10 @@ def create(params):
         else:
             logger.info("vm %s power on successfully" % guestname)
             logger.info("the ip address of vm %s is %s" % (guestname, ip))
-            test_result = True
             break
 
         if timeout == 0:
             logger.info("fail to power on vm %s" % guestname)
-            test_result = False
-            return return_close(conn, logger, 1)
+            return 1
 
-    if test_result:
-        return return_close(conn, logger, 0)
-    else:
-        return return_close(conn, logger, 1)
+    return 0

@@ -8,6 +8,8 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
+
 required_params = ('guestname', 'autostart',)
 optional_params = ()
 
@@ -41,7 +43,7 @@ def autostart(params):
     logger = params['logger']
     guestname = params['guestname']
     autostart = params['autostart']
-    test_result = False
+
     flag = -1
     if autostart == "enable":
         flag = 1
@@ -51,36 +53,26 @@ def autostart(params):
         logger.error("Error: autostart value is invalid")
         return 1
 
-    # Connect to local hypervisor connection URI
-    uri = params['uri']
-    conn = libvirt.open(uri)
-
+    conn = sharedmod.libvirtobj['conn']
     domobj = conn.lookupByName(guestname)
+    uri = conn.getURI()
 
     try:
-        try:
-            domobj.setAutostart(flag)
-            if check_guest_autostart(guestname, uri.split(":")[0], flag, logger):
-                logger.info("current %s autostart: %s" %
-                            (guestname, domobj.autostart()))
-                logger.info("executing autostart operation is successful")
-                test_result = True
-            else:
-                logger.error("Error: fail to check autostart domain")
-                test_result = False
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
-                         % (e.message, e.get_error_code()))
-            logger.error("Error: fail to autostart %s domain" %guestname)
-            test_result = False
-    finally:
-        conn.close()
-        logger.info("closed hypervisor connection")
-
-    if test_result:
-        return 0
-    else:
+        domobj.setAutostart(flag)
+        if check_guest_autostart(guestname, uri.split(":")[0], flag, logger):
+            logger.info("current %s autostart: %s" %
+                        (guestname, domobj.autostart()))
+            logger.info("executing autostart operation is successful")
+        else:
+            logger.error("Error: fail to check autostart domain")
+            return 1
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
+        logger.error("Error: fail to autostart %s domain" %guestname)
         return 1
+
+    return 0
 
 def autostart_clean(params):
     """ clean testing environment """

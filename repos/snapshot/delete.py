@@ -7,6 +7,8 @@ import re
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
+
 required_params = ('guestname', 'snapshotname',)
 optional_params = ()
 
@@ -45,44 +47,33 @@ def delete(params):
     guestname = params['guestname']
     snapshotname = params['snapshotname']
 
-    uri = params['uri']
-    conn = libvirt.open(uri)
-
-    logger.info("the uri is %s" % uri)
+    conn = sharedmod.libvirtobj['conn']
 
     logger.info("checking if the guest is poweroff")
     if not check_domain_state(conn, guestname, logger):
         logger.error("checking failed")
-        conn.close()
-        logger.info("closed hypervisor connection")
         return 1
 
     if not delete_check(guestname, snapshotname, "exist", logger):
         logger.error("no snapshot %s exists" % snapshotname)
         logger.debug("not corresponding xml file in %s" % SNAPSHOT_DIR)
-        conn.close()
-        logger.info("closed hypervisor connection")
         return 1
 
     try:
-        try:
-            logger.info("delete a snapshot for %s" % guestname)
-            domobj = conn.lookupByName(guestname)
-            snapobj = domobj.snapshotLookupByName(snapshotname, 0)
-            snapobj.delete(0)
-            if not delete_check(guestname, snapshotname, "noexist", logger):
-                logger.error("after deleting, the corresponding \
-                             xmlfile still exists in %s" % SNAPSHOT_DIR)
-                return 1
-            else:
-                logger.info("delete snapshot %s succeeded" % snapshotname)
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
-                         % (e.message, e.get_error_code()))
+        logger.info("delete a snapshot for %s" % guestname)
+        domobj = conn.lookupByName(guestname)
+        snapobj = domobj.snapshotLookupByName(snapshotname, 0)
+        snapobj.delete(0)
+        if not delete_check(guestname, snapshotname, "noexist", logger):
+            logger.error("after deleting, the corresponding \
+                         xmlfile still exists in %s" % SNAPSHOT_DIR)
             return 1
-    finally:
-        conn.close()
-        logger.info("closed hypervisor connection")
+        else:
+            logger.info("delete snapshot %s succeeded" % snapshotname)
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
+        return 1
 
     return 0
 

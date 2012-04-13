@@ -10,6 +10,7 @@ import pexpect
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import utils
 from utils import xmlbuilder
 
@@ -59,17 +60,14 @@ def define(params):
     logger = params['logger']
     guestname = params['guestname']
     guesttype = params['guesttype']
-    test_result = False
+    conn = sharedmod.libvirtobj['conn']
+    uri = conn.getURI()
 
-    uri = params['uri']
     hostname = utils.parser_uri(uri)[1]
 
     username = params['username']
     password = params['password']
     logger.info("define domain on %s" % uri)
-
-    # Connect to hypervisor connection URI
-    conn = libvirt.open(uri)
 
     # Generate damain xml
     xml_obj = xmlbuilder.XmlBuilder()
@@ -81,27 +79,19 @@ def define(params):
 
     # Define domain from xml
     try:
-        try:
-            conn.defineXML(dom_xml)
-            if check_define_domain(guestname, guesttype, hostname, \
-                                   username, password, util, logger):
-                logger.info("define a domain form xml is successful")
-                test_result = True
-            else:
-                logger.error("fail to check define domain")
-                test_result = False
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
-                         % (e.message, e.get_error_code()))
-            test_result = False
-    finally:
-        conn.close()
-        logger.info("closed hypervisor connection")
-
-    if test_result:
-        return 0
-    else:
+        conn.defineXML(dom_xml)
+        if check_define_domain(guestname, guesttype, hostname, \
+                               username, password, util, logger):
+            logger.info("define a domain form xml is successful")
+        else:
+            logger.error("fail to check define domain")
+            return 1
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
         return 1
+
+    return 0
 
 def define_clean(params):
     """ clean testing environment """

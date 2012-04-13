@@ -9,6 +9,7 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 
 required_params = ('networkname',)
 optional_params = ()
@@ -32,16 +33,10 @@ def destroy(params):
     logger = params['logger']
     networkname = params['networkname']
 
-    test_result = False
-
-    uri = params['uri']
-
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
 
     if not check_network_status(networkname, conn, logger):
         logger.error("the %s network is inactive" % networkname)
-        conn.close()
-        logger.info("closed hypervisor connection")
         return 1
 
     netobj = conn.networkLookupByName(networkname)
@@ -49,24 +44,19 @@ def destroy(params):
     logger.info("original network active number: %s" % net_num1)
 
     try:
-        try:
-            netobj.destroy()
-            net_num2 = conn.numOfNetworks()
-            if not check_network_status(networkname, conn, logger) and \
-                net_num1 > net_num2:
-                logger.info("current network active number: %s\n" % net_num2)
-                logger.info("destroy %s network successful" % networkname)
-            else:
-                logger.error("the %s network is still running" % networkname)
-                return 1
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
-                         % (e.message, e.get_error_code()))
-            logger.error("fail to destroy %s network" % networkname)
+        netobj.destroy()
+        net_num2 = conn.numOfNetworks()
+        if not check_network_status(networkname, conn, logger) and \
+            net_num1 > net_num2:
+            logger.info("current network active number: %s\n" % net_num2)
+            logger.info("destroy %s network successful" % networkname)
+        else:
+            logger.error("the %s network is still running" % networkname)
             return 1
-    finally:
-        conn.close()
-        logger.info("closed hypervisor connection")
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
+        logger.error("fail to destroy %s network" % networkname)
+        return 1
 
-    time.sleep(3)
     return 0

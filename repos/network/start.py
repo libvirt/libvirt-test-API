@@ -10,13 +10,10 @@ import commands
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
+
 required_params = ('networkname',)
 optional_params = ()
-
-def return_close(conn, logger, ret):
-    conn.close()
-    logger.info("closed hypervisor connection")
-    return ret
 
 def start(params):
     """activate a defined network"""
@@ -28,18 +25,14 @@ def start(params):
     logger.info("the name of virtual network to be activated is %s" % \
                  networkname)
 
-    uri = params['uri']
-
-    logger.info("uri address is %s" % uri)
-
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
 
     net_defined_list = conn.listDefinedNetworks()
 
     if networkname not in net_defined_list:
         logger.error("virtual network %s doesn't exist \
                       or is active already." % networkname)
-        return return_close(conn, logger, 1)
+        return 1
     else:
         netobj = conn.networkLookupByName(networkname)
         netxmldesc = netobj.XMLDesc(0)
@@ -53,13 +46,13 @@ def start(params):
         logger.error("API error message: %s, error code is %s" \
                      % (e.message, e.get_error_code()))
         logger.error("fail to destroy domain")
-        return return_close(conn, logger, 1)
+        return 1
 
     net_activated_list = conn.listNetworks()
 
     if networkname not in net_activated_list:
         logger.error("virtual network %s failed to be activated." % networkname)
-        return return_close(conn, logger, 1)
+        return 1
     else:
         shell_cmd = "virsh net-list --all"
         (status, text) = commands.getstatusoutput(shell_cmd)
@@ -68,4 +61,4 @@ def start(params):
     logger.info("activate the virtual network successfully.")
     time.sleep(3)
 
-    return return_close(conn, logger, 0)
+    return 0

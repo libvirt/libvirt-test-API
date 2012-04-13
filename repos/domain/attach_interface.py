@@ -8,6 +8,7 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import utils
 from utils import xmlbuilder
 
@@ -34,11 +35,7 @@ def attach_interface(params):
     """Attach a interface to domain from xml"""
     logger = params['logger']
     guestname = params['guestname']
-    test_result = False
-
-    # Connect to local hypervisor connection URI
-    uri = params['uri']
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
 
     domobj = conn.lookupByName(guestname)
 
@@ -52,26 +49,18 @@ def attach_interface(params):
 
     # Attach interface to domain
     try:
-        try:
-            domobj.attachDeviceFlags(interfacexml, 0)
-            iface_num2 = utils.dev_num(guestname, "interface")
-            logger.debug("update interface number to %s" %iface_num2)
-            if  check_attach_interface(iface_num1, iface_num2):
-                logger.info("current interface number: %s" %iface_num2)
-                test_result = True
-            else:
-                logger.error("fail to attach a interface to guest: %s" %iface_num2)
-                test_result = False
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
-                         % (e.message, e.get_error_code()))
-            logger.error("attach a interface to guest %s" % guestname)
-            test_result = False
-    finally:
-        conn.close()
-        logger.info("closed hypervisor connection")
-
-    if test_result:
-        return 0
-    else:
+        domobj.attachDeviceFlags(interfacexml, 0)
+        iface_num2 = utils.dev_num(guestname, "interface")
+        logger.debug("update interface number to %s" %iface_num2)
+        if  check_attach_interface(iface_num1, iface_num2):
+            logger.info("current interface number: %s" %iface_num2)
+        else:
+            logger.error("fail to attach a interface to guest: %s" %iface_num2)
+            return 1
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
+        logger.error("attach a interface to guest %s" % guestname)
         return 1
+
+    return 0

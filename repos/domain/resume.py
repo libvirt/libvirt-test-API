@@ -7,15 +7,11 @@ import re
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import utils
 
 required_params = ('guestname',)
 optional_params = ()
-
-def return_close(conn, logger, ret):
-    conn.close()
-    logger.info("closed hypervisor connection")
-    return ret
 
 def resume(params):
     """Resume domain
@@ -28,15 +24,11 @@ def resume(params):
 
         Return 0 on SUCCESS or 1 on FAILURE
     """
-    is_fail = True
     domname = params['guestname']
     logger = params['logger']
 
-    # Connect to local hypervisor connection URI
-    uri = params['uri']
-
     # Resume domain
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
     domobj = conn.lookupByName(domname)
     logger.info('resume domain')
     try:
@@ -45,14 +37,14 @@ def resume(params):
         logger.error("API error message: %s, error code is %s" \
                      % (e.message, e.get_error_code()))
         logger.error("resume failed")
-        return return_close(conn, logger, 1)
+        return 1
 
     state = domobj.info()[0]
     expect_states = [libvirt.VIR_DOMAIN_RUNNING, libvirt.VIR_DOMAIN_NOSTATE, libvirt.VIR_DOMAIN_BLOCKED]
 
     if state not in expect_states:
         logger.error('The domain state is not equal to "paused"')
-        return return_close(conn, logger, 1)
+        return 1
 
     mac = utils.get_dom_mac_addr(domname)
     logger.info("get ip by mac address")
@@ -61,10 +53,10 @@ def resume(params):
     logger.info('ping guest')
     if not utils.do_ping(ip, 300):
         logger.error('Failed on ping guest, IP: ' + str(ip))
-        return return_close(conn, logger, 1)
+        return 1
 
     logger.info("PASS")
-    return return_close(conn, logger, 0)
+    return 0
 
 def resume_clean(params):
     """ clean testing environment """

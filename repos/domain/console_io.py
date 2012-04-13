@@ -11,6 +11,8 @@ import os
 from libvirt import libvirtError
 from exception import TestError
 
+import sharedmod
+
 required_params = ('guestname',)
 optional_params = ('device', 'timeout', 'input', 'output', 'expect',)
 
@@ -27,14 +29,11 @@ def console_io(params):
     expect = params.get('expect', None)
     timeout = params.get('timeout', 5)
 
-    uri = params['uri']
-
     #store the old signal handler
     oldhandler = signal.getsignal(signal.SIGALRM)
 
     try:
-        logger.info("Connecting to hypervisor: '%s'" % uri)
-        conn = libvirt.open(uri)
+        conn = sharedmod.libvirtobj['conn']
         dom = conn.lookupByName(guest)
         if not dom.isActive():
             raise TestError("Guest '%s' not active" % guest)
@@ -115,7 +114,6 @@ def console_io(params):
             stream.abort()
         except:
             pass
-        conn.close()
 
         logger.info("Done")
 

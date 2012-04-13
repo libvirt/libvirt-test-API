@@ -9,6 +9,7 @@ import time
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import utils
 from utils import xmlbuilder
 
@@ -39,11 +40,8 @@ def detach_disk(params):
     guestname = params['guestname']
     imagename = params['imagename']
     disktype = params['hdmodel']
-    test_result = False
 
-    # Connect to local hypervisor connection URI
-    uri = params['uri']
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
     domobj = conn.lookupByName(guestname)
 
     # Detach disk
@@ -62,29 +60,21 @@ def detach_disk(params):
             time.sleep(90)
 
     try:
-        try:
-            domobj.detachDevice(diskxml)
-            disk_num2 = utils.dev_num(guestname, "disk")
-            logger.debug("update disk number to %s" %disk_num2)
-            if  check_detach_disk(disk_num1, disk_num2):
-                logger.info("current disk number: %s\n" %disk_num2)
-                test_result = True
-            else:
-                logger.error("fail to detach a disk to guest: %s\n" %disk_num2)
-                test_result = False
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
-                         % (e.message, e.get_error_code()))
-            logger.error("detach %s disk from guest %s" % (imagename, guestname))
-            test_result = False
-    finally:
-        conn.close()
-        logger.info("closed hypervisor connection")
+        domobj.detachDevice(diskxml)
+        disk_num2 = utils.dev_num(guestname, "disk")
+        logger.debug("update disk number to %s" %disk_num2)
+        if  check_detach_disk(disk_num1, disk_num2):
+            logger.info("current disk number: %s\n" %disk_num2)
+        else:
+            logger.error("fail to detach a disk to guest: %s\n" %disk_num2)
+            return 1
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
+        logger.error("detach %s disk from guest %s" % (imagename, guestname))
+        return 1
 
-    if test_result:
-        return 0
-    else:
-        return -1
+    return 0
 
 def detach_disk_clean(params):
     """ clean testing environment """

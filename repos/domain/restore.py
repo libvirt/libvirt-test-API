@@ -8,15 +8,11 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import utils
 
 required_params = ('guestname', 'filepath',)
 optional_params = ()
-
-def return_close(conn, logger, ret):
-    conn.close()
-    logger.info("closed hypervisor connection")
-    return ret
 
 def get_guest_ipaddr(*args):
     """Get guest ip address"""
@@ -66,36 +62,29 @@ def restore(params):
     logger = params['logger']
     guestname = params['guestname']
     filepath = params['filepath']
-    test_result = False
+    conn = sharedmod.libvirtobj['conn']
 
-    # Connect to local hypervisor connection URI
-    uri = params['uri']
-    conn = libvirt.open(uri)
     domobj = conn.lookupByName(guestname)
 
     if check_guest_status(domobj, logger):
         logger.error("Error: current guest status is not shutoff or shutdown,\
                       can not do restore operation")
-        return return_close(conn, logger, 1)
+        return 1
 
     try:
         conn.restore(filepath)
         if check_guest_restore(guestname, domobj, util, logger):
             logger.info("restore %s domain successful" % guestname)
-            test_result = True
         else:
             logger.error("Error: fail to check restore domain")
-            test_result = False
+            return 1
     except libvirtError, e:
         logger.error("API error message: %s, error code is %s" \
                      % (e.message, e.get_error_code()))
         logger.error("Error: fail to restore %s domain" % guestname)
-        test_result = False
+        return 1
 
-    if test_result:
-        return return_close(conn, logger, 0)
-    else:
-        return return_close(conn, logger, 1)
+    return 0
 
 def restore_clean(params):
     """ clean the testing environment """

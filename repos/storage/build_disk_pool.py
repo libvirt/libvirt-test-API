@@ -10,6 +10,8 @@ from xml.dom import minidom
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
+
 required_params = ('poolname',)
 optional_params = ()
 
@@ -51,10 +53,8 @@ def build_disk_pool(params):
     logger = params['logger']
     poolname = params['poolname']
     logger.info("the poolname is %s" % (poolname))
+    conn = sharedmod.libvirtobj['conn']
 
-    uri = params['uri']
-
-    conn = libvirt.open(uri)
     pool_names = conn.listDefinedStoragePools()
     pool_names += conn.listStoragePools()
 
@@ -62,13 +62,10 @@ def build_disk_pool(params):
         poolobj = conn.storagePoolLookupByName(poolname)
     else:
         logger.error("%s not found\n" % poolname);
-        conn.close()
         return 1
 
     if poolobj.isActive():
         logger.error("%s is active already" % poolname)
-        conn.close()
-        logger.info("closed hypervisor connection")
         return 1
 
     source_device, device_type = get_pool_devicename_type(poolobj)
@@ -77,23 +74,18 @@ def build_disk_pool(params):
                  (source_device, device_type))
 
     try:
-        try:
-            logger.info("begin to build the storage pool")
-            poolobj.build(0)
-            time.sleep(5)
-            if not check_pool_built(source_device, device_type):
-                logger.info("building %s storage pool is SUCCESSFUL!!!" % poolname)
-                return 0
-            else:
-                logger.info("building %s storage pool is UNSUCCESSFUL!!!" % \
-                             poolname)
-                return 1
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
-                         % (e.message, e.get_error_code()))
+        logger.info("begin to build the storage pool")
+        poolobj.build(0)
+        time.sleep(5)
+        if not check_pool_built(source_device, device_type):
+            logger.info("building %s storage pool is SUCCESSFUL!!!" % poolname)
+        else:
+            logger.info("building %s storage pool is UNSUCCESSFUL!!!" % \
+                         poolname)
             return 1
-    finally:
-        conn.close()
-        logger.info("closed hypervisor connection")
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
+        return 1
 
     return 0

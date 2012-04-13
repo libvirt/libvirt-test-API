@@ -8,6 +8,7 @@ import commands
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import utils
 from utils import xmlbuilder
 
@@ -47,12 +48,10 @@ def create(params):
     """Activate specific interface, argument params is dictionary type, and
        includes 'ifacename' key, which is a host interface name, e.g 'eth0'
     """
-    test_result = False
     global logger
     logger = params['logger']
     ifacename = params['ifacename']
 
-    uri = params['uri']
     try:
         hostip = utils.get_ip_address(ifacename)
         logger.error("interface %s is running" % ifacename)
@@ -61,31 +60,23 @@ def create(params):
     except:
         logger.info("interface %s is deactive" % ifacename)
 
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
     ifaceobj = conn.interfaceLookupByName(ifacename)
     display_current_interface(conn)
 
     try:
-        try:
-            ifaceobj.create(0)
-            logger.info("create host interface %s" % ifacename)
-            display_current_interface(conn)
-            if  check_create_interface(ifacename, util):
-                logger.info("create host interface %s is successful" % ifacename)
-                test_result = True
-            else:
-                logger.error("fail to check create interface")
-                test_result = False
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
-                         % (e.message, e.get_error_code()))
-            logger.error("fail to create interface %s" %ifacename)
-            test_result = False
-    finally:
-        conn.close()
-        logger.info("closed hypervisor connection")
-
-    if test_result:
-        return 0
-    else:
+        ifaceobj.create(0)
+        logger.info("create host interface %s" % ifacename)
+        display_current_interface(conn)
+        if check_create_interface(ifacename, util):
+            logger.info("create host interface %s is successful" % ifacename)
+        else:
+            logger.error("fail to check create interface")
+            return 1
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                      % (e.message, e.get_error_code()))
+        logger.error("fail to create interface %s" %ifacename)
         return 1
+
+    return 0

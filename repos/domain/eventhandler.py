@@ -10,6 +10,8 @@ import threading
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
+
 LoopThread = None
 looping = True
 STATE = None
@@ -216,14 +218,9 @@ def eventhandler(params):
 
     loop_start()
 
-    # Connect to local hypervisor connection URI
-    uri = params['uri']
-    conn = libvirt.open(uri)
-
-    logger.info("the uri is %s" % uri)
+    conn = sharedmod.libvirtobj['conn']
 
     if check_domain_running(conn, guestname, logger):
-        conn.close()
         return 1
 
     domobj = conn.lookupByName(guestname)
@@ -243,7 +240,6 @@ def eventhandler(params):
         logger.warn("resume_event error")
 
     loop_stop(conn)
-    conn.close()
     return 0
 
 def eventhandler_clean(params):

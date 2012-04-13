@@ -7,6 +7,8 @@ import mimetypes
 
 import libvirt
 
+import sharedmod
+
 required_params = ('guestname', 'screen', 'filename',)
 optional_params = ()
 
@@ -17,28 +19,22 @@ def screenshot(params):
     """This method takes a screenshot of a running machine and saves
     it in a filename"""
     ret = 1
-    try:
-        logger = params['logger']
+    logger = params['logger']
 
-        conn = libvirt.open(params['uri'])
-        dom = conn.lookupByName(params['guestname'])
+    conn = sharedmod.libvirtobj['conn']
+    dom = conn.lookupByName(params['guestname'])
 
-        st = conn.newStream(0)
-        mime = dom.screenshot(st, params['screen'], 0)
+    st = conn.newStream(0)
+    mime = dom.screenshot(st, params['screen'], 0)
 
-        ext = mimetypes.guess_extension(mime) or '.ppm'
-        filename = params['filename'] + ext
-        f = file(filename, 'w')
+    ext = mimetypes.guess_extension(mime) or '.ppm'
+    filename = params['filename'] + ext
+    f = file(filename, 'w')
 
-        logger.debug('Saving screenshot into %s' % filename)
-        st.recvAll(saver, f)
-        logger.debug('Mimetype of the file is %s' % mime)
+    logger.debug('Saving screenshot into %s' % filename)
+    st.recvAll(saver, f)
+    logger.debug('Mimetype of the file is %s' % mime)
 
-        ret = st.finish()
-
-    finally:
-        # Some error occurred, cleanup
-        if 'conn' in locals() and conn.isAlive():
-            conn.close()
+    ret = st.finish()
 
     return ret

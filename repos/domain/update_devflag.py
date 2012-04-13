@@ -10,6 +10,7 @@ from xml.dom import minidom
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import utils
 from utils import xmlbuilder
 
@@ -170,13 +171,11 @@ def update_devflag(params):
     if not params.has_key('flag'):
         flag = libvirt.VIR_DOMAIN_AFFECT_CONFIG
 
-    # Connect to local hypervisor connection URI
-    uri = params['uri']
     mac = utils.get_dom_mac_addr(guestname)
     guestip = utils.mac_to_ip(mac, 180)
     logger.debug("ip address: %s" % guestip)
 
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
 
     try:
         if guestname not in conn.listDefinedDomains():
@@ -253,11 +252,9 @@ def update_devflag(params):
                                        guestip, domobj, srcfile)
     if result[0]:
         logger.error("fail to update '%s' device: %s\n" % (devtype, result[1]))
-        conn.close()
         return 1
 
     logger.info("success to update '%s' device: %s\n" % (devtype, result[1]))
-    conn.close()
     return 0
 
 def update_devflag_clean(params):

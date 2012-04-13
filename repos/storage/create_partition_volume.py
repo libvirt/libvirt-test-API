@@ -9,15 +9,11 @@ import commands
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import xmlbuilder
 
 required_params = ('poolname', 'volname', 'volformat', 'capacity',)
 optional_params = ()
-
-def return_close(conn, logger, ret):
-    conn.close()
-    logger.info("closed hypervisor connection")
-    return ret
 
 def partition_volume_check(poolobj, volname):
     """check the new created volume, the way of checking is to get
@@ -64,15 +60,13 @@ def create_partition_volume(params):
                  volfomat is %s, capacity is %s" % \
                  (poolname, volname, volformat, capacity))
 
-    uri = params['uri']
-
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
 
     storage_pool_list = conn.listStoragePools()
 
     if poolname not in storage_pool_list:
         logger.error("pool %s doesn't exist or not running")
-        return return_close(conn, logger, 1)
+        return 1
 
     poolobj = conn.storagePoolLookupByName(poolname)
 
@@ -98,7 +92,7 @@ def create_partition_volume(params):
     except libvirtError, e:
         logger.error("API error message: %s, error code is %s" \
                     % (e.message, e.get_error_code()))
-        return return_close(conn, logger, 1)
+        return 1
 
     logger.info("volume create successfully, and output the volume information")
     virsh_vol_list(poolname)
@@ -108,7 +102,7 @@ def create_partition_volume(params):
 
     if not check_res:
         logger.info("checking succeed")
-        return return_close(conn, logger, 0)
+        return 0
     else:
         logger.error("checking failed")
-        return return_close(conn, logger, 1)
+        return 1

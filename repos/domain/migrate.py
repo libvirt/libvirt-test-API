@@ -10,6 +10,7 @@ import commands
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import xmlbuilder
 
 required_params = ('transport',
@@ -69,8 +70,6 @@ def env_clean(srcconn, dstconn, target_machine, guestname, logger):
     REMOTE_UNDEFINE = "ssh %s \"virsh undefine %s\"" % (target_machine, guestname)
     exec_command(logger, REMOTE_UNDEFINE, 1)
 
-    srcconn.close()
-    logger.info("close local hypervisor connection")
     dstconn.close()
     logger.info("close remote hypervisor connection")
 
@@ -192,11 +191,10 @@ def migrate(params):
 
     commands.getstatusoutput("ssh-add")
 
-    srcuri = "qemu:///system"
     dsturi = "qemu+%s://%s/system" % (transport, target_machine)
 
     # Connect to local hypervisor connection URI
-    srcconn = libvirt.open(srcuri)
+    srcconn = sharedmod.libvirtobj['conn']
     dstconn = libvirt.open(dsturi)
 
     srcdom = srcconn.lookupByName(guestname)

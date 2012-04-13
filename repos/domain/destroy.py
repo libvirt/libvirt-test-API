@@ -8,6 +8,7 @@ import time
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import utils
 
 required_params = ('guestname',)
@@ -35,9 +36,7 @@ def destroy(params):
     if params.has_key('flags'):
         flags = params['flags']
 
-    # Connect to local hypervisor connection URI
-    uri = params['uri']
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
 
     # Get running domain by name
     guest_names = []
@@ -48,8 +47,6 @@ def destroy(params):
 
     if guestname not in guest_names:
         logger.error("guest %s doesn't exist or isn't running." % guestname)
-        conn.close()
-        logger.info("closed hypervisor connection")
         return 1
 
     domobj = conn.lookupByName(guestname)
@@ -66,16 +63,12 @@ def destroy(params):
 
     # Destroy domain
     try:
-        try:
-            domobj.destroy()
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
-                         % (e.message, e.get_error_code()))
-            logger.error("failed to destroy domain")
-            return 1
-    finally:
-        conn.close()
-        logger.info("closed hypervisor connection")
+        domobj.destroy()
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
+        logger.error("failed to destroy domain")
+        return 1
 
     # Check domain status by ping ip
     if not "noping" in flags:

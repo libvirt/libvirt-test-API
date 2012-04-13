@@ -7,6 +7,7 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import xmlbuilder
 
 required_params = ('ifacename',)
@@ -25,42 +26,28 @@ def check_undefine_interface(ifacename):
 
 def undefine(params):
     """Undefine a specific interface"""
-    test_result = False
     global logger
     logger = params['logger']
     ifacename = params['ifacename']
-
-    uri = params['uri']
-
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
 
     if check_undefine_interface(ifacename):
         logger.error("interface %s have been undefined" % ifacename)
-        conn.close()
-        logger.info("closed hypervisor connection")
         return 1
 
     ifaceobj = conn.interfaceLookupByName(ifacename)
 
     try:
-        try:
-            ifaceobj.undefine()
-            if check_undefine_interface(ifacename):
-                logger.info("undefine a interface form xml is successful")
-                test_result = True
-            else:
-                logger.error("fail to check undefine interface")
-                test_result = False
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
-                         % (e.message, e.get_error_code()))
-            logger.error("fail to undefine a interface from xml")
-            test_result = False
-    finally:
-        conn.close()
-        logger.info("closed hypervisor connection")
-
-    if test_result:
-        return 0
-    else:
+        ifaceobj.undefine()
+        if check_undefine_interface(ifacename):
+            logger.info("undefine a interface form xml is successful")
+        else:
+            logger.error("fail to check undefine interface")
+            return 1
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
+        logger.error("fail to undefine a interface from xml")
         return 1
+
+    return 0

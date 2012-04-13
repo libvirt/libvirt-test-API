@@ -8,15 +8,11 @@ import commands
 
 import libvirt
 
+import sharedmod
 from utils import utils
 
 required_params = ('guestname', 'capshares',)
 optional_params = ()
-
-def return_close(conn, logger, ret):
-    conn.close()
-    logger.info("closed hypervisor connection")
-    return ret
 
 def check_guest_status(domobj):
     """Check guest current status"""
@@ -54,14 +50,12 @@ def sched_params(params):
        keys, by assigning different value to 'weight' and 'cap'
        to verify validity of the result
     """
-    uri = params['uri']
     hypervisor = utils.get_hypervisor()
 
     logger = params['logger']
     guestname = params['guestname']
-    test_result = False
+    conn = sharedmod.libvirtobj['conn']
 
-    conn = libvirt.open(uri)
     domobj = conn.lookupByName(guestname)
 
     if check_guest_status(domobj):
@@ -81,10 +75,8 @@ def sched_params(params):
 
                 retval = check_sched_params(hypervisor, dicts,
                                             guestname, domobj)
-                if retval == 0:
-                    test_result = True
-                else:
-                    test_result = False
+                if retval != 0:
+                    return 1
     elif 'kvm' in hypervisor:
         cpu_shares = int(params['cpushares'])
         dicts = {'cpu_shares': cpu_shares}
@@ -94,15 +86,10 @@ def sched_params(params):
         logger.info("current scheduler parameters: %s\n" % sched_params)
         retval = check_sched_params(hypervisor, dicts,
                                     guestname, domobj)
-        if retval == 0:
-            test_result = True
-        else:
-            test_result = False
+        if retval != 0:
+            return 1
     else:
         logger.error("unsupported hypervisor type: %s" % hypervisor)
-        return return_close(conn, logger, 1)
+        return 1
 
-    if test_result:
-        return return_close(conn, logger, 0)
-    else:
-        return return_close(conn, logger, 1)
+    return 0

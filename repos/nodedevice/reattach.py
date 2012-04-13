@@ -9,6 +9,7 @@ import commands
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import utils
 
 required_params = ('pciaddress',)
@@ -45,8 +46,6 @@ def reattach(params):
     original_driver = check_node_reattach(pciaddress)
     logger.info("original device driver: %s" % original_driver)
 
-    uri = params['uri']
-
     kernel_version = utils.get_host_kernel_version()
     hypervisor = utils.get_hypervisor()
     pciback = ''
@@ -73,27 +72,23 @@ def reattach(params):
 
     logger.debug("the name of the pci device is: %s" % device_name)
 
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
 
     try:
-        try:
-            nodeobj = conn.nodeDeviceLookupByName(device_name)
-            nodeobj.reAttach()
-            logger.info("reattach the node device")
-            current_driver = check_node_reattach(pciaddress)
-            logger.info("current device driver: %s" % current_driver)
-            if original_driver == pciback and current_driver != pciback:
-                logger.info("the node %s device reattach is successful" \
-                            % device_name)
-            else:
-                logger.info("the node %s device reattach is failed" % device_name)
-                return 1
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
-                         % (e.message, e.get_error_code()))
+        nodeobj = conn.nodeDeviceLookupByName(device_name)
+        nodeobj.reAttach()
+        logger.info("reattach the node device")
+        current_driver = check_node_reattach(pciaddress)
+        logger.info("current device driver: %s" % current_driver)
+        if original_driver == pciback and current_driver != pciback:
+            logger.info("the node %s device reattach is successful" \
+                        % device_name)
+        else:
+            logger.info("the node %s device reattach is failed" % device_name)
             return 1
-    finally:
-        conn.close()
-        logger.info("closed hypervisor connection")
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
+        return 1
 
     return 0

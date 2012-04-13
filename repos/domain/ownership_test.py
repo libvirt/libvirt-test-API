@@ -11,6 +11,7 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import utils
 
 required_params = ('guestname', 'dynamic_ownership', 'use_nfs',)
@@ -19,12 +20,6 @@ optional_params = ()
 QEMU_CONF = "/etc/libvirt/qemu.conf"
 SAVE_FILE = "/mnt/test.save"
 TEMP_FILE = "/tmp/test.save"
-
-def return_close(conn, logger, ret):
-    """close hypervisor connection and return the given value"""
-    conn.close()
-    logger.info("closed hypervisor connection")
-    return ret
 
 def check_domain_running(conn, guestname, logger):
     """ check if the domain exists, may or may not be active """
@@ -185,9 +180,7 @@ def ownership_test(params):
         logger.error("failed to prepare the environment")
         return 1
 
-    # Connect to local hypervisor connection URI
-    uri = params['uri']
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
 
     # save domain to the file
     logger.info("save domain %s to the file %s" % (guestname, SAVE_FILE))
@@ -195,7 +188,7 @@ def ownership_test(params):
     logger.info("check the domain state")
     ret = check_domain_running(conn, guestname, logger)
     if ret:
-        return return_close(conn, logger, 1)
+        return 1
 
     domobj = conn.lookupByName(guestname)
 
@@ -205,7 +198,7 @@ def ownership_test(params):
     except libvirtError, e:
         logger.error("API error message: %s, error code is %s" \
                      % (e.message, e.get_error_code()))
-        return return_close(conn, logger, 1)
+        return 1
 
     logger.info("check the ownership of %s after save" % SAVE_FILE)
     ret, uid, gid = ownership_get(logger)
@@ -215,7 +208,7 @@ def ownership_test(params):
         else:
             logger.error("The chown of %s is %s:%s, it's not as expected" % \
                              (SAVE_FILE, uid, gid))
-            return return_close(conn, logger, 1)
+            return 1
     elif use_nfs == 'disable':
         if dynamic_ownership == 'enable':
             if uid == 0 and gid == 0:
@@ -223,14 +216,14 @@ def ownership_test(params):
             else:
                 logger.error("The chown of %s is %s:%s, it's not as expected" % \
                              (SAVE_FILE, uid, gid))
-                return return_close(conn, logger, 1)
+                return 1
         elif dynamic_ownership == 'disable':
             if uid == 107 and gid == 107:
                 logger.info("As expected, the chown not change.")
             else:
                 logger.error("The chown of %s is %s:%s, it's not as expected" % \
                              (SAVE_FILE, uid, gid))
-                return return_close(conn, logger, 1)
+                return 1
 
     # restore domain from file
     logger.info("restore the domain from the file")
@@ -243,7 +236,7 @@ def ownership_test(params):
                      % (e.message, e.get_error_code()))
         logger.error("Error: fail to restore domain %s from %s" % \
                       (guestname, SAVE_FILE))
-        return return_close(conn, logger, 1)
+        return 1
 
     logger.info("check the ownership of %s after restore" % SAVE_FILE)
     ret, uid, gid = ownership_get(logger)
@@ -252,9 +245,9 @@ def ownership_test(params):
     else:
         logger.error("The chown of %s is %s:%s, not change back as expected" % \
                      (SAVE_FILE, uid, gid))
-        return return_close(conn, logger, 1)
+        return 1
 
-    return return_close(conn, logger, 0)
+    return 0
 
 def ownership_test_clean(params):
     """clean testing environment"""

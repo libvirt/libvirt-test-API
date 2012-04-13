@@ -8,6 +8,7 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import xmlbuilder
 
 required_params = ('poolname', 'pooltype',)
@@ -38,14 +39,10 @@ def create_dir_pool(params):
     poolname = params['poolname']
     pooltype = params['pooltype']
 
-    uri  = params['uri']
-
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
 
     if check_pool_create(conn, poolname, logger):
         logger.error("%s storage pool has already been created" % poolname)
-        conn.close()
-        logger.info("closed hypervisor connection")
         return 1
 
     xmlobj = xmlbuilder.XmlBuilder()
@@ -53,22 +50,17 @@ def create_dir_pool(params):
     logger.debug("storage pool xml:\n%s" % poolxml)
 
     try:
-        try:
-            logger.info("Creating %s storage pool" % poolname)
-            conn.storagePoolCreateXML(poolxml, 0)
-            display_pool_info(conn, logger)
-            if check_pool_create(conn, poolname, logger):
-                logger.info("creating %s storage pool is SUCCESSFUL!!!" % poolname)
-                return 0
-            else:
-                logger.info("aa creating %s storage pool is UNSUCCESSFUL!!!" % poolname)
-                return 1
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
-                         % (e.message, e.get_error_code()))
+        logger.info("Creating %s storage pool" % poolname)
+        conn.storagePoolCreateXML(poolxml, 0)
+        display_pool_info(conn, logger)
+        if check_pool_create(conn, poolname, logger):
+            logger.info("creating %s storage pool is SUCCESSFUL!!!" % poolname)
+        else:
+            logger.info("aa creating %s storage pool is UNSUCCESSFUL!!!" % poolname)
             return 1
-    finally:
-        conn.close()
-        logger.info("closed hypervisor connection")
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
+        return 1
 
     return 0

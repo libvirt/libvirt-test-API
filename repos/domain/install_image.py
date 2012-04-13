@@ -10,6 +10,7 @@ import urllib
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import utils
 from utils import env_parser
 from utils import xmlbuilder
@@ -25,19 +26,12 @@ optional_params = ('uuid',
                    'hdmodel',
                    'nicmodel',)
 
-def return_close(conn, logger, ret):
-    conn.close()
-    logger.info("closed hypervisor connection")
-    return ret
-
 def install_image(params):
     """ install a new virtual machine """
     # Initiate and check parameters
     global logger
     logger = params['logger']
     params.pop('logger')
-    uri = params['uri']
-    params.pop('uri')
 
     guestname = params.get('guestname')
     guesttype = params.get('guesttype')
@@ -53,7 +47,6 @@ def install_image(params):
     hypervisor = utils.get_hypervisor()
 
     logger.info("the type of hypervisor is %s" % hypervisor)
-    logger.debug("the uri to connect is %s" % uri)
 
     if params.has_key('imagepath'):
         imgfullpath = os.join.path(params.get('imagepath'), guestname)
@@ -77,7 +70,7 @@ def install_image(params):
     urllib.urlretrieve(image_url, imgfullpath)
     logger.info("the image is located in %s" % imgfullpath)
 
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
 
     xmlobj = xmlbuilder.XmlBuilder()
     domain = xmlobj.add_domain(params)
@@ -92,7 +85,7 @@ def install_image(params):
         logger.error("API error message: %s, error code is %s" \
                      % (e.message, e.get_error_code()))
         logger.error("fail to define domain %s" % guestname)
-        return return_close(conn, logger, 1)
+        return 1
 
     logger.info("define guest %s " % guestname)
     logger.debug("the xml description of guest booting off harddisk is %s" %
@@ -106,7 +99,7 @@ def install_image(params):
         logger.error("API error message: %s, error code is %s" \
                      % (e.message, e.get_error_code()))
         logger.error("fail to start domain %s" % guestname)
-        return return_close(conn, logger, 1)
+        return 1
 
 
     logger.info("get the mac address of vm %s" % guestname)
@@ -130,6 +123,6 @@ def install_image(params):
 
         if timeout == 0:
             logger.info("fail to power on vm %s" % guestname)
-            return return_close(conn, logger, 1)
+            return 1
 
-    return return_close(conn, logger, 0)
+    return 0

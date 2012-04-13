@@ -7,6 +7,8 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
+
 required_params = ('guestname',)
 optional_params = ()
 
@@ -24,35 +26,23 @@ def undefine(params):
     """Undefine a domain"""
     logger = params['logger']
     guestname = params['guestname']
-    test_result = False
-
-    # Connect to local hypervisor connection URI
-    uri = params['uri']
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
 
     domobj = conn.lookupByName(guestname)
 
     try:
-        try:
-            domobj.undefine()
-            if check_undefine_domain(guestname):
-                logger.info("undefine the domain is successful")
-                test_result = True
-            else:
-                logger.error("fail to check domain undefine")
-                test_result = False
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
-                         % (e.message, e.get_error_code()))
-            test_result = False
-    finally:
-        conn.close()
-        logger.info("closed hypervisor connection")
-
-    if test_result:
-        return 0
-    else:
+        domobj.undefine()
+        if check_undefine_domain(guestname):
+            logger.info("undefine the domain is successful")
+        else:
+            logger.error("fail to check domain undefine")
+            return 1
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
         return 1
+
+    return 0
 
 def undefine_clean(params):
     """ clean testing environment """

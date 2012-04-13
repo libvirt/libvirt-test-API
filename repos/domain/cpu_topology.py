@@ -10,6 +10,7 @@ from xml.dom import minidom
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import utils
 
 required_params = ('guestname',
@@ -175,37 +176,28 @@ def cpu_topology(params):
     logger.info("cores is %s" % cores)
     logger.info("threads is %s" % threads)
 
-    uri = params['uri']
-
-    logger.info("the uri is %s" % uri)
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
 
     if check_domain_running(conn, guestname, logger):
-        conn.close()
         return 1
 
     domobj = conn.lookupByName(guestname)
     domxml = add_cpu_xml(domobj, guestname, sockets, cores, threads, logger)
 
     if guest_undefine(domobj, logger):
-        conn.close()
         return 1
 
     if guest_define(domobj, domxml, logger):
-        conn.close()
         return 1
 
     ret, ip = guest_start(domobj, guestname, util, logger)
     if ret:
-        conn.close()
         return 1
 
     if cpu_topology_check(ip, username, password,
                           sockets, cores, threads, util, logger):
-       conn.close()
        return 1
 
-    conn.close()
     return 0
 
 def cpu_topology_clean(params):

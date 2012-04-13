@@ -9,6 +9,8 @@ import commands
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
+
 required_params = ('poolname', 'volname',)
 optional_params = ()
 
@@ -57,10 +59,8 @@ def delete_logical_volume(params):
     logger = params['logger']
     poolname = params['poolname']
     volname = params['volname']
+    conn = sharedmod.libvirtobj['conn']
 
-    uri = params['uri']
-
-    conn = libvirt.open(uri)
     pool_names = conn.listDefinedStoragePools()
     pool_names += conn.listStoragePools()
 
@@ -68,13 +68,10 @@ def delete_logical_volume(params):
         poolobj = conn.storagePoolLookupByName(poolname)
     else:
         logger.error("%s not found\n" % poolname);
-        conn.close()
         return 1
 
     if not poolobj.isActive():
         logger.debug("%s pool is inactive" % poolname)
-        conn.close()
-        logger.info("closed hypervisor connection")
         return 1
 
     volobj = poolobj.storageVolLookupByName(volname)
@@ -84,26 +81,22 @@ def delete_logical_volume(params):
     vol_num1 = get_storage_volume_number(poolobj)
     display_volume_info(poolobj)
     display_physical_volume()
-    try:
-        try:
-            logger.info("delete %s storage volume" % volname)
-            volobj.delete(0)
-            vol_num2 = get_storage_volume_number(poolobj)
-            display_volume_info(poolobj)
-            display_physical_volume()
 
-            if vol_num1 > vol_num2 and check_volume_delete(poolname, volkey):
-                logger.info("delete %s storage volume is successful" % volname)
-                return 0
-            else:
-                logger.error("fail to delete %s storage volume" % volname)
-                return 1
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
-                         % (e.message, e.get_error_code()))
+    try:
+        logger.info("delete %s storage volume" % volname)
+        volobj.delete(0)
+        vol_num2 = get_storage_volume_number(poolobj)
+        display_volume_info(poolobj)
+        display_physical_volume()
+
+        if vol_num1 > vol_num2 and check_volume_delete(poolname, volkey):
+            logger.info("delete %s storage volume is successful" % volname)
+        else:
+            logger.error("fail to delete %s storage volume" % volname)
             return 1
-    finally:
-        conn.close()
-        logger.info("closed hypervisor connection")
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
+        return 1
 
     return 0

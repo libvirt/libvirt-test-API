@@ -8,6 +8,7 @@ import commands
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import utils
 from utils import xmlbuilder
 
@@ -45,12 +46,10 @@ def destroy(params):
     """Deactive specific interface, argument params is dictionary type, and
        includes 'ifacename' key, which is a host interface name, e.g 'eth0'
     """
-    test_result = False
     global logger
     logger = params['logger']
     ifacename = params['ifacename']
 
-    uri = params['uri']
     try:
         hostip = utils.get_ip_address(ifacename)
         logger.info("interface %s is active" % ifacename)
@@ -59,31 +58,23 @@ def destroy(params):
         logger.error("interface %s is deactive" % ifacename)
         return 1
 
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
     ifaceobj = conn.interfaceLookupByName(ifacename)
     display_current_interface(conn)
 
     try:
-        try:
-            ifaceobj.destroy(0)
-            logger.info("destroy host interface %s" % ifacename)
-            display_current_interface(conn)
-            if  check_destroy_interface(hostip):
-                logger.info("destroy host interface %s is successful" % ifacename)
-                test_result = True
-            else:
-                logger.error("fail to check destroy interface")
-                test_result = False
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
-                         % (e.message, e.get_error_code()))
-            logger.error("fail to destroy interface %s" %ifacename)
-            test_result = False
-    finally:
-        conn.close()
-        logger.info("closed hypervisor connection")
-
-    if test_result:
-        return 0
-    else:
+        ifaceobj.destroy(0)
+        logger.info("destroy host interface %s" % ifacename)
+        display_current_interface(conn)
+        if  check_destroy_interface(hostip):
+            logger.info("destroy host interface %s is successful" % ifacename)
+        else:
+            logger.error("fail to check destroy interface")
+            return 1
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
+        logger.error("fail to destroy interface %s" %ifacename)
         return 1
+
+    return 0

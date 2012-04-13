@@ -10,6 +10,7 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import utils
 
 required_params = ('guestname',)
@@ -72,16 +73,13 @@ def qemu_hang(params):
     """Hang qemu process, check libvirtd status"""
     logger = params['logger']
     guestname = params['guestname']
-    uri = params['uri']
 
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
 
     logger.info("check the domain state")
     ret = check_domain_running(conn, guestname, logger)
     if ret:
         return 1
-
-    conn.close()
 
     logger.info("check the libvirtd status:")
     ret = libvirtd_check(util, logger)

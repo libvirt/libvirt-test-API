@@ -8,6 +8,7 @@ import time
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import utils
 
 required_params = ('guestname',)
@@ -15,11 +16,6 @@ optional_params = ('flags',)
 
 NONE = 0
 START_PAUSED = 1
-
-def return_close(conn, logger, ret):
-    conn.close()
-    logger.info("closed hypervisor connection")
-    return ret
 
 def start(params):
     """Start domain
@@ -33,18 +29,15 @@ def start(params):
 
         Return 0 on SUCCESS or 1 on FAILURE
     """
-    is_fail = True
     domname = params['guestname']
     logger = params['logger']
     flags = params.get('flags', '')
 
     if "none" in flags and "start_paused" in flags:
         logger.error("Flags error: Can't specify none and start_paused simultaneously")
-        return return_close(conn, logger, 1)
+        return 1
 
-    # Connect to local hypervisor connection URI
-    uri = params['uri']
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
     domobj = conn.lookupByName(domname)
 
     timeout = 600
@@ -62,16 +55,16 @@ def start(params):
         logger.error("API error message: %s, error code is %s" \
                      % (e.message, e.get_error_code()))
         logger.error("start failed")
-        return return_close(conn, logger, 1)
+        return 1
 
     if "start_paused" in flags:
         state = domobj.info()[0]
         if state == libvirt.VIR_DOMAIN_PAUSED:
             logger.info("guest start with state paused successfully")
-            return return_close(conn, logger, 0)
+            return 0
         else:
             logger.error("guest state error")
-            return return_close(conn, logger, 1)
+            return 1
 
     while timeout:
         state = domobj.info()[0]
@@ -86,7 +79,7 @@ def start(params):
 
     if timeout <= 0:
         logger.error('The domain state is not as expected, state: ' + state)
-        return return_close(conn, logger, 1)
+        return 1
 
     logger.info("Guest started")
 
@@ -99,10 +92,10 @@ def start(params):
         logger.info('ping guest')
         if not utils.do_ping(ip, 300):
             logger.error('Failed on ping guest, IP: ' + str(ip))
-            return return_close(conn, logger, 1)
+            return 1
 
     logger.info("PASS")
-    return return_close(conn, logger, 0)
+    return 0
 
 def start_clean(params):
     """ clean testing environment """

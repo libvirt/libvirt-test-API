@@ -7,6 +7,8 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
+
 required_params = ('poolname',)
 optional_params = ()
 
@@ -31,10 +33,8 @@ def undefine_pool(params):
     global logger
     logger = params['logger']
     poolname = params['poolname']
+    conn = sharedmod.libvirtobj['conn']
 
-    uri = params['uri']
-
-    conn = libvirt.open(uri)
     pool_names = conn.listDefinedStoragePools()
     pool_names += conn.listStoragePools()
 
@@ -42,13 +42,10 @@ def undefine_pool(params):
         poolobj = conn.storagePoolLookupByName(poolname)
     else:
         logger.error("%s not found\n" % poolname);
-        conn.close()
         return 1
 
     if poolobj.isActive():
         logger.error("%s is active" % poolname)
-        conn.close()
-        logger.info("closed hypervisor connection")
         return 1
 
     pool_num1 = conn.numOfDefinedStoragePools()
@@ -56,22 +53,19 @@ def undefine_pool(params):
     display_pool_info(conn)
 
     try:
-        try:
-            logger.info("undefine %s storage pool" % poolname)
-            poolobj.undefine()
-            pool_num2 = conn.numOfDefinedStoragePools()
-            logger.info("current storage pool define number: %s" % pool_num2)
-            display_pool_info(conn)
-            if check_pool_undefine(poolname) and pool_num2 < pool_num1:
-                logger.info("undefine %s storage pool is successful" % poolname)
-                return 0
-            else:
-                logger.error("%s storage pool is undefined" % poolname)
-                return 1
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
-                         % (e.message, e.get_error_code()))
+        logger.info("undefine %s storage pool" % poolname)
+        poolobj.undefine()
+        pool_num2 = conn.numOfDefinedStoragePools()
+        logger.info("current storage pool define number: %s" % pool_num2)
+        display_pool_info(conn)
+        if check_pool_undefine(poolname) and pool_num2 < pool_num1:
+            logger.info("undefine %s storage pool is successful" % poolname)
+        else:
+            logger.error("%s storage pool is undefined" % poolname)
             return 1
-    finally:
-        conn.close()
-        logger.info("closed hypervisor connection")
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
+        return 1
+
+    return 0

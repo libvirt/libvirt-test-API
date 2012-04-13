@@ -8,6 +8,7 @@ from xml.dom import minidom
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 
 required_params = ('poolname',)
 optional_params = ()
@@ -36,16 +37,11 @@ def build_netfs_pool(params):
     global logger
     logger = params['logger']
     poolname = params['poolname']
-
-    uri = params['uri']
-
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
 
     defined_pool_list = conn.listDefinedStoragePools()
     if poolname not in defined_pool_list:
         logger.error("the pool %s is active or undefine" % poolname)
-        conn.close()
-        logger.info("closed hypervisor connection")
         return 1
 
     poolobj = conn.storagePoolLookupByName(poolname)
@@ -61,24 +57,19 @@ def build_netfs_pool(params):
     display_pool_info(conn)
 
     try:
-        try:
-            logger.info("build %s storage pool" % poolname)
-            poolobj.build(0)
-            display_pool_info(conn)
+        logger.info("build %s storage pool" % poolname)
+        poolobj.build(0)
+        display_pool_info(conn)
 
-            if check_build_pool(path_value):
-                logger.info("build %s storage pool is successful" % poolname)
-                return 0
-            else:
-                logger.error("fail to build %s storage pool" % poolname)
-                return 1
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
-                         % (e.message, e.get_error_code()))
+        if check_build_pool(path_value):
+            logger.info("build %s storage pool is successful" % poolname)
+        else:
+            logger.error("fail to build %s storage pool" % poolname)
             return 1
-    finally:
-        conn.close()
-        logger.info("closed hypervisor connection")
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
+        return 1
 
     return 0
 

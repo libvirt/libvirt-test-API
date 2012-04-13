@@ -11,6 +11,7 @@ import math
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import utils
 from utils import check
 from utils import env_parser
@@ -35,8 +36,6 @@ def install_linux_check(params):
     global logger
     logger = params['logger']
     params.pop('logger')
-    uri = params['uri']
-    params.pop('uri')
 
     guestname = params.get('guestname')
     guesttype = params.get('guesttype')
@@ -47,12 +46,10 @@ def install_linux_check(params):
     hypervisor = utils.get_hypervisor()
 
     logger.info("the type of hypervisor is %s" % hypervisor)
-    logger.debug("the uri to connect is %s" % uri)
 
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
     domobj = conn.lookupByName(guestname)
     state = domobj.info()[0]
-    conn.close()
 
     if(state == libvirt.VIR_DOMAIN_SHUTOFF):
         logger.info("guest is shutoff, if u want to run this case, \

@@ -13,6 +13,7 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import utils
 from shutil import copy
 
@@ -23,12 +24,6 @@ required_params = ('guestname',
 optional_params = ()
 
 QEMU_CONF = "/etc/libvirt/qemu.conf"
-
-def return_close(conn, logger, ret):
-    """close hypervisor connection and return the given value"""
-    conn.close()
-    logger.info("closed hypervisor connection")
-    return ret
 
 def nfs_setup(util, root_squash, logger):
     """setup nfs on localhost
@@ -133,9 +128,7 @@ def domain_nfs_start(params):
     virt_use_nfs = params['virt_use_nfs']
     root_squash = params['root_squash']
 
-    # Connect to local hypervisor connection URI
-    uri = params['uri']
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
     domobj = conn.lookupByName(guestname)
 
     logger.info("get the domain state")
@@ -146,7 +139,7 @@ def domain_nfs_start(params):
         logger.error("API error message: %s, error code is %s" \
                      % (e.message, e.get_error_code()))
         logger.error("Error: fail to get domain %s state" % guestname)
-        return return_close(conn, logger, 1)
+        return 1
 
     if state != libvirt.VIR_DOMAIN_SHUTOFF:
         logger.info("shut down the domain %s" % guestname)
@@ -156,7 +149,7 @@ def domain_nfs_start(params):
             logger.error("API error message: %s, error code is %s" \
                          % (e.message, e.get_error_code()))
             logger.error("Error: fail to destroy domain %s" % guestname)
-            return return_close(conn, logger, 1)
+            return 1
 
     logger.info("get guest img file path")
     try:
@@ -168,10 +161,7 @@ def domain_nfs_start(params):
         logger.error("API error message: %s, error code is %s" \
                      % (e.message, e.get_error_code()))
         logger.error("Error: fail to get domain %s xml" % guestname)
-        return return_close(conn, logger, 1)
-
-    # close connection before restart libvirtd
-    conn.close()
+        return 1
 
     # set env
     logger.info("prepare the environment")
@@ -179,10 +169,8 @@ def domain_nfs_start(params):
                       root_squash, disk_file, img_dir, logger)
     if ret:
         logger.error("failed to prepare the environment")
-        return return_close(conn, logger, 1)
+        return 1
 
-    # reconnect
-    conn = libvirt.open(uri)
     domobj = conn.lookupByName(guestname)
 
     logger.info("begin to test start domain from nfs storage")
@@ -195,7 +183,7 @@ def domain_nfs_start(params):
                     domobj.create()
                     logger.error("Domain %s started, this is not expected" % \
                                   guestname)
-                    return return_close(conn, logger, 1)
+                    return 1
                 except libvirtError, e:
                     logger.error("API error message: %s, error code is %s" \
                                  % (e.message, e.get_error_code()))
@@ -207,7 +195,7 @@ def domain_nfs_start(params):
                     domobj.create()
                     logger.error("Domain %s started, this is not expected" % \
                                   guestname)
-                    return return_close(conn, logger, 1)
+                    return 1
                 except libvirtError, e:
                     logger.error("API error message: %s, error code is %s" \
                                  % (e.message, e.get_error_code()))
@@ -219,7 +207,7 @@ def domain_nfs_start(params):
                     domobj.create()
                     logger.error("Domain %s started, this is not expected" % \
                                   guestname)
-                    return return_close(conn, logger, 1)
+                    return 1
                 except libvirtError, e:
                     logger.error("API error message: %s, error code is %s" \
                                  % (e.message, e.get_error_code()))
@@ -231,7 +219,7 @@ def domain_nfs_start(params):
                     domobj.create()
                     logger.error("Domain %s started, this is not expected" % \
                                   guestname)
-                    return return_close(conn, logger, 1)
+                    return 1
                 except libvirtError, e:
                     logger.error("API error message: %s, error code is %s" \
                                  % (e.message, e.get_error_code()))
@@ -247,14 +235,14 @@ def domain_nfs_start(params):
                     logger.error("API error message: %s, error code is %s" \
                                  % (e.message, e.get_error_code()))
                     logger.error("Fail to start domain %s" % guestname)
-                    return return_close(conn, logger, 1)
+                    return 1
 
             elif dynamic_ownership == "disable":
                 try:
                     domobj.create()
                     logger.error("Domain %s started, this is not expected" % \
                                   guestname)
-                    return return_close(conn, logger, 1)
+                    return 1
                 except libvirtError, e:
                     logger.error("API error message: %s, error code is %s" \
                                  % (e.message, e.get_error_code()))
@@ -266,7 +254,7 @@ def domain_nfs_start(params):
                     domobj.create()
                     logger.error("Domain %s started, this is not expected" % \
                                   guestname)
-                    return return_close(conn, logger, 1)
+                    return 1
                 except libvirtError, e:
                     logger.error("API error message: %s, error code is %s" \
                                  % (e.message, e.get_error_code()))
@@ -278,7 +266,7 @@ def domain_nfs_start(params):
                     domobj.create()
                     logger.error("Domain %s started, this is not expected" % \
                                   guestname)
-                    return return_close(conn, logger, 1)
+                    return 1
                 except libvirtError, e:
                     logger.error("API error message: %s, error code is %s" \
                                  % (e.message, e.get_error_code()))
@@ -293,7 +281,7 @@ def domain_nfs_start(params):
         logger.error("API error message: %s, error code is %s" \
                      % (e.message, e.get_error_code()))
         logger.error("Error: fail to get domain %s state" % guestname)
-        return return_close(conn, logger, 1)
+        return 1
 
     if state != "shutoff":
         logger.info("shut down the domain %s" % guestname)
@@ -303,7 +291,7 @@ def domain_nfs_start(params):
             logger.error("API error message: %s, error code is %s" \
                          % (e.message, e.get_error_code()))
             logger.error("Error: fail to destroy domain %s" % guestname)
-            return return_close(conn, logger, 1)
+            return 1
 
     logger.info("Second, start the domain after chown the img file to qemu")
 
@@ -314,7 +302,7 @@ def domain_nfs_start(params):
     ret, out = utils.exec_cmd(chown_cmd, shell=True)
     if ret:
         logger.error("failed to chown %s to qemu:qemu" % filepath)
-        return return_close(conn, logger, 1)
+        return 1
 
     logger.info("start domain %s" % guestname)
     if root_squash == "yes":
@@ -327,7 +315,7 @@ def domain_nfs_start(params):
                     logger.error("API error message: %s, error code is %s" \
                                  % (e.message, e.get_error_code()))
                     logger.error("Fail to start domain %s" % guestname)
-                    return return_close(conn, logger, 1)
+                    return 1
 
             elif dynamic_ownership == "disable":
                 try:
@@ -337,7 +325,7 @@ def domain_nfs_start(params):
                     logger.error("API error message: %s, error code is %s" \
                                  % (e.message, e.get_error_code()))
                     logger.error("Fail to start domain %s" % guestname)
-                    return return_close(conn, logger, 1)
+                    return 1
 
         elif virt_use_nfs == "off":
             if dynamic_ownership == "enable":
@@ -345,7 +333,7 @@ def domain_nfs_start(params):
                     domobj.create()
                     logger.error("Domain %s started, this is not expected" % \
                                   guestname)
-                    return return_close(conn, logger, 1)
+                    return 1
                 except libvirtError, e:
                     logger.error("API error message: %s, error code is %s" \
                                  % (e.message, e.get_error_code()))
@@ -357,7 +345,7 @@ def domain_nfs_start(params):
                     domobj.create()
                     logger.error("Domain %s started, this is not expected" % \
                                   guestname)
-                    return return_close(conn, logger, 1)
+                    return 1
                 except libvirtError, e:
                     logger.error("API error message: %s, error code is %s" \
                                  % (e.message, e.get_error_code()))
@@ -373,7 +361,7 @@ def domain_nfs_start(params):
                     logger.error("API error message: %s, error code is %s" \
                                  % (e.message, e.get_error_code()))
                     logger.error("Fail to start domain %s" % guestname)
-                    return return_close(conn, logger, 1)
+                    return 1
 
             elif dynamic_ownership == "disable":
                 try:
@@ -383,7 +371,7 @@ def domain_nfs_start(params):
                     logger.error("API error message: %s, error code is %s" \
                                  % (e.message, e.get_error_code()))
                     logger.error("Fail to start domain %s" % guestname)
-                    return return_close(conn, logger, 1)
+                    return 1
 
         elif virt_use_nfs == "off":
             if dynamic_ownership == "enable":
@@ -391,7 +379,7 @@ def domain_nfs_start(params):
                     domobj.create()
                     logger.error("Domain %s started, this is not expected" % \
                                   guestname)
-                    return return_close(conn, logger, 1)
+                    return 1
                 except libvirtError, e:
                     logger.error("API error message: %s, error code is %s" \
                                  % (e.message, e.get_error_code()))
@@ -403,14 +391,14 @@ def domain_nfs_start(params):
                     domobj.create()
                     logger.error("Domain %s started, this is not expected" % \
                                   guestname)
-                    return return_close(conn, logger, 1)
+                    return 1
                 except libvirtError, e:
                     logger.error("API error message: %s, error code is %s" \
                                  % (e.message, e.get_error_code()))
                     logger.info("Fail to start domain %s, this is expected" % \
                                  guestname)
 
-    return return_close(conn, logger, 0)
+    return 0
 
 def domain_nfs_start_clean(params):
     """clean testing environment"""
@@ -419,8 +407,7 @@ def domain_nfs_start_clean(params):
 
 
     # Connect to local hypervisor connection URI
-    uri = params['uri']
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
     domobj = conn.lookupByName(guestname)
 
     if domobj.info()[0] != libvirt.VIR_DOMAIN_SHUTOFF:
@@ -440,8 +427,6 @@ def domain_nfs_start_clean(params):
 
     if os.path.exists(temp_file):
         os.remove(temp_file)
-
-    conn.close()
 
     clean_nfs_conf = "sed -i '$d' /etc/exports"
     utils.exec_cmd(clean_nfs_conf, shell=True)

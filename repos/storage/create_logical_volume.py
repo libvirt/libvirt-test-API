@@ -10,6 +10,7 @@ from xml.dom import minidom
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import utils
 from utils import xmlbuilder
 
@@ -81,8 +82,7 @@ def create_logical_volume(params):
     # default is KB in the /etc/lvm/backup/{poolname}
     caps_kbyte = dicts['capacity_byte']/1024
 
-    uri = params['uri']
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
     pool_names = conn.listDefinedStoragePools()
     pool_names += conn.listStoragePools()
 
@@ -90,13 +90,10 @@ def create_logical_volume(params):
         poolobj = conn.storagePoolLookupByName(poolname)
     else:
         logger.error("%s not found\n" % poolname);
-        conn.close()
         return 1
 
     if not poolobj.isActive():
         logger.error("%s pool is inactive" % poolname)
-        conn.close()
-        logger.info("closed hypervisor connection")
         return 1
 
     poolpath = get_pool_path(poolobj)
@@ -113,25 +110,20 @@ def create_logical_volume(params):
     display_physical_volume()
 
     try:
-        try:
-            logger.info("create %s storage volume" % volname)
-            poolobj.createXML(volxml, 0)
-            display_physical_volume()
-            vol_num2 = get_storage_volume_number(poolobj)
-            display_volume_info(poolobj)
-            if check_volume_create(poolobj, poolname, volname, caps_kbyte) \
-                and vol_num2 > vol_num1:
-                logger.info("create %s storage volume is successful" % volname)
-                return 0
-            else:
-                logger.error("fail to crearte %s storage volume" % volname)
-                return 1
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
-                         % (e.message, e.get_error_code()))
+        logger.info("create %s storage volume" % volname)
+        poolobj.createXML(volxml, 0)
+        display_physical_volume()
+        vol_num2 = get_storage_volume_number(poolobj)
+        display_volume_info(poolobj)
+        if check_volume_create(poolobj, poolname, volname, caps_kbyte) \
+            and vol_num2 > vol_num1:
+            logger.info("create %s storage volume is successful" % volname)
+        else:
+            logger.error("fail to crearte %s storage volume" % volname)
             return 1
-    finally:
-        conn.close()
-        logger.info("closed hypervisor connection")
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
+        return 1
 
     return 0

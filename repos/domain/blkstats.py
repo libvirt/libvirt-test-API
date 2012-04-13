@@ -9,6 +9,7 @@ import libxml2
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 
 required_params = ('guestname',)
 optional_params = ()
@@ -30,11 +31,8 @@ def blkstats(params):
     """Domain block device statistic"""
     logger = params['logger']
     guestname = params['guestname']
-    test_result = False
 
-    # Connect to local hypervisor connection URI
-    uri = params['uri']
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
 
     domobj = conn.lookupByName(guestname)
 
@@ -45,20 +43,16 @@ def blkstats(params):
         domobj.create()
         time.sleep(90)
     try:
-        try:
-            xml = domobj.XMLDesc(0)
-            doc = libxml2.parseDoc(xml)
-            cont = doc.xpathNewContext()
-            devs = cont.xpathEval("/domain/devices/disk/target/@dev")
-            path = devs[0].content
-            blkstats = domobj.blockStats(path)
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
-                         % (e.message, e.get_error_code()))
-            return 1;
-    finally:
-        conn.close()
-        logger.info("closed hypervisor connection")
+        xml = domobj.XMLDesc(0)
+        doc = libxml2.parseDoc(xml)
+        cont = doc.xpathNewContext()
+        devs = cont.xpathEval("/domain/devices/disk/target/@dev")
+        path = devs[0].content
+        blkstats = domobj.blockStats(path)
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
+        return 1
 
     if blkstats:
         # check_blkstats()
@@ -67,15 +61,11 @@ def blkstats(params):
         logger.info("%s rd_bytes %s" %(path, blkstats[1]))
         logger.info("%s wr_req %s" %(path, blkstats[2]))
         logger.info("%s wr_bytes %s" %(path, blkstats[3]))
-        test_result = True
     else:
         logger.error("fail to get domain block statistics\n")
-        test_result = False
-
-    if test_result:
-        return 0
-    else:
         return 1
+
+    return 0
 
 def blkstats_clean(params):
     """ clean testing environment """

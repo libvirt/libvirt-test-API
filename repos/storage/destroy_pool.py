@@ -7,15 +7,11 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import xmlbuilder
 
 required_params = ('poolname',)
 optional_params = ()
-
-def return_close(conn, logger, ret):
-    conn.close()
-    logger.info("closed hypervisor connection")
-    return ret
 
 def check_pool_destroy(conn, poolname, logger):
     """
@@ -37,8 +33,7 @@ def destroy_pool(params):
     """Function to actually destroy the pool"""
     logger = params['logger']
     poolname = params['poolname']
-    uri = params['uri']
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
 
     pool_names = conn.listDefinedStoragePools()
     pool_names += conn.listStoragePools()
@@ -47,24 +42,24 @@ def destroy_pool(params):
         poolobj = conn.storagePoolLookupByName(poolname)
     else:
         logger.error("%s not found\n" % poolname);
-        conn.close()
         return 1
 
     if not poolobj.isActive():
         logger.error("%s is not active. \
                           It must be active to be destroyed." % poolname)
-        return return_close(conn, logger, 1)
+        return 1
 
     try:
         poolobj.destroy()
         # Check in libvirt to make sure that it's really destroyed..
         if not check_pool_destroy(conn, poolname, logger):
             logger.error("%s doesn't seem to be destroyed properly" % poolname)
-            return return_close(conn, logger, 1)
+            return 1
         else:
             logger.info("%s is destroyed!!!" % poolname)
-            return return_close(conn, logger, 0)
     except libvirtError, e:
         logger.error("API error message: %s, error code is %s" \
                     % (e.message, e.get_error_code()))
-        return return_close(conn, logger, 1)
+        return 1
+
+    return 0

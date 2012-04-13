@@ -12,15 +12,11 @@ from xml.dom import minidom
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import utils
 
 required_params = ('guestname', 'vcpu',)
 optional_params = ()
-
-def return_close(conn, logger, ret):
-    conn.close()
-    logger.info("closed hypervisor connection")
-    return ret
 
 def redefine_vcpu_number(domobj, domain_name, vcpu):
     """dump domain xml description to change the vcpu number,
@@ -205,9 +201,8 @@ def cpu_affinity(params):
     logger.info("the name of virtual machine is %s" % domain_name)
     logger.info("the vcpu given is %s" % vcpu)
 
-    # Connect to local hypervisor connection URI
-    uri = params['uri']
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
+    uri = conn.getURI()
     hypervisor = uri.split(':')[0]
 
     # Get cpu affinity
@@ -220,7 +215,7 @@ def cpu_affinity(params):
     if domain_name not in guest_names:
         logger.error("guest %s doesn't exist or not be running." %
                       domain_name)
-        return return_close(conn, logger, 1)
+        return 1
 
     domobj = conn.lookupByName(domain_name)
 
@@ -232,7 +227,7 @@ def cpu_affinity(params):
         logger.info("set the vcpu of the guest to %s" % vcpu)
         ret = set_vcpus(util, domobj, domain_name, vcpu)
         if ret != 0:
-            return return_close(conn, logger, 1)
+            return 1
 
     vcpunum_after_set = utils.get_num_vcpus(domain_name)
     logger.info("after setting, the current vcpu number the guest is %s" % \
@@ -273,7 +268,7 @@ def cpu_affinity(params):
                 logger.error("API error message: %s, error code is %s" \
                              % (e.message, e.get_error_code()))
                 logger.error("fail to vcpupin domain")
-                return return_close(conn, logger, 1)
+                return 1
 
             ret = vcpu_affinity_check(domain_name, vcpu_pinned, i, hypervisor)
             retflag = retflag + ret
@@ -283,9 +278,8 @@ def cpu_affinity(params):
                 logger.info("vcpu affinity checking successed.")
 
     if retflag:
-        return return_close(conn, logger, 1)
-    else:
-        return return_close(conn, logger, 0)
+        return 1
+    return 0
 
 def cpu_affinity_clean(params):
     """ clean testing environment """

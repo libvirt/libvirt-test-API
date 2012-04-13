@@ -8,6 +8,7 @@ import time
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import utils
 from utils import check
 
@@ -16,11 +17,6 @@ optional_params = ('expectedret')
 
 FLAG_FILE = "/tmp/snapshot_flag"
 FLAG_CHECK = "ls %s" % FLAG_FILE
-
-def return_close(conn, logger, ret):
-    conn.close()
-    logger.info("closed hypervisor connection")
-    return ret
 
 def check_domain_running(conn, guestname, logger):
     """ check if the domain exists and in running state as well """
@@ -49,14 +45,11 @@ def flag_check(params):
         expected_result = "exist"
 
     chk = check.Check()
-    uri = params['uri']
-    conn = libvirt.open(uri)
-
-    logger.info("the uri is %s" % uri)
+    conn = sharedmod.libvirtobj['conn']
 
     if not check_domain_running(conn, guestname, logger):
         logger.error("need a running guest")
-        return return_close(conn, logger, 1)
+        return 1
 
     logger.info("get the mac address of vm %s" % guestname)
     mac = utils.get_dom_mac_addr(guestname)
@@ -75,26 +68,26 @@ def flag_check(params):
 
     if timeout == 0:
         logger.info("vm %s failed to get ip address" % guestname)
-        return return_close(conn, logger, 1)
+        return 1
 
     ret = chk.remote_exec_pexpect(ipaddr, username, password, FLAG_CHECK)
     if ret == "TIMEOUT!!!":
         logger.error("connecting to guest OS timeout")
-        return return_close(conn, logger, 1)
+        return 1
     elif ret == FLAG_FILE and expected_result == "exist":
         logger.info("checking flag %s in guest OS succeeded" % FLAG_FILE)
-        return return_close(conn, logger, 0)
+        return 0
     elif ret == FLAG_FILE and expected_result == 'noexist':
         logger.error("flag %s still exist, FAILED." % FLAG_FILE)
-        return return_close(conn, logger, 1)
+        return 1
     elif ret != None and expected_result == "exist":
         logger.error("no flag %s exists in the guest %s " % (FLAG_FILE,guestname))
-        return return_close(conn, logger, 1)
+        return 1
     elif ret != None and expected_result == 'noexist':
         logger.info("flag %s is not present, checking succeeded" % FLAG_FILE)
-        return return_close(conn, logger, 0)
+        return 0
 
-    return return_close(conn, logger, 0)
+    return 0
 
 def flag_check_clean(params):
     """ clean testing environment """

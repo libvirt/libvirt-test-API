@@ -9,6 +9,8 @@ import commands
 import libvirt
 from libvirt import libvirtError
 
+import sharemod
+
 required_params = ()
 optional_params = ()
 
@@ -53,36 +55,27 @@ def domuuid(params):
     guestname = params['guestname']
     logger.info("guest name is %s" % guestname)
 
-    uri = params['uri']
-    conn = libvirt.open(uri)
-
-    logger.info("the uri is %s" % uri)
+    conn = sharedmod.libvirtobj['conn']
 
     if not check_domain_exists(conn, guestname, logger):
         logger.error("need a defined guest")
-        conn.close()
-        logger.info("closed hypervisor connection")
         return 1
 
     domobj = conn.lookupByName(guestname)
 
     try:
-        try:
-            logger.info("get the UUID string of %s" % guestname)
-            UUIDString = domobj.UUIDString()
-            if check_domain_uuid(guestname, UUIDString, logger):
-                logger.info("UUIDString from API is the same as the one from virsh")
-                logger.info("UUID String is %s" % UUIDString)
-                return 0
-            else:
-                logger.error("UUIDString from API is not the same as the one from virsh")
-                return 1
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
-                         % (e.message, e.get_error_code()))
+        logger.info("get the UUID string of %s" % guestname)
+        UUIDString = domobj.UUIDString()
+        if check_domain_uuid(guestname, UUIDString, logger):
+            logger.info("UUIDString from API is the same as the one from virsh")
+            logger.info("UUID String is %s" % UUIDString)
+            return 0
+        else:
+            logger.error("UUIDString from API is not the same as the one from virsh")
             return 1
-    finally:
-        conn.close()
-        logger.info("closed hypervisor connection")
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
+        return 1
 
     return 0

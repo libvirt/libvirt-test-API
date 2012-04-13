@@ -13,6 +13,7 @@ import urllib
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import utils
 from utils import env_parser
 from utils import xmlbuilder
@@ -37,11 +38,6 @@ VM_UNDEFINE = "virsh undefine %s"
 
 BOOT_DIR = "/var/lib/libvirt/boot/"
 HOME_PATH = os.getcwd()
-
-def return_close(conn, logger, ret):
-    conn.close()
-    logger.info("closed hypervisor connection")
-    return ret
 
 def prepare_boot_guest(domobj, dict, logger, installtype):
     """After guest installation is over, undefine the guest with
@@ -137,8 +133,6 @@ def install_linux_net(params):
     global logger
     logger = params['logger']
     params.pop('logger')
-    uri = params['uri']
-    params.pop('uri')
 
     guestname = params.get('guestname')
     guesttype = params.get('guesttype')
@@ -155,7 +149,6 @@ def install_linux_net(params):
 
     logger.info("the macaddress is %s" % macaddr)
     logger.info("the type of hypervisor is %s" % hypervisor)
-    logger.debug("the uri to connect is %s" % uri)
 
     if params.has_key('imagepath'):
         fullimagepath = os.path.join(params.get('imagepath'), guestname)
@@ -252,7 +245,8 @@ def install_linux_net(params):
     logger.debug('dump installation guest xml:\n%s' % guestxml)
 
     #start installation
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
+
     installtype = params.get('type')
     if installtype == None or installtype == 'define':
         logger.info('define guest from xml description')
@@ -262,7 +256,7 @@ def install_linux_net(params):
             logger.error("API error message: %s, error code is %s" \
                          % (e.message, e.get_error_code()))
             logger.error("fail to define domain %s" % guestname)
-            return return_close(conn, logger, 1)
+            return 1
 
         logger.info('start installation guest ...')
 
@@ -272,7 +266,7 @@ def install_linux_net(params):
             logger.error("API error message: %s, error code is %s" \
                          % (e.message, e.get_error_code()))
             logger.error("fail to start domain %s" % guestname)
-            return return_close(conn, logger, 1)
+            return 1
     elif installtype == 'create':
         logger.info('create guest from xml description')
         try:
@@ -281,7 +275,7 @@ def install_linux_net(params):
             logger.error("API error message: %s, error code is %s" \
                          % (e.message, e.get_error_code()))
             logger.error("fail to define domain %s" % guestname)
-            return return_close(conn, logger, 1)
+            return 1
 
     if 'rhel3u9' in guestos:
         interval = 0
@@ -296,7 +290,7 @@ def install_linux_net(params):
 
         if ret:
             logger.info("booting guest vm off harddisk failed")
-            return return_close(conn, logger, 1)
+            return 1
         else:
             logger.info("geust is booting up")
     else:
@@ -312,7 +306,7 @@ def install_linux_net(params):
                                               installtype)
                     if ret:
                         logger.info("booting guest vm off harddisk failed")
-                        return return_close(conn, logger, 1)
+                        return 1
                     break
                 else:
                     interval += 10
@@ -331,7 +325,7 @@ def install_linux_net(params):
                                              installtype)
                     if ret:
                         logger.info("booting guest vm off harddisk failed")
-                        return return_close(conn, logger, 1)
+                        return 1
                     break
                 else:
                     interval += 10
@@ -339,7 +333,7 @@ def install_linux_net(params):
 
         if interval == 3600:
             logger.info("guest installation timeout 3600s")
-            return return_close(conn, logger, 1)
+            return 1
         else:
             logger.info("guest is booting up")
 
@@ -363,9 +357,9 @@ def install_linux_net(params):
 
         if timeout == 0:
             logger.info("fail to power on vm %s" % guestname)
-            return return_close(conn, logger, 1)
+            return 1
 
-    return return_close(conn, logger, 0)
+    return 0
 
 def install_linux_net_clean(params):
     """ clean testing environment """

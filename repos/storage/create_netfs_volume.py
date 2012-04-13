@@ -10,6 +10,7 @@ from xml.dom import minidom
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import xmlbuilder
 
 required_params = ('poolname', 'volname', 'volformat', 'capacity',)
@@ -85,16 +86,12 @@ def create_netfs_volume(params):
                  volfomat is %s, capacity is %s" % \
                  (poolname, volname, volformat, capacity))
 
-    uri = params['uri']
-
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
 
     storage_pool_list = conn.listStoragePools()
 
     if poolname not in storage_pool_list:
         logger.error("pool %s doesn't exist or not running")
-        conn.close()
-        logger.info("closed hypervisor connection")
         return 1
 
     poolobj = conn.storagePoolLookupByName(poolname)
@@ -120,16 +117,12 @@ def create_netfs_volume(params):
     logger.debug("volume xml:\n%s" % volumexml)
 
     try:
-        try:
-            logger.info("create %s volume" % volname)
-            poolobj.createXML(volumexml, 0)
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
-                         % (e.message, e.get_error_code()))
-            return 1
-    finally:
-        conn.close()
-        logger.info("closed hypervisor connection")
+        logger.info("create %s volume" % volname)
+        poolobj.createXML(volumexml, 0)
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
+        return 1
 
     logger.info("volume create successfully, and output the volume information")
     virsh_vol_list(poolname)

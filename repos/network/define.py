@@ -9,6 +9,7 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import xmlbuilder
 
 required_params = ('networkname',
@@ -41,16 +42,11 @@ def define(params):
     """Define a network from xml"""
     logger = params['logger']
     networkname = params['networkname']
-    test_result = False
 
-    uri = params['uri']
-
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
 
     if check_network_define(networkname, logger):
         logger.error("%s network is defined" % networkname)
-        conn.close()
-        logger.info("closed hypervisor connection")
         return 1
 
     xmlobj = xmlbuilder.XmlBuilder()
@@ -61,23 +57,18 @@ def define(params):
     logger.info("original network define number: %s" % net_num1)
 
     try:
-        try:
-            conn.networkDefineXML(netxml)
-            net_num2 = conn.numOfDefinedNetworks()
-            if check_network_define(networkname, logger) and net_num2 > net_num1:
-                logger.info("current network define number: %s" % net_num2)
-                logger.info("define %s network is successful" % networkname)
-            else:
-                logger.error("%s network is undefined" % networkname)
-                return 1
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
-                         % (e.message, e.get_error_code()))
-            logger.error("define a network from xml: \n%s" % netxml)
+        conn.networkDefineXML(netxml)
+        net_num2 = conn.numOfDefinedNetworks()
+        if check_network_define(networkname, logger) and net_num2 > net_num1:
+            logger.info("current network define number: %s" % net_num2)
+            logger.info("define %s network is successful" % networkname)
+        else:
+            logger.error("%s network is undefined" % networkname)
             return 1
-    finally:
-        conn.close()
-        logger.info("closed hypervisor connection")
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
+        logger.error("define a network from xml: \n%s" % netxml)
+        return 1
 
-    time.sleep(3)
     return 0

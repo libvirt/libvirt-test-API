@@ -9,6 +9,7 @@ import time
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import utils
 from utils import xmlbuilder
 
@@ -37,16 +38,13 @@ def detach_interface(params):
     """Detach a interface to domain from xml"""
     logger = params['logger']
     guestname = params['guestname']
-    test_result = False
 
-    # Connect to local hypervisor connection URI
-    uri = params['uri']
     macs = utils.get_dom_mac_addr(guestname)
     mac_list = macs.split("\n")
     logger.debug("mac address: \n%s" % macs)
     params['macaddr'] = mac_list[-1]
 
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
     domobj = conn.lookupByName(guestname)
 
     xmlobj = xmlbuilder.XmlBuilder()
@@ -63,28 +61,19 @@ def detach_interface(params):
         time.sleep(90)
 
     try:
-        try:
-            domobj.detachDevice(ifacexml)
-            iface_num2 = utils.dev_num(guestname, "interface")
-            logger.debug("update interface number to %s" % iface_num2)
-            if  check_detach_interface(iface_num1, iface_num2):
-                logger.info("current interface number: %s" % iface_num2)
-                test_result = True
-            else:
-                logger.error("fail to detach a interface to guest: %s" %
-                              iface_num2)
-                test_result = False
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
-                         % (e.message, e.get_error_code()))
-            logger.error("detach the interface from guest %s" % guestname)
-            test_result = False
+        domobj.detachDevice(ifacexml)
+        iface_num2 = utils.dev_num(guestname, "interface")
+        logger.debug("update interface number to %s" % iface_num2)
+        if  check_detach_interface(iface_num1, iface_num2):
+            logger.info("current interface number: %s" % iface_num2)
+        else:
+            logger.error("fail to detach a interface to guest: %s" %
+                          iface_num2)
             return 1
-    finally:
-        conn.close()
-        logger.info("closed hypervisor connection")
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
+        logger.error("detach the interface from guest %s" % guestname)
+        return 1
 
-    if test_result:
-        return 0
-    else:
-        return -1
+    return 0

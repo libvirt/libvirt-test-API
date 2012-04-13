@@ -10,6 +10,7 @@ import libxml2
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import utils
 
 required_params = ('guestname',)
@@ -32,11 +33,8 @@ def ifstats(params):
     """Domain interface statistic"""
     logger = params['logger']
     guestname = params['guestname']
-    test_result = False
 
-    uri = params['uri']
-
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
     domobj = conn.lookupByName(guestname)
 
     if check_guest_status(domobj):
@@ -49,8 +47,6 @@ def ifstats(params):
             logger.error("API error message: %s, error code is %s" \
                          % (e.message, e.get_error_code()))
             logger.error("start failed")
-            conn.close()
-            logger.info("closed hypervisor connection")
             return 1
 
     mac = utils.get_dom_mac_addr(guestname)
@@ -60,8 +56,6 @@ def ifstats(params):
     logger.info('ping guest')
     if not utils.do_ping(ip, 300):
         logger.error('Failed on ping guest, IP: ' + str(ip))
-        conn.close()
-        logger.info("closed hypervisor connection")
         return 1
 
     xml = domobj.XMLDesc(0)
@@ -82,18 +76,11 @@ def ifstats(params):
         logger.info("%s tx_packets %s" % (path, ifstats[5]))
         logger.info("%s tx_errs %s" % (path, ifstats[6]))
         logger.info("%s tx_drop %s" % (path, ifstats[7]))
-        test_result = True
     else:
         logger.error("fail to get domain interface statistics\n")
-        test_result = False
+        return 1
 
-    conn.close()
-    logger.info("closed hypervisor connection")
-
-    if test_result:
-        return 0
-    else:
-        return -1
+    return 0
 
 def ifstats_clean(params):
     """ clean testing environment """

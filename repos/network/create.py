@@ -9,6 +9,7 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import xmlbuilder
 
 required_params = ('networkname',
@@ -39,14 +40,10 @@ def create(params):
     logger = params['logger']
     networkname = params['networkname']
 
-    uri = params['uri']
-
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
 
     if not check_network_status(networkname, conn, logger):
         logger.error("the %s network is running" % networkname)
-        conn.close()
-        logger.info("closed hypervisor connection")
         return 1
 
     xmlobj = xmlbuilder.XmlBuilder()
@@ -57,24 +54,19 @@ def create(params):
     logger.info("original network active number: %s" % net_num1)
 
     try:
-        try:
-            conn.networkCreateXML(netxml)
-            net_num2 = conn.numOfNetworks()
-            if  not check_network_status(networkname, conn, logger) and \
-                    net_num2 > net_num1:
-                logger.info("current network active number: %s\n" % net_num2)
-            else:
-                logger.error("the %s network is inactive" % networkname)
-                logger.error("fail to create network from :\n%s" % netxml)
-                return 1
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
-                         % (e.message, e.get_error_code()))
-            logger.error("create a network from xml: \n%s" % netxml)
+        conn.networkCreateXML(netxml)
+        net_num2 = conn.numOfNetworks()
+        if  not check_network_status(networkname, conn, logger) and \
+                net_num2 > net_num1:
+            logger.info("current network active number: %s\n" % net_num2)
+        else:
+            logger.error("the %s network is inactive" % networkname)
+            logger.error("fail to create network from :\n%s" % netxml)
             return 1
-    finally:
-        conn.close()
-        logger.info("closed hypervisor connection")
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
+        logger.error("create a network from xml: \n%s" % netxml)
+        return 1
 
-    time.sleep(3)
     return 0

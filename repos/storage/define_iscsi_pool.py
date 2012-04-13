@@ -8,6 +8,7 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import xmlbuilder
 
 required_params = ('poolname', 'pooltype', 'sourcename', 'sourcepath',)
@@ -50,14 +51,10 @@ def define_iscsi_pool(params):
     srcname = params['sourcename']
     srcpath = params['sourcepath']
 
-    uri = params['uri']
-
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
 
     if check_pool_define(conn, poolname, logger):
         logger.error("%s storage pool is ALREADY defined" % poolname)
-        conn.close()
-        logger.info("closed hypervisor connection")
         return 1
 
     xmlobj = xmlbuilder.XmlBuilder()
@@ -69,24 +66,19 @@ def define_iscsi_pool(params):
     display_pool_info(conn, logger)
 
     try:
-        try:
-            logger.info("define %s storage pool" % poolname)
-            conn.storagePoolDefineXML(poolxml, 0)
-            pool_num2 = conn.numOfDefinedStoragePools()
-            logger.info("current storage pool define number: %s" % pool_num2)
-            display_pool_info(conn, logger)
-            if check_pool_define(conn, poolname, logger) and pool_num2 > pool_num1:
-                logger.info("define %s storage pool is successful" % poolname)
-                return 0
-            else:
-                logger.error("%s storage pool is undefined" % poolname)
-                return 1
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
-                         % (e.message, e.get_error_code()))
+        logger.info("define %s storage pool" % poolname)
+        conn.storagePoolDefineXML(poolxml, 0)
+        pool_num2 = conn.numOfDefinedStoragePools()
+        logger.info("current storage pool define number: %s" % pool_num2)
+        display_pool_info(conn, logger)
+        if check_pool_define(conn, poolname, logger) and pool_num2 > pool_num1:
+            logger.info("define %s storage pool is successful" % poolname)
+        else:
+            logger.error("%s storage pool is undefined" % poolname)
             return 1
-    finally:
-        conn.close()
-        logger.info("closed hypervisor connection")
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
+        return 1
 
     return 0

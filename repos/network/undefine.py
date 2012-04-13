@@ -9,6 +9,8 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
+
 required_params = ('networkname',)
 optional_params = ()
 
@@ -28,38 +30,29 @@ def undefine(params):
     logger = params['logger']
     networkname = params['networkname']
 
-    uri = params['uri']
-
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
 
     if check_network_undefine(networkname):
         logger.error("the network %s is undefine" % networkname)
-        conn.close()
-        logger.info("closed hypervisor connection")
         return 1
 
     net_num1 = conn.numOfDefinedNetworks()
     logger.info("original network define number: %s" % net_num1)
 
     try:
-        try:
-            netobj = conn.networkLookupByName(networkname)
-            netobj.undefine()
-            net_num2 = conn.numOfDefinedNetworks()
-            if  check_network_undefine(networkname) and net_num2 < net_num1:
-                logger.info("current network define number: %s" % net_num2)
-                logger.info("undefine %s network is successful" % networkname)
-            else:
-                logger.error("the network %s is still define" % networkname)
-                return 1
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
-                         % (e.message, e.get_error_code()))
-            logger.error("fail to undefine a network")
+        netobj = conn.networkLookupByName(networkname)
+        netobj.undefine()
+        net_num2 = conn.numOfDefinedNetworks()
+        if check_network_undefine(networkname) and net_num2 < net_num1:
+            logger.info("current network define number: %s" % net_num2)
+            logger.info("undefine %s network is successful" % networkname)
+        else:
+            logger.error("the network %s is still define" % networkname)
             return 1
-    finally:
-        conn.close()
-        logger.info("closed hypervisor connection")
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
+        logger.error("fail to undefine a network")
+        return 1
 
-    time.sleep(3)
     return 0

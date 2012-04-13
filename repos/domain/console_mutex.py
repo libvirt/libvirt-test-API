@@ -5,6 +5,8 @@ import libvirt
 from libvirt import libvirtError
 from exception import TestError
 
+import sharedmod
+
 required_params = ('guestname',)
 optional_params = ('device',)
 
@@ -14,11 +16,8 @@ def console_mutex(params):
     guest = params['guestname']
     device = params.get('device', 'serial0')
 
-    uri = params['uri']
-
     try:
-        logger.info("Connecting to hypervisor: '%s'" % uri)
-        conn = libvirt.open(uri)
+        conn = sharedmod.libvirtobj['conn']
         dom = conn.lookupByName(guest)
 
         if not dom.isActive():
@@ -85,8 +84,6 @@ def console_mutex(params):
 
     finally:
         logger.info("Closing hypervisor connection")
-        conn.close()
-
         logger.info("Done")
 
     return ret

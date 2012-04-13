@@ -9,6 +9,8 @@ import commands
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
+
 required_params = ('guestname', 'blockdev',)
 optional_params = ()
 
@@ -16,11 +18,6 @@ GET_DOMBLKINFO_MAC = "virsh domblkinfo %s %s | awk '{print $2}'"
 GET_CAPACITY = "du -b %s | awk '{print $1}'"
 GET_PHYSICAL_K = " du -B K %s | awk '{print $1}'"
 VIRSH_DOMBLKINFO = "virsh domblkinfo %s %s"
-
-def return_close(conn, logger, ret):
-    conn.close()
-    logger.info("closed hypervisor connection")
-    return ret
 
 def get_output(command, logger):
     """execute shell command
@@ -91,32 +88,29 @@ def domblkinfo(params):
     logger.info("the name of guest is %s" % guestname)
     logger.info("the block device is %s" % blockdev)
 
-    uri = params['uri']
-    conn = libvirt.open(uri)
-
-    logger.info("the uri is %s" % uri)
+    conn = sharedmod.libvirtobj['conn']
 
     if not check_domain_exists(conn, guestname, logger):
         logger.error("need a defined guest")
-        return return_close(conn, logger, 1)
+        return 1
 
     logger.info("the output of virsh domblkinfo is:")
     status, output = get_output(VIRSH_DOMBLKINFO % (guestname, blockdev), logger)
     if not status:
         logger.info("\n" + output)
     else:
-        return return_close(conn, logger, 1)
+        return 1
 
     status, data_str = get_output(GET_DOMBLKINFO_MAC % (guestname, blockdev), logger)
     if not status:
         blkdata = data_str.rstrip().split('\n')
         logger.info("capacity,allocation,physical list: %s" % blkdata)
     else:
-        return return_close(conn, logger, 1)
+        return 1
 
     if check_block_data(blockdev, blkdata, logger):
         logger.error("checking domblkinfo data FAILED")
-        return return_close(conn, logger, 1)
+        return 1
     else:
         logger.info("checking domblkinfo data SUCCEEDED")
-    return return_close(conn, logger, 0)
+    return 0

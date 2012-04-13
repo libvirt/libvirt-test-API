@@ -9,6 +9,7 @@ import commands
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import utils
 
 required_params = ('pciaddress',)
@@ -23,8 +24,6 @@ def reset(params):
     global logger
     logger = params['logger']
     pciaddress = params['pciaddress']
-
-    uri = params['uri']
 
     kernel_version = utils.get_host_kernel_version()
 
@@ -44,21 +43,17 @@ def reset(params):
         (slot, func) = slot_func.split(".")
         device_name = "pci_0000_%s_%s_%s" % (bus, slot, func)
 
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
 
     try:
-        try:
-            nodeobj = conn.nodeDeviceLookupByName(device_name)
-            nodeobj.reset()
-            logger.info("reset the node device")
-            logger.info("the node %s device reset is successful" % device_name)
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
-                         % (e.message, e.get_error_code()))
-            logger.error("Error: fail to reset %s node device" % device_name)
-            return 1
-    finally:
-        conn.close()
-        logger.info("closed hypervisor connection")
+        nodeobj = conn.nodeDeviceLookupByName(device_name)
+        nodeobj.reset()
+        logger.info("reset the node device")
+        logger.info("the node %s device reset is successful" % device_name)
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
+        logger.error("Error: fail to reset %s node device" % device_name)
+        return 1
 
     return 0

@@ -9,6 +9,7 @@ import commands
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import utils
 from utils import xmlbuilder
 
@@ -49,10 +50,7 @@ def internal_create(params):
     if not params.has_key('snapshotname'):
         params['snapshotname'] = str(int(time.time()))
 
-    uri = params['uri']
-    logger.info("the uri is %s" % uri)
-
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
     guest_names = conn.listDefinedDomains()
     if guestname not in guest_names:
         logger.error("%s is not poweroff or doesn't exist" % guestname)
@@ -63,8 +61,6 @@ def internal_create(params):
     logger.info("checking the format of its disk")
     if not check_domain_image(domobj, util, guestname, logger):
         logger.error("checking failed")
-        conn.close()
-        logger.info("closed hypervisor connection")
         return 1
 
     xmlobj = xmlbuilder.XmlBuilder()
@@ -72,17 +68,13 @@ def internal_create(params):
     logger.debug("%s snapshot xml:\n%s" % (guestname, snapshot_xml))
 
     try:
-        try:
-            logger.info("create a snapshot for %s" % guestname)
-            domobj.snapshotCreateXML(snapshot_xml, 0)
-            logger.info("creating snapshot succeeded")
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
-                         % (e.message, e.get_error_code()))
-            return 1
-    finally:
-        conn.close()
-        logger.info("closed hypervisor connection")
+        logger.info("create a snapshot for %s" % guestname)
+        domobj.snapshotCreateXML(snapshot_xml, 0)
+        logger.info("creating snapshot succeeded")
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
+        return 1
 
     return 0
 

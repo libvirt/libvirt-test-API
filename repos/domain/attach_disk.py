@@ -10,6 +10,7 @@ import commands
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import utils
 from utils import xmlbuilder
 
@@ -54,18 +55,14 @@ def attach_disk(params):
     imagename = params['imagename']
     imagesize = int(params['imagesize'])
     disktype = params['hdmodel']
-    test_result = False
 
-    # Connect to local hypervisor connection URI
-    uri = params['uri']
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
 
     # Create image
     if create_image(imagename, imagesize, logger):
         del params['imagesize']
     else:
         logger.error("fail to create a image file")
-        conn.close()
         return 1
 
     domobj = conn.lookupByName(guestname)
@@ -87,29 +84,21 @@ def attach_disk(params):
 
     # Attach disk to domain
     try:
-        try:
-            domobj.attachDevice(diskxml)
-            disk_num2 = utils.dev_num(guestname, "disk")
-            logger.debug("update disk number to %s" %disk_num2)
-            if  check_attach_disk(disk_num1, disk_num2):
-                logger.info("current disk number: %s\n" %disk_num2)
-                test_result = True
-            else:
-                logger.error("fail to attach a disk to guest: %s\n" %disk_num2)
-                test_result = False
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
-                         % (e.message, e.get_error_code()))
-            logger.error("attach %s disk to guest %s" % (imagename, guestname))
-            test_result = False
-    finally:
-        conn.close()
-        logger.info("closed hypervisor connection")
-
-    if test_result:
-        return 0
-    else:
+        domobj.attachDevice(diskxml)
+        disk_num2 = utils.dev_num(guestname, "disk")
+        logger.debug("update disk number to %s" %disk_num2)
+        if  check_attach_disk(disk_num1, disk_num2):
+            logger.info("current disk number: %s\n" %disk_num2)
+        else:
+            logger.error("fail to attach a disk to guest: %s\n" %disk_num2)
+            return 1
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
+        logger.error("attach %s disk to guest %s" % (imagename, guestname))
         return 1
+
+    return 0
 
 def attach_disk_clean(params):
     """ clean testing environment """

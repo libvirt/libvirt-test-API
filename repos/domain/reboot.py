@@ -8,6 +8,7 @@ import time
 import libvirt
 from libvirt import libvirtError
 
+import sharedmod
 from utils import utils
 
 required_params = ('guestname',)
@@ -24,13 +25,12 @@ def reboot(params):
     domain_name = params['guestname']
 
     # Connect to local hypervisor connection URI
-    uri = params['uri']
     hypervisor = utils.get_hypervisor()
     if hypervisor == "kvm":
         logger.info("kvm hypervisor doesn't support the funtion now")
         return 0
 
-    conn = libvirt.open(uri)
+    conn = sharedmod.libvirtobj['conn']
     domobj = conn.lookupByName(domain_name)
 
     # Get domain ip
@@ -45,16 +45,12 @@ def reboot(params):
 
     # Reboot domain
     try:
-        try:
-            domobj = reboot(0)
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
-                         % (e.message, e.get_error_code()))
-            logger.error("fail to reboot domain")
-            return 1
-    finally:
-        conn.close()
-        logger.info("closed hypervisor connection")
+        domobj = reboot(0)
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
+        logger.error("fail to reboot domain")
+        return 1
 
     logger.info("the vm %s is power off" % domain_name)
 
