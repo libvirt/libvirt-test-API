@@ -7,10 +7,8 @@ import mimetypes
 
 import libvirt
 
-import sharedmod
-
-required_params = ('guestname', 'screen', 'filename',)
-optional_params = ()
+required_params = ('guestname', 'filename',)
+optional_params = ('screen',)
 
 def saver(stream, data, file_):
     return file_.write(data)
@@ -25,7 +23,8 @@ def screenshot(params):
     dom = conn.lookupByName(params['guestname'])
 
     st = conn.newStream(0)
-    mime = dom.screenshot(st, params['screen'], 0)
+    screen = params.get('screen', 0)
+    mime = dom.screenshot(st, int(screen), 0)
 
     ext = mimetypes.guess_extension(mime) or '.ppm'
     filename = params['filename'] + ext
