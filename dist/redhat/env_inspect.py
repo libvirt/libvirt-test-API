@@ -14,109 +14,127 @@
 # distribution and at <http://www.gnu.org/licenses>.
 #
 # Filename: envinspect.py
-# Summary: To generate a callable class for clearing testing environment
-# Description: The module match the reference of clearing function
-#              from each testcase to the corresponding testcase's
-#              argument in the order of testcase running
+# Description: check the testing environment and state of libvirt as well
+#
 
-import subprocess
+import commands
+import libvirt
+import sharedmod
 
-def childprocess(pcmd, acmd):
-    P1 = subprocess.Popen(pcmd, stdout = subprocess.PIPE)
-    P2 = subprocess.Popen(acmd, stdin = P1.stdout, stdout =subprocess.PIPE)
-    out = P2.communicate()[0].strip()
-    rc = P2.returncode
-
-    if rc == 0:
-        return out
+def check_libvirt(logger):
+    virsh = 'virsh -v'
+    status, output = commands.getstatusoutput(virsh)
+    if status:
+        logger.error(output)
+        return 1
     else:
-        return ""
+        logger.info("    Virsh command line tool of libvirt: %s" % output)
 
-def get_libvirt_ver():
-    ver = childprocess(['rpm', '-qa'], ['egrep', "^libvirt-[0-9]"])
-    if ver == "":
-        return 100, "No libvirt installed"
+    libvirtd = 'libvirtd --version'
+    status, output = commands.getstatusoutput(libvirtd)
+    logger.info("    %s" % output)
+    if status:
+        return 1
+
+    default_uri = 'virsh uri'
+    status, output = commands.getstatusoutput(default_uri)
+    if status:
+        logger.error(output)
+        return 1
     else:
-        return 0, ver
+        logger.info("    Default URI: %s" % output.strip())
 
-def get_libvirt_pyth_ver():
-    ver = childprocess(['rpm', '-qa'], ['egrep', "^libvirt-python-[0-9]"])
-    if ver == "":
-        return 100, "No libvirt-python installed"
-    else:
-        return 0, ver
+    if 'qemu' in output:
+        for qemu in ['/usr/bin/qemu-kvm', '/usr/libexec/qemu-kvm', 'kvm']:
+            QEMU = '%s --version' % qemu
+            status, output = commands.getstatusoutput(QEMU)
+            if not status:
+                logger.info("    %s" % output)
+                break
+        if status:
+            logger.error("    no qemu-kvm found")
+            return 1
+    elif 'xen' in output:
+        #TODO need to get xen hypervisor info here
+        pass
 
-def get_libvirt_cli_ver():
-    ver = childprocess(['rpm', '-qa'], ['egrep', "^libvirt-client-[0-9]"])
-    if ver == "":
-        return 100, "No libvirt-client installed"
-    else:
-        return 0, ver
+    return 0
 
-def get_qemu_kvm_ver():
-    ver = childprocess(['rpm', '-qa'], ['egrep', "qemu-kvm-[0-9]"])
-    if ver == "":
-        return 150, "No qemu-kvm installed"
-    else:
-        return 0, ver
+def hostinfo(logger):
+    command = 'uname -a'
+    status, output = commands.getstatusoutput(command)
+    logger.info("    %s" % output)
+    if status:
+        return 1
+    return 0
 
-def get_kernel_ver():
-    ver = childprocess(['rpm', '-qa'], ['egrep', "^kernel-[0-9]"])
-    if ver == "":
-        return 100, "No kernel installed"
-    else:
-        return 0, ver
+def request_credentials(credentials, user_data):
+    for credential in credentials:
+        if credential[0] == libvirt.VIR_CRED_AUTHNAME:
+            credential[4] = user_data[0]
 
+            if len(credential[4]) == 0:
+                credential[4] = credential[3]
+        elif credential[0] == libvirt.VIR_CRED_PASSPHRASE:
+            credential[4] = user_data[1]
+        else:
+            return -1
+
+    return 0
+
+def sharemod_init(env_parser, logger):
+    """ get connection object from libvirt module
+        initialize sharemod for use by testcases
+    """
+    uri = env_parser.get_value('variables', 'defaulturi')
+    username = env_parser.get_value('variables', 'username')
+    password = env_parser.get_value('variables', 'password')
+    user_data = [username, password]
+    auth = [[libvirt.VIR_CRED_AUTHNAME, libvirt.VIR_CRED_PASSPHRASE], request_credentials, user_data]
+    conn = libvirt.openAuth(uri, auth, 0)
+    if not conn:
+        logger.error("Failed to setup libvirt connection");
+        return 1
+
+    # initialize conn object in sharedmod
+    sharedmod.libvirtobj.clear()
+    sharedmod.data.clear()
+    sharedmod.libvirtobj['conn'] = conn
+    return 0
 
 class EnvInspect(object):
     """to check and collect the testing enviroment infomation
        before performing testing
     """
 
-    def __init__(self, logger):
+    def __init__(self, env_parser, logger):
         self.logger = logger
+        self.env_parser = env_parser
 
     def env_checking(self):
-        flag = 0
-        result = ""
-        if get_libvirt_ver()[0] == 100:
-            result = NOTOK
-            flag = 1
-        else:
-            result = OK
-        self.logger.info("    %-36s%-6s" % (get_libvirt_ver()[1], result))
+        if hostinfo(self.logger):
+            return 1
 
-        if get_libvirt_pyth_ver()[0] == 100:
-            result = NOTOK
-            flag = 1
-        else:
-            result = OK
-        self.logger.info("    %-36s%-6s" % (get_libvirt_pyth_ver()[1], result))
+        if check_libvirt(self.logger):
+            return 1
 
-        if get_libvirt_cli_ver()[0] == 100:
-            result = NOTOK
-            flag = 1
-        else:
-            result = OK
-        self.logger.info("    %-36s%-6s" % (get_libvirt_cli_ver()[1], result))
+        if sharemod_init(self.env_parser, self.logger):
+            return 1
 
-        if get_qemu_kvm_ver()[0] == 150 and flag == 0:
-            flag = 0
-        elif get_qemu_kvm_ver()[0] == 150 and flag == 1:
-            flag = 1
-        else:
-            pass
-        self.logger.info("    %-36s%-6s" % (get_qemu_kvm_ver()[1], OK))
+        return 0
 
-        if get_kernel_ver()[0] == 100:
-            result = NOTOK
-            flag = 1
-        else:
-            result = OK
-        self.logger.info("    %-36s%-6s" % (get_kernel_ver()[1], result))
+    def close_hypervisor_connection(self):
+        conn = sharedmod.libvirtobj.get('conn', None)
+        if conn:
+            # conn probably is invalid pointer
+            # that means the connection is closed
+            # If so we ignore the error here
+            try:
+                conn.close()
+                conn = None
+            except:
+                pass
 
-        return flag
-
-
-OK = "ok"
-NOTOK = "not ok"
+        sharedmod.libvirtobj.clear()
+        sharedmod.data.clear()
+        return 0

@@ -20,6 +20,7 @@
 import time
 import fcntl
 import sys
+import os
 import traceback
 
 import mapper
@@ -30,7 +31,6 @@ from utils import env_parser
 # Import of distribution-specific code.  If this is needed somewhere
 # else in the future, please don't copy-paste this, but create some
 # sensible distribution-specific package
-import os
 for dist in os.listdir('dist'):
     if os.path.exists('/etc/%s-release' % dist):
         exec('from dist.%s import env_inspect' % dist)
@@ -119,7 +119,7 @@ class FuncGen(object):
         start_time = time.strftime("%Y-%m-%d %H:%M:%S")
 
         env_logger.info("Checking Testing Environment... ")
-        envck = env_inspect.EnvInspect(env_logger)
+        envck = env_inspect.EnvInspect(self.env, env_logger)
 
         if envck.env_checking() == 1:
             sys.exit(1)
@@ -157,15 +157,6 @@ class FuncGen(object):
             clean_ret = -1
             try:
                 try:
-                    # Get default uri from env.cfg, if the uri is defined in
-                    # case config file, the value will be overrode.
-                    if 'uri' not in case_params:
-                        case_params['uri'] = self.env.get_value("variables", "defaulturi")
-                    if 'username' not in case_params:
-                        case_params['username'] = self.env.get_value("variables", "username")
-                    if 'password' not in case_params:
-                        case_params['password'] = self.env.get_value("variables", "password")
-
                     if case_ref_name != 'sleep':
                         case_params['logger'] = case_logger
 
@@ -211,6 +202,8 @@ class FuncGen(object):
                     else:
                         self.fmt.print_string(21*" " + "Fail", env_logger)
 
+        # close hypervisor connection
+        envck.close_hypervisor_connection()
         end_time = time.strftime("%Y-%m-%d %H:%M:%S")
 
         env_logger.info("\nSummary:")
