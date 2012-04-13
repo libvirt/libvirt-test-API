@@ -10,6 +10,8 @@ import libvirt
 required_params = ('guestname', 'filename',)
 optional_params = ('screen',)
 
+last_filename = None
+
 def saver(stream, data, file_):
     return file_.write(data)
 
@@ -27,7 +29,7 @@ def screenshot(params):
     mime = dom.screenshot(st, int(screen), 0)
 
     ext = mimetypes.guess_extension(mime) or '.ppm'
-    filename = params['filename'] + ext
+    last_filename = params['filename'] + ext
     f = file(filename, 'w')
 
     logger.debug('Saving screenshot into %s' % filename)
@@ -37,3 +39,7 @@ def screenshot(params):
     ret = st.finish()
 
     return ret
+
+def cleanup(params):
+    if last_filename:
+        os.remove(last_filename)
