@@ -142,8 +142,3 @@ def restart(params):
                      libvirtd restart" % guestname)
 
     return 0
-
-def restart_clean(params):
-    """ clean testing environment """
-    pass
-

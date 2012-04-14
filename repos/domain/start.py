@@ -96,7 +96,3 @@ def start(params):
 
     logger.info("PASS")
     return 0
-
-def start_clean(params):
-    """ clean testing environment """
-    pass

@@ -147,17 +147,3 @@ def multiple_thread_block_on_domain_create(params):
 
     conn.close()
     return 0
-
-
-
-
-
-
-
-
-
-
-
-
-
-

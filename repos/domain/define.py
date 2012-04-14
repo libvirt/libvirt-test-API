@@ -92,7 +92,3 @@ def define(params):
         return 1
 
     return 0
-
-def define_clean(params):
-    """ clean testing environment """
-    pass

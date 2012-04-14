@@ -241,7 +241,3 @@ def eventhandler(params):
 
     loop_stop(conn)
     return 0
-
-def eventhandler_clean(params):
-    """cleanup the testing environment"""
-    pass

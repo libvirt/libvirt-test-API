@@ -61,7 +61,3 @@ def suspend(params):
 
     logger.info('PASS')
     return 0
-
-def suspend_clean(params):
-    """ clean testing environment """
-    pass

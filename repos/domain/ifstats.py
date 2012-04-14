@@ -81,7 +81,3 @@ def ifstats(params):
         return 1
 
     return 0
-
-def ifstats_clean(params):
-    """ clean testing environment """
-    pass

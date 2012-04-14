@@ -43,7 +43,3 @@ def undefine(params):
         return 1
 
     return 0
-
-def undefine_clean(params):
-    """ clean testing environment """
-    pass

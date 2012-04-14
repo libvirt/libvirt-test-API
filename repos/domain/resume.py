@@ -57,7 +57,3 @@ def resume(params):
 
     logger.info("PASS")
     return 0
-
-def resume_clean(params):
-    """ clean testing environment """
-    pass

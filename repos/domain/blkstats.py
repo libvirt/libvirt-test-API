@@ -66,7 +66,3 @@ def blkstats(params):
         return 1
 
     return 0
-
-def blkstats_clean(params):
-    """ clean testing environment """
-    pass

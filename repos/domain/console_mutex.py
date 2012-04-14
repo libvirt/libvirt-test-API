@@ -87,7 +87,3 @@ def console_mutex(params):
         logger.info("Done")
 
     return ret
-
-def console_mutex_clean(params):
-    """clean testing environment"""
-    pass

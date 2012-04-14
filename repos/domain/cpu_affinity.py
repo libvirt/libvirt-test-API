@@ -280,7 +280,3 @@ def cpu_affinity(params):
     if retflag:
         return 1
     return 0
-
-def cpu_affinity_clean(params):
-    """ clean testing environment """
-    pass

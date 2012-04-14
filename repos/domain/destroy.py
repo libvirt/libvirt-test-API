@@ -91,7 +91,3 @@ def destroy(params):
             return 1
 
     return 0
-
-def destroy_clean(params):
-    """ clean testing environment """
-    pass

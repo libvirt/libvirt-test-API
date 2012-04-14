@@ -99,7 +99,3 @@ def attach_disk(params):
         return 1
 
     return 0
-
-def attach_disk_clean(params):
-    """ clean testing environment """
-    pass

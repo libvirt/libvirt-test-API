@@ -88,7 +88,3 @@ def flag_check(params):
         return 0
 
     return 0
-
-def flag_check_clean(params):
-    """ clean testing environment """
-    return 0

@@ -84,6 +84,3 @@ def build_dir_pool(params):
         return 1
 
     return 0
-
-def build_dir_pool_clean(params):
-    pass

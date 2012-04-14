@@ -85,7 +85,3 @@ def restore(params):
         return 1
 
     return 0
-
-def restore_clean(params):
-    """ clean the testing environment """
-    pass

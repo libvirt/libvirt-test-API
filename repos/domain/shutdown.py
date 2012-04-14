@@ -69,7 +69,3 @@ def shutdown(params):
         logger.info("domain %s shutdown successfully" % domname)
 
     return 0
-
-def shutdown_clean(params):
-    """ clean the testing environment """
-    pass

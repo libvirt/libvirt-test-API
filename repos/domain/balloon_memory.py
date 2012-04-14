@@ -259,7 +259,3 @@ def balloon_memory(params):
     if count:
         return 1
     return 0
-
-def balloon_memory_clean(params):
-    """ clean testing environment """
-    pass

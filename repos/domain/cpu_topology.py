@@ -199,8 +199,3 @@ def cpu_topology(params):
        return 1
 
     return 0
-
-def cpu_topology_clean(params):
-    """clean testing enviorment"""
-    return 0
-

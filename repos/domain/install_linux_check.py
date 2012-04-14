@@ -180,8 +180,3 @@ def install_linux_check(params):
             return Test_Result
 
     return Test_Result
-
-def install_linux_check_clean(params):
-    """ clean testing environment """
-    pass
-

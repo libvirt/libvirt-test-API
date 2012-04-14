@@ -88,7 +88,3 @@ def file_flag(params):
         logger.info("making flag in guest %s succeeded" % guestname)
 
     return 0
-
-def file_flag_clean(params):
-    """ clean testing environment """
-    return 0
