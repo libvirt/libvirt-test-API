@@ -61,7 +61,7 @@ class FuncGen(object):
         self.env = env_parser.Envparser("env.cfg")
 
         mapper_obj = mapper.Mapper(activity)
-        pkg_casename_func = mapper_obj.package_casename_func_map()
+        pkg_casename_func = mapper_obj.module_casename_func_map()
 
         for test_procedure in pkg_casename_func:
             log_xml_parser.add_testprocedure_xml(testrunid,

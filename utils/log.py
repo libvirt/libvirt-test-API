@@ -56,6 +56,9 @@ class CaseLog(Log):
         self.logger.setLevel(logging.DEBUG)
         super(CaseLog, self).__init__(logname, loglevel)
 
+    def __del__(self):
+        self.logger.handlers = []
+
     def case_log(self):
         """Initialize log file"""
         fmt = {'file_formatter':
@@ -93,6 +96,9 @@ class EnvLog(Log):
         self.logger = logging.getLogger(logname + "_env")
         self.logger.setLevel(logging.DEBUG)
         super(EnvLog, self).__init__(logname, loglevel)
+
+    def __del__(self):
+        self.logger.handlers = []
 
     def env_log(self):
         """Initialize log file"""

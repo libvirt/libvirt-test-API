@@ -22,10 +22,12 @@ import copy
 class Mapper(object):
 
     def __init__(self, testcases_list):
-        self.testcases_list = copy.deepcopy(testcases_list)
+        self.testcases_list = testcases_list
 
-    def package_casename_func_map(self):
-        """ Remove the package information to form a new dictionary """
+    def module_casename_func_map(self):
+        """ generate a new list of dictionary
+            change key from module:casename to module:casename:func
+        """
         tripped_cases_list = []
         prev_testcasename = ''
         prev_testcases_params = ''
@@ -56,8 +58,10 @@ class Mapper(object):
 
         return tripped_cases_list
 
-    def clean_package_casename_func_map(self):
-        """get testcase function maping without cleaning ones """
+    def module_casename_cleanfunc_map(self):
+        """generate a new data format
+           keys of dictionay are of module:casename:casename_clean
+        """
         tripped_cases_list = []
         for testcase in self.testcases_list:
             tripped_case = {}

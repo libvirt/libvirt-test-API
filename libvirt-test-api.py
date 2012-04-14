@@ -205,6 +205,7 @@ class Main(object):
                     logname = log.Log.get_log_name()
                     logfile = os.path.join('log/%s' % testrunid, logname)
                     env_clear.EnvClear(cases_clearfunc_ref_dict, activity, logfile, self.loglevel)()
+                print "Done"
             elif options_list[0]['options']["cleanup"] == "disable":
                 pass
             else:
