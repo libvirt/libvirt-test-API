@@ -30,7 +30,7 @@ class EnvClear(object):
         self.loglevel = loglevel
 
         mapper_obj = mapper.Mapper(activity)
-        clean_pkg_casename_func = mapper_obj.clean_package_casename_func_map()
+        clean_pkg_casename_func = mapper_obj.module_casename_cleanfunc_map()
 
         self.cases_ref_names = []
         for case in clean_pkg_casename_func:
@@ -47,7 +47,7 @@ class EnvClear(object):
         return retflag
 
     def env_clear(self):
-        """ Run each clearing function with the corresponding arguments """
+        """ Run each clean function with the corresponding arguments """
 
         envlog = log.EnvLog(self.logfile, self.loglevel)
         logger = envlog.env_log()
@@ -60,8 +60,7 @@ class EnvClear(object):
             case_params = self.cases_params_list[i]
 
             case_params['logger'] = logger
-            self.cases_clearfunc_ref_dict[case_ref_name](case_params)
-
-        del envlog
+            if self.cases_clearfunc_ref_dict.has_key(case_ref_name):
+                self.cases_clearfunc_ref_dict[case_ref_name](case_params)
 
         return 0

@@ -85,12 +85,13 @@ class Proxy(object):
             var_func_names = dir(casemod_ref)
 
             key = module + ':' + casename + ':' + func
+
+            # the clean function is optional, we get its reference
+            # only if it exists in testcases
             if func in var_func_names:
                 func_ref = getattr(casemod_ref, func)
                 func_dict[key] = func_ref
-            else:
-                raise exception.TestCaseError("clean function not found in %s" % \
-                                              (func, testcase_name))
+
         return func_dict
 
     def get_params_variables(self):
