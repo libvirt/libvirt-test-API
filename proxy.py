@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# libvirt-test-API is copyright 2010 Red Hat, Inc.
+# libvirt-test-API is copyright 2010, 2012 Red Hat, Inc.
 #
 # libvirt-test-API is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
@@ -37,12 +37,13 @@ class Proxy(object):
             casename = elements[1]
 
             casemod_ref = self.get_call_dict(module, casename)
-            self.testcase_ref_dict[testcase_name] = casemod_ref
+            modcase = module + ':' + casename
+            self.testcase_ref_dict[modcase] = casemod_ref
 
-    def get_func_call_dict(self):
-        """Return running function reference dictionary """
+    def get_func_call_dict(self, unique_testcase_keys):
+        """get reference to functions defined in testcase file """
         func_dict = {}
-        for testcase_name in self.testcases_names:
+        for testcase_name in unique_testcase_keys:
             # Get module, casename
             elements = testcase_name.split(':')
             module = elements[0]
@@ -55,16 +56,21 @@ class Proxy(object):
                 flag = elements[2]
                 func = casename + flag
 
-            casemod_ref = self.testcase_ref_dict[testcase_name]
+            # use modcase key to get the reference to corresponding
+            # testcase module
+            modcase = module + ':' + casename
+            casemod_ref = self.testcase_ref_dict[modcase]
             var_func_names = dir(casemod_ref)
 
-            key = module + ':' + casename + ':' + func
+            key = modcase + ':' + func
+            # check if the expected function is present in
+            # the list of string name from dir()
             if func in var_func_names:
                 func_ref = getattr(casemod_ref, func)
                 func_dict[key] = func_ref
             else:
                 raise exception.TestCaseError("function %s not found in %s" % \
-                                              (func, testcase_name))
+                                              (func, modcase))
         return func_dict
 
     def get_clearfunc_call_dict(self):

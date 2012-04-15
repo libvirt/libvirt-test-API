@@ -112,20 +112,18 @@ class Main(object):
 
         unique_testcases = filterobj.unique_testcases()
 
+        # __import__ TESTCASE.py once for duplicate testcase names
+        proxy_obj = proxy.Proxy(unique_testcases)
+
         # check the options to each testcase in case config file
-        casechk = CaseCfgCheck(unique_testcases, activities_list)
+        casechk = CaseCfgCheck(proxy_obj, activities_list)
         if casechk.check():
             return 1
 
         # get a list of unique testcase
         # with 'clean' flag appended to its previous testcase
         unique_testcase_keys = filterobj.unique_testcase_cleansuffix()
-
-        # call and initilize proxy component to
-        # get a list of reference of testcases
-        proxy_obj = proxy.Proxy(unique_testcase_keys)
-
-        cases_func_ref_dict = proxy_obj.get_func_call_dict()
+        cases_func_ref_dict = proxy_obj.get_func_call_dict(unique_testcase_keys)
 
         # create a null list, then, initilize generator to
         # get the callable testcase function

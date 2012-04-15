@@ -18,13 +18,10 @@ import proxy
 
 class CaseCfgCheck(object):
     """validate the options in testcase config file"""
-    def __init__(self, unique_testcases, activities_list):
-        self.unique_testcases = unique_testcases
-
+    def __init__(self, proxy_obj, activities_list):
         # XXX to check the first testcase list in activities_list
         self.activity = activities_list[0]
 
-        proxy_obj = proxy.Proxy(self.unique_testcases)
         self.case_params = proxy_obj.get_params_variables()
 
     def check(self):
