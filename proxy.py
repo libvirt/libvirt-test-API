@@ -120,6 +120,23 @@ class Proxy(object):
                       ("required_params or optional_params not found in %s" % testcase_name)
         return case_params
 
+    def has_clean_function(self, testcase_name):
+        """ Return true if the testcase have clean function
+        """
+        if testcase_name not in self.testcases_names:
+            return False
+
+        elements = testcase_name.split(':')
+        casename = elements[1]
+        func = casename + '_clean'
+
+        casemod_ref = self.testcase_ref_dict[testcase_name]
+        var_func_names = dir(casemod_ref)
+
+        if func in var_func_names:
+            return True
+        return False
+
     def get_call_dict(self, module, casename, func = None):
         """ Return testing function reference dictionary """
         case_abs_path = '%s.%s.%s' % ('repos', module, casename)

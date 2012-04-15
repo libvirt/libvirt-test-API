@@ -35,6 +35,7 @@ def usage():
     print "Usage: libvirt_test_api.py <OPTIONS> <ARGUS>"
     print "\noptions: -h, --help : Display usage information \
            \n         -c, --casefile: Specify configuration file \
+           \n         -t, --template: Print testcase config file template \
            \n         -f, --logxml: Specify log file with type xml \
            \n         -l, --log-level: 0 or 1 currently \
            \n         -d, --delete-log: Delete log items \
@@ -45,6 +46,7 @@ def usage():
     print "example: \
            \n         python libvirt-test-api.py -l 0|1 -c TEST.CONF    \
            \n         python libvirt-test-api.py -c TEST.CONF -f TEST.XML \
+           \n         python libvirt-test-api.py -t repos/domain/start.py ... \
            \n         python libvirt-test-api.py -m TESTONE.XML TESTTWO.XML \
            \n         python libvirt-test-api.py -d TEST.XML TESTRUNID TESTID \
            \n         python libvirt-test-api.py -d TEST.XML TESTRUNID \
@@ -215,6 +217,41 @@ class Main(object):
             return 1
         return 0
 
+    def print_casefile(self, testcases):
+        """print testcase file template"""
+        modcasename = []
+        for case in testcases:
+            if not os.path.isfile(case) or not case.endswith('.py'):
+                print "testcase %s couldn't be recognized" % case
+                return 1
+
+            paths = case.split('/')
+            modcasename.append(paths[1] + ':' + paths[2][:-3])
+
+        proxy_obj = proxy.Proxy(modcasename)
+        case_params = proxy_obj.get_params_variables()
+
+        string = "# the file is generated automatically, please\n" \
+                 "# make some modifications before the use of it\n" \
+                 "# params in [] are optional to its testcase\n"
+        for key in modcasename:
+            string += "%s\n" % key
+            required_params, optional_params = case_params[key]
+            for p in required_params:
+                string += " " * 4  + p + "\n"
+                string += " " * 8 + p.upper() + "\n"
+            for p in optional_params:
+                string += " " * 4 + "[" + p + "]\n"
+                string += " " * 8 + p.upper() + "\n"
+
+            if proxy_obj.has_clean_function(key):
+                string += "clean\n"
+
+            string += "\n"
+
+        print string
+        return 0
+
     def remove_log(self, testrunid, testid = None):
         """  to remove log item in the log xmlfile """
         log_xml_parser = LogXMLParser(self.logxml)
@@ -274,8 +311,8 @@ if __name__ == "__main__":
     loglevel = 0
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hc:l:dmr",
-                    ["help", "casefile=", "logxml=",
+        opts, args = getopt.getopt(sys.argv[1:], "hc:tl:dmr",
+                    ["help", "casefile=", "template", "logxml=",
                     "delete-log=", "merge=", "rerun="])
     except getopt.GetoptError, err:
         print str(err)
@@ -288,6 +325,14 @@ if __name__ == "__main__":
             sys.exit(0)
         if o == "-c" or o == "--casefile":
             casefile = v
+        if o == "-t" or o == "--template":
+            if len(args) <= 0:
+                usage()
+                sys.exit(1)
+            main = Main('', '', '', '')
+            if main.print_casefile(args):
+                sys.exit(1)
+            sys.exit(0)
         if o == "-f" or o == "--logxml":
             logxml = v
         if o == "-l" or o == "--log-level":
