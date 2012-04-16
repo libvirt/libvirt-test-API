@@ -59,7 +59,7 @@ class Format(object):
         if flag == 1:
             result = 'FAIL'
             console_result = '\033[1;31mFAIL\033[1;m'
-        if flag == 100:
+        if flag == 2:
             result = 'Skip'
             console_result = '\033[1;38mSkip\033[1;m'
 

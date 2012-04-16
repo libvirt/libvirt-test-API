@@ -31,17 +31,17 @@ class EnvClear(object):
         self.loglevel = loglevel
 
         mapper_obj = mapper.Mapper(activity)
-        clean_pkg_casename_func = mapper_obj.module_casename_cleanfunc_map()
+        mod_casename_func = mapper_obj.module_casename_func_noflag()
 
-        self.cases_ref_names = []
-        for case in clean_pkg_casename_func:
-            case_ref_name = case.keys()[0]
-            self.cases_ref_names.append(case_ref_name)
+        self.case_name_list = []
+        for case in mod_casename_func:
+            mod_case_func = case.keys()[0]
+            self.case_name_list.append(mod_case_func)
 
-        self.cases_params_list = []
-        for case in clean_pkg_casename_func:
+        self.case_params_list = []
+        for case in mod_casename_func:
             case_params = case.values()[0]
-            self.cases_params_list.append(case_params)
+            self.case_params_list.append(case_params)
 
     def __call__(self):
         retflag = self.env_clear()
@@ -53,15 +53,15 @@ class EnvClear(object):
         envlog = log.EnvLog(self.logfile, self.loglevel)
         logger = envlog.env_log()
 
-        testcase_number = len(self.cases_ref_names)
+        testcase_number = len(self.case_name_list)
 
         for i in range(testcase_number):
 
-            case_ref_name = self.cases_ref_names[i]
-            case_params = self.cases_params_list[i]
+            mod_case_func = self.case_name_list[i]
+            case_params = self.case_params_list[i]
 
             case_params['logger'] = logger
-            if self.cases_clearfunc_ref_dict.has_key(case_ref_name):
-                self.cases_clearfunc_ref_dict[case_ref_name](case_params)
+            if self.cases_clearfunc_ref_dict.has_key(mod_case_func):
+                self.cases_clearfunc_ref_dict[mod_case_func](case_params)
 
         return 0
