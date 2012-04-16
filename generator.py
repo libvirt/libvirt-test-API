@@ -40,18 +40,19 @@ for dist in os.listdir('dist'):
 class FuncGen(object):
     """ To generate a callable testcase"""
     def __init__(self, cases_func_ref_dict,
+                 cases_checkfunc_ref_dict,
                  activity, logfile,
                  testrunid, testid,
                  log_xml_parser, lockfile,
                  bugstxt, loglevel):
         self.cases_func_ref_dict = cases_func_ref_dict
+        self.cases_checkfunc_ref_dict = cases_checkfunc_ref_dict
         self.logfile = logfile
         self.testrunid = testrunid
         self.testid = testid
         self.lockfile = lockfile
         self.bugstxt = bugstxt
         self.loglevel = loglevel
-        self.testcase_number = 0
 
         self.fmt = format.Format(logfile)
         self.log_xml_parser = log_xml_parser
@@ -62,23 +63,21 @@ class FuncGen(object):
         self.env = env_parser.Envparser("env.cfg")
 
         mapper_obj = mapper.Mapper(activity)
-        pkg_casename_func = mapper_obj.module_casename_func_map()
+        case_list = mapper_obj.module_casename_func_map()
 
-        for test_procedure in pkg_casename_func:
+        for test_procedure in case_list:
             log_xml_parser.add_testprocedure_xml(testrunid,
                                                  testid,
                                                  test_procedure)
-        self.cases_ref_names = []
-        for case in pkg_casename_func:
-            case_ref_name = case.keys()[0]
-            if case_ref_name[-6:] != "_clean":
-                self.testcase_number += 1
-            self.cases_ref_names.append(case_ref_name)
+        self.case_name_list = []
+        for case in case_list:
+            mod_case_func = case.keys()[0]
+            self.case_name_list.append(mod_case_func)
 
-        self.cases_params_list = []
-        for case in pkg_casename_func:
+        self.case_params_list = []
+        for case in case_list:
             case_params = case.values()[0]
-            self.cases_params_list.append(case_params)
+            self.case_params_list.append(case_params)
 
     def __call__(self):
         retflag = self.generator()
@@ -116,7 +115,7 @@ class FuncGen(object):
 
         envlog = log.EnvLog(self.logfile, self.loglevel)
         env_logger = envlog.env_log()
-        loop_number = len(self.cases_ref_names)
+        casenumber = len(self.case_name_list)
         start_time = time.strftime("%Y-%m-%d %H:%M:%S")
 
         env_logger.info("Checking Testing Environment... ")
@@ -126,92 +125,96 @@ class FuncGen(object):
             sys.exit(1)
         else:
             env_logger.info("\nStart Testing:")
-            env_logger.info("    Case Count: %s" % self.testcase_number)
+            env_logger.info("    Case Count: %s" % casenumber)
             env_logger.info("    Log File: %s\n" % self.logfile)
 
         caselog = log.CaseLog(self.logfile, self.loglevel)
         case_logger = caselog.case_log()
 
-        retflag = 0
-        for i in range(loop_number):
+        # retflag: [pass, fail, skip]
+        retflag = [0, 0, 0]
+        for i in range(casenumber):
 
-            case_ref_name = self.cases_ref_names[i]
-            pkg_casename = case_ref_name.rsplit(":", 1)[0]
-            funcname = case_ref_name.rsplit(":", 1)[-1]
+            clean_flag = False
 
-            if "_clean" not in funcname:
-                cleanoper = 0
-            else:
-                cleanoper = 1
+            mod_case_func = self.case_name_list[i]
+            mod_case = mod_case_func.rsplit(":", 1)[0]
+            if mod_case_func.endswith(':clean'):
+                mod_case_func = mod_case_func[:-6]
+                clean_flag = True
 
+            self.fmt.print_start(mod_case, env_logger)
 
-            if not cleanoper:
-                self.fmt.print_start(pkg_casename, env_logger)
-            else:
-                self.fmt.print_string(12*" " + "Cleaning...", env_logger)
+            case_params = self.case_params_list[i]
+            case_params['logger'] = case_logger
 
-            case_params = self.cases_params_list[i]
+            if self.cases_checkfunc_ref_dict.has_key(mod_case_func):
+                if self.cases_checkfunc_ref_dict[mod_case_func](case_params):
+                    case_logger.info("Failed to meet testing requirement")
+                    self.fmt.print_end(mod_case, 2, env_logger)
+                    retflag[2] += 1
+                    continue
 
             case_start_time = time.strftime("%Y-%m-%d %H:%M:%S")
 
-            ret = -1
-            clean_ret = -1
+            ret = 0
             try:
                 try:
-                    if case_ref_name != 'sleep':
-                        case_params['logger'] = case_logger
-
-                    existed_bug_list = self.bug_check(pkg_casename)
+                    existed_bug_list = self.bug_check(mod_case)
 
                     if len(existed_bug_list) == 0:
-                        if case_ref_name == 'sleep':
-                            sleepsecs = case_params['sleep']
+                        if mod_case_func == 'sleep':
+                            sleepsecs = case_params.get('sleep', 0)
                             case_logger.info("sleep %s seconds" % sleepsecs)
                             time.sleep(int(sleepsecs))
                             ret = 0
                         else:
-                            ret = self.cases_func_ref_dict[case_ref_name](case_params)
-                            if cleanoper:
-                                clean_ret = ret
-                                ret = 0
+                            ret = self.cases_func_ref_dict[mod_case_func](case_params)
+                            # In the case where testcase return -1 on error
+                            if ret < 0: ret = 1
+
+                            if clean_flag:
+                                clean_func = mod_case_func + '_clean'
+                                self.fmt.print_string(12*" " + "Cleaning...", env_logger)
+                                # the return value of clean function is optional
+                                clean_ret = self.cases_func_ref_dict[clean_func](case_params)
+                                if clean_ret and clean_ret == 1:
+                                    self.fmt.print_string(21*" " + "Fail", env_logger)
+                                    continue
+
+                                self.fmt.print_string(21*" " + "Done", env_logger)
+
                     else:
                         case_logger.info("about the testcase , bug existed:")
                         for existed_bug in existed_bug_list:
                             case_logger.info("%s" % existed_bug)
 
-                        ret = 100
-                        self.fmt.print_end(pkg_casename, ret, env_logger)
+                        # use 2 to represent skip value
+                        ret = 2
                         continue
                 except Exception, e:
                     case_logger.error(traceback.format_exc())
                     continue
             finally:
                 case_end_time = time.strftime("%Y-%m-%d %H:%M:%S")
-                if ret == -1:
-                    ret = 1
-                elif ret == 100:
-                    retflag += 0
-                else:
-                    pass
-                retflag += ret
+                if ret == 0:
+                    retflag[0] += 1
+                elif ret == 1:
+                    retflag[1] += 1
+                elif ret == 2:
+                    retflag[2] += 1
 
-                if not cleanoper:
-                    self.fmt.print_end(pkg_casename, ret, env_logger)
-                else:
-                    if clean_ret < 1:
-                        self.fmt.print_string(21*" " + "Done", env_logger)
-                    else:
-                        self.fmt.print_string(21*" " + "Fail", env_logger)
+                self.fmt.print_end(mod_case, ret, env_logger)
 
         # close hypervisor connection
         envck.close_hypervisor_connection()
         end_time = time.strftime("%Y-%m-%d %H:%M:%S")
 
         env_logger.info("\nSummary:")
-        env_logger.info("    Total:%s [Pass:%s Fail:%s]" % \
-                     (self.testcase_number, (self.testcase_number - retflag), retflag))
+        env_logger.info("    Total:%s [Pass:%s Fail:%s Skip:%s]" % \
+                     (casenumber, retflag[0], retflag[1], retflag[2]))
 
-        result = (retflag and "FAIL") or "PASS"
+        result = (retflag[1] and "FAIL") or "PASS"
         fcntl.lockf(self.lockfile.fileno(), fcntl.LOCK_EX)
         self.log_xml_parser.add_test_summary(self.testrunid,
                                              self.testid,
@@ -220,7 +223,7 @@ class FuncGen(object):
                                              end_time,
                                              self.logfile)
         fcntl.lockf(self.lockfile.fileno(), fcntl.LOCK_UN)
-        return retflag
+        return retflag[1]
 
     def __case_info_save(self, case, testrunid):
         """ Save data of each test into a file under the testrunid directory
