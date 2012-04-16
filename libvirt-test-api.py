@@ -126,6 +126,9 @@ class Main(object):
         unique_testcase_keys = filterobj.unique_testcase_cleansuffix()
         cases_func_ref_dict = proxy_obj.get_func_call_dict(unique_testcase_keys)
 
+        # get check function reference if that is defined in testcase file
+        cases_checkfunc_ref_dict = proxy_obj.get_optionalfunc_call_dict('check')
+
         # create a null list, then, initilize generator to
         # get the callable testcase function
         # and put it into procs list for running.
@@ -143,6 +146,7 @@ class Main(object):
             else:
                 logfile = os.path.join('log/%s' % testrunid, logname)
             procs.append(generator.FuncGen(cases_func_ref_dict,
+                                           cases_checkfunc_ref_dict,
                                            activity,
                                            logfile,
                                            testrunid,
@@ -200,7 +204,7 @@ class Main(object):
         if options_list[0]['options'].has_key("cleanup"):
             if options_list[0]['options']["cleanup"] == "enable":
                 print "Clean up Testing Environment..."
-                cases_clearfunc_ref_dict = proxy_obj.get_clearfunc_call_dict()
+                cases_clearfunc_ref_dict = proxy_obj.get_optionalfunc_call_dict('clean')
                 log.Log.counter = 0
                 for activity in activities_list:
                     logname = log.Log.get_log_name()
