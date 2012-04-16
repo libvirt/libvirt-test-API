@@ -23,10 +23,10 @@
 import exception
 
 class Proxy(object):
-    """ The Proxy class is used for getting real function call reference """
+    """ The Proxy class is used for getting function reference """
 
     def __init__(self, testcases_names):
-        """ Argument case_list is test case list """
+        """ initialize a list of references to testcases module """
         self.testcases_names = testcases_names
         self.testcase_ref_dict = {}
 
@@ -75,8 +75,8 @@ class Proxy(object):
                                               (func, modcase))
         return func_dict
 
-    def get_clearfunc_call_dict(self):
-        """ Return a clearing function reference dictionary. """
+    def get_optionalfunc_call_dict(self, suffix):
+        """ get optional function that is present in testcase"""
         func_dict = {}
         for testcase_name in self.testcases_names:
             # Get module, casename
@@ -87,14 +87,15 @@ class Proxy(object):
 
             module = elements[0]
             casename = elements[1]
-            func = casename + '_clean'
+            func = casename + '_' + suffix
 
-            casemod_ref = self.testcase_ref_dict[testcase_name]
+            modcase = module + ':' + casename
+            key = modcase + ':' + casename
+
+            casemod_ref = self.testcase_ref_dict[modcase]
             var_func_names = dir(casemod_ref)
 
-            key = module + ':' + casename + ':' + func
-
-            # the clean function is optional, we get its reference
+            # function is optional, we get its reference
             # only if it exists in testcases
             if func in var_func_names:
                 func_ref = getattr(casemod_ref, func)
@@ -116,16 +117,17 @@ class Proxy(object):
             module = elements[0]
             casename = elements[1]
 
-            casemod_ref = self.testcase_ref_dict[testcase_name]
+            modcase = module + ':' + casename
+            casemod_ref = self.testcase_ref_dict[modcase]
             var_func_names = dir(casemod_ref)
 
             if 'required_params' in var_func_names \
                and 'optional_params' in var_func_names:
-                case_params[testcase_name] = \
+                case_params[modcase] = \
                     [casemod_ref.required_params, casemod_ref.optional_params]
             else:
                 raise exception.TestCaseError\
-                      ("required_params or optional_params not found in %s" % testcase_name)
+                      ("required_params or optional_params not found in %s" % modcase)
         return case_params
 
     def has_clean_function(self, testcase_name):
