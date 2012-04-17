@@ -26,7 +26,6 @@ sys.path.append("../utils")
 
 import xml.dom.minidom
 import utils
-import check
 import commands
 
 def domain_xml(params, install = False):
