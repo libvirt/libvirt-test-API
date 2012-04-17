@@ -82,7 +82,6 @@ def install_linux_check(params):
     domain_name=guestname
     blk_type=params['hdmodel']
     nic_type=params['nicmodel']
-    chk = check.Check()
     Test_Result = 0
 
     # Ping guest from host
@@ -96,9 +95,9 @@ def install_linux_check(params):
 
     # Creat file and read file in guest.
     logger.info("check point2: creat and read dirctory/file in guest")
-    if chk.create_dir(ipaddr, "root", "redhat") == 0:
+    if check.create_dir(ipaddr, "root", "redhat") == 0:
         logger.info("create dir - /tmp/test successfully")
-        if chk.write_file(ipaddr, "root", "redhat") == 0:
+        if check.write_file(ipaddr, "root", "redhat") == 0:
             logger.info("write and read file: /tmp/test/test.log successfully")
         else:
             logger.error("Error: fail to write/read file - /tmp/test/test.log")
@@ -115,7 +114,7 @@ def install_linux_check(params):
     vcpunum_expect = int(utils.get_num_vcpus(domain_name))
     logger.info("vcpu number in domain config xml - %s is %s" % \
                  (domain_name, vcpunum_expect))
-    vcpunum_actual = int(chk.get_remote_vcpus(ipaddr, "root", "redhat"))
+    vcpunum_actual = int(check.get_remote_vcpus(ipaddr, "root", "redhat"))
     logger.info("The actual vcpu number in guest - %s is %s" %
                  (domain_name, vcpunum_actual))
     if vcpunum_expect == vcpunum_actual:
@@ -133,7 +132,7 @@ def install_linux_check(params):
     mem_expect = utils.get_size_mem(domain_name)
     logger.info("current mem size in domain config xml - %s is %s" %
                  (domain_name, mem_expect))
-    mem_actual = chk.get_remote_memory(ipaddr, "root", "redhat")
+    mem_actual = check.get_remote_memory(ipaddr, "root", "redhat")
     logger.info("The actual mem size in guest - %s is %s" %
                 (domain_name, mem_actual))
     diff_range = int(mem_expect) * 0.07
@@ -156,7 +155,7 @@ def install_linux_check(params):
     envparser = env_parser.Envparser(envfile)
     file_url = envparser.get_value("other", "wget_url")
 
-    if chk.run_wget_app(ipaddr, "root", "redhat", file_url, logger) == 0:
+    if check.run_wget_app(ipaddr, "root", "redhat", file_url, logger) == 0:
         logger.info("run wget successfully in guest.")
     else:
         logger.error("Error: fail to run wget in guest")
@@ -167,9 +166,9 @@ def install_linux_check(params):
     if 'kvm' in guesttype or 'xenfv' in guesttype:
         logger.info("check point6: check nic and blk driver in guest is \
                      expected as your config:")
-        if chk.validate_remote_nic_type(ipaddr, "root", "redhat",
+        if check.validate_remote_nic_type(ipaddr, "root", "redhat",
            nic_type, logger) == 0 and \
-           chk.validate_remote_blk_type(ipaddr, "root", "redhat",
+           check.validate_remote_blk_type(ipaddr, "root", "redhat",
                                         blk_type, logger) == 0:
             logger.info("nic type - %s and blk type - %s check successfully" %
                        (nic_type, blk_type))

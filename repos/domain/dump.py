@@ -35,8 +35,6 @@ def check_guest_kernel(*args):
     """Check guest kernel version"""
     (guestname, logger) = args
 
-    chk = check.Check()
-
     mac = utils.get_dom_mac_addr(guestname)
     logger.debug("guest mac address: %s" %mac)
 
@@ -47,7 +45,7 @@ def check_guest_kernel(*args):
 
     logger.debug("guest ip address: %s" %ipaddr)
 
-    kernel = chk.get_remote_kernel(ipaddr, "root", "redhat")
+    kernel = check.get_remote_kernel(ipaddr, "root", "redhat")
     logger.debug("current kernel version: %s" %kernel)
 
     if kernel:

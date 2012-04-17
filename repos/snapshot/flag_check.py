@@ -44,7 +44,6 @@ def flag_check(params):
     else:
         expected_result = "exist"
 
-    chk = check.Check()
     conn = sharedmod.libvirtobj['conn']
 
     if not check_domain_running(conn, guestname, logger):
@@ -70,7 +69,7 @@ def flag_check(params):
         logger.info("vm %s failed to get ip address" % guestname)
         return 1
 
-    ret = chk.remote_exec_pexpect(ipaddr, username, password, FLAG_CHECK)
+    ret = check.remote_exec_pexpect(ipaddr, username, password, FLAG_CHECK)
     if ret == "TIMEOUT!!!":
         logger.error("connecting to guest OS timeout")
         return 1

@@ -33,9 +33,9 @@ def check_domain_running(conn, guestname, logger):
     else:
         return True
 
-def make_flag(chk, ipaddr, username, password, logger):
+def make_flag(ipaddr, username, password, logger):
     """ enter guest OS, create a file in /tmp folder """
-    ret = chk.remote_exec_pexpect(ipaddr, username, password, MAKE_FLAG)
+    ret = check.remote_exec_pexpect(ipaddr, username, password, MAKE_FLAG)
     if ret == "TIMEOUT!!!":
         logger.error("connecting to guest OS timeout")
         return False
@@ -55,7 +55,6 @@ def file_flag(params):
     username = params['username']
     password = params['password']
 
-    chk = check.Check()
     conn = sharedmod.libvirtobj['conn']
 
     if not check_domain_running(conn, guestname, logger):
@@ -81,7 +80,7 @@ def file_flag(params):
         logger.info("vm %s failed to get ip address" % guestname)
         return 1
 
-    if not make_flag(chk, ipaddr, username, password, logger):
+    if not make_flag(ipaddr, username, password, logger):
         logger.error("making flag in guest %s failed" % guestname)
         return 1
     else:
