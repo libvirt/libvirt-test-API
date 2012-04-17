@@ -14,12 +14,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
-
-#
 #
 # This module matches the reference of clearing function from each testcase
 # to the corresponding testcase's argument in the order of testcase running
-#
 
 import mapper
 from utils import log

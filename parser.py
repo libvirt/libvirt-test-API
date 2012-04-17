@@ -14,11 +14,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
-
-#
 #
 # This module is for configuration file parsing, to generate a case list.
-#
 
 import re
 import os

@@ -14,12 +14,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
-
-#
 #
 # This module to initilize log module and match testcase function from
 # proxy with corresponding argument to form a callable function.
-#
 
 import time
 import fcntl

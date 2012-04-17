@@ -14,8 +14,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
-
-#
 #
 # Filename: XMLParser.py
 # Summary: parse and xml document into a python dictionary

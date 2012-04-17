@@ -14,11 +14,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
-
-#
 #
 # Generate a list of callable function references.
-
+#
 # The proxy examines the list of unique test cases, received from the
 # generator and import each test case from appropriate module directory.
 
