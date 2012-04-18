@@ -45,7 +45,7 @@ def check_guest_kernel(*args):
 
     logger.debug("guest ip address: %s" %ipaddr)
 
-    kernel = check.get_remote_kernel(ipaddr, "root", "redhat")
+    kernel = utils.get_remote_kernel(ipaddr, "root", "redhat")
     logger.debug("current kernel version: %s" %kernel)
 
     if kernel:

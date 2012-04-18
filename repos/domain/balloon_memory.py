@@ -23,7 +23,7 @@ def get_mem_size(ip):
 
     username = 'root'
     password = 'redhat'
-    current_memory = check.get_remote_memory(ip, username, password)
+    current_memory = utils.get_remote_memory(ip, username, password)
     return current_memory
 
 def compare_memory(expect_memory, actual_memory):

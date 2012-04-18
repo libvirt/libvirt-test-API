@@ -10,7 +10,6 @@ from libvirt import libvirtError
 
 from src import sharedmod
 from utils import utils
-from utils import check
 
 required_params = ('guestname', 'username', 'password',)
 optional_params = ('expectedret')
@@ -69,7 +68,7 @@ def flag_check(params):
         logger.info("vm %s failed to get ip address" % guestname)
         return 1
 
-    ret = check.remote_exec_pexpect(ipaddr, username, password, FLAG_CHECK)
+    ret = utils.remote_exec_pexpect(ipaddr, username, password, FLAG_CHECK)
     if ret == "TIMEOUT!!!":
         logger.error("connecting to guest OS timeout")
         return 1
