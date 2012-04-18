@@ -46,14 +46,14 @@ def usage():
 
 
     print "example: \
-           \n         python libvirt-test-api -l 0|1 -c TEST.CONF    \
-           \n         python libvirt-test-api -c TEST.CONF -f TEST.XML \
-           \n         python libvirt-test-api -t repos/domain/start.py ... \
-           \n         python libvirt-test-api -m TESTONE.XML TESTTWO.XML \
-           \n         python libvirt-test-api -d TEST.XML TESTRUNID TESTID \
-           \n         python libvirt-test-api -d TEST.XML TESTRUNID \
-           \n         python libvirt-test-api -d TEST.XML all \
-           \n         python libvirt-test-api -f TEST.XML \
+           \n         libvirt-test-api -l 0|1 -c TEST.CONF    \
+           \n         libvirt-test-api -c TEST.CONF -f TEST.XML \
+           \n         libvirt-test-api -t repos/domain/start.py ... \
+           \n         libvirt-test-api -m TESTONE.XML TESTTWO.XML \
+           \n         libvirt-test-api -d TEST.XML TESTRUNID TESTID \
+           \n         libvirt-test-api -d TEST.XML TESTRUNID \
+           \n         libvirt-test-api -d TEST.XML all \
+           \n         libvirt-test-api -f TEST.XML \
 -r TESTRUNID TESTID ..."
 
 def append_path():
