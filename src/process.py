@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 #
+# process.py: Multiple process module
+#
 # Copyright (C) 2010-2012 Red Hat, Inc.
 #
 # libvirt-test-API is free software; you can redistribute it and/or
@@ -14,11 +16,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
-#
-# Filename: process.py
-# Summary: multiprocessing module
-# Description: If the switch of multiprocessing is on,
-#              the module will be called to fork subprocess
 
 import os
 import sys
