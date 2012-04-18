@@ -33,7 +33,7 @@ from activityfilter import Filter
 from casecfgcheck import CaseCfgCheck
 
 def usage():
-    print "Usage: libvirt-test-api.py <OPTIONS> <ARGUMENTS>"
+    print "Usage: libvirt-test-api <OPTIONS> <ARGUMENTS>"
     print "\noptions: -h, --help : Display usage information \
            \n         -c, --casefile: Specify configuration file \
            \n         -t, --template: Print testcase config file template \
@@ -45,14 +45,14 @@ def usage():
 
 
     print "example: \
-           \n         python libvirt-test-api.py -l 0|1 -c TEST.CONF    \
-           \n         python libvirt-test-api.py -c TEST.CONF -f TEST.XML \
-           \n         python libvirt-test-api.py -t repos/domain/start.py ... \
-           \n         python libvirt-test-api.py -m TESTONE.XML TESTTWO.XML \
-           \n         python libvirt-test-api.py -d TEST.XML TESTRUNID TESTID \
-           \n         python libvirt-test-api.py -d TEST.XML TESTRUNID \
-           \n         python libvirt-test-api.py -d TEST.XML all \
-           \n         python libvirt-test-api.py -f TEST.XML \
+           \n         python libvirt-test-api -l 0|1 -c TEST.CONF    \
+           \n         python libvirt-test-api -c TEST.CONF -f TEST.XML \
+           \n         python libvirt-test-api -t repos/domain/start.py ... \
+           \n         python libvirt-test-api -m TESTONE.XML TESTTWO.XML \
+           \n         python libvirt-test-api -d TEST.XML TESTRUNID TESTID \
+           \n         python libvirt-test-api -d TEST.XML TESTRUNID \
+           \n         python libvirt-test-api -d TEST.XML all \
+           \n         python libvirt-test-api -f TEST.XML \
 -r TESTRUNID TESTID ..."
 
 def append_path():
