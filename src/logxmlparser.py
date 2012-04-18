@@ -38,7 +38,7 @@ class LogXMLParser(object):
         """ generate a new log xml file with head if that doesn't exist """
         XMLFILE = open(self.logxml, "w")
         XMLFILE.write('<?xml version="1.0"?><?xml-stylesheet type="text/xsl"\
-                         href="log.xsl"?><log xmlns:xlink= \
+                         href="src/log.xsl"?><log xmlns:xlink= \
                          "http://www.w3.org/1999/xlink"></log>')
         XMLFILE.close()
 

@@ -5,7 +5,7 @@
 <html>
   <head>
       <title>Libvirt testing log</title>
-      <link rel="stylesheet" href="log.css" type="text/css" media="screen" />
+      <link rel="stylesheet" href="src/log.css" type="text/css" media="screen" />
       <script language="javascript">
           <![CDATA[
           var xmlDOc;
