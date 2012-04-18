@@ -44,14 +44,13 @@ class FuncGen(object):
                  activity, logfile,
                  testrunid, testid,
                  log_xml_parser, lockfile,
-                 bugstxt, loglevel):
+                 loglevel):
         self.cases_func_ref_dict = cases_func_ref_dict
         self.cases_checkfunc_ref_dict = cases_checkfunc_ref_dict
         self.logfile = logfile
         self.testrunid = testrunid
         self.testid = testid
         self.lockfile = lockfile
-        self.bugstxt = bugstxt
         self.loglevel = loglevel
 
         self.fmt = format.Format(logfile)
@@ -82,31 +81,6 @@ class FuncGen(object):
     def __call__(self):
         retflag = self.generator()
         return retflag
-
-    def bug_check(self, mod_func_name):
-        """ Check if there was already a bug in bugzilla assocaited with
-            specific testcase
-        """
-        exsited_bug = []
-        bugstxt = open(self.bugstxt, "r")
-        linelist = bugstxt.readlines()
-
-        if len(linelist) == 0:
-            bugstxt.close()
-            return exsited_bug
-
-        for line in linelist:
-            if line.startswith('#'):
-                continue
-            else:
-                casename = line.split(' ', 1)[0]
-                if casename == "casename:" + mod_func_name:
-                    exsited_bug.append(line)
-                else:
-                    pass
-
-        bugstxt.close()
-        return exsited_bug
 
     def generator(self):
         """ Run each test case with the corresponding arguments and
@@ -160,38 +134,26 @@ class FuncGen(object):
             ret = 0
             try:
                 try:
-                    existed_bug_list = self.bug_check(mod_case)
-
-                    if len(existed_bug_list) == 0:
-                        if mod_case_func == 'sleep':
-                            sleepsecs = case_params.get('sleep', 0)
-                            case_logger.info("sleep %s seconds" % sleepsecs)
-                            time.sleep(int(sleepsecs))
-                            ret = 0
-                        else:
-                            ret = self.cases_func_ref_dict[mod_case_func](case_params)
-                            # In the case where testcase return -1 on error
-                            if ret < 0: ret = 1
-
-                            if clean_flag:
-                                clean_func = mod_case_func + '_clean'
-                                self.fmt.print_string(12*" " + "Cleaning...", env_logger)
-                                # the return value of clean function is optional
-                                clean_ret = self.cases_func_ref_dict[clean_func](case_params)
-                                if clean_ret and clean_ret == 1:
-                                    self.fmt.print_string(21*" " + "Fail", env_logger)
-                                    continue
-
-                                self.fmt.print_string(21*" " + "Done", env_logger)
-
+                    if mod_case_func == 'sleep':
+                        sleepsecs = case_params.get('sleep', 0)
+                        case_logger.info("sleep %s seconds" % sleepsecs)
+                        time.sleep(int(sleepsecs))
+                        ret = 0
                     else:
-                        case_logger.info("about the testcase , bug existed:")
-                        for existed_bug in existed_bug_list:
-                            case_logger.info("%s" % existed_bug)
+                        ret = self.cases_func_ref_dict[mod_case_func](case_params)
+                        # In the case where testcase return -1 on error
+                        if ret < 0: ret = 1
 
-                        # use 2 to represent skip value
-                        ret = 2
-                        continue
+                        if clean_flag:
+                            clean_func = mod_case_func + '_clean'
+                            self.fmt.print_string(12*" " + "Cleaning...", env_logger)
+                            # the return value of clean function is optional
+                            clean_ret = self.cases_func_ref_dict[clean_func](case_params)
+                            if clean_ret and clean_ret == 1:
+                                self.fmt.print_string(21*" " + "Fail", env_logger)
+                                continue
+
+                            self.fmt.print_string(21*" " + "Done", env_logger)
                 except Exception, e:
                     case_logger.error(traceback.format_exc())
                     continue

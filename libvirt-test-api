@@ -68,11 +68,10 @@ class Main(object):
     """ The class provides methods to run a new test and manage
         testing log and records
     """
-    def __init__(self, casefile, logxml, loglevel, bugstxt):
+    def __init__(self, casefile, logxml, loglevel):
         self.casefile = casefile
         self.logxml = logxml
         self.loglevel = loglevel
-        self.bugstxt = bugstxt
 
     def run(self, activities_options_list=None):
         """ Run a test instance """
@@ -154,7 +153,6 @@ class Main(object):
                                            testid,
                                            log_xml_parser,
                                            lockfile,
-                                           self.bugstxt,
                                            self.loglevel)
                         )
 
@@ -311,7 +309,6 @@ if __name__ == "__main__":
 
     casefile = "./case.conf"
     logxml = "./log.xml"
-    bugstxt = "./BUGSKIP"
     loglevel = 0
 
     try:
@@ -333,7 +330,7 @@ if __name__ == "__main__":
             if len(args) <= 0:
                 usage()
                 sys.exit(1)
-            main = Main('', '', '', '')
+            main = Main('', '', '')
             if main.print_casefile(args):
                 sys.exit(1)
             sys.exit(0)
@@ -355,7 +352,7 @@ if __name__ == "__main__":
                 usage()
                 sys.exit(1)
 
-            main = Main(casefile, logxml, loglevel, bugstxt)
+            main = Main(casefile, logxml, loglevel)
             main.remove_log(testrunid, testid)
             sys.exit(0)
         if o == "-m" or o == "--merge":
@@ -363,7 +360,7 @@ if __name__ == "__main__":
                 logxml_one = args[0]
                 logxml_two = args[1]
 
-                main = Main(casefile, logxml_one, loglevel, bugstxt)
+                main = Main(casefile, logxml_one, loglevel)
                 main.merge_logxmls(logxml_two)
                 sys.exit(0)
             else:
@@ -379,14 +376,14 @@ if __name__ == "__main__":
                 for testid in args[1:]:
                     testid = int(testid)
                     testid_list.append(testid)
-                main = Main(casefile, logxml, loglevel, bugstxt)
+                main = Main(casefile, logxml, loglevel)
                 main.rerun(testrunid, testid_list)
                 sys.exit(0)
 
     # Add root path of libvirt-test-API into sys.path
     append_path()
 
-    main = Main(casefile, logxml, loglevel, bugstxt)
+    main = Main(casefile, logxml, loglevel)
     if main.run():
         sys.exit(1)
     sys.exit(0)
