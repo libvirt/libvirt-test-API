@@ -33,7 +33,7 @@ from activityfilter import Filter
 from casecfgcheck import CaseCfgCheck
 
 def usage():
-    print "Usage: libvirt_test_api.py <OPTIONS> <ARGUS>"
+    print "Usage: libvirt-test-api.py <OPTIONS> <ARGUMENTS>"
     print "\noptions: -h, --help : Display usage information \
            \n         -c, --casefile: Specify configuration file \
            \n         -t, --template: Print testcase config file template \
