@@ -32,9 +32,9 @@ from utils import env_parser
 # Import of distribution-specific code.  If this is needed somewhere
 # else in the future, please don't copy-paste this, but create some
 # sensible distribution-specific package
-for dist in os.listdir('dist'):
+for dist in os.listdir('src/dist'):
     if os.path.exists('/etc/%s-release' % dist):
-        exec('from dist.%s import env_inspect' % dist)
+        exec('from src.dist.%s import env_inspect' % dist)
         break
 
 class FuncGen(object):
