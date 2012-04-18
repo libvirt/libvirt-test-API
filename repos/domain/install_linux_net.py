@@ -98,7 +98,7 @@ def prepare_cdrom(*args):
 
     if os.path.exists(new_dir):
         logger.info("the folder exists, remove it")
-        shutils.rmtree(new_dir)
+        shutil.rmtree(new_dir)
 
     os.makedirs(new_dir)
     logger.info("the directory is %s" % new_dir)
@@ -112,7 +112,7 @@ def prepare_cdrom(*args):
     urllib.urlretrieve(ks, '%s/%s' % (new_dir, ks_name))[0]
     logger.info("the url of kickstart is %s" % ks)
 
-    shutils.copy('utils/ksiso.sh', new_dir)
+    shutil.copy('utils/ksiso.sh', new_dir)
     src_path = os.getcwd()
 
     logger.info("enter into the workshop folder: %s" % new_dir)
@@ -408,4 +408,4 @@ def install_linux_net_clean(params):
     elif guesttype == 'xenfv':
         guest_dir = os.path.join(HOME_PATH, guestname)
         if os.path.exists(guest_dir):
-            shutils.rmtree(guest_dir)
+            shutil.rmtree(guest_dir)

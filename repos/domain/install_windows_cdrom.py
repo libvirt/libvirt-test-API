@@ -90,7 +90,7 @@ def prepare_floppy_image(guestname, guestos, guestarch,
     floppy_mount = "/mnt/libvirt_floppy"
     if os.path.exists(floppy_mount):
         logger.info("the floppy mount point folder exists, remove it")
-        shutils.rmtree(floppy_mount)
+        shutil.rmtree(floppy_mount)
 
     logger.info("create mount point %s" % floppy_mount)
     os.makedirs(floppy_mount)
@@ -113,7 +113,7 @@ def prepare_floppy_image(guestname, guestos, guestarch,
             setup_file = 'winnt.bat'
             setup_file_path = os.path.join(windows_unattended_path, setup_file)
             setup_file_dest = os.path.join(floppy_mount, setup_file)
-            shutils.copyfile(setup_file_path, setup_file_dest)
+            shutil.copyfile(setup_file_path, setup_file_dest)
             source = os.path.join(windows_unattended_path, "%s_%s.sif" %
                                   (guestos, guestarch))
 

@@ -351,7 +351,7 @@ def tls_setup(params):
     if params.has_key('pkipath'):
         pkipath = params['pkipath']
         if os.path.exists(pkipath):
-            shutils.rmtree(pkipath)
+            shutil.rmtree(pkipath)
 
         os.mkdir(pkipath)
 
@@ -371,7 +371,7 @@ def tls_setup(params):
         return 1
 
     if os.path.exists(TEMP_TLS_FOLDER):
-        shutils.rmtree(TEMP_TLS_FOLDER)
+        shutil.rmtree(TEMP_TLS_FOLDER)
 
     os.mkdir(TEMP_TLS_FOLDER)
 
@@ -413,7 +413,7 @@ def tls_setup(params):
 def tls_setup_clean(params):
     """ cleanup testing enviroment """
     if os.path.exists(TEMP_TLS_FOLDER):
-        shutils.rmtree(TEMP_TLS_FOLDER)
+        shutil.rmtree(TEMP_TLS_FOLDER)
 
     logger = params['logger']
     target_machine = params['target_machine']
@@ -435,7 +435,7 @@ def tls_setup_clean(params):
         logger.error("failed to remove libvirt folder")
 
     os.remove("%s/cacert.pem" % CA_FOLDER)
-    shutils.rmtree(CERTIFICATE_FOLDER)
+    shutil.rmtree(CERTIFICATE_FOLDER)
 
     if auth_tls == 'sasl':
         saslpasswd2_delete = "%s -a libvirt -d %s" % (SASLPASSWD2, username)
