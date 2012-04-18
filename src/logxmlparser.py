@@ -252,4 +252,3 @@ class LogXMLParser(object):
         file = open(logxml, "w")
         xmldoc.writexml(file)
         file.close()
-

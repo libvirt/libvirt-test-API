@@ -53,4 +53,3 @@ class Process:
             else:
                 passnum += 1
         return passnum, failnum
-
