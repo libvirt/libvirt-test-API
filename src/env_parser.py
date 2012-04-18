@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 #
+# env_parser.py: Parser for environment config (env.cfg).
+#
 # Copyright (C) 2010-2012 Red Hat, Inc.
 #
 # libvirt-test-API is free software; you can redistribute it and/or
@@ -14,10 +16,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
-#
-# Filename: env_parser.py
-# Summary: parse the env configuration file
-# Description: The module is a tool to parse the env configuration file
 
 import ConfigParser
 import os

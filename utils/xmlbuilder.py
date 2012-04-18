@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 #
+# xmlbuilder.py: Class for building XML for libvirt objects.
+#
 # Copyright (C) 2010-2012 Red Hat, Inc.
 #
 # libvirt-test-API is free software; you can redistribute it and/or
@@ -14,10 +16,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
-#
-# Filename: xmlbuilder.py
-# Summary: operation for building domain xml
-# Description: The module is to provide operation for building domain xml
 
 __DEBUG__ = False
 

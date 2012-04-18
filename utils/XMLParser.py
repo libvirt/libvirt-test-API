@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 #
+# XMLParser.py: Parse XML document, the result is a python dict.
+#
 # Copyright (C) 2010-2012 Red Hat, Inc.
 #
 # libvirt-test-API is free software; you can redistribute it and/or
@@ -14,11 +16,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
-#
-# Filename: XMLParser.py
-# Summary: parse and xml document into a python dictionary
-# Description: The module is a tool to parses
-# and xml document into a python dictionary
 
 import os
 from xml.dom import minidom

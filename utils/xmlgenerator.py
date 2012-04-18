@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 #
+# xmlgenerator.py: Generate XML for libvirt objects.
+#
 # Copyright (C) 2010-2012 Red Hat, Inc.
 #
 # libvirt-test-API is free software; you can redistribute it and/or
@@ -14,10 +16,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
-#
-# Filename: xmlgenerator.py
-# Summary: generate domain xml
-# Description: The module is a tool to generate domain xml
 
 import os
 import sys
