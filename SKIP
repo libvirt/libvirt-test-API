@@ -1,0 +1,26 @@
+# Skip cases due to existed bug, or lacking of testing environment.
+#
+# The format:
+# {
+#     case: $casename
+#     bugzilla: $bug_uri
+#     reason: $why_to_skip
+# }
+#
+# Fields "case" and "reason" is required, "bug" is optional.
+#
+# Example:
+#
+# Skip case 'cases/foo.conf' due to a bug
+# {
+#     case: "cases/foo.conf",
+#     bug: http://bugzilla.redhat.com/show_bug.cgi?id=809783
+#     reason: "It's bug!",
+# }
+#
+# Skip case due to lacking of testing environment
+#
+# {
+#     case: "cases/bar.conf",
+#     reason: "Lacks of device"
+# }
