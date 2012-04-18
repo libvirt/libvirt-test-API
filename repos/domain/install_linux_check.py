@@ -12,8 +12,8 @@ import libvirt
 from libvirt import libvirtError
 
 from src import sharedmod
+from src import env_parser
 from utils import utils
-from utils import env_parser
 
 required_params = ('guestname', 'guesttype', 'hdmodel', 'nicmodel',)
 optional_params = ('disksize',

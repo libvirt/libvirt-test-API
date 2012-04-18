@@ -14,8 +14,8 @@ import libvirt
 from libvirt import libvirtError
 
 from src import sharedmod
+from src import env_parser
 from utils import utils
-from utils import env_parser
 from utils import xmlbuilder
 
 required_params = ('guestname', 'guesttype', 'guestos', 'guestarch',)

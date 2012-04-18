@@ -25,9 +25,9 @@ import os
 import traceback
 
 from src import mapper
+from src import env_parser
 from utils import log
 from utils import format
-from utils import env_parser
 
 # Import of distribution-specific code.  If this is needed somewhere
 # else in the future, please don't copy-paste this, but create some

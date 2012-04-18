@@ -13,8 +13,8 @@ import libvirt
 from libvirt import libvirtError
 
 from src import sharedmod
+from src import env_parser
 from utils import utils
-from utils import env_parser
 from utils import xmlbuilder
 
 VIRSH_QUIET_LIST = "virsh --quiet list --all|awk '{print $2}'|grep \"^%s$\""
