@@ -8,7 +8,7 @@ import commands
 
 import libvirt
 
-import sharedmod
+from src import sharedmod
 from utils import utils
 
 required_params = ('guestname', 'capshares',)

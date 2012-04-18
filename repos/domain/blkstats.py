@@ -9,7 +9,7 @@ import libxml2
 import libvirt
 from libvirt import libvirtError
 
-import sharedmod
+from src import sharedmod
 
 required_params = ('guestname',)
 optional_params = ()

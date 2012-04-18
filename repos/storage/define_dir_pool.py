@@ -9,7 +9,7 @@ import commands
 import libvirt
 from libvirt import libvirtError
 
-import sharedmod
+from src import sharedmod
 from utils import xmlbuilder
 
 VIRSH_POOLLIST = "virsh --quiet pool-list --all|awk '{print $1}'|grep \"^%s$\""

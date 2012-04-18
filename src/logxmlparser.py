@@ -25,7 +25,7 @@ import copy
 from xml.dom import minidom
 from xml.dom.minidom import Document
 
-import exception
+from src import exception
 
 class LogXMLParser(object):
     """ Generate and parser log xml file

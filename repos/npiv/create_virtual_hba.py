@@ -11,7 +11,7 @@ from utils import xmlbuilder
 import libvirt
 from libvirt import libvirtError
 
-import sharedmod
+from src import sharedmod
 
 required_params = ('wwpn',)
 optional_params = ()

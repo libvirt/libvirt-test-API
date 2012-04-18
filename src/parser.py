@@ -21,10 +21,10 @@ import re
 import os
 import sys
 import copy
-import exception
 import string
 
 from utils import env_parser
+from src import exception
 
 class CaseFileParser(object):
     """ Parser the case configuration file to generate a data list.

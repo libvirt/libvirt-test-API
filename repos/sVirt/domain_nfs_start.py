@@ -13,7 +13,7 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
-import sharedmod
+from src import sharedmod
 from utils import utils
 from shutil import copy
 

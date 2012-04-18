@@ -5,7 +5,7 @@ import libvirt
 from libvirt import libvirtError
 from exception import TestError
 
-import sharedmod
+from src import sharedmod
 
 required_params = ('guestname',)
 optional_params = ('device',)

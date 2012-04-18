@@ -7,7 +7,7 @@ import re
 import libvirt
 from libvirt import libvirtError
 
-import sharedmod
+from src import sharedmod
 from utils import utils
 
 required_params = ('guestname',)

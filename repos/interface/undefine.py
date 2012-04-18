@@ -7,7 +7,7 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
-import sharedmod
+from src import sharedmod
 from utils import xmlbuilder
 
 required_params = ('ifacename',)

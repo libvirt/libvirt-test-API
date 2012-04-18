@@ -10,7 +10,7 @@ import threading
 import libvirt
 from libvirt import libvirtError
 
-import sharedmod
+from src import sharedmod
 
 LoopThread = None
 looping = True

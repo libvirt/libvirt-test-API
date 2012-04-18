@@ -27,7 +27,7 @@ dir = os.path.dirname(sys.modules[__name__].__file__)
 absdir = os.path.abspath(dir)
 sys.path.append(os.path.split(absdir)[0])
 
-import exception
+from src import exception
 
 class Envparser(object):
     def __init__(self, configfile):

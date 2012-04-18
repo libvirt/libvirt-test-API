@@ -11,7 +11,7 @@ import os
 from libvirt import libvirtError
 from exception import TestError
 
-import sharedmod
+from src import sharedmod
 
 required_params = ('guestname',)
 optional_params = ('device', 'timeout', 'input', 'output', 'expect',)

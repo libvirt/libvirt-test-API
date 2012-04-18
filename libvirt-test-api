@@ -22,15 +22,15 @@ import getopt
 import shutil
 import tempfile
 
-import parser
-import proxy
-import generator
-import env_clear
-import process
+from src import parser
+from src import proxy
+from src import generator
+from src import env_clear
+from src import process
 from utils import log
-from logxmlparser import LogXMLParser
-from activityfilter import Filter
-from casecfgcheck import CaseCfgCheck
+from src.logxmlparser import LogXMLParser
+from src.activityfilter import Filter
+from src.casecfgcheck import CaseCfgCheck
 
 def usage():
     print "Usage: libvirt-test-api <OPTIONS> <ARGUMENTS>"

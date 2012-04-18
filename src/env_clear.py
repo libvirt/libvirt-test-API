@@ -18,7 +18,7 @@
 # This module matches the reference of clearing function from each testcase
 # to the corresponding testcase's argument in the order of testcase running
 
-import mapper
+from src import mapper
 from utils import log
 
 class EnvClear(object):

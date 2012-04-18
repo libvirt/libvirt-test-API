@@ -24,7 +24,7 @@ import sys
 import os
 import traceback
 
-import mapper
+from src import mapper
 from utils import log
 from utils import format
 from utils import env_parser
