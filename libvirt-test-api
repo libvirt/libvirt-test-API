@@ -37,7 +37,8 @@ def usage():
     print "\noptions: -h, --help : Display usage information \
            \n         -c, --casefile: Specify configuration file \
            \n         -t, --template: Print testcase config file template \
-           \n         -f, --logxml: Specify log file with type xml \
+           \n         -f, --logxml: Specify log file with type xml,\
+           \n                       defaults to log.xml in current directory \
            \n         -l, --log-level: 0 or 1 currently \
            \n         -d, --delete-log: Delete log items \
            \n         -m, --merge: Merge two log xmlfiles \
