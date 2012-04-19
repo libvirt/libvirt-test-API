@@ -21,6 +21,3 @@ else
    rm -f guestdump.xml
    exit 1
 fi
-
-
-
