@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# logxmlparser.py: Generate output log file in XML format.
+# log_generator.py: Generate output log file in XML format.
 
 # Copyright (C) 2010-2012 Red Hat, Inc.
 #
@@ -24,7 +24,7 @@ from xml.dom.minidom import Document
 
 from src import exception
 
-class Logxml_parser(object):
+class LogGenerator(object):
     """ Generate and parser log xml file
     """
     def __init__(self, logxml):
