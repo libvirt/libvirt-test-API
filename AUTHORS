@@ -1,14 +1,15 @@
+Maintainers and people with commit rights::
 
-The primary contributors:
-
-  Daniel Veillard      <veillard@redhat.com>
   Guannan Ren          <gren@redhat.com>
-  Alex Jia             <ajia@redhat.com>
+  Daniel Veillard      <veillard@redhat.com>
   Osier Yang           <jyang@redhat.com>
-  Nan Zhang            <nzhang@redhat.com>
-  Gurhan Ozen          <gozen@redhat.com>
-  Johnny Liu           <jialiu@redhat.com>
-  Guannan Sun          <gsun@redhat.com>
   Peter Krempa         <pkrempa@redhat.com>
   Martin Kletzander    <mkletzan@redhat.com>
+
+Patches have also been contributed by:
+  Alex Jia             <ajia@redhat.com>
+  Nan Zhang            <nzhang@redhat.com>
+  Johnny Liu           <jialiu@redhat.com>
+  Gurhan Ozen          <gozen@redhat.com>
   XiaoQiang Hu         <xhu@redhat.com>
+  Guannan Sun          <gsun@redhat.com>
