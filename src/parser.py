@@ -35,7 +35,7 @@ class CaseFileParser(object):
         self.missing_variables = []
         self.debug = debug
         self.casefile = casefile
-        self.env = env_parser.Envparser("env.cfg")
+        self.env = env_parser.Envparser("global.cfg")
         self.loop_finish = False
         self.loop_start = 0
         self.loop_end = 0
@@ -210,7 +210,7 @@ class CaseFileParser(object):
                 tripped_valuelist = self.variables_lookup(tripped_valuelist)
                 if len(self.missing_variables) != 0:
                     raise exception.MissingVariable(
-                    "The variables %s referenced in %s could not be found in env.cfg" %
+                    "The variables %s referenced in %s could not be found in global.cfg" %
                         (self.missing_variables, self.casefile))
 
                 tripped_valuename = tripped_valuelist[0]

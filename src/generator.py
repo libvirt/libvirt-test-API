@@ -59,7 +59,7 @@ class FuncGen(object):
         # Save case information to a file in a format
         self.__case_info_save(activity, testrunid)
 
-        self.env = env_parser.Envparser("env.cfg")
+        self.env = env_parser.Envparser("global.cfg")
 
         mapper_obj = mapper.Mapper(activity)
         case_list = mapper_obj.module_casename_func_map()

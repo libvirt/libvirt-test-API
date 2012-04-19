@@ -256,10 +256,10 @@ def install_windows_cdrom(params):
         logger.info("creating disk images file is successful.")
 
     logger.info("get system environment information")
-    envfile = os.path.join(HOME_PATH, 'env.cfg')
+    envfile = os.path.join(HOME_PATH, 'global.cfg')
     logger.info("the environment file is %s" % envfile)
 
-    # Get iso file based on guest os and arch from env.cfg
+    # Get iso file based on guest os and arch from global.cfg
     envparser = env_parser.Envparser(envfile)
     iso_file = envparser.get_value("guest", guestos + '_' + guestarch)
     cdkey = envparser.get_value("guest", "%s_%s_key" % (guestos, guestarch))
@@ -427,7 +427,7 @@ def install_windows_cdrom_clean(params):
     guestos = params.get('guestos')
     guestarch = params.get('guestarch')
 
-    envfile = os.path.join(HOME_PATH, 'env.cfg')
+    envfile = os.path.join(HOME_PATH, 'global.cfg')
     envparser = env_parser.Envparser(envfile)
     iso_file = envparser.get_value("guest", guestos + '_' + guestarch)
 

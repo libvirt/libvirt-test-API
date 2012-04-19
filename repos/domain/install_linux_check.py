@@ -148,7 +148,7 @@ def install_linux_check(params):
     # Check app works fine in guest, such as: wget
     logger.info("check point5: check app works fine in guest, such as: wget")
     logger.info("get system environment information")
-    envfile = os.path.join(HOME_PATH, 'env.cfg')
+    envfile = os.path.join(HOME_PATH, 'global.cfg')
     logger.info("the environment file is %s" % envfile)
 
     envparser = env_parser.Envparser(envfile)

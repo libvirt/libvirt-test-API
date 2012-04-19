@@ -116,7 +116,7 @@ def multiple_thread_block_on_domain_create(params):
     logger.info("the type of hypervisor is %s" % hypervisor)
     logger.debug("the uri to connect is %s" % uri)
 
-    envfile = os.path.join(homepath, 'env.cfg')
+    envfile = os.path.join(homepath, 'global.cfg')
     envparser = env_parser.Envpaser(envfile)
     ostree = envparser.get_value("guest", guestos + "_" + arch)
     ks = envparser.get_value("guest", guestos + "_" + arch +

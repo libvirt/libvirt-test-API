@@ -60,7 +60,7 @@ def install_image(params):
     logger.info("the path of directory of disk images located on is %s" %
                  imgfullpath)
 
-    envfile = os.path.join(HOME_PATH, 'env.cfg')
+    envfile = os.path.join(HOME_PATH, 'global.cfg')
     logger.info("the environment file is %s" % envfile)
 
     envparser = env_parser.Envparser(envfile)

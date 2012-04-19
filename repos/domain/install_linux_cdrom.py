@@ -223,7 +223,7 @@ def install_linux_cdrom(params):
         logger.info("creating disk images file is successful.")
 
     logger.info("get system environment information")
-    envfile = os.path.join(HOME_PATH, 'env.cfg')
+    envfile = os.path.join(HOME_PATH, 'global.cfg')
     logger.info("the environment file is %s" % envfile)
 
     envparser = env_parser.Envparser(envfile)

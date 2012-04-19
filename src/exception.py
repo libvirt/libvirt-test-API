@@ -73,7 +73,7 @@ class CaseConfigfileError(LibvirtException):
 
 class MissingVariable(LibvirtException):
     code = 210
-    message = "Variables missing from env.cfg [variables] section"
+    message = "Variables missing from global.cfg [variables] section"
 
 class TestError(LibvirtException):
     code = 211
