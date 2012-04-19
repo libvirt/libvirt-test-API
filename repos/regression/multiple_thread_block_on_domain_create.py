@@ -21,7 +21,7 @@ from utils import xmlbuilder
 IMAG_PATH = "/var/lib/libvirt/images/"
 DISK_DD = "dd if=/dev/zero of=%s bs=1 count=1 seek=6G"
 
-required_params = ('guestos', 'guestarch', 'guesttype', 'guestnum', 'uri')
+required_params = ('guestos', 'guestarch', 'virt_type', 'guestnum', 'uri')
 optional_params = ()
 
 def request_credentials(credentials, user_data):
@@ -62,7 +62,7 @@ class guest_install(Thread):
 
     def run(self):
         guest_params = {};
-        guest_params['guesttype'] = self.type
+        guest_params['virt_type'] = self.type
         guest_params['guestname'] = self.name
         guest_params['kickstart'] = self.ks
         macaddr = self.utils.get_rand_mac()
@@ -98,7 +98,7 @@ def multiple_thread_block_on_domain_create(params):
     logger = params['logger']
     guestos = params.get('guestos')
     arch = params.get('guestarch')
-    type = params.get('guesttype')
+    type = params.get('virt_type')
     num = params.get('guestnum')
 
     logger.info("the os of guest is %s" % guestos)

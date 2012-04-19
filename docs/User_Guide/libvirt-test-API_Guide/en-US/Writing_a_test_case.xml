@@ -108,7 +108,7 @@ storage:initialize_storage
 domain:install_guest
     guestname
         rhel5u4
-    guesttype
+    virt_type
         xenfv
     memory
         1048576

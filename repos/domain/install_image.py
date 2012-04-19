@@ -17,7 +17,7 @@ from utils import xmlbuilder
 
 HOME_PATH = os.getcwd()
 
-required_params = ('guestname', 'guesttype', 'guestos', 'guestarch',)
+required_params = ('guestname', 'virt_type', 'guestos', 'guestarch',)
 optional_params = ('uuid',
                    'memory',
                    'vcpu',
@@ -34,12 +34,12 @@ def install_image(params):
     params.pop('logger')
 
     guestname = params.get('guestname')
-    guesttype = params.get('guesttype')
+    virt_type = params.get('virt_type')
     guestos = params.get('guestos')
     guestarch = params.get('guestarch')
 
     logger.info("the name of guest is %s" % guestname)
-    logger.info("the type of guest is %s" % guesttype)
+    logger.info("the type of guest is %s" % virt_type)
     logger.info("the os of guest is %s" % guestos)
     logger.info("the arch of guest is %s" % guestarch)
 

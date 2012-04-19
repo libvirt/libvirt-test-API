@@ -67,7 +67,7 @@ class XmlBuilder:
     def build_domain_install(self, params):
         domain = xmlgenerator.domain_xml(params, True)
         self.add_disk(params, domain)
-        if params['guesttype'] != 'xenpv':
+        if params['virt_type'] != 'xenpv':
             if params.has_key('bootcd'):
                 self.add_cdrom(params, domain)
         self.add_interface(params, domain)
@@ -103,7 +103,7 @@ class XmlBuilder:
             print 'Wrong harddisk model.'
 
         disk = xmlgenerator.disk_xml(params)
-        if params['guesttype'] == 'xenpv':
+        if params['virt_type'] == 'xenpv':
             disk.getElementsByTagName("target")[0].setAttribute("dev", "xvdb")
         else:
             disk.getElementsByTagName("target")[0].setAttribute("dev",
@@ -124,7 +124,7 @@ class XmlBuilder:
             print 'Wrong cdrom model.'
 
         cdrom = xmlgenerator.disk_xml(params, True)
-        if params['guesttype'] == 'xenpv':
+        if params['virt_type'] == 'xenpv':
             cdrom.getElementsByTagName("target")[0].setAttribute("dev", "xvdc")
         else:
             cdrom.getElementsByTagName("target")[0].setAttribute("dev",
@@ -202,7 +202,7 @@ if __name__ == "__main__":
     # get disk xml string
     #---------------------
     print '=' * 30, 'disk xml', '=' * 30
-    params['guesttype'] = 'kvm'
+    params['virt_type'] = 'kvm'
     params['guestname'] = 'foo'
     params['hdmodel'] = 'virtio'
 
@@ -212,7 +212,7 @@ if __name__ == "__main__":
     # get cdrom xml string
     #---------------------
     print '=' * 30, 'cdrom xml', '=' * 30
-    params['guesttype'] = 'kvm'
+    params['virt_type'] = 'kvm'
     params['guestname'] = 'foo'
     params['hdmodel'] = 'ide'
     params['bootcd'] = '/tmp/cdrom.img'
@@ -292,7 +292,7 @@ if __name__ == "__main__":
     # get domain xml string
     #-----------------------
     print '=' * 30, 'domain xml', '=' * 30
-    params['guesttype'] = 'kvm'
+    params['virt_type'] = 'kvm'
     params['guestname'] = 'rhel5u4'
     params['memory'] = '1048576'
     params['vcpu'] = '2'
@@ -321,7 +321,7 @@ if __name__ == "__main__":
     # get domain xml string for installation
     #----------------------------------------
     print '=' * 30, 'install domain xml', '=' * 30
-    params['guesttype'] = 'kvm'
+    params['virt_type'] = 'kvm'
     params['guestname'] = 'rhel5u4'
     params['memory'] = '1048576'
     params['vcpu'] = '2'

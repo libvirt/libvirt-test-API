@@ -18,7 +18,7 @@ from src import env_parser
 from utils import utils
 from utils import xmlbuilder
 
-required_params = ('guestname', 'guesttype', 'guestos', 'guestarch',)
+required_params = ('guestname', 'virt_type', 'guestos', 'guestarch',)
 optional_params = ('uuid',
                    'memory',
                    'vcpu',
@@ -159,12 +159,12 @@ def install_linux_cdrom(params):
     params.pop('logger')
 
     guestname = params.get('guestname')
-    guesttype = params.get('guesttype')
+    virt_type = params.get('virt_type')
     guestos = params.get('guestos')
     guestarch = params.get('guestarch')
 
     logger.info("the name of guest is %s" % guestname)
-    logger.info("the type of guest is %s" % guesttype)
+    logger.info("the type of guest is %s" % virt_type)
 
     hypervisor = utils.get_hypervisor()
     conn = sharedmod.libvirtobj['conn']
@@ -235,7 +235,7 @@ def install_linux_cdrom(params):
 
     logger.info('prepare installation...')
 
-    if guesttype == 'xenpv':
+    if virt_type == 'xenpv':
         params['kickstart'] = ks
         vmlinuzpath = os.path.join(ostree, 'isolinux/vmlinuz')
         initrdpath = os.path.join(ostree, 'isolinux/initrd.img')
@@ -248,14 +248,14 @@ def install_linux_cdrom(params):
 
         logger.debug("vmlinuz and initrd.img is located in %s" % BOOT_DIR)
 
-    elif guesttype == 'xenfv' or guesttype == 'kvm':
+    elif virt_type == 'xenfv' or virt_type == 'kvm':
         params['bootcd'] = '%s/custom.iso' % \
                            (os.path.join(HOME_PATH, guestname))
         logger.debug("the bootcd path is %s" % params['bootcd'])
         logger.info("begin to customize the custom.iso file")
         prepare_cdrom(ostree, ks, guestname, logger)
     else:
-        logger.error("unknown guest type: %s" % guesttype)
+        logger.error("unknown virt type: %s" % virt_type)
         return 1
 
     xmlobj = xmlbuilder.XmlBuilder()
@@ -375,7 +375,7 @@ def install_linux_cdrom_clean(params):
     """ clean testing environment """
     logger = params['logger']
     guestname = params.get('guestname')
-    guesttype = params.get('guesttype')
+    virt_type = params.get('virt_type')
 
     hypervisor = utils.get_hypervisor()
     if hypervisor == 'xen':
@@ -408,14 +408,14 @@ def install_linux_cdrom_clean(params):
     if os.path.exists(imgfullpath):
         os.remove(imgfullpath)
 
-    if guesttype == 'xenpv':
+    if virt_type == 'xenpv':
         vmlinuz = os.path.join(BOOT_DIR, 'vmlinuz')
         initrd = os.path.join(BOOT_DIR, 'initrd.img')
         if os.path.exists(vmlinuz):
             os.remove(vmlinuz)
         if os.path.exists(initrd):
             os.remove(initrd)
-    elif guesttype == 'xenfv' or guesttype == 'kvm':
+    elif virt_type == 'xenfv' or virt_type == 'kvm':
         guest_dir = os.path.join(HOME_PATH, guestname)
         if os.path.exists(guest_dir):
             shutil.rmtree(guest_dir)

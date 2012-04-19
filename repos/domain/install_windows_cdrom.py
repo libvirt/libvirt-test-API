@@ -26,7 +26,7 @@ FLOOPY_IMG = "/tmp/floppy.img"
 ISO_MOUNT_POINT = "/mnt/libvirt_windows"
 HOME_PATH = os.getcwd()
 
-required_params = ('guestname', 'guesttype', 'guestos', 'guestarch',)
+required_params = ('guestname', 'virt_type', 'guestos', 'guestarch',)
 optional_params = ('uuid',
                    'memory',
                    'vcpu',
@@ -196,12 +196,12 @@ def install_windows_cdrom(params):
     params.pop('logger')
 
     guestname = params.get('guestname')
-    guesttype = params.get('guesttype')
+    virt_type = params.get('virt_type')
     guestos = params.get('guestos')
     guestarch = params.get('guestarch')
 
     logger.info("the name of guest is %s" % guestname)
-    logger.info("the type of guest is %s" % guesttype)
+    logger.info("the type of guest is %s" % virt_type)
 
     hypervisor = utils.get_hypervisor()
 
@@ -394,7 +394,7 @@ def install_windows_cdrom_clean(params):
     """ clean testing environment """
     logger = params['logger']
     guestname = params.get('guestname')
-    guesttype = params.get('guesttype')
+    virt_type = params.get('virt_type')
 
     hypervisor = utils.get_hypervisor()
     if hypervisor == 'xen':

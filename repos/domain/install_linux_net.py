@@ -18,7 +18,7 @@ from src import env_parser
 from utils import utils
 from utils import xmlbuilder
 
-required_params = ('guestname', 'guesttype', 'guestos', 'guestarch','netmethod',)
+required_params = ('guestname', 'virt_type', 'guestos', 'guestarch','netmethod',)
 optional_params = ('uuid',
                    'memory',
                    'vcpu',
@@ -135,13 +135,13 @@ def install_linux_net(params):
     params.pop('logger')
 
     guestname = params.get('guestname')
-    guesttype = params.get('guesttype')
+    virt_type = params.get('virt_type')
     guestos = params.get('guestos')
     guestarch = params.get('guestarch')
     installmethod = params.get('netmethod')
 
     logger.info("the name of guest is %s" % guestname)
-    logger.info("the type of guest is %s" % guesttype)
+    logger.info("the type of guest is %s" % virt_type)
     logger.info("the installation method is %s" % installmethod)
 
     hypervisor = utils.get_hypervisor()
@@ -211,11 +211,11 @@ def install_linux_net(params):
 
     logger.info('prepare installation...')
 
-    if guesttype == 'xenpv' or guesttype == 'kvm':
+    if virt_type == 'xenpv' or virt_type == 'kvm':
         params['kickstart'] = ks
         params['macaddr'] = macaddr
 
-        if guesttype == 'kvm':
+        if virt_type == 'kvm':
             vmlinuzpath = os.path.join(ostree, 'isolinux/vmlinuz')
             initrdpath = os.path.join(ostree, 'isolinux/initrd.img')
         else:
@@ -230,14 +230,14 @@ def install_linux_net(params):
 
         logger.debug("vmlinuz file is located in /var/lib/libvirt/boot")
         logger.debug("initrd file is located in /var/lib/libvirt/boot")
-    elif guesttype == 'xenfv':
+    elif virt_type == 'xenfv':
         params['bootcd'] = '%s/custom.iso' % \
                            (os.path.join(HOME_PATH, guestname))
         logger.debug("the bootcd path is %s" % params['bootcd'])
         logger.info("begin to customize the custom.iso file")
         prepare_cdrom(ostree, ks, guestname, logger)
     else:
-        logger.error("unknown guest type %s" % guesttype)
+        logger.error("unknown virt type %s" % virt_type)
 
     # Prepare guest installation xml
     xmlobj = xmlbuilder.XmlBuilder()
@@ -365,7 +365,7 @@ def install_linux_net_clean(params):
     """ clean testing environment """
     logger = params['logger']
     guestname = params.get('guestname')
-    guesttype = params.get('guesttype')
+    virt_type = params.get('virt_type')
 
     hypervisor = utils.get_hypervisor()
     if hypervisor == 'xen':
@@ -398,14 +398,14 @@ def install_linux_net_clean(params):
     if os.path.exists(imgfullpath):
         os.remove(imgfullpath)
 
-    if guesttype == 'xenpv' or guesttype == 'kvm':
+    if virt_type == 'xenpv' or virt_type == 'kvm':
         vmlinuz = os.path.join(BOOT_DIR, 'vmlinuz')
         initrd = os.path.join(BOOT_DIR, 'initrd.img')
         if os.path.exists(vmlinuz):
             os.remove(vmlinuz)
         if os.path.exists(initrd):
             os.remove(initrd)
-    elif guesttype == 'xenfv':
+    elif virt_type == 'xenfv':
         guest_dir = os.path.join(HOME_PATH, guestname)
         if os.path.exists(guest_dir):
             shutil.rmtree(guest_dir)

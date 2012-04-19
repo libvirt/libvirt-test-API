@@ -150,7 +150,7 @@ def update_devflag(params):
     if devtype == 'cdrom':
         xmlargs = {}
         xmlargs['guestname'] = guestname
-        xmlargs['guesttype'] = 'kvm'
+        xmlargs['virt_type'] = 'kvm'
         xmlargs['hdmodel'] = 'ide'
         xmlargs['bootcd'] = '/var/lib/libvirt/boot/cdrom.img'
         srcfile = xmlargs['bootcd']

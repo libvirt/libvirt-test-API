@@ -15,11 +15,11 @@ from src import sharedmod
 from src import env_parser
 from utils import utils
 
-required_params = ('guestname', 'guesttype', 'hdmodel', 'nicmodel',)
+required_params = ('guestname', 'virt_type', 'hdmodel', 'nicmodel',)
 optional_params = ('disksize',
                    'memory',
                    'vcpu',
-                   'guesttype',
+                   'virt_type',
                    'imagepath',
                    'ifacetype',
                    'netmethod',
@@ -37,7 +37,7 @@ def install_linux_check(params):
     params.pop('logger')
 
     guestname = params.get('guestname')
-    guesttype = params.get('guesttype')
+    virt_type = params.get('virt_type')
 
     logger.info("the name of guest is %s" % guestname)
 
@@ -162,7 +162,7 @@ def install_linux_check(params):
         return Test_Result
 
     # Check nic and blk driver in guest
-    if 'kvm' in guesttype or 'xenfv' in guesttype:
+    if 'kvm' in virt_type or 'xenfv' in virt_type:
         logger.info("check point6: check nic and blk driver in guest is \
                      expected as your config:")
         if utils.validate_remote_nic_type(ipaddr, "root", "redhat",

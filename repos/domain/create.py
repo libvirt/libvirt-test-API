@@ -16,7 +16,7 @@ from utils import xmlbuilder
 NONE = 0
 START_PAUSED = 1
 
-required_params = ('guestname', 'guesttype',)
+required_params = ('guestname', 'virt_type',)
 optional_params = ('uuid',
                    'memory',
                    'vcpu',

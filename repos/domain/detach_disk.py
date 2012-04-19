@@ -13,7 +13,7 @@ from src import sharedmod
 from utils import utils
 from utils import xmlbuilder
 
-required_params = ('guestname', 'guesttype', 'imagename', 'hdmodel',)
+required_params = ('guestname', 'virt_type', 'imagename', 'hdmodel',)
 optional_params = ()
 
 def check_guest_status(domobj):

@@ -14,7 +14,7 @@ from src import sharedmod
 from utils import utils
 from utils import xmlbuilder
 
-required_params = ('guestname', 'guesttype',)
+required_params = ('guestname', 'virt_type',)
 optional_params = ('uuid',
                    'memory',
                    'vcpu',
@@ -27,18 +27,18 @@ optional_params = ('uuid',
                    'ifacetype',
                    'source',)
 
-def check_define_domain(guestname, guesttype, hostname, username, \
+def check_define_domain(guestname, virt_type, hostname, username, \
                         password, util, logger):
     """Check define domain result, if define domain is successful,
        guestname.xml will exist under /etc/libvirt/qemu/
        and can use virt-xml-validate tool to check the file validity
     """
-    if "kvm" in guesttype:
+    if "kvm" in virt_type:
         path = "/etc/libvirt/qemu/%s.xml" % guestname
-    elif "xen" in guesttype:
+    elif "xen" in virt_type:
         path = "/etc/xen/%s" % guestname
     else:
-        logger.error("unknown guest type")
+        logger.error("unknown virt type")
 
     if hostname:
         cmd = "ls %s" % path
@@ -59,7 +59,7 @@ def define(params):
     """Define a domain from xml"""
     logger = params['logger']
     guestname = params['guestname']
-    guesttype = params['guesttype']
+    virt_type = params['virt_type']
     conn = sharedmod.libvirtobj['conn']
     uri = conn.getURI()
 
@@ -80,7 +80,7 @@ def define(params):
     # Define domain from xml
     try:
         conn.defineXML(dom_xml)
-        if check_define_domain(guestname, guesttype, hostname, \
+        if check_define_domain(guestname, virt_type, hostname, \
                                username, password, util, logger):
             logger.info("define a domain form xml is successful")
         else:

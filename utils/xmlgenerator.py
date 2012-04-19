@@ -30,12 +30,12 @@ def domain_xml(params, install = False):
     domain = xml.dom.minidom.Document()
     domain_element = domain.createElement('domain')
     domain.appendChild(domain_element)
-    if params['guesttype'] == 'xenpv' or params['guesttype'] == 'xenfv':
+    if params['virt_type'] == 'xenpv' or params['virt_type'] == 'xenfv':
         domain_element.setAttribute('type', 'xen')
-    elif params['guesttype'] == 'kvm' or params['guesttype'] == 'qemu':
-        domain_element.setAttribute('type', params['guesttype'])
+    elif params['virt_type'] == 'kvm' or params['virt_type'] == 'qemu':
+        domain_element.setAttribute('type', params['virt_type'])
     else:
-        print 'Wrong guest type was set.'
+        print 'Wrong virt type was set.'
         sys.exit(1)
 
     # <name>
@@ -71,7 +71,7 @@ def domain_xml(params, install = False):
 
     if not install:
         # <bootloader>
-        if params['guesttype'] == 'xenpv':
+        if params['virt_type'] == 'xenpv':
             bootloader_element = domain.createElement('bootloader')
             bootloader_node = domain.createTextNode('/usr/bin/pygrub')
             bootloader_element.appendChild(bootloader_node)
@@ -84,43 +84,43 @@ def domain_xml(params, install = False):
     if not install:
         # <type>
         type_element = domain.createElement('type')
-        if params['guesttype'] == 'xenpv':
+        if params['virt_type'] == 'xenpv':
             type_element.setAttribute('machine', 'xenpv')
             type_node = domain.createTextNode('linux')
-        elif params['guesttype'] == 'xenfv':
+        elif params['virt_type'] == 'xenfv':
             type_element.setAttribute('machine', 'xenfv')
             type_node = domain.createTextNode('hvm')
-        elif params['guesttype'] == 'kvm' or params['guesttype'] == 'qemu':
+        elif params['virt_type'] == 'kvm' or params['virt_type'] == 'qemu':
             type_element.setAttribute('machine', 'pc')
             type_node = domain.createTextNode('hvm')
         else:
-            print 'Wrong guest type was set.'
+            print 'Wrong virt type was set.'
             sys.exit(1)
         type_element.appendChild(type_node)
         os_element.appendChild(type_element)
 
         # <loader>
-        if params['guesttype'] == 'xenfv':
+        if params['virt_type'] == 'xenfv':
             loader_element = domain.createElement('loader')
             loader_node = domain.createTextNode('/usr/lib/xen/boot/hvmloader')
             loader_element.appendChild(loader_node)
             os_element.appendChild(loader_element)
 
         # <boot>
-        if params['guesttype'] != 'xenpv':
+        if params['virt_type'] != 'xenpv':
             boot_element = domain.createElement('boot')
             boot_element.setAttribute('dev', 'hd')
             os_element.appendChild(boot_element)
 
     elif install:
-        if params['guesttype'] == 'xenpv' \
-            or (params['guesttype'] == 'kvm' and not params.has_key('bootcd')) \
-            or (params['guesttype'] == 'qemu' and not params.has_key('bootcd')):
+        if params['virt_type'] == 'xenpv' \
+            or (params['virt_type'] == 'kvm' and not params.has_key('bootcd')) \
+            or (params['virt_type'] == 'qemu' and not params.has_key('bootcd')):
             # <type>
             type_element = domain.createElement('type')
-            if params['guesttype'] == 'xenpv':
+            if params['virt_type'] == 'xenpv':
                 type_node = domain.createTextNode('linux')
-            if params['guesttype'] == 'kvm' or params['guesttype'] == 'qemu':
+            if params['virt_type'] == 'kvm' or params['virt_type'] == 'qemu':
                 type_node = domain.createTextNode('hvm')
             type_element.appendChild(type_node)
             os_element.appendChild(type_element)
@@ -140,21 +140,21 @@ def domain_xml(params, install = False):
             cmdline_node = domain.createTextNode('ks=' + params['kickstart'])
             cmdline_element.appendChild(cmdline_node)
             os_element.appendChild(cmdline_element)
-            if params['guesttype'] != 'xenpv':
+            if params['virt_type'] != 'xenpv':
                 # <boot>
                 boot_element = domain.createElement('boot')
                 boot_element.setAttribute('dev', 'hd')
                 os_element.appendChild(boot_element)
 
-        elif params['guesttype'] == 'xenfv' \
-            or (params['guesttype'] == 'kvm' and params.has_key('bootcd')) \
-            or (params['guesttype'] == 'qemu' and params.has_key('bootcd')):
+        elif params['virt_type'] == 'xenfv' \
+            or (params['virt_type'] == 'kvm' and params.has_key('bootcd')) \
+            or (params['virt_type'] == 'qemu' and params.has_key('bootcd')):
             # <type>
             type_element = domain.createElement('type')
             type_node = domain.createTextNode('hvm')
             type_element.appendChild(type_node)
             os_element.appendChild(type_element)
-            if params['guesttype'] == 'xenfv':
+            if params['virt_type'] == 'xenfv':
                 # <loader>
                 loader_element = domain.createElement('loader')
                 loader_node = domain.createTextNode(
@@ -170,7 +170,7 @@ def domain_xml(params, install = False):
     # </os> -- END
 
     # <features>
-    if params['guesttype'] != 'xenpv':
+    if params['virt_type'] != 'xenpv':
         features_element = domain.createElement('features')
         domain_element.appendChild(features_element)
         acpi_element = domain.createElement('acpi')
@@ -205,7 +205,7 @@ def domain_xml(params, install = False):
 
     # <devices> -- START
     devices_element = domain.createElement('devices')
-#    if params['guesttype'] == 'xenfv':
+#    if params['virt_type'] == 'xenfv':
 #        emulator_element = domain.createElement('emulator')
 #        host_arch = utils.get_host_arch()
 #        if host_arch == 'i386' or host_arch == 'ia64':
@@ -217,7 +217,7 @@ def domain_xml(params, install = False):
 #            sys.exit(1)
 #        emulator_element.appendChild(emulator_node)
 #        devices_element.appendChild(emulator_element)
-#    if params['guesttype'] == 'kvm' or params['guesttype'] == 'qemu':
+#    if params['virt_type'] == 'kvm' or params['virt_type'] == 'qemu':
 #        emulator_element = domain.createElement('emulator')
 #        emulator_node = domain.createTextNode('/usr/libexec/qemu-kvm')
 #        emulator_element.appendChild(emulator_node)
@@ -230,7 +230,7 @@ def domain_xml(params, install = False):
     # <input>
     input_element = domain.createElement('input')
     input_element.setAttribute('type', 'mouse')
-    if params['guesttype'] == 'xenpv':
+    if params['virt_type'] == 'xenpv':
         input_element.setAttribute('bus', 'xen')
     else:
         if params.has_key('inputbus'):
@@ -275,7 +275,7 @@ def disk_xml(params, cdrom = False):
 
     # <driver>
     if not cdrom:
-        if params['guesttype'] == 'kvm' or params['guesttype'] == 'qemu':
+        if params['virt_type'] == 'kvm' or params['virt_type'] == 'qemu':
             driver_element = disk.createElement('driver')
             driver_element.setAttribute('name', 'qemu')
             if params.get('imagetype', None) == None:
@@ -285,19 +285,19 @@ def disk_xml(params, cdrom = False):
                 params['cache'] = 'none'
             driver_element.setAttribute('cache', params['cache'])
             disk_element.appendChild(driver_element)
-        elif params['guesttype'] == 'xenpv' or params['guesttype'] == 'xenfv':
+        elif params['virt_type'] == 'xenpv' or params['virt_type'] == 'xenfv':
             driver_element = disk.createElement('driver')
-            if params['guesttype'] == 'xenpv':
+            if params['virt_type'] == 'xenpv':
                 driver_element.setAttribute('name', 'tap')
                 driver_element.setAttribute('type', 'aio')
-            if params['guesttype'] == 'xenfv':
+            if params['virt_type'] == 'xenfv':
                 driver_element.setAttribute('name', 'file')
             disk_element.appendChild(driver_element)
         else:
-            print 'Unknown guest type.'
+            print 'Unknown virt type.'
             sys.exit(1)
     elif cdrom:
-        if params['guesttype'] == 'xenpv' or params['guesttype'] == 'xenfv':
+        if params['virt_type'] == 'xenpv' or params['virt_type'] == 'xenfv':
             driver_element = disk.createElement('driver')
             driver_element.setAttribute('name', 'file')
             disk_element.appendChild(driver_element)
@@ -350,7 +350,7 @@ def disk_xml(params, cdrom = False):
         print 'Wrong disk target device is specified.'
 
     if not cdrom:
-        if params['guesttype'] == 'xenpv':
+        if params['virt_type'] == 'xenpv':
             target_element.setAttribute('dev', 'xvda')
             target_element.setAttribute('bus', 'xen')
         else:

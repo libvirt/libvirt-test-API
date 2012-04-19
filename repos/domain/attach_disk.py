@@ -15,7 +15,7 @@ from utils import utils
 from utils import xmlbuilder
 
 required_params = ('guestname',
-                   'guesttype',
+                   'virt_type',
                    'imagename',
                    'imagesize',
                    'hdmodel',)
