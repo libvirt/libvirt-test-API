@@ -12,7 +12,7 @@ from libvirt import libvirtError
 
 from src import sharedmod
 from utils import utils
-from utils import xmlbuilder
+from utils import xml_builder
 
 required_params = ('guestname', 'devtype', 'username', 'password',)
 optional_params = ()
@@ -192,7 +192,7 @@ def update_devflag(params):
     guestobj = minidom.parseString(guestxml)
 
     # Generat device XML for original use
-    origxmlobj = xmlbuilder.XmlBuilder()
+    origxmlobj = xml_builder.XmlBuilder()
 
     if devtype == 'cdrom':
         origxmlobj.add_cdrom(xmlargs, guestobj)
@@ -217,7 +217,7 @@ def update_devflag(params):
         return 1
 
     # Generate device XML for updating
-    newxmlobj = xmlbuilder.XmlBuilder()
+    newxmlobj = xml_builder.XmlBuilder()
 
     if devtype == 'cdrom':
         xmlargs['bootcd'] = '/var/lib/libvirt/boot/cdrom-new.img'

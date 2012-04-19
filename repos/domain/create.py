@@ -11,7 +11,7 @@ from libvirt import libvirtError
 
 from src import sharedmod
 from utils import utils
-from utils import xmlbuilder
+from utils import xml_builder
 
 NONE = 0
 START_PAUSED = 1
@@ -43,7 +43,7 @@ def create(params):
 
     conn = sharedmod.libvirtobj['conn']
 
-    xmlobj = xmlbuilder.XmlBuilder()
+    xmlobj = xml_builder.XmlBuilder()
     domain = xmlobj.add_domain(params)
     xmlobj.add_disk(params, domain)
     xmlobj.add_interface(params, domain)

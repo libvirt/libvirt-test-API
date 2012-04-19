@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# xmlbuilder.py: Class for building XML for libvirt objects.
+# xml_builder.py: Class for building XML for libvirt objects.
 #
 # Copyright (C) 2010-2012 Red Hat, Inc.
 #
@@ -21,7 +21,7 @@ __DEBUG__ = False
 
 import os, sys
 import xml.dom.minidom
-import xmlgenerator
+import xml_generator
 
 class XmlBuilder:
     """Operation for building domain xml"""
@@ -29,43 +29,43 @@ class XmlBuilder:
         print doc.toprettyxml()
 
     def add_domain(self, params):
-        domain = xmlgenerator.domain_xml(params)
+        domain = xml_generator.domain_xml(params)
         return domain
 
     def add_disk(self, params, domain):
-        disk = xmlgenerator.disk_xml(params)
+        disk = xml_generator.disk_xml(params)
         disk_node = domain.importNode(disk.childNodes[0], True)
         domain.getElementsByTagName("devices")[0].insertBefore(
         disk_node, domain.getElementsByTagName("console")[0])
 
     def add_floppy(self, params, domain):
-        floppy = xmlgenerator.floppy_xml(params)
+        floppy = xml_generator.floppy_xml(params)
         floppy_node = domain.importNode(floppy.childNodes[0], True)
         domain.getElementsByTagName("devices")[0].insertBefore(
         floppy_node, domain.getElementsByTagName("console")[0])
 
     def add_cdrom(self, params, domain):
-        cdrom = xmlgenerator.disk_xml(params, True)
+        cdrom = xml_generator.disk_xml(params, True)
         cdrom_node = domain.importNode(cdrom.childNodes[0], True)
         domain.getElementsByTagName("devices")[0].insertBefore(
         cdrom_node, domain.getElementsByTagName("console")[0])
 
     def add_interface(self, params, domain):
-        interface = xmlgenerator.interface_xml(params)
+        interface = xml_generator.interface_xml(params)
         interface_node = domain.importNode(interface.childNodes[0], True)
         domain.getElementsByTagName("devices")[0].insertBefore(
         interface_node, domain.getElementsByTagName("console")[0])
         return interface
 
     def add_hostdev(self, params, domain):
-        hostdev = xmlgenerator.hostdev_xml(params)
+        hostdev = xml_generator.hostdev_xml(params)
         hostdev_node = domain.importNode(hostdev.childNodes[0], True)
         domain.getElementsByTagName("devices")[0].insertBefore(
         hostdev_node, domain.getElementsByTagName("console")[0])
         return hostdev
 
     def build_domain_install(self, params):
-        domain = xmlgenerator.domain_xml(params, True)
+        domain = xml_generator.domain_xml(params, True)
         self.add_disk(params, domain)
         if params['virt_type'] != 'xenpv':
             if params.has_key('bootcd'):
@@ -76,7 +76,7 @@ class XmlBuilder:
         return domain.toxml()
 
     def build_domain_install_win(self, params):
-        domain = xmlgenerator.domain_xml(params, True)
+        domain = xml_generator.domain_xml(params, True)
         self.add_disk(params, domain)
         self.add_floppy(params, domain)
         if params.has_key('bootcd'):
@@ -102,7 +102,7 @@ class XmlBuilder:
         else:
             print 'Wrong harddisk model.'
 
-        disk = xmlgenerator.disk_xml(params)
+        disk = xml_generator.disk_xml(params)
         if params['virt_type'] == 'xenpv':
             disk.getElementsByTagName("target")[0].setAttribute("dev", "xvdb")
         else:
@@ -123,7 +123,7 @@ class XmlBuilder:
         else:
             print 'Wrong cdrom model.'
 
-        cdrom = xmlgenerator.disk_xml(params, True)
+        cdrom = xml_generator.disk_xml(params, True)
         if params['virt_type'] == 'xenpv':
             cdrom.getElementsByTagName("target")[0].setAttribute("dev", "xvdc")
         else:
@@ -134,61 +134,61 @@ class XmlBuilder:
         return cdrom.toxml()
 
     def build_floppy(self, params):
-        floppy = xmlgenerator.floppy_xml(params)
+        floppy = xml_generator.floppy_xml(params)
         if __DEBUG__:
             self.write_toxml(floppy)
         return floppy.toxml()
 
     def build_interface(self, params):
-        interface = xmlgenerator.interface_xml(params)
+        interface = xml_generator.interface_xml(params)
         if __DEBUG__:
             self.write_toxml(interface)
         return interface.toxml()
 
     def build_hostdev(self, params):
-        hostdev = xmlgenerator.hostdev_xml(params)
+        hostdev = xml_generator.hostdev_xml(params)
         if __DEBUG__:
             self.write_toxml(hostdev)
         return hostdev.toxml()
 
     def build_pool(self, params):
-        pool = xmlgenerator.pool_xml(params)
+        pool = xml_generator.pool_xml(params)
         if __DEBUG__:
             self.write_toxml(pool)
         return pool.toxml()
 
     def build_volume(self, params):
-        volume = xmlgenerator.volume_xml(params)
+        volume = xml_generator.volume_xml(params)
         if __DEBUG__:
             self.write_toxml(volume)
         return volume.toxml()
 
     def build_network(self, params):
-        network = xmlgenerator.network_xml(params)
+        network = xml_generator.network_xml(params)
         if __DEBUG__:
             self.write_toxml(network)
         return network.toxml()
 
     def build_host_interface(self, params):
-        interface = xmlgenerator.host_iface_xml(params)
+        interface = xml_generator.host_iface_xml(params)
         if __DEBUG__:
             self.write_toxml(interface)
         return interface.toxml()
 
     def build_domain_snapshot(self, params):
-        snapshot = xmlgenerator.snapshot_xml(params)
+        snapshot = xml_generator.snapshot_xml(params)
         if __DEBUG__:
             self.write_toxml(snapshot)
         return snapshot.toxml()
 
     def build_secret(self, params):
-        secret = xmlgenerator.secret_xml(params)
+        secret = xml_generator.secret_xml(params)
         if __DEBUG__:
             self.write_toxml(secret)
         return secret.toxml()
 
     def build_nodedev(self, params):
-        nodedev = xmlgenerator.nodedev_xml(params)
+        nodedev = xml_generator.nodedev_xml(params)
         if __DEBUG__:
             self.write_toxml(nodedev)
         return nodedev.toxml()

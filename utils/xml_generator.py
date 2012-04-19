@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# xmlgenerator.py: Generate XML for libvirt objects.
+# xml_generator.py: Generate XML for libvirt objects.
 #
 # Copyright (C) 2010-2012 Red Hat, Inc.
 #

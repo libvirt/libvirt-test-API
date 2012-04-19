@@ -10,7 +10,7 @@ import libvirt
 from libvirt import libvirtError
 
 from src import sharedmod
-from utils import xmlbuilder
+from utils import xml_builder
 
 VIRSH_POOLLIST = "virsh --quiet pool-list --all|awk '{print $1}'|grep \"^%s$\""
 POOL_STAT = "virsh --quiet pool-list --all|grep \"^%s\\b\" |grep \"inactive\""
@@ -53,7 +53,7 @@ def define_dir_pool(params):
         logger.error("%s storage pool is defined" % poolname)
         return 1
 
-    xmlobj = xmlbuilder.XmlBuilder()
+    xmlobj = xml_builder.XmlBuilder()
     poolxml = xmlobj.build_pool(params)
     logger.debug("storage pool xml:\n%s" % poolxml)
 

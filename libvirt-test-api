@@ -28,7 +28,7 @@ from src import generator
 from src import env_clear
 from src import process
 from utils import log
-from src.logxmlparser import LogXMLParser
+from src.logxmlparser import Logxml_parser
 from src.activityfilter import Filter
 from src.casecfgcheck import CaseCfgCheck
 
@@ -93,7 +93,7 @@ class Main(object):
         testrunid = time.strftime("%Y%m%d%H%M%S")
         os.makedirs('log/%s' %testrunid)
 
-        log_xml_parser = LogXMLParser(self.logxml)
+        log_xml_parser = Logxml_parser(self.logxml)
 
         # If the specified log xmlfile exists, then append the testrun
         # item of this time to the file, if not, create a new log xmlfile
@@ -256,7 +256,7 @@ class Main(object):
 
     def remove_log(self, testrunid, testid = None):
         """  to remove log item in the log xmlfile """
-        log_xml_parser = LogXMLParser(self.logxml)
+        log_xml_parser = Logxml_parser(self.logxml)
 
         # remove a test in a testrun
         if testrunid and testid:
@@ -289,7 +289,7 @@ class Main(object):
 
     def merge_logxmls(self, logxml_two):
         """ to merge two log xml files of log into one"""
-        log_xml_parser = LogXMLParser(self.logxml)
+        log_xml_parser = Logxml_parser(self.logxml)
         log_xml_parser.merge_xmlfiles(logxml_two)
         print "Merge the second log xml file %s to %s successfully " % \
               (logxml_two, self.logxml)

@@ -6,7 +6,7 @@ import sys
 import re
 import commands
 import xml.dom.minidom
-from utils import xmlbuilder
+from utils import xml_builder
 
 import libvirt
 from libvirt import libvirtError
@@ -70,7 +70,7 @@ def create_virtual_hba(params):
         else:
             logger.info("No NPIV capabilities on '%s'" % fc_name)
 
-    xmlobj = xmlbuilder.XmlBuilder()
+    xmlobj = xml_builder.XmlBuilder()
     nodedev_xml = xmlobj.build_nodedev(params)
     logger.debug("node device xml:\n%s" % nodedev_xml)
 

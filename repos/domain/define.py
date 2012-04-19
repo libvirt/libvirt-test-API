@@ -12,7 +12,7 @@ from libvirt import libvirtError
 
 from src import sharedmod
 from utils import utils
-from utils import xmlbuilder
+from utils import xml_builder
 
 required_params = ('guestname', 'virt_type',)
 optional_params = ('uuid',
@@ -70,7 +70,7 @@ def define(params):
     logger.info("define domain on %s" % uri)
 
     # Generate damain xml
-    xml_obj = xmlbuilder.XmlBuilder()
+    xml_obj = xml_builder.XmlBuilder()
     domain = xml_obj.add_domain(params)
     xml_obj.add_disk(params, domain)
     xml_obj.add_interface(params, domain)

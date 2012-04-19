@@ -13,7 +13,7 @@ from libvirt import libvirtError
 from src import sharedmod
 from src import env_parser
 from utils import utils
-from utils import xmlbuilder
+from utils import xml_builder
 
 HOME_PATH = os.getcwd()
 
@@ -72,7 +72,7 @@ def install_image(params):
 
     conn = sharedmod.libvirtobj['conn']
 
-    xmlobj = xmlbuilder.XmlBuilder()
+    xmlobj = xml_builder.XmlBuilder()
     domain = xmlobj.add_domain(params)
 
     xmlobj.add_disk(params, domain)

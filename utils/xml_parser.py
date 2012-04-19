@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# XMLParser.py: Parse XML document, the result is a python dict.
+# xml_parser.py: Parse XML document, the result is a python dict.
 #
 # Copyright (C) 2010-2012 Red Hat, Inc.
 #
@@ -21,8 +21,8 @@ import os
 from xml.dom import minidom
 import StringIO
 
-class XMLParser(object):
-    """Class XMLParser. It parses and xml document into a python dictionary.
+class xml_parser(object):
+    """Class xml_parser. It parses and xml document into a python dictionary.
        The elements of the xml documents will be python dictionary keys. For
        example, the xml document:
           <firstel>firstdata</firstel>
@@ -32,7 +32,7 @@ class XMLParser(object):
        will be parsed into the python dictionary:
          { "firstel":"firstdata" , "secondel":{"subsinsecond":"seconddata"} }
        Then the data can be retrieve as:
-       out = XMLParser.XMLParser().parse(xml)
+       out = xml_parser.xml_parser().parse(xml)
        out["firstel"] (this will be firstdata )
        out["secondel"]["subinsecond"] (this will be seconddata)
 

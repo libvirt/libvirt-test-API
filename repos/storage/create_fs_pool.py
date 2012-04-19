@@ -9,8 +9,8 @@ import libvirt
 from libvirt import libvirtError
 
 from src import sharedmod
-from utils import xmlbuilder
-from utils import XMLParser
+from utils import xml_builder
+from utils import xml_parser
 
 required_params = ('poolname', 'sourcepath', 'pooltype',)
 optional_params = ('sourceformat',)
@@ -30,7 +30,7 @@ def check_pool_create_libvirt(conn, poolname, logger):
 def check_pool_create_OS(poolobj, logger):
     """Check the result of create storage pool on OS level.  """
     poolxml = poolobj.XMLDesc(0)
-    out = XMLParser.XMLParser().parse(poolxml)
+    out = xml_parser.xml_parser().parse(poolxml)
     src_path = out["source"]["device"]["attr"]["path"]
     dest_path = out["target"]["path"]
     logger.info("src path: %s tgt path: %s" % (src_path, dest_path))
@@ -64,7 +64,7 @@ def create_fs_pool(params):
         logger.error("%s storage pool has already been created" % poolname)
         return 1
 
-    xmlobj = xmlbuilder.XmlBuilder()
+    xmlobj = xml_builder.XmlBuilder()
     poolxml = xmlobj.build_pool(params)
     logger.debug("storage pool xml:\n%s" % poolxml)
 

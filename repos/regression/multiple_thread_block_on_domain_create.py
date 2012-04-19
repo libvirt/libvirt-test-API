@@ -16,7 +16,7 @@ from libvirt import libvirtError
 from src import sharedmod
 from utils import utils
 from utils import env_parser
-from utils import xmlbuilder
+from utils import xml_builder
 
 IMAG_PATH = "/var/lib/libvirt/images/"
 DISK_DD = "dd if=/dev/zero of=%s bs=1 count=1 seek=6G"
@@ -76,7 +76,7 @@ class guest_install(Thread):
         else:
             self.logger.info("creating disk images file is successful.")
 
-        xmlobj = xmlbuilder.XmlBuilder()
+        xmlobj = xml_builder.XmlBuilder()
         guestxml = xmlobj.build_domain_install(guest_params)
         self.logger.debug("guestxml is %s" % guestxml)
         self.logger.info('create guest %sfrom xml description' % self.name)

@@ -10,7 +10,7 @@ import libvirt
 from libvirt import libvirtError
 
 from src import sharedmod
-from utils import xmlbuilder
+from utils import xml_builder
 
 required_params = ('networkname',
                    'bridgename',
@@ -49,7 +49,7 @@ def define(params):
         logger.error("%s network is defined" % networkname)
         return 1
 
-    xmlobj = xmlbuilder.XmlBuilder()
+    xmlobj = xml_builder.XmlBuilder()
     netxml = xmlobj.build_network(params)
     logger.debug("network xml:\n%s" % netxml)
 

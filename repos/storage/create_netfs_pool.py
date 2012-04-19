@@ -9,8 +9,8 @@ import libvirt
 from libvirt import libvirtError
 
 from src import sharedmod
-from utils import xmlbuilder
-from utils import XMLParser
+from utils import xml_builder
+from utils import xml_parser
 
 required_params = ('poolname', 'sourcename', 'sourcepath', 'pooltype',)
 optional_params = ('targetpath',)
@@ -36,7 +36,7 @@ def check_pool_create_OS(conn, poolname, logger):
     poolobj = conn.storagePoolLookupByName(poolname)
     poolxml = poolobj.XMLDesc(0)
     # parse the xml to see where this is mounted...
-    out = XMLParser.XMLParser().parse(poolxml)
+    out = xml_parser.xml_parser().parse(poolxml)
     dest_path = out["target"]["path"]
     src_host = out["source"]["host"]["attr"]["name"]
     src_path = out["source"]["dir"]["attr"]["path"]
@@ -71,7 +71,7 @@ def create_netfs_pool(params):
         logger.error("%s storage pool has already been created" % poolname)
         return 1
 
-    xmlobj = xmlbuilder.XmlBuilder()
+    xmlobj = xml_builder.XmlBuilder()
     poolxml = xmlobj.build_pool(params)
     logger.debug("storage pool xml:\n%s" % poolxml)
 

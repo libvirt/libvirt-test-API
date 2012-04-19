@@ -11,7 +11,7 @@ import libvirt
 from libvirt import libvirtError
 
 from src import sharedmod
-from utils import xmlbuilder
+from utils import xml_builder
 
 required_params = ('poolname', 'volname', 'volformat', 'capacity',)
 optional_params = ()
@@ -112,7 +112,7 @@ def create_netfs_volume(params):
                  ouput the volume information in the pool %s" % poolname)
     virsh_vol_list(poolname)
 
-    xmlobj = xmlbuilder.XmlBuilder()
+    xmlobj = xml_builder.XmlBuilder()
     volumexml = xmlobj.build_volume(params)
     logger.debug("volume xml:\n%s" % volumexml)
 

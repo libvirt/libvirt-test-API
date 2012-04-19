@@ -11,7 +11,7 @@ from libvirt import libvirtError
 
 from src import sharedmod
 from utils import utils
-from utils import xmlbuilder
+from utils import xml_builder
 
 required_params = ('guestname',)
 optional_params = ('snapshotname',)
@@ -63,7 +63,7 @@ def internal_create(params):
         logger.error("checking failed")
         return 1
 
-    xmlobj = xmlbuilder.XmlBuilder()
+    xmlobj = xml_builder.XmlBuilder()
     snapshot_xml = xmlobj.build_domain_snapshot(params)
     logger.debug("%s snapshot xml:\n%s" % (guestname, snapshot_xml))
 

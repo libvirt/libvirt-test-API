@@ -8,7 +8,7 @@ import libvirt
 from libvirt import libvirtError
 
 from src import sharedmod
-from utils import xmlbuilder
+from utils import xml_builder
 
 required_params = ('ifacename', 'ifacetype',)
 optional_params = ()
@@ -37,7 +37,7 @@ def define(params):
         logger.error("interface %s have been defined" % ifacename)
         return 1
 
-    xmlobj = xmlbuilder.XmlBuilder()
+    xmlobj = xml_builder.XmlBuilder()
     iface_xml = xmlobj.build_host_interface(params)
     logger.debug("interface xml:\n%s" %iface_xml)
 

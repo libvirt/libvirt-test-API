@@ -9,7 +9,7 @@ import libvirt
 from libvirt import libvirtError
 
 from src import sharedmod
-from utils import xmlbuilder
+from utils import xml_builder
 
 required_params = ('poolname',)
 optional_params = ()

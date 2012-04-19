@@ -16,7 +16,7 @@ from libvirt import libvirtError
 from src import sharedmod
 from src import env_parser
 from utils import utils
-from utils import xmlbuilder
+from utils import xml_builder
 
 required_params = ('guestname', 'virt_type', 'guestos', 'guestarch','netmethod',)
 optional_params = ('uuid',
@@ -50,7 +50,7 @@ def prepare_boot_guest(domobj, dict, logger, installtype):
 
     guestname = params['guestname']
 
-    xmlobj = xmlbuilder.XmlBuilder()
+    xmlobj = xml_builder.XmlBuilder()
     domain = xmlobj.add_domain(params)
 
     xmlobj.add_disk(params, domain)
@@ -240,7 +240,7 @@ def install_linux_net(params):
         logger.error("unknown virt type %s" % virt_type)
 
     # Prepare guest installation xml
-    xmlobj = xmlbuilder.XmlBuilder()
+    xmlobj = xml_builder.XmlBuilder()
     guestxml = xmlobj.build_domain_install(params)
     logger.debug('dump installation guest xml:\n%s' % guestxml)
 

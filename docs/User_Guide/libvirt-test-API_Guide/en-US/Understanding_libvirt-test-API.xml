@@ -197,10 +197,10 @@ repos
       <para><filename>/utils</filename> is a directory which contains various scripts to assist in creating and verifying test cases.</para>
       <!--<itemizedlist>
         <listitem>
-          <para><filename>xmlgenerator.py</filename>XML generator.</para>
+          <para><filename>xml_generator.py</filename>XML generator.</para>
         </listitem>
         <listitem>
-          <para><filename>xmlbuilder.py</filename> builds a virtual machine from an XML file.</para>
+          <para><filename>xml_builder.py</filename> builds a virtual machine from an XML file.</para>
         </listitem>
         <listitem>
           <para>Random MAC address generator. Useful when installing a guest machine.</para>

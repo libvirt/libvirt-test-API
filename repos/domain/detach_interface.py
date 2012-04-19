@@ -11,7 +11,7 @@ from libvirt import libvirtError
 
 from src import sharedmod
 from utils import utils
-from utils import xmlbuilder
+from utils import xml_builder
 
 required_params = ('guestname', 'ifacetype', 'source', 'nicmodel',)
 optional_params = ()
@@ -47,7 +47,7 @@ def detach_interface(params):
     conn = sharedmod.libvirtobj['conn']
     domobj = conn.lookupByName(guestname)
 
-    xmlobj = xmlbuilder.XmlBuilder()
+    xmlobj = xml_builder.XmlBuilder()
     ifacexml = xmlobj.build_interface(params)
     logger.debug("interface xml:\n%s" % ifacexml)
 

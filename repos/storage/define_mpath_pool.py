@@ -8,7 +8,7 @@ import libvirt
 from libvirt import libvirtError
 
 from src import sharedmod
-from utils import xmlbuilder
+from utils import xml_builder
 
 required_params = ('poolname', 'pooltype',)
 optional_params = ('targetpath',)
@@ -50,7 +50,7 @@ def define_mpath_pool(params):
         logger.error("%s storage pool is defined" % poolname)
         return 1
 
-    xmlobj = xmlbuilder.XmlBuilder()
+    xmlobj = xml_builder.XmlBuilder()
     poolxml = xmlobj.build_pool(params)
     logger.debug("storage pool xml:\n%s" % poolxml)
 

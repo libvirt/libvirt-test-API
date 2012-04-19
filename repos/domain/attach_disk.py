@@ -12,7 +12,7 @@ from libvirt import libvirtError
 
 from src import sharedmod
 from utils import utils
-from utils import xmlbuilder
+from utils import xml_builder
 
 required_params = ('guestname',
                    'virt_type',
@@ -68,7 +68,7 @@ def attach_disk(params):
     domobj = conn.lookupByName(guestname)
 
     # Generate disk xml
-    xmlobj = xmlbuilder.XmlBuilder()
+    xmlobj = xml_builder.XmlBuilder()
     diskxml = xmlobj.build_disk(params)
     logger.debug("disk xml:\n%s" %diskxml)
 

@@ -24,7 +24,7 @@ from xml.dom.minidom import Document
 
 from src import exception
 
-class LogXMLParser(object):
+class Logxml_parser(object):
     """ Generate and parser log xml file
     """
     def __init__(self, logxml):

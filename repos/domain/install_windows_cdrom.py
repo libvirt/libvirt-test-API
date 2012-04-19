@@ -15,7 +15,7 @@ from libvirt import libvirtError
 from src import sharedmod
 from src import env_parser
 from utils import utils
-from utils import xmlbuilder
+from utils import xml_builder
 
 VIRSH_QUIET_LIST = "virsh --quiet list --all|awk '{print $2}'|grep \"^%s$\""
 VM_STAT = "virsh --quiet list --all| grep \"\\b%s\\b\"|grep off"
@@ -152,7 +152,7 @@ def prepare_boot_guest(domobj, dict, installtype):
 
     guestname = params['guestname']
 
-    xmlobj = xmlbuilder.XmlBuilder()
+    xmlobj = xml_builder.XmlBuilder()
     domain = xmlobj.add_domain(params)
 
     xmlobj.add_disk(params, domain)
@@ -285,7 +285,7 @@ def install_windows_cdrom(params):
         return 1
     params['floppysource'] = FLOOPY_IMG
 
-    xmlobj = xmlbuilder.XmlBuilder()
+    xmlobj = xml_builder.XmlBuilder()
     guestxml = xmlobj.build_domain_install_win(params)
     logger.debug('dump installation guest xml:\n%s' % guestxml)
 

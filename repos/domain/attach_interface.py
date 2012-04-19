@@ -10,7 +10,7 @@ from libvirt import libvirtError
 
 from src import sharedmod
 from utils import utils
-from utils import xmlbuilder
+from utils import xml_builder
 
 required_params = ('guestname', 'ifacetype', 'source',)
 optional_params = ('hdmodel',)
@@ -40,7 +40,7 @@ def attach_interface(params):
     domobj = conn.lookupByName(guestname)
 
     # Generate interface xml
-    xmlobj = xmlbuilder.XmlBuilder()
+    xmlobj = xml_builder.XmlBuilder()
     interfacexml = xmlobj.build_interface(params)
     logger.debug("interface xml:\n%s" %interfacexml)
 

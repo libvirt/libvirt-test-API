@@ -12,7 +12,7 @@ from libvirt import libvirtError
 
 from src import sharedmod
 from utils import utils
-from utils import xmlbuilder
+from utils import xml_builder
 
 required_params = ('poolname', 'pooltype', 'volname', 'capacity',)
 optional_params = ()
@@ -101,7 +101,7 @@ def create_logical_volume(params):
     params['volpath'] = "%s/%s" % (poolpath, volname)
     logger.debug("volume target path: %s" % params['volpath'])
 
-    xmlobj = xmlbuilder.XmlBuilder()
+    xmlobj = xml_builder.XmlBuilder()
     volxml = xmlobj.build_volume(params)
     logger.debug("storage volume xml:\n%s" % volxml)
 
