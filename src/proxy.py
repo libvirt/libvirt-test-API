@@ -130,6 +130,23 @@ class Proxy(object):
                       ("required_params or optional_params not found in %s" % modcase)
         return case_params
 
+    def get_testcase_params(self, modcase):
+        """ Return a pair of required_params and optional_params
+            for a testcase
+        """
+        if not modcase:
+            return None
+
+        casemod_ref = self.testcase_ref_dict[modcase]
+        var_func_names = dir(casemod_ref)
+
+        if 'required_params' not in var_func_names \
+           or 'optional_params' not in var_func_names:
+            raise exception.TestCaseError\
+                  ("required_params or optional_params not found in %s" % modcase)
+
+        return [casemod_ref.required_params, casemod_ref.optional_params]
+
     def has_clean_function(self, testcase_name):
         """ Return true if the testcase have clean function
         """

@@ -147,6 +147,7 @@ class Main(object):
                 logfile = os.path.join('log/%s' % testrunid, logname)
             procs.append(generator.FuncGen(cases_func_ref_dict,
                                            cases_checkfunc_ref_dict,
+                                           proxy_obj,
                                            activity,
                                            logfile,
                                            testrunid,
@@ -244,7 +245,7 @@ class Main(object):
                 string += " " * 8 + p.upper() + "\n"
             for p in optional_params:
                 string += " " * 4 + "[" + p + "]\n"
-                string += " " * 8 + p.upper() + "\n"
+                string += " " * 8 + optional_params[p] + "\n"
 
             if proxy_obj.has_clean_function(key):
                 string += "clean\n"

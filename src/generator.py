@@ -25,6 +25,7 @@ import os
 import traceback
 
 from src import mapper
+from src.testcasexml import xml_file_to_str
 from src import env_parser
 from utils import log
 from utils import format
@@ -41,12 +42,14 @@ class FuncGen(object):
     """ To generate a callable testcase"""
     def __init__(self, cases_func_ref_dict,
                  cases_checkfunc_ref_dict,
+                 proxy_obj,
                  activity, logfile,
                  testrunid, testid,
                  log_xml_parser, lockfile,
                  loglevel):
         self.cases_func_ref_dict = cases_func_ref_dict
         self.cases_checkfunc_ref_dict = cases_checkfunc_ref_dict
+        self.proxy_obj = proxy_obj
         self.logfile = logfile
         self.testrunid = testrunid
         self.testid = testid
@@ -131,7 +134,7 @@ class FuncGen(object):
 
             case_start_time = time.strftime("%Y-%m-%d %H:%M:%S")
 
-            ret = 0
+            ret = 1
             try:
                 try:
                     if mod_case_func == 'sleep':
@@ -140,6 +143,8 @@ class FuncGen(object):
                         time.sleep(int(sleepsecs))
                         ret = 0
                     else:
+                        xml_file_to_str(self.proxy_obj, mod_case, case_params)
+
                         ret = self.cases_func_ref_dict[mod_case_func](case_params)
                         # In the case where testcase return -1 on error
                         if ret < 0: ret = 1
