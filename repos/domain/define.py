@@ -12,23 +12,22 @@ from libvirt import libvirtError
 
 from src import sharedmod
 from utils import utils
-from utils import xml_builder
 
-required_params = ('guestname', 'virt_type',)
-optional_params = ('uuid',
-                   'memory',
-                   'vcpu',
-                   'disksize',
-                   'fullimagepath',
-                   'imagetype',
-                   'hdmodel',
-                   'nicmodel',
-                   'macaddr',
-                   'ifacetype',
-                   'source',)
+required_params = ('guestname', 'diskpath',)
+optional_params = {'memory': 1048576,
+                   'vcpu': 1,
+                   'hddriver' : 'virtio',
+                   'nicdriver': 'virtio',
+                   'macaddr': '52:54:00:97:e4:28',
+                   'uuid' : '05867c1a-afeb-300e-e55e-2673391ae080',
+                   'username': None,
+                   'password': None,
+                   'virt_type': 'kvm',
+                   'xml': 'xmls/kvm_guest_define.xml'
+                  }
 
 def check_define_domain(guestname, virt_type, hostname, username, \
-                        password, util, logger):
+                        password, logger):
     """Check define domain result, if define domain is successful,
        guestname.xml will exist under /etc/libvirt/qemu/
        and can use virt-xml-validate tool to check the file validity
@@ -59,29 +58,25 @@ def define(params):
     """Define a domain from xml"""
     logger = params['logger']
     guestname = params['guestname']
-    virt_type = params['virt_type']
+
+    xmlstr = params['xml']
+    logger.debug("domain xml:\n%s" % xmlstr)
+
     conn = sharedmod.libvirtobj['conn']
     uri = conn.getURI()
 
-    hostname = utils.parser_uri(uri)[1]
+    hostname = utils.parse_uri(uri)[1]
+    username = params.get('username', '')
+    password = params.get('password', '')
+    virt_type = params.get('virt_type', 'kvm')
 
-    username = params['username']
-    password = params['password']
     logger.info("define domain on %s" % uri)
-
-    # Generate damain xml
-    xml_obj = xml_builder.XmlBuilder()
-    domain = xml_obj.add_domain(params)
-    xml_obj.add_disk(params, domain)
-    xml_obj.add_interface(params, domain)
-    dom_xml = xml_obj.build_domain(domain)
-    logger.debug("domain xml:\n%s" %dom_xml)
 
     # Define domain from xml
     try:
-        conn.defineXML(dom_xml)
+        conn.defineXML(xmlstr)
         if check_define_domain(guestname, virt_type, hostname, \
-                               username, password, util, logger):
+                               username, password, logger):
             logger.info("define a domain form xml is successful")
         else:
             logger.error("fail to check define domain")
