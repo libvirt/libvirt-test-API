@@ -5,7 +5,6 @@ import os
 import sys
 import re
 import time
-import copy
 import commands
 import shutil
 import urllib
@@ -16,21 +15,20 @@ from libvirt import libvirtError
 from src import sharedmod
 from src import env_parser
 from utils import utils
-from utils import xml_builder
 
-required_params = ('guestname', 'virt_type', 'guestos', 'guestarch',)
-optional_params = {'memory': 1048576,
+required_params = ('guestname', 'guestos', 'guestarch',)
+optional_params = {
+                   'memory': 1048576,
                    'vcpu': 1,
-                   'disksize' : 20
-                   'diskpath' : '/var/lib/libvirt/images'
-                   'imagetype' : 'raw'
+                   'disksize' : 10,
+                   'diskpath' : '/var/lib/libvirt/images/libvirt-test-api',
+                   'imageformat' : 'raw',
                    'hddriver' : 'virtio',
                    'nicdriver': 'virtio',
                    'macaddr': '52:54:00:97:e4:28',
                    'uuid' : '05867c1a-afeb-300e-e55e-2673391ae080',
-                   'username': None,
-                   'password': None,
-                   'virt_type': 'kvm',
+                   'type' : 'define',
+                   'xml': 'xmls/kvm_linux_guest_install_cdrom.xml',
                   }
 
 VIRSH_QUIET_LIST = "virsh --quiet list --all|awk '{print $2}'|grep \"^%s$\""
@@ -82,23 +80,12 @@ def prepare_cdrom(*args):
                 src_path)
     os.chdir(src_path)
 
-def prepare_boot_guest(domobj, dict, logger, installtype):
+def prepare_boot_guest(domobj, xmlstr, guestname, installtype, logger):
     """ After guest installation is over, undefine the guest with
         bootting off cdrom, to define the guest to boot off harddisk.
     """
-    params = copy.deepcopy(dict)
-
-    if params.has_key('kickstart'):
-        params.pop('kickstart')
-
-    guestname = params['guestname']
-
-    xmlobj = xml_builder.XmlBuilder()
-    domain = xmlobj.add_domain(params)
-
-    xmlobj.add_disk(params, domain)
-    xmlobj.add_interface(params, domain)
-    guestxml = xmlobj.build_domain(domain)
+    xmlstr = xmlstr.replace('<boot dev="cdrom"/>', '<boot dev="hd"/>')
+    xmlstr = re.sub('<disk device="cdrom".*\n.*\n.*\n.*\n.*\n', '', xmlstr)
 
     if installtype != 'create':
         domobj.undefine()
@@ -106,7 +93,7 @@ def prepare_boot_guest(domobj, dict, logger, installtype):
 
     try:
         conn = domobj._conn
-        domobj = conn.defineXML(guestxml)
+        domobj = conn.defineXML(xmlstr)
     except libvirtError, e:
         logger.error("API error message: %s, error code is %s" \
                      % (e.message, e.get_error_code()))
@@ -115,7 +102,7 @@ def prepare_boot_guest(domobj, dict, logger, installtype):
 
     logger.info("define guest %s " % guestname)
     logger.debug("the xml description of guest booting off harddisk is %s" %
-                 guestxml)
+                 xmlstr)
 
     logger.info('boot guest up ...')
 
@@ -154,73 +141,46 @@ def check_domain_state(conn, guestname, logger):
 
 def install_linux_cdrom(params):
     """ install a new virtual machine """
-    global logger
     logger = params['logger']
-    params.pop('logger')
 
     guestname = params.get('guestname')
-    virt_type = params.get('virt_type')
     guestos = params.get('guestos')
     guestarch = params.get('guestarch')
+    xmlstr = params['xml']
 
     logger.info("the name of guest is %s" % guestname)
-    logger.info("the type of guest is %s" % virt_type)
 
-    hypervisor = utils.get_hypervisor()
     conn = sharedmod.libvirtobj['conn']
-
     check_domain_state(conn, guestname, logger)
 
-    if not params.has_key('macaddr'):
-        macaddr = utils.get_rand_mac()
-        params['macaddr'] = macaddr
+    logger.info("the macaddress is %s" %
+                params.get('macaddr', '52:54:00:97:e4:28'))
 
-    logger.info("the macaddress is %s" % params['macaddr'])
-    logger.info("the type of hypervisor is %s" % hypervisor)
-
-    if params.has_key('imagepath') and not params.has_key('volumepath'):
-        imgfullpath = os.path.join(params.get('imagepath'), guestname)
-
-    elif not params.has_key('imagepath') and not params.has_key('volumepath'):
-        if hypervisor == 'xen':
-            imgfullpath = os.path.join('/var/lib/xen/images', guestname)
-        elif hypervisor == 'kvm':
-            imgfullpath = os.path.join('/var/lib/libvirt/images', guestname)
-
-    elif not params.has_key('imagepath') and params.has_key('volumepath'):
-        imgfullpath = params['volumepath']
-
-    else:
-        logger.error("we only choose one between imagepath and volumepath")
-        return 1
-
-    params['fullimagepath'] = imgfullpath
-
-    logger.info("the path of directory of disk images located on is %s" %
-                imgfullpath)
-
-    if params.has_key('disksize'):
-        seeksize = params.get('disksize')
-    else:
-        seeksize = '10'
-
-    if params.has_key('imagetype'):
-        imagetype = params.get('imagetype')
-    else:
-        imagetype = 'raw'
-
-    logger.info("create disk image with size %sG, format %s" % (seeksize, imagetype))
+    diskpath = params.get('diskpath', '/var/lib/libvirt/images/libvirt-test-api')
+    logger.info("disk image is %s" % diskpath)
+    seeksize = params.get('disksize', 10)
+    imageformat = params.get('imageformat', 'raw')
+    logger.info("create disk image with size %sG, format %s" % (seeksize, imageformat))
     disk_create = "qemu-img create -f %s %s %sG" % \
-                    (imagetype, imgfullpath, seeksize)
-    logger.debug("the commands line of creating disk images is '%s'" % \
+                    (imageformat, diskpath, seeksize)
+    logger.debug("the command line of creating disk images is '%s'" % \
                    disk_create)
 
     (status, message) = commands.getstatusoutput(disk_create)
-
     if status != 0:
         logger.debug(message)
-    else:
-        logger.info("creating disk images file is successful.")
+        return 1
+
+    os.chown(diskpath, 107, 107)
+    logger.info("creating disk images file is successful.")
+
+    hddriver = params.get('hddriver', 'virtio')
+    if hddriver == 'virtio':
+        xmlstr = xmlstr.replace('DEV', 'vda')
+    elif hddriver == 'ide':
+        xmlstr = xmlstr.replace('DEV', 'hda')
+    elif hddriver == 'scsi':
+        xmlstr = xmlstr.replace('DEV', 'sda')
 
     logger.info("get system environment information")
     envfile = os.path.join(HOME_PATH, 'global.cfg')
@@ -235,39 +195,21 @@ def install_linux_cdrom(params):
 
     logger.info('prepare installation...')
 
-    if virt_type == 'xenpv':
-        params['kickstart'] = ks
-        vmlinuzpath = os.path.join(ostree, 'isolinux/vmlinuz')
-        initrdpath = os.path.join(ostree, 'isolinux/initrd.img')
+    bootcd = '%s/custom.iso' % \
+                       (os.path.join(HOME_PATH, guestname))
+    logger.debug("the bootcd path is %s" % bootcd)
+    logger.info("begin to customize the custom.iso file")
+    prepare_cdrom(ostree, ks, guestname, logger)
 
-        logger.debug("the url of vmlinuz file is %s" % vmlinuzpath)
-        logger.debug("the url of initrd file is %s" % initrdpath)
+    xmlstr = xmlstr.replace('CUSTOMISO', bootcd)
 
-        urllib.urlretrieve(vmlinuzpath, os.path.join(BOOT_DIR, 'vmlinuz'))
-        urllib.urlretrieve(initrdpath, os.path.join(BOOT_DIR, 'initrd.img'))
+    logger.debug('dump installation guest xml:\n%s' % xmlstr)
 
-        logger.debug("vmlinuz and initrd.img is located in %s" % BOOT_DIR)
-
-    elif virt_type == 'xenfv' or virt_type == 'kvm':
-        params['bootcd'] = '%s/custom.iso' % \
-                           (os.path.join(HOME_PATH, guestname))
-        logger.debug("the bootcd path is %s" % params['bootcd'])
-        logger.info("begin to customize the custom.iso file")
-        prepare_cdrom(ostree, ks, guestname, logger)
-    else:
-        logger.error("unknown virt type: %s" % virt_type)
-        return 1
-
-    xmlobj = xml_builder.XmlBuilder()
-    guestxml = xmlobj.build_domain_install(params)
-    logger.debug('dump installation guest xml:\n%s' % guestxml)
-
-    installtype = params.get('type')
-
-    if installtype == None or installtype == 'define':
+    installtype = params.get('type', 'define')
+    if installtype == 'define':
         logger.info('define guest from xml description')
         try:
-            domobj = conn.defineXML(guestxml)
+            domobj = conn.defineXML(xmlstr)
         except libvirtError, e:
             logger.error("API error message: %s, error code is %s" \
                          % (e.message, e.get_error_code()))
@@ -286,7 +228,7 @@ def install_linux_cdrom(params):
     elif installtype == 'create':
         logger.info('create guest from xml description')
         try:
-            domobj = conn.createXML(guestxml, 0)
+            domobj = conn.createXML(xmlstr, 0)
         except libvirtError, e:
             logger.error("API error message: %s, error code is %s" \
                          % (e.message, e.get_error_code()))
@@ -296,12 +238,12 @@ def install_linux_cdrom(params):
     interval = 0
     while(interval < 2400):
         time.sleep(10)
-        if installtype == None or installtype == 'define':
+        if installtype == 'define':
             state = domobj.info()[0]
             if(state == libvirt.VIR_DOMAIN_SHUTOFF):
                 logger.info("guest installaton of define type is complete.")
                 logger.info("boot guest vm off harddisk")
-                ret  = prepare_boot_guest(domobj, params, logger, installtype)
+                ret = prepare_boot_guest(domobj, xmlstr, guestname, installtype, logger)
                 if ret:
                     logger.info("booting guest vm off harddisk failed")
                     return 1
@@ -319,7 +261,7 @@ def install_linux_cdrom(params):
             if guestname not in guest_names:
                 logger.info("guest installation of create type is complete.")
                 logger.info("define the vm and boot it up")
-                ret = prepare_boot_guest(domobj, params, logger, installtype)
+                ret = prepare_boot_guest(domobj, xmlstr, guestname, installtype, logger)
                 if ret:
                     logger.info("booting guest vm off harddisk failed")
                     return 1
@@ -334,7 +276,7 @@ def install_linux_cdrom(params):
             "guest installaton will be destoryed forcelly for rhel3u9 guest")
             domobj.destroy()
             logger.info("boot guest vm off harddisk")
-            ret =  prepare_boot_guest(domobj, params, logger, installtype)
+            ret =  prepare_boot_guest(domobj, xmlstr, guestname, installtype, logger)
             if ret:
                 logger.info("booting guest vm off harddisk failed")
                 return 1
@@ -375,18 +317,11 @@ def install_linux_cdrom_clean(params):
     """ clean testing environment """
     logger = params['logger']
     guestname = params.get('guestname')
-    virt_type = params.get('virt_type')
 
-    hypervisor = utils.get_hypervisor()
-    if hypervisor == 'xen':
-        imgfullpath = os.path.join('/var/lib/xen/images', guestname)
-    elif hypervisor == 'kvm':
-        imgfullpath = os.path.join('/var/lib/libvirt/images', guestname)
+    diskpath = params.get('diskpath', '/var/lib/libvirt/images/libvirt-test-api')
 
     (status, output) = commands.getstatusoutput(VIRSH_QUIET_LIST % guestname)
-    if status:
-        pass
-    else:
+    if not status:
         logger.info("remove guest %s, and its disk image file" % guestname)
         (status, output) = commands.getstatusoutput(VM_STAT % guestname)
         if status:
@@ -405,17 +340,9 @@ def install_linux_cdrom_clean(params):
                 logger.error("failed to undefine guest %s" % guestname)
                 logger.error("%s" % output)
 
-    if os.path.exists(imgfullpath):
-        os.remove(imgfullpath)
+    if os.path.exists(diskpath):
+        os.remove(diskpath)
 
-    if virt_type == 'xenpv':
-        vmlinuz = os.path.join(BOOT_DIR, 'vmlinuz')
-        initrd = os.path.join(BOOT_DIR, 'initrd.img')
-        if os.path.exists(vmlinuz):
-            os.remove(vmlinuz)
-        if os.path.exists(initrd):
-            os.remove(initrd)
-    elif virt_type == 'xenfv' or virt_type == 'kvm':
-        guest_dir = os.path.join(HOME_PATH, guestname)
-        if os.path.exists(guest_dir):
-            shutil.rmtree(guest_dir)
+    guest_dir = os.path.join(HOME_PATH, guestname)
+    if os.path.exists(guest_dir):
+        shutil.rmtree(guest_dir)
