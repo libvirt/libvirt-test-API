@@ -13,7 +13,7 @@ from src import sharedmod
 from utils import utils
 
 required_params = ('pciaddress',)
-optional_params = ()
+optional_params = {}
 
 def check_node_reattach(pciaddress):
     """Check node device reattach result, if reattachment is successful, the

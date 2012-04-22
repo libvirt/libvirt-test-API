@@ -12,7 +12,7 @@ from src import sharedmod
 from utils import utils
 
 required_params = ('guestname', 'username', 'password',)
-optional_params = ('expectedret')
+optional_params = {'expectedret' : ''}
 
 FLAG_FILE = "/tmp/snapshot_flag"
 FLAG_CHECK = "ls %s" % FLAG_FILE

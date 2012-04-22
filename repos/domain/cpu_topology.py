@@ -19,7 +19,7 @@ required_params = ('guestname',
                    'sockets',
                    'cores',
                    'threads',)
-optional_params = ()
+optional_params = {}
 
 def check_domain_running(conn, guestname, logger):
     """check if the domain exists"""

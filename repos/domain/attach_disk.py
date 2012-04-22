@@ -19,7 +19,7 @@ required_params = ('guestname',
                    'imagename',
                    'imagesize',
                    'hdmodel',)
-optional_params = ()
+optional_params = {}
 
 def create_image(name, size, logger):
     """Create a image file"""

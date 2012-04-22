@@ -16,7 +16,7 @@ from src import sharedmod
 from utils import utils
 
 required_params = ('guestname', 'vcpu',)
-optional_params = ()
+optional_params = {}
 
 def redefine_vcpu_number(domobj, domain_name, vcpu):
     """dump domain xml description to change the vcpu number,

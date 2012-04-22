@@ -11,7 +11,7 @@ from src import sharedmod
 from utils import xml_builder
 
 required_params = ('ifacename',)
-optional_params = ()
+optional_params = {}
 
 def check_undefine_interface(ifacename):
     """Check undefining interface result, if undefine interface is successful,

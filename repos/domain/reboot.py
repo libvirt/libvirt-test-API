@@ -12,7 +12,7 @@ from src import sharedmod
 from utils import utils
 
 required_params = ('guestname',)
-optional_params = ()
+optional_params = {}
 
 def reboot(params):
     """Reboot virtual machine

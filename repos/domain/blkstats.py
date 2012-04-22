@@ -12,7 +12,7 @@ from libvirt import libvirtError
 from src import sharedmod
 
 required_params = ('guestname',)
-optional_params = ()
+optional_params = {}
 
 def check_guest_status(domobj):
     """Check guest current status"""

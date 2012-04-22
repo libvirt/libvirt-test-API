@@ -10,7 +10,7 @@ from utils import utils
 from shutil import copy
 
 required_params = ()
-optional_params = ()
+optional_params = {}
 
 VIRSH_LIST = "virsh list --all"
 UPSTART_CONF = "rpm -ql libvirt|grep upstart"

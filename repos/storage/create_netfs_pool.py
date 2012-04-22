@@ -13,7 +13,7 @@ from utils import xml_builder
 from utils import xml_parser
 
 required_params = ('poolname', 'sourcename', 'sourcepath', 'pooltype',)
-optional_params = ('targetpath',)
+optional_params = {'targetpath' : ''}
 
 def check_pool_create_libvirt(conn, poolname, logger):
     """Check the result of create storage pool inside libvirt """

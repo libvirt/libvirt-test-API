@@ -11,7 +11,7 @@ from src import sharedmod
 from utils import xml_builder
 
 required_params = ('poolname', 'sourcename', 'sourcepath', 'pooltype',)
-optional_params = ()
+optional_params = {}
 
 def check_pool_create(conn, poolname, logger):
     """Check the result of create storage pool.  """

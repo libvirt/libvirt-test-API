@@ -12,7 +12,7 @@ from libvirt import libvirtError
 from src import sharedmod
 
 required_params = ('guestname', 'blockdev',)
-optional_params = ()
+optional_params = {}
 
 GET_DOMBLKINFO_MAC = "virsh domblkinfo %s %s | awk '{print $2}'"
 GET_CAPACITY = "du -b %s | awk '{print $1}'"

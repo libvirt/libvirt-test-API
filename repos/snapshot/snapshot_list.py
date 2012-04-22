@@ -6,7 +6,7 @@ import re
 import commands
 
 required_params = ('guestname',)
-optional_params = ()
+optional_params = {}
 
 SNAPSHOT_DIR = "/var/lib/libvirt/qemu/snapshot"
 SNAPSHOT_LIST = "virsh snapshot-list %s |sed -n '3,$'p|awk '{print $1}'"

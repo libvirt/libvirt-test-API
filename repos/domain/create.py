@@ -17,17 +17,19 @@ NONE = 0
 START_PAUSED = 1
 
 required_params = ('guestname', 'virt_type',)
-optional_params = ('uuid',
-                   'memory',
-                   'vcpu',
-                   'disksize',
-                   'imagepath',
-                   'imagetype',
-                   'hdmodel',
-                   'nicmodel',
-                   'ifacetype',
-                   'source',
-                   'flag',)
+optional_params = {'memory': 1048576,
+                   'vcpu': 1,
+                   'disksize' : 20
+                   'diskpath' : '/var/lib/libvirt/images'
+                   'imagetype' : 'raw'
+                   'hddriver' : 'virtio',
+                   'nicdriver': 'virtio',
+                   'macaddr': '52:54:00:97:e4:28',
+                   'uuid' : '05867c1a-afeb-300e-e55e-2673391ae080',
+                   'username': None,
+                   'password': None,
+                   'virt_type': 'kvm',
+                  }
 
 def create(params):
     """create a domain from xml"""

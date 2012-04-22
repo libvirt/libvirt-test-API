@@ -10,7 +10,7 @@ from libvirt import libvirtError
 from src import sharedmod
 
 required_params = ('guestname', 'snapshotname',)
-optional_params = ()
+optional_params = {}
 
 SNAPSHOT_DIR = "/var/lib/libvirt/qemu/snapshot"
 

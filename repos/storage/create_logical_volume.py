@@ -15,7 +15,7 @@ from utils import utils
 from utils import xml_builder
 
 required_params = ('poolname', 'pooltype', 'volname', 'capacity',)
-optional_params = ()
+optional_params = {}
 
 def get_pool_path(poolobj):
     """ Get pool target path """

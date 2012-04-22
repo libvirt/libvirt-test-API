@@ -14,7 +14,7 @@ from libvirt import libvirtError
 from src import sharedmod
 
 required_params = ('wwpn',)
-optional_params = ()
+optional_params = {}
 
 def check_nodedev_create(wwpn, device_name):
     """Check if the node device vHBA was created. Can search created

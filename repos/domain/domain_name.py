@@ -7,7 +7,7 @@ import re
 import commands
 
 required_params = ()
-optional_params = ()
+optional_params = {}
 
 VIRSH_DOMNAME = "virsh domname"
 VIRSH_IDS = "virsh --quiet list |awk '{print $1}'"

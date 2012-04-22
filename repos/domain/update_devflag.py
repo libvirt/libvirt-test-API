@@ -15,7 +15,7 @@ from utils import utils
 from utils import xml_builder
 
 required_params = ('guestname', 'devtype', 'username', 'password',)
-optional_params = ()
+optional_params = {}
 
 def create_image(params, util, img_name):
     """Create an image file"""

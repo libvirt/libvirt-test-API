@@ -13,7 +13,7 @@ from libvirt import libvirtError
 from src import sharedmod
 
 required_params = ('networkname',)
-optional_params = ()
+optional_params = {}
 
 def start(params):
     """activate a defined network"""

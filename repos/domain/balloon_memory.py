@@ -16,7 +16,7 @@ from utils import utils
 from utils import check
 
 required_params = ('guestname', 'memorypair',)
-optional_params = ()
+optional_params = {}
 
 def get_mem_size(ip):
     """ get current memory size in guest virtual machine"""

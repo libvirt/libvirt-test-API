@@ -12,7 +12,7 @@ from src import sharedmod
 from utils import utils
 
 required_params = ('guestname',)
-optional_params = ('flags',)
+optional_params = {'flags' : 'noping'}
 
 def destroy(params):
     """destroy domain

@@ -8,7 +8,7 @@ from exception import TestError
 from src import sharedmod
 
 required_params = ('guestname',)
-optional_params = ('device',)
+optional_params = {'device' : 'serial0'}
 
 def console_mutex(params):
     """Attach to console"""

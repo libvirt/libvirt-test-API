@@ -14,7 +14,7 @@ from utils import utils
 from utils import xml_builder
 
 required_params = ('guestname', 'virt_type', 'imagename', 'hdmodel',)
-optional_params = ()
+optional_params = {}
 
 def check_guest_status(domobj):
     """Check guest current status"""

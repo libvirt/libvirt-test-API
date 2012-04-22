@@ -12,7 +12,7 @@ from src import sharedmod
 from utils import utils
 
 required_params = ('guestname', 'filepath',)
-optional_params = ()
+optional_params = {}
 
 def get_guest_ipaddr(*args):
     """Get guest ip address"""

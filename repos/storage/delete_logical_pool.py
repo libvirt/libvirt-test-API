@@ -12,7 +12,7 @@ from libvirt import libvirtError
 from src import sharedmod
 
 required_params = ('poolname',)
-optional_params = ()
+optional_params = {}
 
 def display_pool_info(conn):
     """Display current storage pool information"""

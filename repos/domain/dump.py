@@ -12,10 +12,9 @@ from libvirt import libvirtError
 
 from src import sharedmod
 from utils import utils
-from utils import check
 
 required_params = ('guestname', 'file',)
-optional_params = ()
+optional_params = {}
 
 def check_guest_status(*args):
     """Check guest current status"""

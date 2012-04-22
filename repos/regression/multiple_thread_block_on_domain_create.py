@@ -22,7 +22,7 @@ IMAG_PATH = "/var/lib/libvirt/images/"
 DISK_DD = "dd if=/dev/zero of=%s bs=1 count=1 seek=6G"
 
 required_params = ('guestos', 'guestarch', 'virt_type', 'guestnum', 'uri')
-optional_params = ()
+optional_params = {}
 
 def request_credentials(credentials, user_data):
     for credential in credentials:

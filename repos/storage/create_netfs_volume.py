@@ -14,7 +14,7 @@ from src import sharedmod
 from utils import xml_builder
 
 required_params = ('poolname', 'volname', 'volformat', 'capacity',)
-optional_params = ()
+optional_params = {}
 
 def get_pool_path(poolobj):
     """ get pool xml description """

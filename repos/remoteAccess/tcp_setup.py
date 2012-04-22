@@ -16,7 +16,7 @@ required_params = ('target_machine',
                    'password',
                    'listen_tcp',
                    'auth_tcp',)
-optional_params = ()
+optional_params = {}
 
 SASLPASSWD2 = "/usr/sbin/saslpasswd2"
 LIBVIRTD_CONF = "/etc/libvirt/libvirtd.conf"

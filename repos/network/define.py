@@ -19,7 +19,7 @@ required_params = ('networkname',
                    'netstart',
                    'netend',
                    'netmode',)
-optional_params = ()
+optional_params = {}
 
 def check_network_define(networkname, logger):
     """Check define network result, if define network is successful,

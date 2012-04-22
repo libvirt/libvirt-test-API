@@ -19,7 +19,7 @@ required_params = ('networkname',
                    'netstart',
                    'netend',
                    'netmode',)
-optional_params = ()
+optional_params = {}
 
 def check_network_status(*args):
     """Check current network status, it will return True if

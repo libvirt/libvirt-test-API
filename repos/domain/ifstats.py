@@ -14,7 +14,7 @@ from src import sharedmod
 from utils import utils
 
 required_params = ('guestname',)
-optional_params = ()
+optional_params = {}
 
 def check_guest_status(domobj):
     """Check guest current status"""

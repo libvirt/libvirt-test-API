@@ -13,7 +13,7 @@ from src import sharedmod
 from utils import utils
 
 required_params = ('pciaddress',)
-optional_params = ()
+optional_params = {}
 
 def check_node_detach(pciaddress):
     """Check node device detach result, if detachment is successful, the

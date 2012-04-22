@@ -13,7 +13,7 @@ from src import sharedmod
 from utils import utils
 
 required_params = ('guestname', 'username', 'password',)
-optional_params = ()
+optional_params = {}
 
 FLAG_FILE = "snapshot_flag"
 MAKE_FLAG = "rm -f /tmp/%s; touch /tmp/%s " % (FLAG_FILE, FLAG_FILE)

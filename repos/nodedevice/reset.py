@@ -13,7 +13,7 @@ from src import sharedmod
 from utils import utils
 
 required_params = ('pciaddress',)
-optional_params = ()
+optional_params = {}
 
 def check_node_reset():
     """Check node device reset result, I have no idea how to check it now"""

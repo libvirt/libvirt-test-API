@@ -16,15 +16,7 @@ from src import env_parser
 from utils import utils
 
 required_params = ('guestname', 'virt_type', 'hdmodel', 'nicmodel',)
-optional_params = ('disksize',
-                   'memory',
-                   'vcpu',
-                   'virt_type',
-                   'imagepath',
-                   'ifacetype',
-                   'netmethod',
-                   'source',
-                   'type',)
+optional_params = {}
 
 HOME_PATH = os.getcwd()
 

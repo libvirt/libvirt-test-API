@@ -12,7 +12,7 @@ from src import sharedmod
 from utils import xml_builder
 
 required_params = ('poolname', 'pooltype', 'sourcename', 'sourcepath',)
-optional_params = ()
+optional_params = {}
 
 def display_pool_info(conn, logger):
     """Display current storage pool information"""

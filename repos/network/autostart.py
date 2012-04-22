@@ -13,7 +13,7 @@ from libvirt import libvirtError
 from src import sharedmod
 
 required_params = ('networkname', 'autostart',)
-optional_params = ()
+optional_params = {}
 
 def check_network_autostart(*args):
     """Check network start automatically result, if setting network is

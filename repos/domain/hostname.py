@@ -7,7 +7,7 @@ import re
 import commands
 
 required_params = ()
-optional_params = ()
+optional_params = {}
 
 VIRSH_HOSTNAME = "virsh hostname"
 

@@ -25,7 +25,7 @@ required_params = ('transport',
                    'predstconfig',
                    'postdstconfig',
                    'flags',)
-optional_params = ()
+optional_params = {}
 
 SSH_KEYGEN = "ssh-keygen -t rsa"
 SSH_COPY_ID = "ssh-copy-id"

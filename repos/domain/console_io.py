@@ -14,7 +14,12 @@ from exception import TestError
 from src import sharedmod
 
 required_params = ('guestname',)
-optional_params = ('device', 'timeout', 'input', 'output', 'expect',)
+optional_params = {'device': 'serial0',
+                   'timeout':5,
+                   'input': None,
+                   'output': None,
+                   'expect': None
+                  }
 
 def alarm_handler(signum, frame):
     raise TestError("Timed out while waiting for console")

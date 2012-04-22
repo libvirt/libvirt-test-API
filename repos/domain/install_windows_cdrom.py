@@ -27,19 +27,19 @@ ISO_MOUNT_POINT = "/mnt/libvirt_windows"
 HOME_PATH = os.getcwd()
 
 required_params = ('guestname', 'virt_type', 'guestos', 'guestarch',)
-optional_params = ('uuid',
-                   'memory',
-                   'vcpu',
-                   'disksize',
-                   'imagepath',
-                   'hdmodel',
-                   'nicmodel',
-                   'macaddr',
-                   'ifacetype',
-                   'source',
-                   'type',
-                   'volumepath',
-                   'imagetype',)
+optional_params = {'memory': 1048576,
+                   'vcpu': 1,
+                   'disksize' : 20
+                   'diskpath' : '/var/lib/libvirt/images'
+                   'imagetype' : 'raw'
+                   'hddriver' : 'virtio',
+                   'nicdriver': 'virtio',
+                   'macaddr': '52:54:00:97:e4:28',
+                   'uuid' : '05867c1a-afeb-300e-e55e-2673391ae080',
+                   'username': None,
+                   'password': None,
+                   'virt_type': 'kvm',
+                  }
 
 def cleanup(mount):
     """Clean up a previously used mountpoint.

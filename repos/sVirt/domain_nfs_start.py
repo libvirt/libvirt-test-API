@@ -21,7 +21,7 @@ required_params = ('guestname',
                    'dynamic_ownership',
                    'virt_use_nfs',
                    'root_squash',)
-optional_params = ()
+optional_params = {}
 
 QEMU_CONF = "/etc/libvirt/qemu.conf"
 

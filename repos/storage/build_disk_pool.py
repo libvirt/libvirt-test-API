@@ -13,7 +13,7 @@ from libvirt import libvirtError
 from src import sharedmod
 
 required_params = ('poolname',)
-optional_params = ()
+optional_params = {}
 
 def get_pool_devicename_type(poolobj):
     """ get device name and partition table of the pool

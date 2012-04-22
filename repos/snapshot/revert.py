@@ -10,7 +10,7 @@ from libvirt import libvirtError
 from src import sharedmod
 
 required_params = ('guestname', 'snapshotname',)
-optional_params = ()
+optional_params = {}
 
 def check_domain_state(conn, guestname, logger):
     """ check if the domain exists and in shutdown state as well """

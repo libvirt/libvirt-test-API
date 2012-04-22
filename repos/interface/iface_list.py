@@ -6,7 +6,7 @@ import re
 import commands
 
 required_params = ('ifaceopt',)
-optional_params = ()
+optional_params = {}
 
 VIRSH_QUIET_IFACE_LIST = "virsh --quiet iface-list %s | awk '{print ""$%s""}'"
 NETWORK_CONFIG = "/etc/sysconfig/network-scripts/"

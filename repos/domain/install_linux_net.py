@@ -19,17 +19,19 @@ from utils import utils
 from utils import xml_builder
 
 required_params = ('guestname', 'virt_type', 'guestos', 'guestarch','netmethod',)
-optional_params = ('uuid',
-                   'memory',
-                   'vcpu',
-                   'disksize',
-                   'imagepath',
-                   'hdmodel',
-                   'nicmodel',
-                   'ifacetype',
-                   'imagetype',
-                   'source',
-                   'type',)
+optional_params = {'memory': 1048576,
+                   'vcpu': 1,
+                   'disksize' : 20
+                   'diskpath' : '/var/lib/libvirt/images'
+                   'imagetype' : 'raw'
+                   'hddriver' : 'virtio',
+                   'nicdriver': 'virtio',
+                   'macaddr': '52:54:00:97:e4:28',
+                   'uuid' : '05867c1a-afeb-300e-e55e-2673391ae080',
+                   'username': None,
+                   'password': None,
+                   'virt_type': 'kvm',
+                  }
 
 VIRSH_QUIET_LIST = "virsh --quiet list --all|awk '{print $2}'|grep \"^%s$\""
 VM_STAT = "virsh --quiet list --all| grep \"\\b%s\\b\"|grep off"

@@ -12,7 +12,7 @@ from libvirt import libvirtError
 import sharemod
 
 required_params = ()
-optional_params = ()
+optional_params = {}
 
 VIRSH_DOMUUID = "virsh domuuid"
 

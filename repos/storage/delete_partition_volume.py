@@ -12,7 +12,7 @@ from src import sharedmod
 from utils import xml_builder
 
 required_params = ('poolname', 'volname',)
-optional_params = ()
+optional_params = {}
 
 def partition_volume_check(poolobj, volname, partition_name):
     """check the newly deleted volume, the way of checking is to

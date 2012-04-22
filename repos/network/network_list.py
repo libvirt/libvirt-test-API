@@ -13,7 +13,7 @@ from src import sharedmod
 from utils import utils
 
 required_params = ('netlistopt',)
-optional_params = ()
+optional_params = {}
 
 VIRSH_QUIET_NETLIST = "virsh --quiet net-list %s|awk '{print $1}'"
 VIRSH_NETLIST = "virsh net-list %s"

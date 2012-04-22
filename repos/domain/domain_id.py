@@ -10,7 +10,7 @@ import libvirt
 from src import sharedmod
 
 required_params = ()
-optional_params = ('guestname',)
+optional_params = {'guestname': ''}
 
 VIRSH_DOMID = "virsh domid"
 VIRSH_IDS = "virsh --quiet list |awk '{print $1}'"

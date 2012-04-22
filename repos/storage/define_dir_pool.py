@@ -18,7 +18,7 @@ POOL_DESTROY = "virsh pool-destroy %s"
 POOL_UNDEFINE = "virsh pool-undefine %s"
 
 required_params = ('poolname', 'pooltype',)
-optional_params = ('targetpath',)
+optional_params = {'targetpath' : ''}
 
 def display_pool_info(conn, logger):
     """Display current storage pool information"""

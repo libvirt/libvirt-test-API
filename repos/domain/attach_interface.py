@@ -13,7 +13,7 @@ from utils import utils
 from utils import xml_builder
 
 required_params = ('guestname', 'ifacetype', 'source',)
-optional_params = ('hdmodel',)
+optional_params = {}
 
 def check_guest_status(guestname, domobj):
     """Check guest current status"""

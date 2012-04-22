@@ -12,7 +12,7 @@ from libvirt import libvirtError
 from src import sharedmod
 
 required_params = ('networkname',)
-optional_params = ()
+optional_params = {}
 
 def check_network_status(*args):
     """Check current network status, it will return True if

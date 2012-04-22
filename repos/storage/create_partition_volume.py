@@ -13,7 +13,7 @@ from src import sharedmod
 from utils import xml_builder
 
 required_params = ('poolname', 'volname', 'volformat', 'capacity',)
-optional_params = ()
+optional_params = {}
 
 def partition_volume_check(poolobj, volname):
     """check the new created volume, the way of checking is to get

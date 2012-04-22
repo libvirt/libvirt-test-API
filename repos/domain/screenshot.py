@@ -8,7 +8,7 @@ import mimetypes
 import libvirt
 
 required_params = ('guestname', 'filename',)
-optional_params = ('screen',)
+optional_params = {'screen' : 0}
 
 last_filename = None
 

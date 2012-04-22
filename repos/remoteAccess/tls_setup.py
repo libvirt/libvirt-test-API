@@ -18,7 +18,7 @@ required_params = ('listen_tls',
                    'target_machine',
                    'username',
                    'password',)
-optional_params = ()
+optional_params = {}
 
 CERTTOOL = "/usr/bin/certtool"
 CP = "/bin/cp"

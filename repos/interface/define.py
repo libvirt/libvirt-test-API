@@ -11,7 +11,7 @@ from src import sharedmod
 from utils import xml_builder
 
 required_params = ('ifacename', 'ifacetype',)
-optional_params = ()
+optional_params = {}
 
 def check_define_interface(ifacename):
     """Check defining interface result, if define interface is successful,

@@ -14,7 +14,7 @@ from utils import utils
 from utils import xml_builder
 
 required_params = ('guestname',)
-optional_params = ('snapshotname',)
+optional_params = {'snapshotname' : ''}
 
 QEMU_IMAGE_FORMAT = "qemu-img info %s |grep format |awk -F': ' '{print $2}'"
 

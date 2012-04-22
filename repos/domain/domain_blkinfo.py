@@ -17,7 +17,7 @@ GET_PHYSICAL_K = " du -B K %s | awk '{print $1}'"
 VIRSH_DOMBLKINFO = "virsh domblkinfo %s %s"
 
 required_params = ('guestname', 'blockdev',)
-optional_params = ()
+optional_params = {}
 
 def get_output(command, logger):
     """execute shell command
