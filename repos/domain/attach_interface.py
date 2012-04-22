@@ -10,19 +10,12 @@ from libvirt import libvirtError
 
 from src import sharedmod
 from utils import utils
-from utils import xml_builder
 
-required_params = ('guestname', 'ifacetype', 'source',)
-optional_params = {}
-
-def check_guest_status(guestname, domobj):
-    """Check guest current status"""
-    state = domobj.get_state(guestname)
-    if state == "shutoff" or state == "shutdown":
-    # add check function
-        return False
-    else:
-        return True
+required_params = ('guestname', 'macaddr', 'nicdriver',)
+optional_params = {'ifacetype': 'network',
+                   'network': 'default',
+                   'xml' : 'xmls/nic.xml',
+                  }
 
 def check_attach_interface(num1, num2):
     """Check attach interface result via simple interface number comparison """
@@ -35,21 +28,22 @@ def attach_interface(params):
     """Attach a interface to domain from xml"""
     logger = params['logger']
     guestname = params['guestname']
+    macaddr = params['macaddr']
+    nicdriver = params['nicdriver']
+    xmlstr = params['xml']
+
     conn = sharedmod.libvirtobj['conn']
 
     domobj = conn.lookupByName(guestname)
 
-    # Generate interface xml
-    xmlobj = xml_builder.XmlBuilder()
-    interfacexml = xmlobj.build_interface(params)
-    logger.debug("interface xml:\n%s" %interfacexml)
+    logger.debug("interface xml:\n%s" % xmlstr)
 
     iface_num1 = utils.dev_num(guestname, "interface")
     logger.debug("original interface number: %s" %iface_num1)
 
     # Attach interface to domain
     try:
-        domobj.attachDeviceFlags(interfacexml, 0)
+        domobj.attachDeviceFlags(xmlstr, 0)
         iface_num2 = utils.dev_num(guestname, "interface")
         logger.debug("update interface number to %s" %iface_num2)
         if  check_attach_interface(iface_num1, iface_num2):

@@ -15,7 +15,6 @@ from libvirt import libvirtError
 from src import sharedmod
 from src import env_parser
 from utils import utils
-from utils import xml_builder
 
 VIRSH_QUIET_LIST = "virsh --quiet list --all|awk '{print $2}'|grep \"^%s$\""
 VM_STAT = "virsh --quiet list --all| grep \"\\b%s\\b\"|grep off"

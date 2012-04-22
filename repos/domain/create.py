@@ -11,53 +11,42 @@ from libvirt import libvirtError
 
 from src import sharedmod
 from utils import utils
-from utils import xml_builder
 
 NONE = 0
 START_PAUSED = 1
 
-required_params = ('guestname', 'virt_type',)
+required_params = ('guestname', 'diskpath',)
 optional_params = {'memory': 1048576,
                    'vcpu': 1,
-                   'disksize' : 20
-                   'diskpath' : '/var/lib/libvirt/images'
-                   'imagetype' : 'raw'
                    'hddriver' : 'virtio',
                    'nicdriver': 'virtio',
                    'macaddr': '52:54:00:97:e4:28',
                    'uuid' : '05867c1a-afeb-300e-e55e-2673391ae080',
-                   'username': None,
-                   'password': None,
                    'virt_type': 'kvm',
+                   'xml': 'xmls/kvm_guest_define.xml',
+                   'flags' : 'none',
+                   'xml': 'xmls/kvm_guest_define.xml'
                   }
 
 def create(params):
     """create a domain from xml"""
     logger = params['logger']
     guestname = params['guestname']
+    xmlstr = params['xml']
 
-    flags = None
-    if params.has_key('flags'):
-        flags = params['flags']
-        if flags != "none" and flags != "start_paused":
-            logger.error("flags value either \"none\" or \"start_paused\"");
-            return 1
+    flags = params.get('flags', 'none')
+    if flags != "none" and flags != "start_paused":
+        logger.error("flags value either \"none\" or \"start_paused\"");
+        return 1
 
     conn = sharedmod.libvirtobj['conn']
 
-    xmlobj = xml_builder.XmlBuilder()
-    domain = xmlobj.add_domain(params)
-    xmlobj.add_disk(params, domain)
-    xmlobj.add_interface(params, domain)
-    domxml = xmlobj.build_domain(domain)
-    logger.debug("domain xml:\n%s" %domxml)
-
     # Create domain from xml
     try:
-        if not flags or flags == "none":
-            domobj = conn.createXML(domxml, NONE)
+        if flags == "none":
+            domobj = conn.createXML(xmlstr, NONE)
         elif flags == "start_paused":
-            domobj = conn.createXML(domxml, START_PAUSED)
+            domobj = conn.createXML(xmlstr, START_PAUSED)
         else:
             logger.error("flags error")
     except libvirtError, e:
