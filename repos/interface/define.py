@@ -8,10 +8,10 @@ import libvirt
 from libvirt import libvirtError
 
 from src import sharedmod
-from utils import xml_builder
 
 required_params = ('ifacename', 'ifacetype',)
-optional_params = {}
+optional_params = {'xml' : 'xmls/iface_ethernet.xml',
+                  }
 
 def check_define_interface(ifacename):
     """Check defining interface result, if define interface is successful,
@@ -29,7 +29,7 @@ def define(params):
     global logger
     logger = params['logger']
     ifacename = params['ifacename']
-    params['dhcp'] = 'yes'
+    xmlstr = params['xml']
 
     conn = sharedmod.libvirtobj['conn']
 
@@ -37,21 +37,19 @@ def define(params):
         logger.error("interface %s have been defined" % ifacename)
         return 1
 
-    xmlobj = xml_builder.XmlBuilder()
-    iface_xml = xmlobj.build_host_interface(params)
-    logger.debug("interface xml:\n%s" %iface_xml)
+    logger.debug("interface xml:\n%s" % xmlstr)
 
-        try:
-            conn.interfaceDefineXML(iface_xml, 0)
-            if  check_define_interface(ifacename):
-                logger.info("define a interface form xml is successful")
-            else:
-                logger.error("fail to check define interface")
-                return 1
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
-                         % (e.message, e.get_error_code()))
-            logger.error("fail to define a interface from xml")
+    try:
+        conn.interfaceDefineXML(xmlstr, 0)
+        if check_define_interface(ifacename):
+            logger.info("define a interface form xml is successful")
+        else:
+            logger.error("fail to check define interface")
             return 1
+    except libvirtError, e:
+        logger.error("API error message: %s, error code is %s" \
+                     % (e.message, e.get_error_code()))
+        logger.error("fail to define a interface from xml")
+        return 1
 
     return 0

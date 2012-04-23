@@ -1,0 +1,8 @@
+<volume>
+  <name>VOLNAME</name>
+  <capacity unit="SUFFIX">CAP</capacity>
+  <allocation unit="SUFFIX">CAP</allocation>
+  <target>
+    <format type="VOLFORMAT"/>
+  </target>
+</volume>

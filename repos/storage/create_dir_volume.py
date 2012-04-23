@@ -11,10 +11,10 @@ import libvirt
 from libvirt import libvirtError
 
 from src import sharedmod
-from utils import xml_builder
 
 required_params = ('poolname', 'volname', 'volformat', 'capacity',)
-optional_params = {}
+optional_params = {'xml' : 'xmls/dir_volume.xml',
+                  }
 
 def get_pool_path(poolobj):
     """ get pool xml description """
@@ -29,41 +29,6 @@ def get_pool_path(poolobj):
 
     return path_value
 
-def dir_volume_check(volume_path, capacity, volformat):
-    """check the new created volume """
-    unit_bytes = {'K':pow(2, 10), 'M':pow(2, 20), \
-                  'G':pow(2, 30), 'T':pow(2, 40)}
-
-    if os.path.exists(volume_path):
-        shell_cmd = "qemu-img info %s" % volume_path
-        res, text = commands.getstatusoutput(shell_cmd)
-
-        logger.debug("the output of qemu-img is %s" % text)
-
-        format_info = text.split('\n')[1]
-        disk_info = text.split('\n')[2]
-
-        actual_format = format_info.split(": ")[1]
-        actual_size_bytes = disk_info.split("(")[1].split(" ")[0]
-
-        expected_size_bytes = unit_bytes[capacity[-1]] * int(capacity[:-1])
-
-        logger.debug("the actual_size_bytes is %s, \
-                      the expected_size_bytes is %s" % \
-                      (actual_size_bytes, expected_size_bytes))
-        logger.debug("the actual_format is %s, the expected_format is %s" % \
-                      (actual_format, volformat))
-
-        if int(actual_size_bytes) == expected_size_bytes and \
-                actual_format == volformat:
-            return 0
-        else:
-            return 1
-
-    else:
-        logger.error("volume file %s doesn't exist" % volume_path)
-        return 1
-
 def virsh_vol_list(poolname):
     """using virsh command list the volume information"""
 
@@ -71,17 +36,16 @@ def virsh_vol_list(poolname):
     (status, text) = commands.getstatusoutput(shell_cmd)
     logger.debug(text)
 
-
 def create_dir_volume(params):
     """create a volume in the dir type of pool"""
 
     global logger
     logger = params['logger']
-    params.pop('logger')
-    poolname = params.pop('poolname')
+    poolname = params['poolname']
     volname = params['volname']
     volformat = params['volformat']
-    capacity = params.pop('capacity')
+    capacity = params['capacity']
+    xmlstr = params['xml']
 
     logger.info("the poolname is %s, volname is %s, \
                  volfomat is %s, capacity is %s" % \
@@ -100,10 +64,9 @@ def create_dir_volume(params):
 
     volume_path = path_value + "/" + volname
 
-    params['volpath'] = volume_path
-    params['suffix'] = capacity[-1]
-    params['capacity'] = capacity[:-1]
-    params['pooltype'] = 'dir'
+    xmlstr = xmlstr.replace('VOLPATH', volume_path)
+    xmlstr = xmlstr.replace('SUFFIX', capacity[-1])
+    xmlstr = xmlstr.replace('CAP', capacity[:-1])
 
     logger.info("before create the new volume, current volume list is %s" % \
                  poolobj.listVolumes())
@@ -112,13 +75,11 @@ def create_dir_volume(params):
                  the volume information in the pool %s" % poolname)
     virsh_vol_list(poolname)
 
-    xmlobj = xml_builder.XmlBuilder()
-    volumexml = xmlobj.build_volume(params)
-    logger.debug("volume xml:\n%s" % volumexml)
+    logger.debug("volume xml:\n%s" % xmlstr)
 
     try:
         logger.info("create %s volume" % volname)
-        poolobj.createXML(volumexml, 0)
+        poolobj.createXML(xmlstr, 0)
     except libvirtError, e:
         logger.error("API error message: %s, error code is %s" \
                      % (e.message, e.get_error_code()))
@@ -126,14 +87,5 @@ def create_dir_volume(params):
 
     logger.info("volume create successfully, and output the volume information")
     virsh_vol_list(poolname)
-
-    logger.info("Now, let check the validation of the created volume")
-    check_res = dir_volume_check(volume_path, capacity, volformat)
-
-    if check_res:
-        logger.error("checking failed")
-        return 1
-    else:
-        logger.info("checking succeed")
 
     return 0

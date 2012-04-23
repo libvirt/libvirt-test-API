@@ -9,10 +9,11 @@ import libvirt
 from libvirt import libvirtError
 
 from src import sharedmod
-from utils import xml_builder
 
-required_params = ('poolname', 'pooltype', 'sourcename', 'sourcepath',)
-optional_params = {}
+required_params = ('poolname', 'sourcehost', 'sourcepath',)
+optional_params = {'targetpath': '/dev/disk/by-path',
+                   'xml' : 'xmls/iscsi_pool.xml',
+                  }
 
 def display_pool_info(conn, logger):
     """Display current storage pool information"""
@@ -42,14 +43,10 @@ def check_pool_define(conn, poolname, logger):
 def define_iscsi_pool(params):
     """
     Defines a iscsi based storage pool from xml.
-    Parameters passed are :
-    pooltype, poolname, sourcename, sourcepath and targetpath.
     """
     logger = params['logger']
     poolname = params['poolname']
-    pooltype = params['pooltype']
-    srcname = params['sourcename']
-    srcpath = params['sourcepath']
+    xmlstr = params['xml']
 
     conn = sharedmod.libvirtobj['conn']
 
@@ -57,9 +54,7 @@ def define_iscsi_pool(params):
         logger.error("%s storage pool is ALREADY defined" % poolname)
         return 1
 
-    xmlobj = xml_builder.XmlBuilder()
-    poolxml = xmlobj.build_pool(params)
-    logger.debug("storage pool xml:\n%s" % poolxml)
+    logger.debug("storage pool xml:\n%s" % xmlstr)
 
     pool_num1 = conn.numOfDefinedStoragePools()
     logger.info("original storage pool define number: %s" % pool_num1)
@@ -67,7 +62,7 @@ def define_iscsi_pool(params):
 
     try:
         logger.info("define %s storage pool" % poolname)
-        conn.storagePoolDefineXML(poolxml, 0)
+        conn.storagePoolDefineXML(xmlstr, 0)
         pool_num2 = conn.numOfDefinedStoragePools()
         logger.info("current storage pool define number: %s" % pool_num2)
         display_pool_info(conn, logger)

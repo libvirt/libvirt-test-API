@@ -10,15 +10,16 @@ import libvirt
 from libvirt import libvirtError
 
 from src import sharedmod
-from utils import xml_builder
 
 VIRSH_POOLLIST = "virsh --quiet pool-list --all|awk '{print $1}'|grep \"^%s$\""
 POOL_STAT = "virsh --quiet pool-list --all|grep \"^%s\\b\" |grep \"inactive\""
 POOL_DESTROY = "virsh pool-destroy %s"
 POOL_UNDEFINE = "virsh pool-undefine %s"
 
-required_params = ('poolname', 'pooltype',)
-optional_params = {'targetpath' : ''}
+required_params = ('poolname',)
+optional_params = {'targetpath': '/var/lib/libvirt/images/dirpool',
+                   'xml' : 'xmls/dir_pool.xml',
+                  }
 
 def display_pool_info(conn, logger):
     """Display current storage pool information"""
@@ -46,6 +47,7 @@ def define_dir_pool(params):
     """Define a dir type storage pool from xml"""
     logger = params['logger']
     poolname = params['poolname']
+    xmlstr = params['xml']
 
     conn = sharedmod.libvirtobj['conn']
 
@@ -53,9 +55,11 @@ def define_dir_pool(params):
         logger.error("%s storage pool is defined" % poolname)
         return 1
 
-    xmlobj = xml_builder.XmlBuilder()
-    poolxml = xmlobj.build_pool(params)
-    logger.debug("storage pool xml:\n%s" % poolxml)
+    targetpath = params.get('targetpath', '/var/lib/libvirt/images/dirpool')
+    if not os.path.exists(targetpath):
+        os.mkdir(targetpath)
+
+    logger.debug("storage pool xml:\n%s" % xmlstr)
 
     pool_num1 = conn.numOfDefinedStoragePools()
     logger.info("original storage pool define number: %s" % pool_num1)
@@ -63,7 +67,7 @@ def define_dir_pool(params):
 
     try:
         logger.info("define %s storage pool" % poolname)
-        conn.storagePoolDefineXML(poolxml, 0)
+        conn.storagePoolDefineXML(xmlstr, 0)
         pool_num2 = conn.numOfDefinedStoragePools()
         logger.info("current storage pool define number: %s" % pool_num2)
         display_pool_info(conn, logger)
@@ -83,9 +87,7 @@ def define_dir_pool_clean(params):
     logger = params['logger']
     poolname = params['poolname']
     (status, output) = commands.getstatusoutput(VIRSH_POOLLIST % poolname)
-    if status:
-        pass
-    else:
+    if not status:
        logger.info("remove storage pool %s" % poolname)
        (status, output) = commands.getstatusoutput(POOL_STAT % poolname)
        if status:
@@ -103,6 +105,3 @@ def define_dir_pool_clean(params):
             if status:
                 logger.error("failed to undefine storage pool %s" % poolname)
                 logger.error("%s" % output)
-
-
-

@@ -9,10 +9,11 @@ import libvirt
 from libvirt import libvirtError
 
 from src import sharedmod
-from utils import xml_builder
 
-required_params = ('poolname', 'pooltype',)
-optional_params = {}
+required_params = ('poolname',)
+optional_params = {'targetpath': '/var/lib/libvirt/images/dirpool',
+                   'xml' : 'xmls/dir_pool.xml',
+                  }
 
 def check_pool_create(conn, poolname, logger):
     """Check the result of create storage pool.
@@ -23,8 +24,7 @@ def check_pool_create(conn, poolname, logger):
     try:
         pool_names.index(poolname)
     except ValueError:
-        logger.info("check_pool_create %s storage pool \
-                     is UNSUCCESSFUL!!" % poolname)
+        logger.info("check_pool_create %s storage pool pass" % poolname)
         return False
     return True
 
@@ -37,7 +37,7 @@ def create_dir_pool(params):
     """ Create a dir type storage pool from xml"""
     logger = params['logger']
     poolname = params['poolname']
-    pooltype = params['pooltype']
+    xmlstr = params['xml']
 
     conn = sharedmod.libvirtobj['conn']
 
@@ -45,13 +45,16 @@ def create_dir_pool(params):
         logger.error("%s storage pool has already been created" % poolname)
         return 1
 
-    xmlobj = xml_builder.XmlBuilder()
-    poolxml = xmlobj.build_pool(params)
-    logger.debug("storage pool xml:\n%s" % poolxml)
+    targetpath = params.get('targetpath', '/var/lib/libvirt/images/dirpool')
+
+    if not os.path.exists(targetpath):
+        os.mkdir(targetpath)
+
+    logger.debug("storage pool xml:\n%s" % xmlstr)
 
     try:
         logger.info("Creating %s storage pool" % poolname)
-        conn.storagePoolCreateXML(poolxml, 0)
+        conn.storagePoolCreateXML(xmlstr, 0)
         display_pool_info(conn, logger)
         if check_pool_create(conn, poolname, logger):
             logger.info("creating %s storage pool is SUCCESSFUL!!!" % poolname)

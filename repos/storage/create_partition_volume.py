@@ -10,7 +10,6 @@ import libvirt
 from libvirt import libvirtError
 
 from src import sharedmod
-from utils import xml_builder
 
 required_params = ('poolname', 'volname', 'volformat', 'capacity',)
 optional_params = {}
@@ -50,18 +49,17 @@ def create_partition_volume(params):
 
     global logger
     logger = params['logger']
-    params.pop('logger')
-    poolname = params.pop('poolname')
+    poolname = params['poolname']
     volname = params['volname']
     volformat = params['volformat']
-    capacity = params.pop('capacity')
+    capacity = params['capacity']
+    xmlstr = params['xml']
 
     logger.info("the poolname is %s, volname is %s, \
                  volfomat is %s, capacity is %s" % \
                  (poolname, volname, volformat, capacity))
 
     conn = sharedmod.libvirtobj['conn']
-
     storage_pool_list = conn.listStoragePools()
 
     if poolname not in storage_pool_list:
@@ -70,9 +68,8 @@ def create_partition_volume(params):
 
     poolobj = conn.storagePoolLookupByName(poolname)
 
-    params['suffix'] = capacity[-1]
-    params['capacity'] = capacity[:-1]
-    params['pooltype'] = 'disk'
+    xmlstr = xmlstr.replace('SUFFIX', capacity[-1])
+    xmlstr = xmlstr.replace('CAP', capacity[:-1])
 
     logger.info("before create the new volume, \
                  current volume list is %s" % \
@@ -82,13 +79,11 @@ def create_partition_volume(params):
                  ouput the volume information in the pool %s" % poolname)
     virsh_vol_list(poolname)
 
-    xmlobj = xml_builder.XmlBuilder()
-    volumexml = xmlobj.build_volume(params)
-    logger.debug("volume xml:\n%s" % volumexml)
+    logger.debug("volume xml:\n%s" % xmlstr)
 
     try:
         logger.info("create %s volume" % volname)
-        poolobj.createXML(volumexml, 0)
+        poolobj.createXML(xmlstr, 0)
     except libvirtError, e:
         logger.error("API error message: %s, error code is %s" \
                     % (e.message, e.get_error_code()))

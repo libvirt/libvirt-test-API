@@ -12,10 +12,10 @@ from libvirt import libvirtError
 
 from src import sharedmod
 from utils import utils
-from utils import xml_builder
 
-required_params = ('poolname', 'pooltype', 'volname', 'capacity',)
-optional_params = {}
+required_params = ('poolname', 'volname', 'capacity',)
+optional_params = {'xml' : 'xmls/logical_volume.xml',
+                  }
 
 def get_pool_path(poolobj):
     """ Get pool target path """
@@ -74,13 +74,9 @@ def create_logical_volume(params):
     poolname = params['poolname']
     volname = params['volname']
     capacity = params['capacity']
+    xmlstr = params['xmlstr']
 
     dicts = utils.get_capacity_suffix_size(capacity)
-
-    params['capacity'] = dicts['capacity']
-    params['suffix'] = dicts['suffix']
-    # default is KB in the /etc/lvm/backup/{poolname}
-    caps_kbyte = dicts['capacity_byte']/1024
 
     conn = sharedmod.libvirtobj['conn']
     pool_names = conn.listDefinedStoragePools()
@@ -98,12 +94,11 @@ def create_logical_volume(params):
 
     poolpath = get_pool_path(poolobj)
     logger.debug("pool target path: %s" % poolpath)
-    params['volpath'] = "%s/%s" % (poolpath, volname)
-    logger.debug("volume target path: %s" % params['volpath'])
+    volpath = "%s/%s" % (poolpath, volname)
+    xmlstr = xmlstr.replace('TARGETPATH', volpath)
+    logger.debug("volume target path: %s" % volpath)
 
-    xmlobj = xml_builder.XmlBuilder()
-    volxml = xmlobj.build_volume(params)
-    logger.debug("storage volume xml:\n%s" % volxml)
+    logger.debug("storage volume xml:\n%s" % xmlstr)
 
     vol_num1 = get_storage_volume_number(poolobj)
     display_volume_info(poolobj)
@@ -111,11 +106,11 @@ def create_logical_volume(params):
 
     try:
         logger.info("create %s storage volume" % volname)
-        poolobj.createXML(volxml, 0)
+        poolobj.createXML(xmlstr, 0)
         display_physical_volume()
         vol_num2 = get_storage_volume_number(poolobj)
         display_volume_info(poolobj)
-        if check_volume_create(poolobj, poolname, volname, caps_kbyte) \
+        if check_volume_create(poolobj, poolname, volname, capacity*1024) \
             and vol_num2 > vol_num1:
             logger.info("create %s storage volume is successful" % volname)
         else:

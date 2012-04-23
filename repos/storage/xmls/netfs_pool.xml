@@ -1,0 +1,13 @@
+<pool type="netfs">
+  <name>POOLNAME</name>
+  <source>
+    <host name="SOURCEHOST"/>
+    <dir path="SOURCEPATH"/>
+    <format type="nfs"/>
+  </source>
+  <target>
+    <path>
+      TARGETPATH
+    </path>
+  </target>
+</pool>

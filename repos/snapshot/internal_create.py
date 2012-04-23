@@ -11,14 +11,15 @@ from libvirt import libvirtError
 
 from src import sharedmod
 from utils import utils
-from utils import xml_builder
 
 required_params = ('guestname',)
-optional_params = {'snapshotname' : ''}
+optional_params = {'snapshotname' : '',
+                   'xml' : 'xmls/snapshot.xml',
+                  }
 
 QEMU_IMAGE_FORMAT = "qemu-img info %s |grep format |awk -F': ' '{print $2}'"
 
-def check_domain_image(domobj, util, guestname, logger):
+def check_domain_image(domobj, guestname, logger):
     """ensure that the state of guest is poweroff
        and its disk image is the type of qcow2
     """
@@ -46,9 +47,10 @@ def internal_create(params):
     """
     logger = params['logger']
     guestname = params['guestname']
+    xmlstr = params['xml']
 
     if not params.has_key('snapshotname'):
-        params['snapshotname'] = str(int(time.time()))
+        xmlstr = xmlstr.replace('SNAPSHOTNAME', str(int(time.time())))
 
     conn = sharedmod.libvirtobj['conn']
     guest_names = conn.listDefinedDomains()
@@ -59,17 +61,15 @@ def internal_create(params):
     domobj = conn.lookupByName(guestname)
 
     logger.info("checking the format of its disk")
-    if not check_domain_image(domobj, util, guestname, logger):
+    if not check_domain_image(domobj, guestname, logger):
         logger.error("checking failed")
         return 1
 
-    xmlobj = xml_builder.XmlBuilder()
-    snapshot_xml = xmlobj.build_domain_snapshot(params)
-    logger.debug("%s snapshot xml:\n%s" % (guestname, snapshot_xml))
+    logger.debug("%s snapshot xml:\n%s" % (guestname, xmlstr))
 
     try:
         logger.info("create a snapshot for %s" % guestname)
-        domobj.snapshotCreateXML(snapshot_xml, 0)
+        domobj.snapshotCreateXML(xmlstr, 0)
         logger.info("creating snapshot succeeded")
     except libvirtError, e:
         logger.error("API error message: %s, error code is %s" \

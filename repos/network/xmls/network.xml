@@ -1,0 +1,10 @@
+<network>
+  <name>NETWORKNAME</name>
+  <forward mode="NETMODE"/>
+  <bridge forwardDelay="0" name="BRIDGENAME" stp="on"/>
+  <ip address="BRIDGEIP" netmask="BRIDGENETMASK">
+    <dhcp>
+      <range start="NETSTART" end="NETEND"/>
+    </dhcp>
+  </ip>
+</network>

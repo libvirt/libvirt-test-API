@@ -9,22 +9,22 @@ import libvirt
 from libvirt import libvirtError
 
 from src import sharedmod
-from utils import xml_builder
 from utils import xml_parser
 
-required_params = ('poolname', 'sourcename', 'sourcepath', 'pooltype',)
-optional_params = {'targetpath' : ''}
+required_params = ('poolname', 'sourcehost', 'sourcepath',)
+optional_params = {'targetpath' : '/mnt',
+                   'xml' : 'xmls/netfs_pool.xml',
+                  }
 
 def check_pool_create_libvirt(conn, poolname, logger):
     """Check the result of create storage pool inside libvirt """
     pool_names = conn.listStoragePools()
-    logger.info("poolnames is: %s " % pool_names)
+    logger.info("poolnames is: %s" % pool_names)
     # check thru libvirt that it's really created..
     try:
         pool_names.index(poolname)
     except ValueError:
-        logger.info("check_pool_create %s storage pool is \
-                     UNSUCCESSFUL!!" % poolname)
+        logger.info("check_pool_create %s storage pool pass" % poolname)
         return False
     # check
     return True
@@ -65,19 +65,19 @@ def create_netfs_pool(params):
     """ Create a network FS type storage pool from xml"""
     logger = params['logger']
     poolname = params['poolname']
+    xmlstr = params['xml']
+
     conn = sharedmod.libvirtobj['conn']
 
     if check_pool_create_libvirt(conn, poolname, logger):
         logger.error("%s storage pool has already been created" % poolname)
         return 1
 
-    xmlobj = xml_builder.XmlBuilder()
-    poolxml = xmlobj.build_pool(params)
-    logger.debug("storage pool xml:\n%s" % poolxml)
+    logger.debug("storage pool xml:\n%s" % xmlstr)
 
     try:
         logger.info("Creating %s storage pool" % poolname)
-        conn.storagePoolCreateXML(poolxml, 0)
+        conn.storagePoolCreateXML(xmlstr, 0)
         display_pool_info(conn, logger)
         if check_pool_create_libvirt(conn, poolname, logger):
             logger.info("creating %s storage pool is \

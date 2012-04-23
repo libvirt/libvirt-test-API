@@ -8,10 +8,11 @@ import libvirt
 from libvirt import libvirtError
 
 from src import sharedmod
-from utils import xml_builder
 
-required_params = ('poolname', 'sourcename', 'sourcepath', 'pooltype',)
-optional_params = {}
+required_params = ('poolname', 'sourcehost', 'sourcepath',)
+optional_params = {'targetpath': '/dev/disk/by-path',
+                   'xml' : 'xmls/iscsi_pool.xml',
+                  }
 
 def check_pool_create(conn, poolname, logger):
     """Check the result of create storage pool.  """
@@ -34,7 +35,8 @@ def create_iscsi_pool(params):
     """ Create a iscsi type storage pool from xml"""
     logger = params['logger']
     poolname = params['poolname']
-    pooltype = params['pooltype']
+    xmlstr = params['xml']
+
     conn = sharedmod.libvirtobj['conn']
 
     pool_names = conn.listDefinedStoragePools()
@@ -44,13 +46,11 @@ def create_iscsi_pool(params):
         logger.error("%s storage pool has already been created" % poolname)
         return 1
 
-    xmlobj = xml_builder.XmlBuilder()
-    poolxml = xmlobj.build_pool(params)
-    logger.debug("storage pool xml:\n%s" % poolxml)
+    logger.debug("storage pool xml:\n%s" % xmlstr)
 
     try:
         logger.info("Creating %s storage pool" % poolname)
-        conn.storagePoolCreateXML(poolxml, 0)
+        conn.storagePoolCreateXML(xmlstr, 0)
         display_pool_info(conn,logger)
         if check_pool_create(conn, poolname,logger):
             logger.info("creating %s storage pool is SUCCESSFUL!!!" % poolname)

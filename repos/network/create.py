@@ -10,7 +10,6 @@ import libvirt
 from libvirt import libvirtError
 
 from src import sharedmod
-from utils import xml_builder
 
 required_params = ('networkname',
                    'bridgename',
@@ -19,7 +18,8 @@ required_params = ('networkname',
                    'netstart',
                    'netend',
                    'netmode',)
-optional_params = {}
+optional_params = {'xml' : 'xmls/network.xml',
+                  }
 
 def check_network_status(*args):
     """Check current network status, it will return True if
@@ -39,6 +39,7 @@ def create(params):
     """Create a network from xml"""
     logger = params['logger']
     networkname = params['networkname']
+    xmlstr = params['xml']
 
     conn = sharedmod.libvirtobj['conn']
 
@@ -46,27 +47,25 @@ def create(params):
         logger.error("the %s network is running" % networkname)
         return 1
 
-    xmlobj = xml_builder.XmlBuilder()
-    netxml = xmlobj.build_network(params)
-    logger.debug("%s network xml:\n%s" % (networkname, netxml))
+    logger.debug("%s network xml:\n%s" % (networkname, xmlstr))
 
     net_num1 = conn.numOfNetworks()
     logger.info("original network active number: %s" % net_num1)
 
     try:
-        conn.networkCreateXML(netxml)
+        conn.networkCreateXML(xmlstr)
         net_num2 = conn.numOfNetworks()
         if  not check_network_status(networkname, conn, logger) and \
                 net_num2 > net_num1:
             logger.info("current network active number: %s\n" % net_num2)
         else:
             logger.error("the %s network is inactive" % networkname)
-            logger.error("fail to create network from :\n%s" % netxml)
+            logger.error("fail to create network from :\n%s" % xmlstr)
             return 1
     except libvirtError, e:
         logger.error("API error message: %s, error code is %s" \
                      % (e.message, e.get_error_code()))
-        logger.error("create a network from xml: \n%s" % netxml)
+        logger.error("create a network from xml: \n%s" % xmlstr)
         return 1
 
     return 0

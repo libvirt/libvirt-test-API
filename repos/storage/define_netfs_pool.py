@@ -9,10 +9,11 @@ import libvirt
 from libvirt import libvirtError
 
 from src import sharedmod
-from utils import xml_builder
 
-required_params = ('poolname', 'pooltype', 'sourcename', 'sourcepath',)
-optional_params = {'targetpath' : ''}
+required_params = ('poolname', 'sourcehost', 'sourcepath',)
+optional_params = {'targetpath' : '/mnt',
+                   'xml' : 'xmls/netfs_pool.xml',
+                  }
 
 def display_pool_info(conn, logger):
     """Display current storage pool information"""
@@ -36,15 +37,15 @@ def define_netfs_pool(params):
     """Define a netfs type storage pool from xml"""
     logger = params['logger']
     poolname = params['poolname']
+    xmlstr = params['xml']
+
     conn = sharedmod.libvirtobj['conn']
 
     if check_pool_define(poolname, logger):
         logger.error("%s storage pool is defined" % poolname)
         return 1
 
-    xmlobj = xml_builder.XmlBuilder()
-    poolxml = xmlobj.build_pool(params)
-    logger.debug("storage pool xml:\n%s" % poolxml)
+    logger.debug("storage pool xml:\n%s" % xmlstr)
 
     pool_num1 = conn.numOfDefinedStoragePools()
     logger.info("original storage pool define number: %s" % pool_num1)
@@ -52,7 +53,7 @@ def define_netfs_pool(params):
 
     try:
         logger.info("define %s storage pool" % poolname)
-        conn.storagePoolDefineXML(poolxml, 0)
+        conn.storagePoolDefineXML(xmlstr, 0)
         pool_num2 = conn.numOfDefinedStoragePools()
         logger.info("current storage pool define number: %s" % pool_num2)
         display_pool_info(conn, logger)

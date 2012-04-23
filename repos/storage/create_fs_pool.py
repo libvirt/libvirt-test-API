@@ -9,11 +9,13 @@ import libvirt
 from libvirt import libvirtError
 
 from src import sharedmod
-from utils import xml_builder
 from utils import xml_parser
 
-required_params = ('poolname', 'sourcepath', 'pooltype',)
-optional_params = {'sourceformat' : ''}
+required_params = ('poolname', 'sourcepath',)
+optional_params = {'sourceformat' : 'ext3',
+                   'targetpath' : '/mnt',
+                   'xml' : 'xmls/fs_pool.xml',
+                  }
 
 def check_pool_create_libvirt(conn, poolname, logger):
     """Check the result of create storage pool on libvirt level.  """
@@ -55,6 +57,8 @@ def create_fs_pool(params):
     """ Create a fs type storage pool from xml"""
     logger = params['logger']
     poolname = params['poolname']
+    xmlstr = params['xml']
+
     conn = sharedmod.libvirtobj['conn']
 
     pool_names = conn.listDefinedStoragePools()
@@ -64,13 +68,11 @@ def create_fs_pool(params):
         logger.error("%s storage pool has already been created" % poolname)
         return 1
 
-    xmlobj = xml_builder.XmlBuilder()
-    poolxml = xmlobj.build_pool(params)
-    logger.debug("storage pool xml:\n%s" % poolxml)
+    logger.debug("storage pool xml:\n%s" % xmlstr)
 
     try:
         logger.info("Creating %s storage pool" % poolname)
-        poolobj = conn.storagePoolCreateXML(poolxml, 0)
+        poolobj = conn.storagePoolCreateXML(xmlstr, 0)
         display_pool_info(conn, logger)
         if check_pool_create_libvirt(conn, poolname, logger):
             logger.info("creating %s storage pool is in libvirt" % poolname)

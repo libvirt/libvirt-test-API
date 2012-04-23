@@ -10,7 +10,6 @@ import libvirt
 from libvirt import libvirtError
 
 from src import sharedmod
-from utils import xml_builder
 
 required_params = ('networkname',
                    'bridgename',
@@ -19,7 +18,8 @@ required_params = ('networkname',
                    'netstart',
                    'netend',
                    'netmode',)
-optional_params = {}
+optional_params = {'xml' : 'xmls/network.xml',
+                  }
 
 def check_network_define(networkname, logger):
     """Check define network result, if define network is successful,
@@ -42,6 +42,7 @@ def define(params):
     """Define a network from xml"""
     logger = params['logger']
     networkname = params['networkname']
+    xmlstr = params['xml']
 
     conn = sharedmod.libvirtobj['conn']
 
@@ -49,15 +50,13 @@ def define(params):
         logger.error("%s network is defined" % networkname)
         return 1
 
-    xmlobj = xml_builder.XmlBuilder()
-    netxml = xmlobj.build_network(params)
-    logger.debug("network xml:\n%s" % netxml)
+    logger.debug("network xml:\n%s" % xmlstr)
 
     net_num1 = conn.numOfDefinedNetworks()
     logger.info("original network define number: %s" % net_num1)
 
     try:
-        conn.networkDefineXML(netxml)
+        conn.networkDefineXML(xmlstr)
         net_num2 = conn.numOfDefinedNetworks()
         if check_network_define(networkname, logger) and net_num2 > net_num1:
             logger.info("current network define number: %s" % net_num2)
@@ -68,7 +67,7 @@ def define(params):
     except libvirtError, e:
         logger.error("API error message: %s, error code is %s" \
                      % (e.message, e.get_error_code()))
-        logger.error("define a network from xml: \n%s" % netxml)
+        logger.error("define a network from xml: \n%s" % xmlstr)
         return 1
 
     return 0

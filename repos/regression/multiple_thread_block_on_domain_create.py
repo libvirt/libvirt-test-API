@@ -15,14 +15,15 @@ from libvirt import libvirtError
 
 from src import sharedmod
 from utils import utils
-from utils import env_parser
-from utils import xml_builder
+from src import env_parser
+
+required_params = ('guestos', 'guestarch', 'guestnum', 'uri')
+optional_params = {'xml' : 'xmls/domain.xml',
+                  }
 
 IMAG_PATH = "/var/lib/libvirt/images/"
 DISK_DD = "dd if=/dev/zero of=%s bs=1 count=1 seek=6G"
-
-required_params = ('guestos', 'guestarch', 'virt_type', 'guestnum', 'uri')
-optional_params = {}
+HOME_PATH = os.getcwd()
 
 def request_credentials(credentials, user_data):
     for credential in credentials:
@@ -49,44 +50,43 @@ def request_credentials(credentials, user_data):
 class guest_install(Thread):
     """function callable by as a thread to create guest
     """
-    def __init__(self, name, os, arch, type, ks, conn, util, logger):
+    def __init__(self, name, os, arch, ks, conn, xmlstr, logger):
         Thread.__init__(self)
         self.name = name
         self.os = os
         self.arch = arch
-        self.type = type
         self.ks = ks
         self.conn = conn
-        self.util = util
+        self.xmlstr = xmlstr
         self.logger = logger
 
     def run(self):
-        guest_params = {};
-        guest_params['virt_type'] = self.type
-        guest_params['guestname'] = self.name
-        guest_params['kickstart'] = self.ks
-        macaddr = self.utils.get_rand_mac()
-        guest_params['macaddr'] = macaddr
+        macaddr = utils.get_rand_mac()
+
+        self.xmlstr = self.xmlstr.replace('GUESTNAME', self.name)
+        self.xmlstr = self.xmlstr.replace('MACADDR', macaddr)
+        self.xmlstr = self.xmlstr.replace('KS', self.ks)
 
 	# prepare disk image file
-        imagepath = IMAG_PATH + self.name
-        (status, message) = commands.getstatusoutput(DISK_DD % imagepath)
+        diskpath = IMAG_PATH + self.name
+        (status, message) = commands.getstatusoutput(DISK_DD % diskpath)
         if status != 0:
             self.logger.debug(message)
         else:
             self.logger.info("creating disk images file is successful.")
 
-        xmlobj = xml_builder.XmlBuilder()
-        guestxml = xmlobj.build_domain_install(guest_params)
-        self.logger.debug("guestxml is %s" % guestxml)
-        self.logger.info('create guest %sfrom xml description' % self.name)
+        self.xmlstr = self.xmlstr.replace('DISKPATH', diskpath)
+        os.chown(diskpath, 107, 107)
+
+        self.logger.debug("guestxml is %s" % self.xmlstr)
+        self.logger.info('create guest %s from xml description' % self.name)
         try:
-            guestobj = self.conn.createXML(guestxml, 0)
+            guestobj = self.conn.createXML(self.xmlstr, 0)
             self.logger.info('guest %s API createXML returned successfuly' % guestobj.name())
         except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
+            self.logger.error("API error message: %s, error code is %s" \
                          % (e.message, e.get_error_code()))
-            self.logger.error("fail to define domain %s" % guestname)
+            self.logger.error("fail to define domain %s" % self.name)
             return 1
 
         return 0
@@ -98,12 +98,11 @@ def multiple_thread_block_on_domain_create(params):
     logger = params['logger']
     guestos = params.get('guestos')
     arch = params.get('guestarch')
-    type = params.get('virt_type')
     num = params.get('guestnum')
+    xmlstr = params['xml']
 
     logger.info("the os of guest is %s" % guestos)
     logger.info("the arch of guest is %s" % arch)
-    logger.info("the type of guest is %s" % type)
     logger.info("the number of guest we are going to install is %s" % num)
 
     hypervisor = utils.get_hypervisor()
@@ -116,8 +115,8 @@ def multiple_thread_block_on_domain_create(params):
     logger.info("the type of hypervisor is %s" % hypervisor)
     logger.debug("the uri to connect is %s" % uri)
 
-    envfile = os.path.join(homepath, 'global.cfg')
-    envparser = env_parser.Envpaser(envfile)
+    envfile = os.path.join(HOME_PATH, 'global.cfg')
+    envparser = env_parser.Envparser(envfile)
     ostree = envparser.get_value("guest", guestos + "_" + arch)
     ks = envparser.get_value("guest", guestos + "_" + arch +
                                 "_http_ks")
@@ -136,7 +135,7 @@ def multiple_thread_block_on_domain_create(params):
     thread_pid = []
     for i in range(int(start_num), int(end_num)):
         guestname =  name + str(i)
-        thr = guest_install(guestname, guestos, arch, type, ks, conn, util, logger)
+        thr = guest_install(guestname, guestos, arch, ks, conn, xmlstr, logger)
         thread_pid.append(thr)
 
     for id in thread_pid:

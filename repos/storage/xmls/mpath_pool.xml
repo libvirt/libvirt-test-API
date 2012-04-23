@@ -1,0 +1,9 @@
+<pool type="mpath">
+  <name>POOLNAME</name>
+  <source/>
+  <target>
+    <path>
+      TARGETPATH
+    </path>
+  </target>
+</pool>
