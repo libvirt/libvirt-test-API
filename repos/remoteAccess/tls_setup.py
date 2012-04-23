@@ -37,7 +37,7 @@ SERVERCERT = os.path.join(TEMP_TLS_FOLDER, 'servercert.pem')
 CLIENTKEY = os.path.join(TEMP_TLS_FOLDER, 'clientkey.pem')
 CLIENTCERT = os.path.join(TEMP_TLS_FOLDER, 'clientcert.pem')
 
-def CA_setting_up(util, logger):
+def CA_setting_up(logger):
     """ setting up a Certificate Authority """
     # Create a private key for CA
     logger.info("generate CA certificates")
@@ -72,7 +72,7 @@ def CA_setting_up(util, logger):
     logger.info("done the CA certificates job")
     return 0
 
-def tls_server_cert(target_machine, util, logger):
+def tls_server_cert(target_machine, logger):
     """ generating server certificates """
     # Create tls server key
     logger.info("generate server certificates")
@@ -114,7 +114,7 @@ def tls_server_cert(target_machine, util, logger):
     logger.info("done the server certificates job")
     return 0
 
-def tls_client_cert(local_machine, util, logger):
+def tls_client_cert(local_machine, logger):
     """ generating client certificates """
     # Create tls client key
     logger.info("generate client certificates")
@@ -160,7 +160,7 @@ def tls_client_cert(local_machine, util, logger):
     logger.info("done the client certificates job")
     return 0
 
-def deliver_cert(target_machine, username, password, pkipath, util, logger):
+def deliver_cert(target_machine, username, password, pkipath, logger):
     """ deliver CA, server and client certificates """
     # transmit cacert.pem to remote host
     logger.info("deliver CA, server and client certificates to both local and remote server")
@@ -218,7 +218,7 @@ def deliver_cert(target_machine, username, password, pkipath, util, logger):
     logger.info("done to delivery")
     return 0
 
-def sasl_user_add(target_machine, username, password, util, logger):
+def sasl_user_add(target_machine, username, password, logger):
     """ execute saslpasswd2 to add sasl user """
     logger.info("add sasl user on server side")
     saslpasswd2_add = "echo %s | %s -a libvirt %s" % (password, SASLPASSWD2, username)
@@ -231,7 +231,7 @@ def sasl_user_add(target_machine, username, password, util, logger):
     return 0
 
 def tls_libvirtd_set(target_machine, username, password,
-                     listen_tls, auth_tls, util, logger):
+                     listen_tls, auth_tls, logger):
     """ configure libvirtd.conf on tls server """
     logger.info("setting libvirtd.conf on tls server")
     # open libvirtd --listen option
@@ -272,7 +272,7 @@ def tls_libvirtd_set(target_machine, username, password,
     logger.info("done to libvirtd configuration")
     return 0
 
-def iptables_stop(target_machine, username, password, util, logger):
+def iptables_stop(target_machine, username, password, logger):
     """ This is a temprory method in favor of migration """
     logger.info("stop local and remote iptables temprorily")
     iptables_stop_cmd = "service iptables stop"
@@ -375,28 +375,28 @@ def tls_setup(params):
 
     os.mkdir(TEMP_TLS_FOLDER)
 
-    if iptables_stop(target_machine, username, password, util, logger):
+    if iptables_stop(target_machine, username, password, logger):
         return 1
 
-    if CA_setting_up(util, logger):
+    if CA_setting_up(logger):
         return 1
 
-    if tls_server_cert(target_machine, util, logger):
+    if tls_server_cert(target_machine, logger):
         return 1
 
-    if tls_client_cert(local_machine, util, logger):
+    if tls_client_cert(local_machine, logger):
         return 1
 
     if deliver_cert(target_machine, username,
-                     password, pkipath, util, logger):
+                     password, pkipath, logger):
         return 1
 
     if auth_tls == 'sasl':
-        if sasl_user_add(target_machine, username, password, util, logger):
+        if sasl_user_add(target_machine, username, password, logger):
             return 1
 
     if tls_libvirtd_set(target_machine, username, password,
-                        listen_tls, auth_tls, util, logger):
+                        listen_tls, auth_tls, logger):
         return 1
 
     if listen_tls == 'disable':

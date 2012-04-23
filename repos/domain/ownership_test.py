@@ -35,7 +35,7 @@ def check_domain_running(conn, guestname, logger):
     else:
         return 0
 
-def nfs_setup(util, logger):
+def nfs_setup(logger):
     """setup nfs on localhost
     """
     logger.info("set nfs service")
@@ -57,7 +57,7 @@ def nfs_setup(util, logger):
 
     return 0
 
-def chown_file(util, filepath, logger):
+def chown_file(filepath, logger):
     """touch a file and setting the chown
     """
     if os.path.exists(filepath):
@@ -87,7 +87,7 @@ def chown_file(util, filepath, logger):
 
     return 0
 
-def prepare_env(util, dynamic_ownership, use_nfs, logger):
+def prepare_env(dynamic_ownership, use_nfs, logger):
     """configure dynamic_ownership in /etc/libvirt/qemu.conf,
        set chown of the file to save
     """
@@ -126,12 +126,12 @@ def prepare_env(util, dynamic_ownership, use_nfs, logger):
         logger.error("wrong use_nfs value")
         return 1
 
-    ret = chown_file(util, filepath, logger)
+    ret = chown_file(filepath, logger)
     if ret:
         return 1
 
     if use_nfs == 'enable':
-        ret = nfs_setup(util, logger)
+        ret = nfs_setup(logger)
         if ret:
             return 1
 
@@ -175,7 +175,7 @@ def ownership_test(params):
 
     # set env
     logger.info("prepare the environment")
-    ret = prepare_env(util, dynamic_ownership, use_nfs, logger)
+    ret = prepare_env(dynamic_ownership, use_nfs, logger)
     if ret:
         logger.error("failed to prepare the environment")
         return 1

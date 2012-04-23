@@ -38,7 +38,7 @@ def redefine_vcpu_number(domobj, domain_name, vcpu):
 
     return doc.toxml()
 
-def set_vcpus(util, domobj, domain_name, vcpu):
+def set_vcpus(domobj, domain_name, vcpu):
     """set the value of virtual machine to vcpu offline , then boot up
        the virtual machine
     """
@@ -225,7 +225,7 @@ def cpu_affinity(params):
 
     if vcpunum != vcpu:
         logger.info("set the vcpu of the guest to %s" % vcpu)
-        ret = set_vcpus(util, domobj, domain_name, vcpu)
+        ret = set_vcpus(domobj, domain_name, vcpu)
         if ret != 0:
             return 1
 

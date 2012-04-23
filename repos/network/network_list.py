@@ -47,7 +47,7 @@ def get_output(logger, command, flag):
         logger.error(ret)
     return status, ret
 
-def check_all_option(conn, util, logger):
+def check_all_option(conn, logger):
     """check the output of virsh net-list with --all option
     """
     all_network = []
@@ -73,7 +73,7 @@ def check_all_option(conn, util, logger):
                 return 1
     return 0
 
-def check_inactive_option(conn, util, logger):
+def check_inactive_option(conn, logger):
     """check the output of virsh net-list with --inactive option
     """
     inactive_network = []
@@ -105,7 +105,7 @@ def check_inactive_option(conn, util, logger):
 
     return 0
 
-def check_default_option(conn, util, logger):
+def check_default_option(conn, logger):
     """check the output of virsh net-list
     """
     active_network = []
@@ -158,7 +158,7 @@ def network_list(params):
     for option in option_list:
         if option == ' ':
             logger.info("check the output of virsh net-list")
-            if not check_default_option(conn, util, logger):
+            if not check_default_option(conn, logger):
                 logger.info("virsh net-list checking succeeded")
                 execute_virsh_netlist(option, logger)
             else:
@@ -166,7 +166,7 @@ def network_list(params):
                 return 1
         elif option == '--inactive':
             logger.info("check the output of virsh net-list --inactive")
-            if not check_inactive_option(conn, util, logger):
+            if not check_inactive_option(conn, logger):
                 logger.info("virsh net-list --inactive checking succeeded")
                 execute_virsh_netlist(option, logger)
             else:
@@ -174,7 +174,7 @@ def network_list(params):
                 return 1
         elif option == '--all':
             logger.info("check the output of virsh net-list --all")
-            if not check_all_option(conn, util, logger):
+            if not check_all_option(conn, logger):
                 logger.info("virsh net-list --all checking succeeded")
                 execute_virsh_netlist(option, logger)
             else:

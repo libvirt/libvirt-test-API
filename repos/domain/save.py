@@ -16,7 +16,7 @@ optional_params = {}
 
 def get_guest_ipaddr(*args):
     """Get guest ip address"""
-    (guestname, util, logger) = args
+    (guestname, logger) = args
 
     mac = utils.get_dom_mac_addr(guestname)
     logger.debug("guest mac address: %s" %mac)
@@ -50,10 +50,10 @@ def check_guest_save(*args):
        guestname.save will exist under /tmp directory and guest
        can't be ping and status is paused
     """
-    (guestname, domobj, util, logger) = args
+    (guestname, domobj, logger) = args
 
     if not check_guest_status(domobj, logger):
-        if not get_guest_ipaddr(guestname, util, logger):
+        if not get_guest_ipaddr(guestname, logger):
             return True
         else:
             return False
@@ -70,7 +70,7 @@ def save(params):
     domobj = conn.lookupByName(guestname)
 
     # Save domain
-    ipaddr = get_guest_ipaddr(guestname, util, logger)
+    ipaddr = get_guest_ipaddr(guestname, logger)
 
     if not check_guest_status(domobj, logger):
         logger.error("Error: current guest status is shutoff")
@@ -82,7 +82,7 @@ def save(params):
 
     try:
         domobj.save(filepath)
-        if check_guest_save(guestname, domobj, util, logger):
+        if check_guest_save(guestname, domobj, logger):
             logger.info("save %s domain successful" %guestname)
         else:
             logger.error("Error: fail to check save domain")

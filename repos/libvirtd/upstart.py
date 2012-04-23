@@ -20,7 +20,7 @@ INITCTL_RELOAD_CMD = "initctl reload-configuration"
 SYSTEMCTL_RELOAD_CMD = "systemctl daemon-reload"
 INIT_CONF = "/etc/init/libvirtd.conf"
 
-def libvirtd_check(util, logger):
+def libvirtd_check(logger):
     """check libvirtd status
     """
     cmd = "service libvirtd status"
@@ -133,7 +133,7 @@ def upstart(params):
     time.sleep(5)
 
     logger.info("check the libvirtd status:")
-    ret = libvirtd_check(util, logger)
+    ret = libvirtd_check(logger)
     if ret:
         return 1
 
@@ -149,7 +149,7 @@ def upstart(params):
     time.sleep(5)
 
     logger.info("recheck libvirtd status:")
-    ret = libvirtd_check(util, logger)
+    ret = libvirtd_check(logger)
     if ret:
         return 1
     else:

@@ -33,7 +33,7 @@ def check_domain_running(conn, guestname, logger):
     else:
         return 0
 
-def libvirtd_check(util, logger):
+def libvirtd_check(logger):
     """check libvirtd status
     """
     cmd = "service libvirtd status"
@@ -55,7 +55,7 @@ def libvirtd_check(util, logger):
 
     return 0
 
-def get_domain_pid(util, logger, guestname):
+def get_domain_pid(logger, guestname):
     """get the pid of running domain"""
     logger.info("get the pid of running domain %s"  % guestname)
     get_pid_cmd = "cat /var/run/libvirt/qemu/%s.pid" % guestname
@@ -82,7 +82,7 @@ def restart(params):
         return 1
 
     logger.info("check the libvirtd status:")
-    ret = libvirtd_check(util, logger)
+    ret = libvirtd_check(logger)
     if ret:
         return 1
 
@@ -102,7 +102,7 @@ def restart(params):
         logger.error("fail to ping domain %s" % guestname)
         return 1
 
-    ret, pid_before = get_domain_pid(util, logger, guestname)
+    ret, pid_before = get_domain_pid(logger, guestname)
     if ret:
         return 1
 
@@ -118,7 +118,7 @@ def restart(params):
             logger.info(out[i])
 
     logger.info("recheck libvirtd status:")
-    ret = libvirtd_check(util, logger)
+    ret = libvirtd_check(logger)
     if ret:
         return 1
 
@@ -129,7 +129,7 @@ def restart(params):
         logger.error("fail to ping domain %s" % guestname)
         return 1
 
-    ret, pid_after = get_domain_pid(util, logger, guestname)
+    ret, pid_after = get_domain_pid(logger, guestname)
     if ret:
         return 1
 

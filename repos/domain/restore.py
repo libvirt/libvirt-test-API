@@ -16,7 +16,7 @@ optional_params = {}
 
 def get_guest_ipaddr(*args):
     """Get guest ip address"""
-    (guestname, util, logger) = args
+    (guestname, logger) = args
 
     mac = utils.get_dom_mac_addr(guestname)
     logger.debug("guest mac address: %s" % mac)
@@ -47,10 +47,10 @@ def check_guest_restore(*args):
     """Check restore domain result, if restore domain is successful,
        guest status will not be paused and can be ping
     """
-    (guestname, domobj, util, logger) = args
+    (guestname, domobj, logger) = args
 
     if check_guest_status(domobj, logger):
-        if get_guest_ipaddr(guestname, util, logger):
+        if get_guest_ipaddr(guestname, logger):
             return True
         else:
             return False
@@ -73,7 +73,7 @@ def restore(params):
 
     try:
         conn.restore(filepath)
-        if check_guest_restore(guestname, domobj, util, logger):
+        if check_guest_restore(guestname, domobj, logger):
             logger.info("restore %s domain successful" % guestname)
         else:
             logger.error("Error: fail to check restore domain")

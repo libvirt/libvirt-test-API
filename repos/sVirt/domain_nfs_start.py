@@ -25,7 +25,7 @@ optional_params = {}
 
 QEMU_CONF = "/etc/libvirt/qemu.conf"
 
-def nfs_setup(util, root_squash, logger):
+def nfs_setup(root_squash, logger):
     """setup nfs on localhost
     """
     logger.info("set nfs service")
@@ -55,7 +55,7 @@ def nfs_setup(util, root_squash, logger):
 
     return 0
 
-def prepare_env(util, d_ownership, virt_use_nfs, guestname, root_squash, \
+def prepare_env(d_ownership, virt_use_nfs, guestname, root_squash, \
                 disk_file, img_dir, logger):
     """set virt_use_nfs SElinux boolean, configure
        dynamic_ownership in /etc/libvirt/qemu.conf
@@ -105,7 +105,7 @@ def prepare_env(util, d_ownership, virt_use_nfs, guestname, root_squash, \
     copy(disk_file, "/tmp")
 
     logger.info("set up nfs service on localhost")
-    ret = nfs_setup(util, root_squash, logger)
+    ret = nfs_setup(root_squash, logger)
     if ret:
         return 1
 
@@ -165,7 +165,7 @@ def domain_nfs_start(params):
 
     # set env
     logger.info("prepare the environment")
-    ret = prepare_env(util, dynamic_ownership, virt_use_nfs, guestname, \
+    ret = prepare_env(dynamic_ownership, virt_use_nfs, guestname, \
                       root_squash, disk_file, img_dir, logger)
     if ret:
         logger.error("failed to prepare the environment")

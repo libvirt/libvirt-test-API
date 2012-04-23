@@ -86,7 +86,7 @@ def guest_define(domobj, domxml, logger):
 
     return 0
 
-def guest_start(domobj, guestname, util, logger):
+def guest_start(domobj, guestname, logger):
     """start guest"""
     timeout = 600
     ip = ''
@@ -121,7 +121,7 @@ def guest_start(domobj, guestname, util, logger):
     return 0, ip
 
 def cpu_topology_check(ip, username, password,
-                       sockets, cores, threads, util, logger):
+                       sockets, cores, threads, logger):
     """login the guest, run lscpu command to check the result"""
     lscpu = "lscpu"
     # sleep for 5 seconds
@@ -190,12 +190,12 @@ def cpu_topology(params):
     if guest_define(domobj, domxml, logger):
         return 1
 
-    ret, ip = guest_start(domobj, guestname, util, logger)
+    ret, ip = guest_start(domobj, guestname, logger)
     if ret:
         return 1
 
     if cpu_topology_check(ip, username, password,
-                          sockets, cores, threads, util, logger):
+                          sockets, cores, threads, logger):
        return 1
 
     return 0

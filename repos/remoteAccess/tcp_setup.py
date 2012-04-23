@@ -22,7 +22,7 @@ SASLPASSWD2 = "/usr/sbin/saslpasswd2"
 LIBVIRTD_CONF = "/etc/libvirt/libvirtd.conf"
 SYSCONFIG_LIBVIRTD = "/etc/sysconfig/libvirtd"
 
-def sasl_user_add(target_machine, username, password, util, logger):
+def sasl_user_add(target_machine, username, password, logger):
     """ execute saslpasswd2 to add sasl user """
     logger.info("add sasl user on server side")
     saslpasswd2_add = "echo %s | %s -a libvirt %s" % (password, SASLPASSWD2, username)
@@ -35,7 +35,7 @@ def sasl_user_add(target_machine, username, password, util, logger):
     return 0
 
 def tcp_libvirtd_set(target_machine, username, password,
-                      listen_tcp, auth_tcp, util, logger):
+                      listen_tcp, auth_tcp, logger):
     """ configure libvirtd.conf on libvirt server """
     logger.info("setting libvirtd.conf on libvirt server")
     # open libvirtd --listen option
@@ -156,11 +156,11 @@ def tcp_setup(params):
         return 1
 
     if auth_tcp == 'sasl':
-        if sasl_user_add(target_machine, username, password, util, logger):
+        if sasl_user_add(target_machine, username, password, logger):
             return 1
 
     if tcp_libvirtd_set(target_machine, username, password,
-                         listen_tcp, auth_tcp, util, logger):
+                         listen_tcp, auth_tcp, logger):
         return 1
 
     if listen_tcp == 'disable':

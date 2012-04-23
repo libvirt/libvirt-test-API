@@ -33,7 +33,7 @@ def check_domain_running(conn, guestname, logger):
     else:
         return 0
 
-def libvirtd_check(util, logger):
+def libvirtd_check(logger):
     """check libvirtd status
     """
     cmd = "service libvirtd status"
@@ -55,7 +55,7 @@ def libvirtd_check(util, logger):
 
     return 0
 
-def get_domain_pid(util, logger, guestname):
+def get_domain_pid(logger, guestname):
     """get the pid of running domain"""
     logger.info("get the pid of running domain %s"  % guestname)
     get_pid_cmd = "cat /var/run/libvirt/qemu/%s.pid" % guestname
@@ -82,11 +82,11 @@ def qemu_hang(params):
         return 1
 
     logger.info("check the libvirtd status:")
-    ret = libvirtd_check(util, logger)
+    ret = libvirtd_check(logger)
     if ret:
         return 1
 
-    ret, pid = get_domain_pid(util, logger, guestname)
+    ret, pid = get_domain_pid(logger, guestname)
     if ret:
         return 1
 
@@ -98,7 +98,7 @@ def qemu_hang(params):
         return 1
 
     logger.info("recheck libvirtd status:")
-    ret = libvirtd_check(util, logger)
+    ret = libvirtd_check(logger)
     if ret:
         return 1
 
@@ -109,7 +109,7 @@ def qemu_hang_clean(params):
     logger = params['logger']
     guestname = params['guestname']
 
-    ret = get_domain_pid(util, logger, guestname)
+    ret = get_domain_pid(logger, guestname)
     cmd = "kill -CONT %s" % ret[1]
     ret = utils.exec_cmd(cmd, shell=True)
     if ret[0]:
