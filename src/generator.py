@@ -115,11 +115,11 @@ class FuncGen(object):
             clean_flag = False
 
             mod_case_func = self.case_name_list[i]
-            mod_case = mod_case_func.rsplit(":", 1)[0]
             if mod_case_func.endswith(':clean'):
                 mod_case_func = mod_case_func[:-6]
                 clean_flag = True
 
+            mod_case = mod_case_func.rsplit(":", 1)[0]
             self.fmt.print_start(mod_case, env_logger)
 
             case_params = self.case_params_list[i]
