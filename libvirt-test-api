@@ -245,7 +245,7 @@ class Main(object):
                 string += " " * 8 + p.upper() + "\n"
             for p in optional_params:
                 string += " " * 4 + "[" + p + "]\n"
-                string += " " * 8 + optional_params[p] + "\n"
+                string += " " * 8 + str(optional_params[p]) + "\n"
 
             if proxy_obj.has_clean_function(key):
                 string += "clean\n"
