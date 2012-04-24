@@ -23,6 +23,8 @@ import random
 import commands
 import socket
 import fcntl
+import pty
+import signal
 import struct
 import pexpect
 import string
