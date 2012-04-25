@@ -24,7 +24,7 @@ def check_domain_state(conn, guestname, logger):
     else:
         return True
 
-def delete_check(guestname, snapshotname, expected_flag, logger):
+def check_xml(guestname, snapshotname, expected_flag, logger):
     """ after deleting, check if appropriate xml file exists or not"""
     guest_snapshot_dir = os.path.join(SNAPSHOT_DIR, guestname)
     snapshot_entries = os.listdir(guest_snapshot_dir)
@@ -54,7 +54,7 @@ def delete(params):
         logger.error("checking failed")
         return 1
 
-    if not delete_check(guestname, snapshotname, "exist", logger):
+    if not check_xml(guestname, snapshotname, "exist", logger):
         logger.error("no snapshot %s exists" % snapshotname)
         logger.debug("not corresponding xml file in %s" % SNAPSHOT_DIR)
         return 1
@@ -64,7 +64,7 @@ def delete(params):
         domobj = conn.lookupByName(guestname)
         snapobj = domobj.snapshotLookupByName(snapshotname, 0)
         snapobj.delete(0)
-        if not delete_check(guestname, snapshotname, "noexist", logger):
+        if not check_xml(guestname, snapshotname, "noexist", logger):
             logger.error("after deleting, the corresponding \
                          xmlfile still exists in %s" % SNAPSHOT_DIR)
             return 1

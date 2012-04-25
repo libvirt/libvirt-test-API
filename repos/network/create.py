@@ -39,6 +39,7 @@ def create(params):
     """Create a network from xml"""
     logger = params['logger']
     networkname = params['networkname']
+    netmode = params['netmode']
     xmlstr = params['xml']
 
     conn = sharedmod.libvirtobj['conn']
@@ -46,6 +47,9 @@ def create(params):
     if not check_network_status(networkname, conn, logger):
         logger.error("the %s network is running" % networkname)
         return 1
+
+    if netmode == 'isolate':
+        xmlstr = re.sub('<forward.*\n', '', xmlstr)
 
     logger.debug("%s network xml:\n%s" % (networkname, xmlstr))
 

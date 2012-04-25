@@ -42,13 +42,17 @@ def define(params):
     """Define a network from xml"""
     logger = params['logger']
     networkname = params['networkname']
+    netmode = params['netmode']
     xmlstr = params['xml']
 
     conn = sharedmod.libvirtobj['conn']
 
     if check_network_define(networkname, logger):
-        logger.error("%s network is defined" % networkname)
+        logger.error("%s network is already defined" % networkname)
         return 1
+
+    if netmode == 'isolate':
+        xmlstr = re.sub('<forward.*\n', '', xmlstr)
 
     logger.debug("network xml:\n%s" % xmlstr)
 

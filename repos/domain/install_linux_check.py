@@ -15,7 +15,7 @@ from src import sharedmod
 from src import env_parser
 from utils import utils
 
-required_params = ('guestname', 'virt_type', 'hdmodel', 'nicmodel',)
+required_params = ('guestname', 'virt_type', 'hddriver', 'nicdriver',)
 optional_params = {}
 
 HOME_PATH = os.getcwd()
@@ -71,8 +71,8 @@ def install_linux_check(params):
     logger.info("Now checking guest health after installation")
 
     domain_name=guestname
-    blk_type=params['hdmodel']
-    nic_type=params['nicmodel']
+    blk_type=params['hddriver']
+    nic_type=params['nicdriver']
     Test_Result = 0
 
     # Ping guest from host
