@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import libvirt
-
 class LibvirtException(Exception):
     code = 200
     message = "General libvirt-test-suite Exception"

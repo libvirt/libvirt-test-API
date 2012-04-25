@@ -19,7 +19,7 @@
 
 import commands
 import libvirt
-from src import sharedmod
+import sharedmod
 
 def check_libvirt(logger):
     virsh = 'virsh -v'

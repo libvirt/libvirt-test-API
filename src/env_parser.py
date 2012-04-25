@@ -21,11 +21,7 @@ import ConfigParser
 import os
 import sys
 
-dir = os.path.dirname(sys.modules[__name__].__file__)
-absdir = os.path.abspath(dir)
-sys.path.append(os.path.split(absdir)[0])
-
-from src import exception
+import exception
 
 class Envparser(object):
     def __init__(self, configfile):

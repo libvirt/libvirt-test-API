@@ -23,8 +23,8 @@ import sys
 import copy
 import string
 
-from src import exception
-from src import env_parser
+import exception
+import env_parser
 
 class CaseFileParser(object):
     """ Parser the case configuration file to generate a data list.

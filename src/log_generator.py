@@ -22,7 +22,7 @@ import copy
 from xml.dom import minidom
 from xml.dom.minidom import Document
 
-from src import exception
+import exception
 
 class LogGenerator(object):
     """ Generate and parser log xml file

@@ -24,12 +24,12 @@ import sys
 import os
 import traceback
 
-from src import mapper
-from src.testcasexml import xml_file_to_str
-from src import env_parser
-from src import env_inspect
 from utils import log
-from utils import format
+import mapper
+from testcasexml import xml_file_to_str
+import env_parser
+import env_inspect
+import format
 
 class FuncGen(object):
     """ To generate a callable testcase"""
