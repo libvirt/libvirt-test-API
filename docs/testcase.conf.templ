@@ -1,0 +1,70 @@
+# single line comments looks like this
+
+/*
+  Multiline comments look like this.
+  The lines enclosed by the C style comments will
+  be skipped by parser.py
+*/
+
+###############################################################
+# Indentation:
+# An indent level is four spaces, do not use tabs to indent.
+#
+
+# .----------- testcase: The first line contains the module name and the test case name separated by a colon and is not indented.
+# |
+domain:undefine
+
+#     .-------- options: Indent options by an indent level(four spaces)
+#     |
+    guestname
+
+#           .---- value: Indent Values by two indent levels(eight spaces)
+#          |
+        fedoraVM
+
+################################################################
+#
+# Keywords:  'clean', 'times', 'sleep', '{start_loop, end_loop}'
+#
+
+# 'clean': invoke the clean function in previous testcase
+clean
+
+# 'times': repeat testcase 'repos/domain/install_linux_cdrom.py' N times
+domain:install_linux_cdrom times 2
+    guestname
+       fedoraVM
+    memory
+       1024
+    vcpu
+       1
+
+# 'sleep 5': pause the run of testing for N seconds.
+sleep 5
+
+# The pair of 'start_loop' and 'end_loop' will
+# run the testcases between them N loops
+domain:start start_loop
+    guestname
+        fedoraVM
+
+domain:destroy end_loop 3
+    guestname
+        fedoraVM
+
+################################################################
+#
+# Options: 'times', 'cleanup'
+# always be the last line of testcase config file
+#
+
+#         .---------------------- repeat the above testcases n more times.
+#         |       .-------------- invoke the clean function in all of above testcases
+#         |       |
+options times=2 cleanup=enable
+
+# python libvirt-test-api.py -t repos/domain/undefine.py repos/domain/install_linux_cdrom.py \
+#                                repos/domain/start.py repos/domain/destroy.py
+#
+# The command generates a template of tescase file like above

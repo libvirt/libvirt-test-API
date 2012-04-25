@@ -1,0 +1,48 @@
+#! /usr/bin/env python
+# How to write a new testcase
+
+# If testcase wants to use the connection object offered
+# by the framework or share variables between testcases
+# import sharedmod module.
+from src import sharedmod
+
+# parameters supported by the testcase in the two global variables:
+# required_params, tuple with a ',' at the end of last element.
+# optional_params, a dictionary with option and value pairs
+# Both variables are mandatory.
+required_params = ('guestname',)
+optional_params = {'vcpu', 1,
+                   'memory', 1048576,
+                  }
+
+# The check function is optional. This is for some testcases that
+# need to check whether specific hardware is present on box or
+# testing environment is good before testing.
+# Return value 0 means check pass, 1 means to skip the
+# testcase during running.
+def TESTCASE_check(params):
+    logger = params['logger']
+    ...
+    return 0
+
+# This is the main testing function, The function name must be
+# the same as the file name of the testcase. params['logger'] is
+# provided by framework for logging.
+# Return value 0 means the success of testing, 1 means testing failure.
+# It is mandatory.
+def TESTCASE(params):
+    logger = params['logger']
+    ...
+    return 0
+
+# The clean function is optional. This is for testcases that dirtied
+# testing environment after executed. If keyword 'clean' is set
+# just below the testcase in testcase config file, the clean function
+# defined in the testcase.py will be invoked by framework to do the
+# cleaning job.
+# Return value is optional too, 1 means clean failure, but will not
+# stop the run of testing.
+def TESTCASE_clean(params):
+    logger = params['logger']
+    ...
+    return 0
