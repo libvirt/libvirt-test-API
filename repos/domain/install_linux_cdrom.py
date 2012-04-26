@@ -36,18 +36,16 @@ VM_STAT = "virsh --quiet list --all| grep \"\\b%s\\b\"|grep off"
 VM_DESTROY = "virsh destroy %s"
 VM_UNDEFINE = "virsh undefine %s"
 
-BOOT_DIR = "/var/lib/libvirt/boot/"
 HOME_PATH = os.getcwd()
 
-def prepare_cdrom(*args):
+def prepare_cdrom(ostree, ks, guestname, cache_folder, logger):
     """ to customize boot.iso file to add kickstart
         file into it for automatic guest installation
     """
-    ostree, ks, guestname, logger = args
     ks_name = os.path.basename(ks)
 
-    new_dir = os.path.join(HOME_PATH, guestname)
-    logger.info("creating a new folder for customizing custom.iso file in it")
+    new_dir = os.path.join(cache_folder, guestname)
+    logger.info("creating a workshop folder for customizing custom.iso file")
 
     if os.path.exists(new_dir):
         logger.info("the folder exists, remove it")
@@ -68,7 +66,7 @@ def prepare_cdrom(*args):
     shutil.copy('utils/ksiso.sh', new_dir)
     src_path = os.getcwd()
 
-    logger.info("enter into the workshop folder: %s" % new_dir)
+    logger.debug("enter folder: %s" % new_dir)
     os.chdir(new_dir)
     shell_cmd = 'sh ksiso.sh %s' % ks_name
 
@@ -76,8 +74,8 @@ def prepare_cdrom(*args):
     (status, text) = commands.getstatusoutput(shell_cmd)
 
     logger.debug(text)
-    logger.info("make custom.iso file, change to original directory: %s" %
-                src_path)
+
+    logger.debug("go back to original directory: %s" % src_path)
     os.chdir(src_path)
 
 def prepare_boot_guest(domobj, xmlstr, guestname, installtype, logger):
@@ -186,21 +184,27 @@ def install_linux_cdrom(params):
     envfile = os.path.join(HOME_PATH, 'global.cfg')
     logger.info("the environment file is %s" % envfile)
 
-    envparser = env_parser.Envparser(envfile)
-    ostree = envparser.get_value("guest", guestos + "_" +guestarch)
-    ks = envparser.get_value("guest", guestos + "_" +guestarch + "_http_ks")
+    os_arch = guestos + "_" + guestarch
 
-    logger.debug('install source: \n    %s' % ostree)
-    logger.debug('kisckstart file: \n    %s' % ks)
+    envparser = env_parser.Envparser(envfile)
+    ostree = envparser.get_value("guest", os_arch)
+    ks = envparser.get_value("guest", os_arch + "_http_ks")
+
+    logger.debug('install source:\n    %s' % ostree)
+    logger.debug('kisckstart file:\n    %s' % ks)
+
+    if (ostree == 'http://'):
+        logger.error("no os tree defined in %s for %s" % (envfile, os_arch))
+        return 1
 
     logger.info('prepare installation...')
+    cache_folder = envparser.get_value("variables", "domain_cache_folder")
+
+    logger.info("begin to customize the custom.iso file")
+    prepare_cdrom(ostree, ks, guestname, cache_folder, logger)
 
     bootcd = '%s/custom.iso' % \
-                       (os.path.join(HOME_PATH, guestname))
-    logger.debug("the bootcd path is %s" % bootcd)
-    logger.info("begin to customize the custom.iso file")
-    prepare_cdrom(ostree, ks, guestname, logger)
-
+                       (os.path.join(cache_folder, guestname))
     xmlstr = xmlstr.replace('CUSTOMISO', bootcd)
 
     logger.debug('dump installation guest xml:\n%s' % xmlstr)

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # - simple support to add kernel args
 

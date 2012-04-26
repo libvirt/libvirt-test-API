@@ -79,47 +79,6 @@ def prepare_boot_guest(domobj, xmlstr, guestname, logger, installtype):
 
     return 0
 
-def prepare_cdrom(*args):
-    """ to customize boot.iso file to add kickstart
-        file into it for automatic guest installation
-    """
-    ostree, ks, guestname, logger = args
-    ks_name = os.path.basename(ks)
-
-    new_dir = os.path.join(HOME_PATH, guestname)
-    logger.info("creating a new folder for customizing custom.iso file in it")
-
-    if os.path.exists(new_dir):
-        logger.info("the folder exists, remove it")
-        shutil.rmtree(new_dir)
-
-    os.makedirs(new_dir)
-    logger.info("the directory is %s" % new_dir)
-
-    boot_path = os.path.join(ostree, 'images/boot.iso')
-    logger.info("the url of downloading boot.iso file is %s" % boot_path)
-
-    urllib.urlretrieve(boot_path, '%s/boot.iso' % new_dir)[0]
-    time.sleep(10)
-
-    urllib.urlretrieve(ks, '%s/%s' % (new_dir, ks_name))[0]
-    logger.info("the url of kickstart is %s" % ks)
-
-    shutil.copy('utils/ksiso.sh', new_dir)
-    src_path = os.getcwd()
-
-    logger.info("enter into the workshop folder: %s" % new_dir)
-    os.chdir(new_dir)
-    shell_cmd = 'sh ksiso.sh %s' % ks_name
-
-    logger.info("running command %s to making the custom.iso file" % shell_cmd)
-    (status, text) = commands.getstatusoutput(shell_cmd)
-
-    logger.debug(text)
-    logger.info("make custom.iso file, change to original directory: %s" %
-                src_path)
-    os.chdir(src_path)
-
 def check_domain_state(conn, guestname, logger):
     """ if a guest with the same name exists, remove it """
     running_guests = []
@@ -197,19 +156,24 @@ def install_linux_net(params):
     # Get http, ftp or nfs url based on guest os, arch
     # and installation method from global.cfg
 
+    os_arch = guestos + "_" + guestarch
+
     if installmethod == 'http':
-        ks = envparser.get_value("guest", guestos + "_" + guestarch +
-                                "_http_ks")
+        ks = envparser.get_value("guest", os_arch + "_http_ks")
     elif installmethod == 'ftp':
-        ks = envparser.get_value("guest", guestos + "_" + guestarch + "_ftp_ks")
+        ks = envparser.get_value("guest", os_arch + "_ftp_ks")
     elif installmethod == "nfs":
-        ks = envparser.get_value("guest", guestos + "_" + guestarch + "_nfs_ks")
+        ks = envparser.get_value("guest", os_arch + "_nfs_ks")
 
     xmlstr = xmlstr.replace('KS', ks)
 
-    ostree = envparser.get_value("guest", guestos + "_" + guestarch)
-    logger.debug('install source: \n    %s' % ostree)
-    logger.debug('kisckstart file: \n    %s' % ks)
+    ostree = envparser.get_value("guest", os_arch)
+    logger.debug('install source:\n    %s' % ostree)
+    logger.debug('kisckstart file:\n    %s' % ks)
+
+    if (ostree == 'http://'):
+        logger.error("no os tree defined in %s for %s" % (envfile, os_arch))
+        return 1
 
     logger.info('prepare installation...')
 
