@@ -29,6 +29,7 @@ optional_params = {
                    'uuid' : '05867c1a-afeb-300e-e55e-2673391ae080',
                    'type' : 'define',
                    'xml': 'xmls/kvm_linux_guest_install_cdrom.xml',
+                   'guestmachine': 'pc',
                   }
 
 VIRSH_QUIET_LIST = "virsh --quiet list --all|awk '{print $2}'|grep \"^%s$\""

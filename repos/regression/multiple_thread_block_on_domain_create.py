@@ -19,6 +19,7 @@ from src import env_parser
 
 required_params = ('guestos', 'guestarch', 'guestnum', 'uri')
 optional_params = {'xml' : 'xmls/domain.xml',
+                   'guestmachine': 'pc',
                   }
 
 IMAG_PATH = "/var/lib/libvirt/images/"

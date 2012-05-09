@@ -36,6 +36,7 @@ optional_params = {'memory': 1048576,
                    'type' : 'define',
                    'uuid' : '05867c1a-afeb-300e-e55e-2673391ae080',
                    'xml' : 'xmls/kvm_windows_guest_install_cdrom.xml',
+                   'guestmachine': 'pc',
                   }
 
 def cleanup(mount):

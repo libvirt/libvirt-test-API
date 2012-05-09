@@ -26,6 +26,7 @@ optional_params = {'memory': 1048576,
                    'xml': 'xmls/kvm_guest_define.xml',
                    'flags' : 'none',
                    'xml': 'xmls/kvm_guest_define.xml'
+                   'guestmachine': 'pc',
                   }
 
 def create(params):

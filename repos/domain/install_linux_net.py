@@ -29,6 +29,7 @@ optional_params = {'memory': 1048576,
                    'netmethod' : 'http',
                    'type' : 'define',
                    'xml': 'xmls/kvm_linux_guest_install_net.xml',
+                   'guestmachine': 'pc',
                   }
 
 VIRSH_QUIET_LIST = "virsh --quiet list --all|awk '{print $2}'|grep \"^%s$\""

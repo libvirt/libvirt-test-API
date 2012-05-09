@@ -3,7 +3,7 @@
   <memory>1048576</memory>
   <vcpu>1</vcpu>
   <os>
-    <type>hvm</type>
+    <type machine="GUESTMACHINE">hvm</type>
     <kernel>/var/lib/libvirt/boot/vmlinuz</kernel>
     <initrd>/var/lib/libvirt/boot/initrd.img</initrd>
     <cmdline>KS</cmdline>

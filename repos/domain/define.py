@@ -24,6 +24,8 @@ optional_params = {'memory': 1048576,
                    'password': None,
                    'virt_type': 'kvm',
                    'xml': 'xmls/kvm_guest_define.xml'
+                   'guestarch': 'x86_64',
+                   'guestmachine': 'pc',
                   }
 
 def check_define_domain(guestname, virt_type, hostname, username, \
