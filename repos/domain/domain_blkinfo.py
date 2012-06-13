@@ -77,7 +77,7 @@ def check_block_data(blockdev, blkdata, logger):
     return 0
 
 
-def domblkinfo(params):
+def domain_blkinfo(params):
     """ using du command to check the data
         in the output of virsh domblkinfo
     """

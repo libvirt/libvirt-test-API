@@ -48,7 +48,7 @@ def check_domain_uuid(guestname, UUIDString, logger):
         else:
             return False
 
-def domuuid(params):
+def domain_uuid(params):
     """check virsh domuuid command
     """
     logger = params['logger']

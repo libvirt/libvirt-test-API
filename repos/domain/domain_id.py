@@ -39,7 +39,7 @@ def check_domain_exists(conn, guestname, logger):
     else:
         return True
 
-def domid(params):
+def domain_id(params):
     """check virsh domid command
     """
     logger = params['logger']

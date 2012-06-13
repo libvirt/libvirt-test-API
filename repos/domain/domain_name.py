@@ -22,7 +22,7 @@ def get_output(logger, command):
         logger.error(ret)
     return status, ret
 
-def domname(params):
+def domain_name(params):
     """check virsh domname command
     """
     logger = params['logger']
