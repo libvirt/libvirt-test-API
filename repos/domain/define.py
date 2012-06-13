@@ -23,7 +23,7 @@ optional_params = {'memory': 1048576,
                    'username': None,
                    'password': None,
                    'virt_type': 'kvm',
-                   'xml': 'xmls/kvm_guest_define.xml'
+                   'xml': 'xmls/kvm_guest_define.xml',
                    'guestarch': 'x86_64',
                    'guestmachine': 'pc',
                   }
