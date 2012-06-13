@@ -9,7 +9,7 @@ import commands
 import libvirt
 from libvirt import libvirtError
 
-import sharemod
+from src import sharedmod
 
 required_params = ()
 optional_params = {}
