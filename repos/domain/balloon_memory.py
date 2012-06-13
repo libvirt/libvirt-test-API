@@ -13,7 +13,6 @@ from libvirt import libvirtError
 
 from src import sharedmod
 from utils import utils
-from utils import check
 
 required_params = ('guestname', 'memorypair',)
 optional_params = {}
