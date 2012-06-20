@@ -142,7 +142,7 @@ class Main(object):
             log_xml_parser.add_test_xml(testrunid, testid)
             if os.environ.has_key('AUTODIR'):
                 autotest_testdir = os.path.join(os.environ['AUTODIR'],'tests/libvirt_test_API')
-                logfile = os.path.join('%s/libvirt-test-API/log/%s' % (autotest_testdir, testrunid), logname)
+                logfile = os.path.join('%s/src/log/%s' % (autotest_testdir, testrunid), logname)
             else:
                 logfile = os.path.join('log/%s' % testrunid, logname)
             procs.append(generator.FuncGen(cases_func_ref_dict,
