@@ -32,6 +32,8 @@ import subprocess
 from xml.dom import minidom
 from urlparse import urlparse
 
+subproc_flag = 0
+
 def get_hypervisor():
     if commands.getoutput("lsmod | grep kvm"):
         return 'kvm'
@@ -439,10 +441,12 @@ def support_virt(self):
         return True
 
 def subproc(a, b):
+    global subproc_flag
     subproc_flag = 1
 
 def remote_exec(hostname, username, password, cmd):
     """Remote execution on specified host"""
+    global subproc_flag
     pid, fd = pty.fork()
     if pid == 0:
         try:
@@ -479,6 +483,7 @@ def remote_exec(hostname, username, password, cmd):
             subproc_flag = 0
             return ret
         except Exception, e:
+            print e
             subproc_flag = 0
             return -1
 
