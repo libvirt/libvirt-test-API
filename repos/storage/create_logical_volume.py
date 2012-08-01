@@ -73,10 +73,8 @@ def create_logical_volume(params):
     logger = params['logger']
     poolname = params['poolname']
     volname = params['volname']
-    capacity = params['capacity']
-    xmlstr = params['xmlstr']
-
-    dicts = utils.get_capacity_suffix_size(capacity)
+    capacity = int(params['capacity'])
+    xmlstr = params['xml']
 
     conn = sharedmod.libvirtobj['conn']
     pool_names = conn.listDefinedStoragePools()
