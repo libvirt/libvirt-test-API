@@ -18,12 +18,12 @@ START_PAUSED = 1
 required_params = ('guestname', 'diskpath',)
 optional_params = {'memory': 1048576,
                    'vcpu': 1,
+                   'imageformat' : 'raw',
                    'hddriver' : 'virtio',
                    'nicdriver': 'virtio',
                    'macaddr': '52:54:00:97:e4:28',
                    'uuid' : '05867c1a-afeb-300e-e55e-2673391ae080',
                    'virt_type': 'kvm',
-                   'xml': 'xmls/kvm_guest_define.xml',
                    'flags' : 'none',
                    'xml': 'xmls/kvm_guest_define.xml',
                    'guestmachine': 'pc',
