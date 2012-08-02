@@ -88,15 +88,21 @@ class xml_parser(object):
                     if thenode.attributes != None:
                         tmpattr = dict()
                         if thenode.attributes.length > 0:
-                            for key in thenode.attributes.keys():
+                            for attrkey in thenode.attributes.keys():
                                 tmpattr.update(
-                                {key:thenode.attributes.get(key).nodeValue})
+                                {attrkey:thenode.attributes.get(attrkey).nodeValue})
                             attrdic = { "attr":tmpattr }
                     if key in out:
                         if out[key] == None:
-                            out[key] = value
                             if attrdic != None:
-                                out[key].update(attrdic)
+                                if value == None:
+                                    out[key] = attrdic
+                                else:
+                                    valdic = { "value":value }
+                                    valdic.update(attrdic)
+                                    out[key] = valdic
+                            else:
+                                out[key] = value
                         elif type(out[key]) == list:
                             if attrdic != None:
                                 newdict.update(attrdic)
@@ -111,7 +117,13 @@ class xml_parser(object):
                     else:
                         out[key] = value
                         if attrdic != None:
-                            out[key].update(attrdic)
+                            if value == None:
+                                newdict[key] = attrdic
+                            else:
+                                valdic = { "value":value }
+                                valdic.update(attrdic)
+                                newdict = valdic
+                            out[key] = newdict
                 self.parseintodict(thenode, level+1, out, key)
         return out
 
