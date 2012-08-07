@@ -25,7 +25,7 @@ def display_current_interface(conn):
     logger.debug("current defined host interface list: %s " \
 % conn.listDefinedInterfaces())
 
-def check_create_interface(ifacename, util):
+def check_create_interface(ifacename):
     """Check creating interface result, it will can ping itself
        if create interface is successful.
     """
@@ -67,7 +67,7 @@ def create(params):
         ifaceobj.create(0)
         logger.info("create host interface %s" % ifacename)
         display_current_interface(conn)
-        if check_create_interface(ifacename, util):
+        if check_create_interface(ifacename):
             logger.info("create host interface %s is successful" % ifacename)
         else:
             logger.error("fail to check create interface")
