@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # Upstart libvirtd testing
+#
+# NOTES: Libvirtd will be restarted during test, better run this
+# case alone.
 
 import os
 import re

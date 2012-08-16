@@ -2,6 +2,9 @@
 # Restart libvirtd testing. A running guest is required in
 # this test. During libvirtd restart, the guest remains
 # running and not affected by libvirtd restart.
+#
+# NOTES: Libvirtd will be restarted during test, better run this
+# case alone.
 
 import os
 import re

@@ -3,6 +3,9 @@
 # check the ownership of saved domain file. Test could
 # be on local or root_squash nfs. The default owner of
 # the saved domain file is qemu:qemu in this case.
+#
+# NOTES: Libvirtd will be restarted during test, better run this
+# case alone.
 
 import os
 import re
@@ -11,7 +14,6 @@ import sys
 import libvirt
 from libvirt import libvirtError
 
-from src import sharedmod
 from utils import utils
 
 required_params = ('guestname', 'dynamic_ownership', 'use_nfs',)
@@ -180,7 +182,7 @@ def ownership_test(params):
         logger.error("failed to prepare the environment")
         return 1
 
-    conn = sharedmod.libvirtobj['conn']
+    conn = utils.get_conn()
 
     # save domain to the file
     logger.info("save domain %s to the file %s" % (guestname, SAVE_FILE))

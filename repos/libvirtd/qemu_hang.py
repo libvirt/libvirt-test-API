@@ -17,7 +17,6 @@ required_params = ('guestname',)
 optional_params = {}
 
 VIRSH_LIST = "virsh list --all"
-RESTART_CMD = "service libvirtd restart"
 
 def check_domain_running(conn, guestname, logger):
     """ check if the domain exists, may or may not be active """

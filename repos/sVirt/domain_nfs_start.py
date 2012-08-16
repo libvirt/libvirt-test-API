@@ -5,6 +5,9 @@
 # check whether the guest can be started or not. The nfs could
 # be root_squash or no_root_squash. SElinux should be enabled
 # and enforcing on host.
+#
+# NOTES: Libvirtd will be restarted during test, better run this
+# case alone.
 
 import os
 import re
@@ -12,7 +15,6 @@ import sys
 
 import libvirt
 from libvirt import libvirtError
-
 from src import sharedmod
 from utils import utils
 from shutil import copy
@@ -171,6 +173,9 @@ def domain_nfs_start(params):
         logger.error("failed to prepare the environment")
         return 1
 
+    # reconnect libvirt
+    conn = utils.get_conn()
+
     domobj = conn.lookupByName(guestname)
 
     logger.info("begin to test start domain from nfs storage")
@@ -283,7 +288,7 @@ def domain_nfs_start(params):
         logger.error("Error: fail to get domain %s state" % guestname)
         return 1
 
-    if state != "shutoff":
+    if state != libvirt.VIR_DOMAIN_SHUTOFF:
         logger.info("shut down the domain %s" % guestname)
         try:
             domobj.destroy()
@@ -407,7 +412,7 @@ def domain_nfs_start_clean(params):
 
 
     # Connect to local hypervisor connection URI
-    conn = sharedmod.libvirtobj['conn']
+    conn = utils.get_conn()
     domobj = conn.lookupByName(guestname)
 
     if domobj.info()[0] != libvirt.VIR_DOMAIN_SHUTOFF:
