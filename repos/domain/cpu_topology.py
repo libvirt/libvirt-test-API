@@ -120,7 +120,7 @@ def guest_start(domobj, guestname, logger):
 
     return 0, ip
 
-def cpu_topology_check(ip, username, password,
+def cpu_topology_chk(ip, username, password,
                        sockets, cores, threads, logger):
     """login the guest, run lscpu command to check the result"""
     lscpu = "lscpu"
@@ -194,7 +194,7 @@ def cpu_topology(params):
     if ret:
         return 1
 
-    if cpu_topology_check(ip, username, password,
+    if cpu_topology_chk(ip, username, password,
                           sockets, cores, threads, logger):
        return 1
 
