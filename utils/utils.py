@@ -487,24 +487,6 @@ def remote_exec(hostname, username, password, cmd):
             subproc_flag = 0
             return -1
 
-def remote_exec_pexpect(hostname, username, password, cmd):
-    """Remote exec function via pexpect"""
-    user_hostname = "%s@%s" % (username, hostname)
-    child = pexpect.spawn("/usr/bin/ssh", [user_hostname, cmd],
-                          timeout = 60, maxread = 2000, logfile = None)
-    #child.logfile = sys.stdout
-    while True:
-        index = child.expect(['(yes\/no)', 'password:', pexpect.EOF,
-                             pexpect.TIMEOUT])
-        if index == 0:
-            child.sendline("yes")
-        elif index == 1:
-            child.sendline(password)
-        elif index == 2:
-            return string.strip(child.before)
-        elif index == 3:
-            return "TIMEOUT!!!"
-
 def get_remote_vcpus(hostname, username, password):
     """Get cpu number of specified host"""
     cmd = "cat /proc/cpuinfo | grep processor | wc -l"
