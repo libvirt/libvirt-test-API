@@ -6,8 +6,6 @@
     <format type="nfs"/>
   </source>
   <target>
-    <path>
-      TARGETPATH
-    </path>
+    <path>TARGETPATH</path>
   </target>
 </pool>
