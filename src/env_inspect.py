@@ -20,6 +20,7 @@
 import commands
 import libvirt
 import sharedmod
+from utils import utils
 
 def check_libvirt(logger):
     virsh = 'virsh -v'
@@ -68,20 +69,6 @@ def hostinfo(logger):
         return 1
     return 0
 
-def request_credentials(credentials, user_data):
-    for credential in credentials:
-        if credential[0] == libvirt.VIR_CRED_AUTHNAME:
-            credential[4] = user_data[0]
-
-            if len(credential[4]) == 0:
-                credential[4] = credential[3]
-        elif credential[0] == libvirt.VIR_CRED_PASSPHRASE:
-            credential[4] = user_data[1]
-        else:
-            return -1
-
-    return 0
-
 def sharemod_init(env_parser, logger):
     """ get connection object from libvirt module
         initialize sharemod for use by testcases
@@ -89,11 +76,8 @@ def sharemod_init(env_parser, logger):
     uri = env_parser.get_value('variables', 'defaulturi')
     username = env_parser.get_value('variables', 'username')
     password = env_parser.get_value('variables', 'password')
-    user_data = [username, password]
-    auth = [[libvirt.VIR_CRED_AUTHNAME, libvirt.VIR_CRED_PASSPHRASE], request_credentials, user_data]
-    conn = libvirt.openAuth(uri, auth, 0)
-    if not conn:
-        logger.error("Failed to setup libvirt connection");
+    conn = utils.get_conn(uri, username, password)
+    if not conn
         return 1
 
     # initialize conn object in sharedmod

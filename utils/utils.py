@@ -29,6 +29,7 @@ import struct
 import pexpect
 import string
 import subprocess
+import libvirt
 from xml.dom import minidom
 from urlparse import urlparse
 
@@ -56,6 +57,28 @@ def get_uri(ip):
         if hypervisor == "kvm":
             uri = "qemu+ssh://%s/system" % ip
     return uri
+
+def request_credentials(credentials, user_data):
+    for credential in credentials:
+        if credential[0] == libvirt.VIR_CRED_AUTHNAME:
+            credential[4] = user_data[0]
+
+            if len(credential[4]) == 0:
+                credential[4] = credential[3]
+        elif credential[0] == libvirt.VIR_CRED_PASSPHRASE:
+            credential[4] = user_data[1]
+        else:
+            return -1
+
+    return 0
+
+def get_conn(uri='', username='', password=''):
+    """ get connection object from libvirt module
+    """
+    user_data = [username, password]
+    auth = [[libvirt.VIR_CRED_AUTHNAME, libvirt.VIR_CRED_PASSPHRASE], request_credentials, user_data]
+    conn = libvirt.openAuth(uri, auth, 0)
+    return conn
 
 def parse_uri(uri):
     # This is a simple parser for uri
