@@ -77,7 +77,7 @@ def sharemod_init(env_parser, logger):
     username = env_parser.get_value('variables', 'username')
     password = env_parser.get_value('variables', 'password')
     conn = utils.get_conn(uri, username, password)
-    if not conn
+    if not conn:
         return 1
 
     # initialize conn object in sharedmod
