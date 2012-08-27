@@ -34,12 +34,12 @@ def check_domain_running(conn, guestname, logger):
 
 def make_flag(ipaddr, username, password, logger):
     """ enter guest OS, create a file in /tmp folder """
-    ret = utils.remote_exec_pexpect(ipaddr, username, password, MAKE_FLAG)
-    if ret == "TIMEOUT!!!":
+    ret, out = utils.remote_exec_pexpect(ipaddr, username, password, MAKE_FLAG)
+    if ret:
         logger.error("connecting to guest OS timeout")
         return False
-    elif ret != '':
-        logger.error("failed to make flag in guest OS, %s" % ret)
+    elif out != '':
+        logger.error("failed to make flag in guest OS, %s" % out)
         return False
     else:
         logger.info("flag %s is created in /tmp folder" % FLAG_FILE)

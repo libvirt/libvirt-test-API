@@ -136,7 +136,7 @@ def cpu_topology_chk(ip, username, password,
     int = 0
     actual_thread = actual_core = actual_socket = ''
 
-    for item in output.strip().split('\r'):
+    for item in output.split('\r'):
         if int == 5:
             actual_thread = item.split()[-1]
             logger.info("the actual thread in the guest is %s" % actual_thread)

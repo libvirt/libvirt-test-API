@@ -427,10 +427,10 @@ def remote_exec_pexpect(hostname, username, password, cmd):
             child.sendline(password)
         elif index == 2:
             child.close()
-            return 0, child.before
+            return 0, string.strip(child.before)
         elif index == 3:
             child.close()
-            return 1, ""
+            return 1, "Timeout!!!!"
 
     return 0
 
@@ -531,8 +531,8 @@ def get_remote_memory(hostname, username, password):
     i = 0
     while i < 3:
         i += 1
-        memsize = \
-        int(remote_exec_pexpect(hostname, username, password, cmd)) * 1024
+        ret, out = remote_exec_pexpect(hostname, username, password, cmd)
+        memsize = int(out) * 1024
         if memsize == -1:
             continue
         else:
@@ -595,10 +595,10 @@ def libvirt_version(latest_ver = ''):
 def create_dir(hostname, username, password):
     """Create new dir"""
     cmd = "mkdir /tmp/test"
-    mkdir_ret = remote_exec_pexpect(hostname, username, password, cmd)
+    ret, mkdir_ret = remote_exec_pexpect(hostname, username, password, cmd)
     if mkdir_ret == '':
         cmd = "ls -d /tmp/test"
-        check_str = remote_exec_pexpect(hostname, username,
+        ret, check_str = remote_exec_pexpect(hostname, username,
                                              password, cmd)
         if check_str == "/tmp/test":
             return 0
@@ -613,11 +613,11 @@ def write_file(hostname, username, password):
     """Simple test for writting file on specified host"""
     test_string = 'hello word testing'
     cmd = """echo '%s'>/tmp/test/test.log""" % (test_string)
-    write_file_ret = remote_exec_pexpect(hostname, username,
+    ret, write_file_ret = remote_exec_pexpect(hostname, username,
                                               password, cmd)
     if write_file_ret == '':
         cmd = """grep '%s' /tmp/test/test.log""" % ("hello")
-        check_str = remote_exec_pexpect(hostname, username,
+        ret, check_str = remote_exec_pexpect(hostname, username,
                                              password, cmd)
         if check_str == test_string:
             return 0
@@ -649,10 +649,10 @@ def run_wget_app(hostname, username, password, file_url, logger):
     """Simple test for wget app on specified host"""
     cmd_line = "wget -P /tmp %s -o /tmp/wget.log" % (file_url)
     logger.info("Command: %s" % (cmd_line))
-    wget_ret = remote_exec_pexpect(hostname, username,
+    ret, wget_ret = remote_exec_pexpect(hostname, username,
                                         password, cmd_line)
     cmd_line = "grep %s %s" % ('100%', '/tmp/wget.log')
-    check_ret = remote_exec_pexpect(hostname, username,
+    ret, check_ret = remote_exec_pexpect(hostname, username,
                                          password, cmd_line)
     if check_ret == "":
         logger.info("grep output is nothing")
@@ -683,9 +683,9 @@ def validate_remote_nic_type(hostname, username,
     logger.info("nic_driver = %s" % (nic_driver))
     lspci_cmd = "lspci"
     lsmod_cmd = "lsmod"
-    lspci_cmd_ret = remote_exec_pexpect(hostname, username,
+    ret, lspci_cmd_ret = remote_exec_pexpect(hostname, username,
                                              password, lspci_cmd)
-    lsmod_cmd_ret = remote_exec_pexpect(hostname, username,
+    ret, lsmod_cmd_ret = remote_exec_pexpect(hostname, username,
                                              password, lsmod_cmd)
     logger.info("------------")
     logger.info("lspci_cmd_ret:\n %s" % (lspci_cmd_ret))
@@ -743,9 +743,9 @@ def validate_remote_blk_type(hostname, username, password,
     blk_type_to_driver_dict = {'ide':'unknow', 'virtio':'virtio_blk'}
     lspci_cmd = "lspci"
     lsmod_cmd = "lsmod"
-    lspci_cmd_ret = remote_exec_pexpect(hostname, username,
+    ret, lspci_cmd_ret = remote_exec_pexpect(hostname, username,
                                              password, lspci_cmd)
-    lsmod_cmd_ret = remote_exec_pexpect(hostname, username,
+    ret, lsmod_cmd_ret = remote_exec_pexpect(hostname, username,
                                             password, lsmod_cmd)
     logger.info("------------")
     logger.info("lspci_cmd_ret:\n %s" % (lspci_cmd_ret))

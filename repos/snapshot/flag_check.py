@@ -68,20 +68,20 @@ def flag_check(params):
         logger.info("vm %s failed to get ip address" % guestname)
         return 1
 
-    ret = utils.remote_exec_pexpect(ipaddr, username, password, FLAG_CHECK)
-    if ret == "TIMEOUT!!!":
+    ret, out = utils.remote_exec_pexpect(ipaddr, username, password, FLAG_CHECK)
+    if ret:
         logger.error("connecting to guest OS timeout")
         return 1
-    elif ret == FLAG_FILE and expected_result == "exist":
+    elif out == FLAG_FILE and expected_result == "exist":
         logger.info("checking flag %s in guest OS succeeded" % FLAG_FILE)
         return 0
-    elif ret == FLAG_FILE and expected_result == 'noexist':
+    elif out == FLAG_FILE and expected_result == 'noexist':
         logger.error("flag %s still exist, FAILED." % FLAG_FILE)
         return 1
-    elif ret != None and expected_result == "exist":
+    elif out != None and expected_result == "exist":
         logger.error("no flag %s exists in the guest %s " % (FLAG_FILE,guestname))
         return 1
-    elif ret != None and expected_result == 'noexist':
+    elif out != None and expected_result == 'noexist':
         logger.info("flag %s is not present, checking succeeded" % FLAG_FILE)
         return 0
 
