@@ -54,9 +54,9 @@ def check_volume_create(poolobj, poolname, volname, size):
     logger.debug("%s file path: %s" % (poolname, path))
     if os.access(path, os.R_OK):
         logger.debug("execute grep lvcreate %s command" % path)
-        stat, ret = commands.getstatusoutput("grep \
-'lvcreate --name %s -L %sK /dev/%s' %s"\
- % (volname, size, poolname, path))
+        stat, ret = commands.getstatusoutput(
+            "grep 'lvcreate --name %s -L %sK .*%s' %s"
+            % (volname, size, poolname, path))
         if stat == 0 and volname in poolobj.listVolumes():
             logger.debug(ret)
             return True
