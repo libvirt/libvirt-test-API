@@ -12,7 +12,7 @@ dist:
 	@cp -r $(PWD) /tmp/$(APP)
 	@find /tmp/$(APP) -name "*.pyc" -exec rm -f {} \; 
 	@cd /tmp/$(APP); rm -rf .git/ log/; rm -f .gitignore log.xml
-	@chmod +x /tmp/$(APP)/libvirt-test-api.py
+	@chmod +x /tmp/$(APP)/libvirt-test-api*
 	@cd /tmp; tar czSpf $(APP).tar.gz $(APP)
 	@rm -rf /tmp/$(APP)
 	@cp /tmp/$(APP).tar.gz .
