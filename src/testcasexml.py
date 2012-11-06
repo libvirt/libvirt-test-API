@@ -31,7 +31,7 @@ def xml_file_to_str(proxy_obj, mod_case, case_params):
         text = fh.read()
         fh.close()
     else:
-        raise exception.FileDoesNotExist("xml file %s doesn't exist" % xml_file_path)
+        raise exception.FileDoesNotExist("xml file %s doesn't exist" % file_path)
 
     # replace the params that in testcase.conf first
     for (key, value) in case_params.items():
