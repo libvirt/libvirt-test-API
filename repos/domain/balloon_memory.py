@@ -209,6 +209,7 @@ def balloon_memory(params):
 
     logger.debug("dump the xml description of guest virtual machine %s" %
                   domname)
+    time.sleep(3)
     dom_xml = domobj.XMLDesc(0)
     logger.debug("the xml definination is %s" % dom_xml)
 
@@ -240,6 +241,7 @@ def balloon_memory(params):
 
     logger.debug("dump the xml description of \
                   guest virtual machine %s" % domname)
+    time.sleep(3)
     dom_xml = domobj.XMLDesc(0)
     logger.debug("the xml definination is %s" % dom_xml)
 
