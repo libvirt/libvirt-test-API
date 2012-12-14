@@ -63,18 +63,38 @@ def set_vcpus_config(params):
     try:
         domobj = conn.lookupByName(guestname)
         if vcpu:
+            flags = libvirt.VIR_DOMAIN_AFFECT_CONFIG
             logger.info("the given vcpu number is %s" % vcpu)
             logger.info("set domain vcpu as %s with flag: %s" %
-                        (vcpu, libvirt.VIR_DOMAIN_AFFECT_CONFIG))
-            domobj.setVcpusFlags(int(vcpu), libvirt.VIR_DOMAIN_AFFECT_CONFIG)
+                        (vcpu, flags))
+            domobj.setVcpusFlags(int(vcpu), flags)
             logger.info("set domain vcpu succeed")
 
+            logger.info("check with vcpusFlags api")
+            ret = domobj.vcpusFlags(flags)
+            logger.info("vcpusFlags return current vcpu is: %s" % ret)
+            if ret == int(vcpu):
+                logger.info("vcpusFlags check succeed")
+            else:
+                logger.error("vcpusFlags check failed")
+                return 1
+
         if maxvcpu:
+            flags = libvirt.VIR_DOMAIN_VCPU_MAXIMUM
 	    logger.info("the given max vcpu number is %s" % maxvcpu)
             logger.info("set domain maximum vcpu as %s with flag: %s" %
-                        (maxvcpu, libvirt.VIR_DOMAIN_VCPU_MAXIMUM))
-            domobj.setVcpusFlags(int(maxvcpu), libvirt.VIR_DOMAIN_VCPU_MAXIMUM)
+                        (maxvcpu, flags))
+            domobj.setVcpusFlags(int(maxvcpu), flags)
             logger.info("set domain vcpu succeed")
+
+            logger.info("check with vcpusFlags api")
+            ret = domobj.vcpusFlags(flags)
+            logger.info("vcpusFlags return max vcpu is: %s" % ret)
+            if ret == int(maxvcpu):
+                logger.info("vcpusFlags check succeed")
+            else:
+                logger.error("vcpusFlags check failed")
+                return 1
 
     except libvirtError, e:
         logger.error("libvirt call failed: " + str(e))

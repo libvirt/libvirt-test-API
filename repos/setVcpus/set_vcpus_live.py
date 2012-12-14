@@ -82,6 +82,14 @@ def set_vcpus_live(params):
         logger.info("set domain vcpu as %s with flag: %s" %
                     (vcpu, libvirt.VIR_DOMAIN_VCPU_LIVE))
         domobj.setVcpusFlags(vcpu, libvirt.VIR_DOMAIN_VCPU_LIVE)
+        logger.info("check with vcpusFlags api")
+        ret = domobj.vcpusFlags(libvirt.VIR_DOMAIN_VCPU_LIVE)
+        logger.info("vcpusFlags return current vcpu is: %s" % ret)
+        if ret == vcpu:
+            logger.info("vcpusFlags check succeed")
+        else:
+            logger.error("vcpusFlags check failed")
+            return 1
     except libvirtError, e:
         logger.error("libvirt call failed: " + str(e))
         return 1
