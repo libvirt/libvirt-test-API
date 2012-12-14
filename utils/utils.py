@@ -645,6 +645,77 @@ def run_mount_app(hostname, username, password,
         print "mount fail"
         return 1
 
+def format_parammap(paramlist, map_test, length):
+    """paramlist contains numbers which can be divided by '-', '^' and
+       ',', map_test is a tuple for getting it's content (True or False)
+       and form the new tuple base on numbers in paramlist, length is
+       the length of the return tuple
+    """
+    parammap = ()
+
+    try:
+        if re.match('\^', paramlist):
+            unuse = int(re.split('\^', paramlist)[1])
+            for i in range(length):
+                if i == unuse:
+                    parammap += (False,)
+                else:
+                    parammap += (map_test[i],)
+
+        elif '-' in paramlist:
+            param = re.split('-', paramlist)
+            if not len(param) == 2:
+                return False
+            if not int(param[1]) < length:
+                print "paramlist: out of max range"
+                return False
+            if int(param[1]) < int(param[0]):
+                return False
+
+            for i in range(length):
+                if i in range(int(param[0]), int(param[1])+1):
+                    parammap += (True,)
+                else:
+                    parammap += (map_test[i],)
+
+        else:
+            for i in range(length):
+                if i == int(paramlist):
+                    parammap += (True,)
+                else:
+                    parammap += (map_test[i],)
+
+        return parammap
+    except ValueError, e:
+        print "ValueError: " + str(e)
+        return False
+
+def param_to_tuple(paramlist, length):
+    """paramlist contains numbers which can be divided by '-', '^' and
+       ',', length is the length of the return tuple, return tuple only
+       have True or False value
+    """
+    map_test = ()
+    for i in range(length):
+        map_test += (False,)
+
+    if ',' in paramlist:
+        param = re.split(',', paramlist)
+        for i in range(len(param)):
+            parammap = format_parammap(param[i], map_test, length)
+            if parammap:
+                map_test = parammap
+            else:
+                return False
+        return parammap
+
+    else:
+        parammap = format_parammap(paramlist, map_test, length)
+        if parammap:
+            return parammap
+        else:
+            return False
+
 def run_wget_app(hostname, username, password, file_url, logger):
     """Simple test for wget app on specified host"""
     cmd_line = "wget -P /tmp %s -o /tmp/wget.log" % (file_url)
