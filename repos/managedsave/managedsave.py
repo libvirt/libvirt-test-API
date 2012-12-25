@@ -2,6 +2,8 @@
 
 import os
 import math
+import thread
+import time
 
 import libvirt
 from libvirt import libvirtError
@@ -39,39 +41,43 @@ def check_savefile_create(*args):
         logger.info("managed save file exists")
         return True
 
-def compare_cachedfile(cachebefore, cacheafter):
-    """Compare cached value before managed save and its value after
-    managed save """
+def get_fileflags():
+    """Get the file flags of managed save file"""
+    cmds = "cat /proc/$(lsof -w /var/lib/libvirt/qemu/save/"+guestname+".save"\
+    "|awk '/libvirt_i/{print $2}')/fdinfo/1|grep flags|awk '{print $NF}'"
+    global fileflags
+    while True:
+        (status, output) = utils.exec_cmd(cmds, shell=True)
+        if status == 0:
+	    if len(output) == 1:
+	        logger.info("The flags of saved file %s " % output[0])
+                fileflags = output[0][-5]
+		break
+        else:
+            logger.error("Fail to get the flags of saved file")
+            return 1
 
-    diff = cacheafter - cachebefore
-    logger.info("diff is %s " % diff)
-    percent = math.fabs(diff)/cachebefore
-    logger.info("diff percent is %s " % percent)
-    if percent < 0.05:
+    thread.exit_thread()
+
+def check_fileflag(fileflags):
+    """Check the file flags of managed save file if include O_DIRECT"""
+    if int(fileflags) == 4:
+        logger.info("file flags include O_DIRECT")
         return True
     else:
+        logger.error("file flags doesn't include O_DIRECT")
         return False
-
-def get_cachevalue():
-    """Get the file system cached value """
-
-    cmds = "head -n4 /proc/meminfo|grep Cached|awk '{print $2}'"
-    (status, output) = utils.exec_cmd(cmds, shell=True)
-    if status != 0:
-        logger.error("Fail to run cmd line to get cache")
-        return 1
-    else:
-        logger.debug(output[0])
-    cachevalue= int(output[0])
-    return cachevalue
 
 def managedsave(params):
     """Managed save a running domain"""
 
     global logger
     logger = params['logger']
+    global guestname
     guestname = params['guestname']
     flags = params ['flags']
+    global fileflags
+    fileflags = ''
     #Save given flags to sharedmod.data
     sharedmod.data['flagsave'] = flags
 
@@ -123,16 +129,13 @@ def managedsave(params):
         #If given flags include bypass-cache,check if bypass file system cache
         if flagn % 2 == 1:
             logger.info("Given flags include --bypass-cache")
-            os.system('echo 3 > /proc/sys/vm/drop_caches')
-            cache_before = get_cachevalue()
-            logger.info("Cached value before managedsave is %s" % cache_before)
+            thread.start_new_thread(get_fileflags,())
 
+	    # Guarantee get_fileflags shell has run before managed save
+            time.sleep(5)
             domobj.managedSave(flagn)
 
-            cache_after = get_cachevalue()
-            logger.info("Cached value after managedsave is %s" % cache_after)
-
-            if compare_cachedfile(cache_before, cache_after):
+            if check_fileflag(fileflags):
                 logger.info("Bypass file system cache successfully")
             else:
                 logger.error("Bypass file system cache failed")
