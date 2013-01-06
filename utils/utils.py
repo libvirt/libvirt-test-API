@@ -29,6 +29,7 @@ import struct
 import pexpect
 import string
 import subprocess
+import hashlib
 import libvirt
 from xml.dom import minidom
 from urlparse import urlparse
@@ -715,6 +716,29 @@ def param_to_tuple(paramlist, length):
             return parammap
         else:
             return False
+
+def digest(path, offset, length):
+    """read data from file with length bytes, begin at offset
+       and return md5 hexdigest
+    """
+    f = open(path, 'r')
+    f.seek(offset)
+    m = hashlib.md5()
+    done = 0
+
+    while True:
+        want = 1024
+        if length and length - done < want:
+            want = length - done
+        outstr = f.read(want)
+        got = len(outstr)
+        if got == 0:
+            break
+        done += got
+        m.update(outstr)
+
+    f.close()
+    return m.hexdigest()
 
 def run_wget_app(hostname, username, password, file_url, logger):
     """Simple test for wget app on specified host"""
