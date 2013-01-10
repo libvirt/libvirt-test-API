@@ -1,0 +1,4 @@
+<source>
+  <host name="SOURCEHOST"/>
+  <format type="nfs"/>
+</source>
