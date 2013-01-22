@@ -6,6 +6,7 @@ import os
 import mimetypes
 
 import libvirt
+from src import sharedmod
 
 required_params = ('guestname', 'filename',)
 optional_params = {'screen' : 0}
@@ -30,9 +31,9 @@ def screenshot(params):
 
     ext = mimetypes.guess_extension(mime) or '.ppm'
     last_filename = params['filename'] + ext
-    f = file(filename, 'w')
+    f = file(last_filename, 'w')
 
-    logger.debug('Saving screenshot into %s' % filename)
+    logger.debug('Saving screenshot into %s' % last_filename)
     st.recvAll(saver, f)
     logger.debug('Mimetype of the file is %s' % mime)
 
