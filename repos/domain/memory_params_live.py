@@ -4,6 +4,7 @@
 
 import os
 import math
+import commands
 from xml.dom import minidom
 
 import libvirt
@@ -15,27 +16,35 @@ required_params = ('guestname', 'hard_limit', 'soft_limit', 'swap_hard_limit', )
 optional_params = {}
 
 UNLIMITED = 9007199254740991
-CGROUP_PATH = "/cgroup/memory/libvirt/qemu"
+CGROUP_PATH = "/cgroup/"
 
 def get_cgroup_setting(guestname):
     """get domain memory parameters in cgroup
     """
     if os.path.exists(CGROUP_PATH):
-        cgroup_path = "%s/%s" % (CGROUP_PATH, guestname)
+        cgroup_path = CGROUP_PATH
     else:
-        cgroup_path = "/sys/fs%s/%s" % (CGROUP_PATH, guestname)
+        cgroup_path = "/sys/fs%s" % CGROUP_PATH
 
-    f = open("%s/memory.limit_in_bytes" % cgroup_path)
+    cmd = "lscgroup | grep %s | grep memory:" % guestname
+    ret, out = commands.getstatusoutput(cmd)
+    if ret:
+        logger.error(out)
+        return 1
+    else:
+        mem_cgroup_path = "%s%s" % (cgroup_path, out.replace(':', ''))
+
+    f = open("%s/memory.limit_in_bytes" % mem_cgroup_path)
     hard = int(f.read())
     logger.info("memory.limit_in_bytes value is %s" % hard)
     f.close()
 
-    f = open("%s/memory.soft_limit_in_bytes" % cgroup_path)
+    f = open("%s/memory.soft_limit_in_bytes" % mem_cgroup_path)
     soft = int(f.read())
     logger.info("memory.soft_limit_in_bytes value is %s" % soft)
     f.close()
 
-    f = open("%s/memory.memsw.limit_in_bytes" % cgroup_path)
+    f = open("%s/memory.memsw.limit_in_bytes" % mem_cgroup_path)
     swap = int(f.read())
     logger.info("memory.memsw.limit_in_bytes value is %s" % swap)
     f.close()
@@ -98,6 +107,10 @@ def memory_params_live(params):
 
         logger.info("check memory parameters in cgroup")
         ret = get_cgroup_setting(guestname)
+        if ret == 1:
+            logger.error("fail to get domain memory cgroup setting")
+            return 1
+
         for i in param_dict.keys():
             if math.fabs(param_dict[i] - ret[i]) > 1:
                 logger.error("%s value not match with cgroup setting" % i)
@@ -110,3 +123,14 @@ def memory_params_live(params):
         return 1
 
     return 0
+
+def memory_params_live_check(params):
+    """check lscgroup packages
+    """
+    logger = params['logger']
+    cmd = 'lscgroup'
+    ret, out = commands.getstatusoutput(cmd)
+    if ret and 'command not found' in out:
+        logger.error(out)
+        logger.error("package libcgroup or libcgroup-tools is not installed")
+        return 1
