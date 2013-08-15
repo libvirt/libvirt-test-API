@@ -93,13 +93,15 @@ class LogGenerator(object):
 
         self. __write_to_file(xmldoc, self.logxml)
 
-    def add_test_summary(self, testrunid, testid, result,
+    def add_test_summary(self, testrunid, testid, result, case_retlist,
                          start_time, end_time, path):
         """ add a test summary xml block into log xml file """
         xmldoc = minidom.parse(self.logxml)
         testresult = self.doc.createElement('result')
         resulttext = self.doc.createTextNode(result)
         testresult.appendChild(resulttext)
+
+        caseresult = self.doc.createElement('caseresult')
 
         teststarttime = self.doc.createElement('start_time')
         starttimetext = self.doc.createTextNode(start_time)
@@ -126,9 +128,19 @@ class LogGenerator(object):
                         test.childNodes.insert(0, testendtime)
                         test.childNodes.insert(0, teststarttime)
                         test.childNodes.insert(0, testresult)
+                        test.childNodes.insert(0, caseresult)
+                        for ret in reversed(case_retlist):
+                            retstr = ''
+                            if ret == 0:
+                                retstr = 'PASS'
+                            else:
+                                retstr = 'FAIL'
+                            itemresult = self.doc.createElement('case')
+                            caseresulttext = self.doc.createTextNode(retstr)
+                            itemresult.appendChild(caseresulttext)
+                            caseresult.childNodes.insert(0,itemresult)
 
         self. __write_to_file(xmldoc, self.logxml)
-
 
     def add_testrun_summary(self, testrunid, passnum, failnum, totalnum,
                             start_time, end_time):

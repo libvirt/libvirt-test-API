@@ -87,7 +87,6 @@ class FuncGen(object):
         env_logger = envlog.env_log()
         casenumber = len(self.case_name_list)
         start_time = time.strftime("%Y-%m-%d %H:%M:%S")
-
         env_logger.info("Checking Testing Environment... ")
         envck = env_inspect.EnvInspect(self.env, env_logger)
 
@@ -103,6 +102,7 @@ class FuncGen(object):
 
         # retflag: [pass, fail, skip]
         retflag = [0, 0, 0]
+        case_retlist = []
         for i in range(casenumber):
 
             clean_flag = False
@@ -165,7 +165,7 @@ class FuncGen(object):
                     retflag[2] += 1
 
                 self.fmt.print_end(mod_case, ret, env_logger)
-
+                case_retlist.append(ret)
         # close hypervisor connection
         envck.close_hypervisor_connection()
         end_time = time.strftime("%Y-%m-%d %H:%M:%S")
@@ -179,6 +179,7 @@ class FuncGen(object):
         self.log_xml_parser.add_test_summary(self.testrunid,
                                              self.testid,
                                              result,
+                                             case_retlist,
                                              start_time,
                                              end_time,
                                              self.logfile)
