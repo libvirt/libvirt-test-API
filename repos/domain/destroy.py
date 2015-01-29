@@ -12,7 +12,7 @@ from src import sharedmod
 from utils import utils
 
 required_params = ('guestname',)
-optional_params = {'flags' : 'noping'}
+optional_params = {'flags' : 'noping','bridgename' : 'virbr0',}
 
 def destroy(params):
     """destroy domain
@@ -32,6 +32,7 @@ def destroy(params):
     logger = params['logger']
     params.pop('logger')
     guestname = params['guestname']
+    br = params['bridgename']
     flags = ""
     if params.has_key('flags'):
         flags = params['flags']
@@ -58,7 +59,7 @@ def destroy(params):
         # Get domain ip
         mac = utils.get_dom_mac_addr(guestname)
         logger.info("get ip by mac address")
-        ip = utils.mac_to_ip(mac, 180)
+        ip = utils.mac_to_ip(mac,br,180)
         logger.info("the ip address of guest is %s" % ip)
 
     # Destroy domain
