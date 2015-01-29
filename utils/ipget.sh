@@ -1,8 +1,13 @@
 #!/bin/sh
 
 mac=$1
+br=$2
 if [[ -z $mac ]]; then
    echo "mac address is null."
+   exit 1
+fi
+if [[ -z $br ]]; then
+   echo "bridge name is null."
    exit 1
 fi
 
@@ -11,7 +16,7 @@ if ! type nmap >/dev/null 2>&1; then
    exit 1
 fi
 
-ipaddr=`ip route |grep virbr0 |sed -n 1p|awk {'print $1'}`
+ipaddr=`ip route |grep $br |sed -n 1p|awk {'print $1'}`
 
 #if lsmod | grep kvm > /dev/null ;then
 #  ipaddr=`ip route |grep switch |sed -n 1p|awk {'print $1'}`
