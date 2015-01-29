@@ -7,4 +7,9 @@
       <range start="NETSTART" end="NETEND"/>
     </dhcp>
   </ip>
+  <ip family="ipv6" address="NETIP6ADDR" prefix="NETIP6PREFIX" >
+    <dhcp>
+      <range start="NETIP6START" end="NETIP6END" />
+    </dhcp>
+  </ip>
 </network>
