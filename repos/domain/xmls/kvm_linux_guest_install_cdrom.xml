@@ -28,7 +28,7 @@
       <readonly/>
     </disk>
     <interface type="network">
-      <source network="default"/>
+      <source network="NETWORKSOURCE"/>
       <mac address='MACADDR'/>
       <model type='NICDRIVER'/>
     </interface>
