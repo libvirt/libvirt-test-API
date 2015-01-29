@@ -19,6 +19,10 @@ required_params = ('networkname',
                    'netend',
                    'netmode',)
 optional_params = {'xml' : 'xmls/network.xml',
+                   'netip6addr' : '2001:db8:ca2:98::1',
+                   'netip6prefix' : '64',
+                   'netip6start' : '2001:db8:ca2:98::11',
+                   'netip6end' : '2001:db8:ca2:98::ff',
                   }
 
 def check_network_define(networkname, logger):
