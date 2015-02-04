@@ -349,15 +349,12 @@ def locate_utils():
     result = re.search('(.*)libvirt-test-API(.*)', pwd)
     return result.group(0) + "/utils"
 
-def mac_to_ip(mac,br,timeout):
-    """Map mac address to ip
+def mac_to_ip(mac, timeout, br = 'virbr0'):
+    """Map mac address to ip under a specified brige
 
        Return None on FAILURE and the mac address on SUCCESS
     """
     if not mac:
-        return None
-
-    if not br:
         return None
 
     if timeout < 10:
