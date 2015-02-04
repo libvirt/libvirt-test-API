@@ -147,7 +147,7 @@ def install_linux_cdrom(params):
     guestname = params.get('guestname')
     guestos = params.get('guestos')
     guestarch = params.get('guestarch')
-    br = params['bridgename']
+    br = params.get('bridgename','virbr0')
     xmlstr = params['xml']
 
     logger.info("the name of guest is %s" % guestname)
@@ -304,7 +304,7 @@ def install_linux_cdrom(params):
         time.sleep(10)
         timeout -= 10
 
-        ip = utils.mac_to_ip(mac,br,180)
+        ip = utils.mac_to_ip(mac,180,br)
 
         if not ip:
             logger.info(str(timeout) + "s left")

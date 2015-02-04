@@ -32,7 +32,7 @@ def destroy(params):
     logger = params['logger']
     params.pop('logger')
     guestname = params['guestname']
-    br = params['bridgename']
+    br = params.get('bridgename','virbr0')
     flags = ""
     if params.has_key('flags'):
         flags = params['flags']
@@ -59,7 +59,7 @@ def destroy(params):
         # Get domain ip
         mac = utils.get_dom_mac_addr(guestname)
         logger.info("get ip by mac address")
-        ip = utils.mac_to_ip(mac,br,180)
+        ip = utils.mac_to_ip(mac,180,br)
         logger.info("the ip address of guest is %s" % ip)
 
     # Destroy domain
