@@ -98,4 +98,3 @@ def connection_security_model(params):
     except libvirtError, e:
         logger.error("API error message: %s" % e.message)
         return 1
-
