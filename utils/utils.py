@@ -31,6 +31,7 @@ import string
 import subprocess
 import hashlib
 import libvirt
+import math
 from xml.dom import minidom
 from urlparse import urlparse
 
@@ -896,3 +897,30 @@ def validate_remote_blk_type(hostname, username, password,
     else:
         logger.info("lspci and lsmod return nothing")
         return 1
+
+def get_standard_deviation(cb1, cb2, opaque1, opaque2, number = 1000):
+    """ pass two callback functions and opaque return Standard Deviation,
+        this function will be useful when need equal some quick change
+        value (like memory, cputime), default loop times are 1000,
+        and notice callback functions cb1 and cb2 should allways success
+    """
+    D = 0
+    for i in range(number):
+        a = cb1(opaque1)
+        b = cb2(opaque2)
+        D += (int(a) - int(b))**2
+    return math.sqrt(D/number)
+
+def param_to_tuple_nolength(paramlist):
+    """paramlist contains numbers which can be divided by '-', '^' and
+       ',', return tuple only have True or False value
+    """
+    d = []
+    a = paramlist.split(',')
+    for i in range(len(a)):
+        if a[i].find('^') >= 0:
+            continue
+        d += a[i].split('-')
+    lengh = max(d)
+
+    return param_to_tuple(paramlist, int(lengh) + 1)
