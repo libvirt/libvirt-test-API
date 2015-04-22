@@ -228,9 +228,7 @@ def check_os(arch, logger):
     ovmf1 =  os.getElementsByTagName('value')[0]
     ovmf1 = ovmf1.childNodes[0].data
     logger.debug("Got OVMF path is %s" % ovmf1)
-    if ovmf_f and ovmf1 == OVMF:
-        pass
-    else:
+    if ovmf_f and ovmf1 != OVMF:
         return False
     enum = loader.getElementsByTagName('enum')
     for item in enum:
