@@ -16,7 +16,6 @@ node_memory = ['full_scans',
                'sleep_millisecs']
 
 SYSFS_MEMORY_SHARED_PATH = '/sys/kernel/mm/ksm/'
-LIBVIRT_API_PATH = '/usr/share/libvirt/api/libvirt-api.xml'
 flags=0
 
 def check_memory_parameter(libvirt_dict, parameter_name):
@@ -46,9 +45,6 @@ def connection_getMemoryParameters(params):
         conn=libvirt.open(params['conn'])
 
         logger.info("get connection to libvirtd")
-
-        if utils.check_flags('getMemoryParameters', LIBVIRT_API_PATH) == 1:
-            return 1
 
         param_dict=conn.getMemoryParameters()
 
