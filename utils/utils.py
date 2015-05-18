@@ -906,9 +906,10 @@ def get_standard_deviation(cb1, cb2, opaque1, opaque2, number = 1000):
     """
     D = 0
     for i in range(number):
-        a = cb1(opaque1)
+        a1 = cb1(opaque1)
         b = cb2(opaque2)
-        D += (int(a) - int(b))**2
+        a2 = cb1(opaque1)
+        D += ((int(a1) + int(a2))/2 - int(b))**2
     return math.sqrt(D/number)
 
 def param_to_tuple_nolength(paramlist):
