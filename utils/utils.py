@@ -925,3 +925,40 @@ def param_to_tuple_nolength(paramlist):
     lengh = max(d)
 
     return param_to_tuple(paramlist, int(lengh) + 1)
+
+def parse_mountinfo(string):
+    """a helper to parse mountinfo in /proc/self/mountinfo
+       and return a list contains multiple dict
+    """
+
+    ret = []
+    mount_list = string.split("\n")
+    for n in mount_list:
+        mount_dict = {}
+        if n.find("/") > 0:
+            tmp = n[:n.find("/")]
+            if len(tmp.split()) != 3:
+                continue
+
+            if tmp.split()[2].find(":") < 0:
+                continue
+
+            mount_dict['devmajor'] = tmp.split()[2].split(":")[0]
+            mount_dict['devminor'] = tmp.split()[2].split(":")[1]
+
+            tmp = n[n.find("/") + 1:]
+
+            mount_dict['mountdir'] = tmp.split()[0]
+
+            if tmp.find(" - ") < 0:
+                continue
+
+            tmp = tmp.split(" - ")[1]
+
+            mount_dict['mounttype'] = tmp.split()[0]
+            if tmp.split()[1].find("/") > 0:
+                mount_dict['sourcedir'] = tmp.split()[1]
+
+            ret.append(mount_dict)
+
+    return ret
