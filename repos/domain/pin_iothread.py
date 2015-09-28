@@ -116,7 +116,7 @@ def pin_iothread(params):
 
             if not find_iothreadid_fromxml(vm, 1, 1):
                 logger.info("add iothread %d to running guest" % 1)
-                vm.addIOThread(i, libvirt.VIR_DOMAIN_AFFECT_LIVE)
+                vm.addIOThread(1, libvirt.VIR_DOMAIN_AFFECT_LIVE)
 
             vm.pinIOThread(1, tu_cpu, libvirt.VIR_DOMAIN_AFFECT_LIVE)
             cpuset = find_iothreadpin_fromxml(vm, 1, 1)

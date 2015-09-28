@@ -164,7 +164,7 @@ def check_each_vcpu(logger,dom_name,dom_active,dom_eles):
         if not vcpu_cur:
             for i in range(0,vcpu_max):
                 vcpu_pre = "vcpu."+ str(i) + "."
-                logger.debug("Checking %sstate: %d" \
+                logger.debug("Checking %sstate: %s" \
                         %(vcpu_pre, dom_eles.get(vcpu_pre + "state")))
                 if not compare_value(logger,vcpu_stat, \
                         dom_eles.get(vcpu_pre + "state")):
@@ -172,7 +172,7 @@ def check_each_vcpu(logger,dom_name,dom_active,dom_eles):
         elif int(vcpu_cur.nodeValue) <= vcpu_max:
             for i in range(0,int(vcpu_cur.nodeValue)):
                 vcpu_pre = "vcpu."+ str(i) + "."
-                logger.debug("Checking %sstate: %d" \
+                logger.debug("Checking %sstate: %s" \
                         %(vcpu_pre, dom_eles.get(vcpu_pre + "state")))
                 if not compare_value(logger,vcpu_stat, \
                         dom_eles.get(vcpu_pre + "state")):
