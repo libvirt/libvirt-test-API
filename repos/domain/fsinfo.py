@@ -81,7 +81,7 @@ def fsinfo(params):
             return 1
 
         fsinfo = vm.fsInfo()
-        logger.info("get geust filesystem information")
+        logger.info("get guest filesystem information")
 
         mac = get_guest_mac(vm)
         if not mac:

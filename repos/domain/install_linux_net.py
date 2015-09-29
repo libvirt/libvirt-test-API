@@ -239,7 +239,7 @@ def install_linux_net(params):
             logger.info("booting guest vm off harddisk failed")
             return 1
         else:
-            logger.info("geust is booting up")
+            logger.info("guest is booting up")
     else:
         interval = 0
         while(interval < 3600):

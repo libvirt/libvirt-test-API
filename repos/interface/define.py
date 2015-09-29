@@ -42,7 +42,7 @@ def define(params):
     try:
         conn.interfaceDefineXML(xmlstr, 0)
         if check_define_interface(ifacename):
-            logger.info("define a interface form xml is successful")
+            logger.info("define a interface from xml is successful")
         else:
             logger.error("fail to check define interface")
             return 1

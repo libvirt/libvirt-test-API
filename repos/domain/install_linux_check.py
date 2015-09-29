@@ -99,7 +99,7 @@ def install_linux_check(params):
         Test_Result = 1
         return Test_Result
 
-    # Check whether vcpu equals the value set in geust config xml
+    # Check whether vcpu equals the value set in guest config xml
     logger.info("check point3: check cpu number in guest equals to \
                  the value set in domain config xml")
     vcpunum_expect = int(utils.get_num_vcpus(domain_name))

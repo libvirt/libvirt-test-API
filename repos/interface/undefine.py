@@ -39,14 +39,14 @@ def undefine(params):
     try:
         ifaceobj.undefine()
         if check_undefine_interface(ifacename):
-            logger.info("undefine a interface form xml is successful")
+            logger.info("undefine a interface is successful")
         else:
             logger.error("fail to check undefine interface")
             return 1
     except libvirtError, e:
         logger.error("API error message: %s, error code is %s" \
                      % (e.message, e.get_error_code()))
-        logger.error("fail to undefine a interface from xml")
+        logger.error("fail to undefine a interface")
         return 1
 
     return 0
