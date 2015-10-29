@@ -13,30 +13,34 @@ from utils import utils
 required_params = ('guestname', 'vcpu', 'cpulist',)
 optional_params = {}
 
-def vcpupin_check(guestname, vcpu, cpumap):
+def vcpupin_check(guestname, vcpu, cpulist):
     """check vcpu subprocess status of the running virtual machine
        grep Cpus_allowed_list /proc/PID/task/*/status
     """
-    tmp_str = ''
-    cmd = "cat /var/run/libvirt/qemu/%s.pid" % guestname
-    status, pid = utils.exec_cmd(cmd, shell=True)
+    cmd_pid = "cat /var/run/libvirt/qemu/%s.pid" % guestname
+    status, pid = utils.exec_cmd(cmd_pid, shell=True)
     if status:
         logger.error("failed to get the pid of domain %s" % guestname)
         return 1
 
-    cmd = "grep Cpus_allowed_list /proc/%s/task/*/status" % pid[0]
-    status, output = utils.exec_cmd(cmd, shell=True)
-    logger.debug("command '%s' output is:" % cmd)
-    for i in range(len(output)):
-        tmp_str += ''.join(output[i]) + '\n'
-    logger.debug(tmp_str)
+    cmd_vcpu_task_id = "virsh qemu-monitor-command %s --hmp info cpus|grep '#%s'|cut -d '=' -f3"\
+                                % (guestname,vcpu)
+    status, vcpu_task_id = utils.exec_cmd(cmd_vcpu_task_id, shell=True)
+    if status:
+        logger.error("failed to get the threadid of domain %s" % guestname)
+        return 1
 
-    task_list = output[1:]
-    vcpu_task = task_list[int(vcpu)]
-    cpulist = vcpu_task.split('\t')[1]
-    ret = utils.param_to_tuple(cpulist, maxcpu)
+    logger.debug("vcpu id %s:" % vcpu_task_id[0])
+    cmd_cpus_allowed_list = "grep Cpus_allowed_list /proc/%s/task/%s/status" % (pid[0] , vcpu_task_id[0])
+    status, output = utils.exec_cmd(cmd_cpus_allowed_list, shell=True)
+    if status:
+        logger.error("failed to get the cpu_allowed_list of vcpu %s")
+        return 1
 
-    if ret == cpumap:
+    logger.debug("the output of command 'grep Cpus_allowed_list \
+                          /proc/%s/task/%s/status' is %s" % (pid[0],vcpu_task_id[0],output))
+
+    if output[0].split('\t')[1] == cpulist:
         logger.info("vcpu process cpus allowed list is expected")
         return 0
     else:
@@ -92,7 +96,7 @@ def vcpupin_live(params):
         return 1
 
     logger.info("check vcpu pin status on host")
-    ret = vcpupin_check(guestname, vcpu, cpumap)
+    ret = vcpupin_check(guestname, vcpu, cpulist)
     if ret:
         logger.error("domain vcpu pin failed")
         return 1
