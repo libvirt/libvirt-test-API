@@ -80,7 +80,7 @@ def set_vcpus_config(params):
                 return 1
 
         if maxvcpu:
-            flags = libvirt.VIR_DOMAIN_VCPU_MAXIMUM
+            flags = libvirt.VIR_DOMAIN_VCPU_MAXIMUM|libvirt.VIR_DOMAIN_AFFECT_CONFIG
 	    logger.info("the given max vcpu number is %s" % maxvcpu)
             logger.info("set domain maximum vcpu as %s with flag: %s" %
                         (maxvcpu, flags))
