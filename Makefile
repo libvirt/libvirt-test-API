@@ -20,6 +20,9 @@ dist:
 	@echo " "
 	@echo "the archive is $(APP).tar.gz"
 
+check:
+	selftests/check
+
 clean:
 	@find . -name "*.pyc" -exec rm -f {} \;
 	@rm -rf log/ log.xml
