@@ -13,14 +13,16 @@ VIRSH_DOMNAME = "virsh domname"
 VIRSH_IDS = "virsh --quiet list |awk '{print $1}'"
 VIRSH_DOMS = "virsh --quiet list |awk '{print $2}'"
 
+
 def get_output(logger, command):
     """execute shell command
     """
     status, ret = commands.getstatusoutput(command)
     if status:
-        logger.error("executing "+ "\"" +  command  + "\"" + " failed")
+        logger.error("executing " + "\"" + command + "\"" + " failed")
         logger.error(ret)
     return status, ret
+
 
 def domain_name(params):
     """check virsh domname command
@@ -50,7 +52,7 @@ def domain_name(params):
         return 1
 
     id_domname = {}
-    for id  in ids_list:
+    for id in ids_list:
         index = ids_list.index(id)
         id_domname[id] = doms_list[index]
 

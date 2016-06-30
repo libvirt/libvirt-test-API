@@ -9,10 +9,11 @@ from src import sharedmod
 from utils import utils
 
 required_params = ('guestname',)
-optional_params = {'flags' : ''}
+optional_params = {'flags': ''}
 
 NONE = 0
 START_PAUSED = 1
+
 
 def check_savefile_remove(*args):
     """Check guest managed save file"""
@@ -23,9 +24,10 @@ def check_savefile_remove(*args):
     if status != 0:
         logger.info("No managed save file")
         return True
-    else :
+    else:
         logger.error("managed save file exists")
         return False
+
 
 def managedsave_start(params):
     """ Start domain with managedsave image and check if its status is right
@@ -47,7 +49,7 @@ def managedsave_start(params):
     logger = params['logger']
     flags = params.get('flags', '')
     # Get given flags of managedsave
-    if sharedmod.data.has_key('flagsave'):
+    if 'flagsave' in sharedmod.data:
         flagsave = sharedmod.data.get('flagsave')
     else:
         logger.error("Failed to get flags from managedsave")
@@ -60,7 +62,7 @@ def managedsave_start(params):
     timeout = 600
     logger.info('start domain')
     # Check if guest has managedsave image before start
-    if domobj.hasManagedSaveImage(0) :
+    if domobj.hasManagedSaveImage(0):
         logger.info("Domain has managedsave image")
     else:
         logger.info("Domain hasn't managedsave image")
@@ -73,16 +75,19 @@ def managedsave_start(params):
         else:
             # this covers flags = None as well as flags = 'noping'
             domobj.create()
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % e.message)
         logger.error("start failed")
         return 1
 
     while timeout:
         state = domobj.info()[0]
-        expect_states = [libvirt.VIR_DOMAIN_RUNNING,libvirt.VIR_DOMAIN_PAUSED,\
-                         libvirt.VIR_DOMAIN_NOSTATE,libvirt.VIR_DOMAIN_BLOCKED]
+        expect_states = [
+            libvirt.VIR_DOMAIN_RUNNING,
+            libvirt.VIR_DOMAIN_PAUSED,
+            libvirt.VIR_DOMAIN_NOSTATE,
+            libvirt.VIR_DOMAIN_BLOCKED]
 
         if state in expect_states:
             break
@@ -109,14 +114,14 @@ def managedsave_start(params):
             try:
                 domobj.resume()
 
-            except libvirtError, e:
-                logger.error("API error message: %s, error code is %s" \
-                     % e.message)
+            except libvirtError as e:
+                logger.error("API error message: %s, error code is %s"
+                             % e.message)
                 logger.error("resume failed")
                 return 1
             stateresume = domobj.info()[0]
-            expect_states = [libvirt.VIR_DOMAIN_RUNNING, \
-                             libvirt.VIR_DOMAIN_NOSTATE, \
+            expect_states = [libvirt.VIR_DOMAIN_RUNNING,
+                             libvirt.VIR_DOMAIN_NOSTATE,
                              libvirt.VIR_DOMAIN_BLOCKED]
             if stateresume not in expect_states:
                 logger.error('The domain state is not equal to "paused"')
@@ -129,7 +134,7 @@ def managedsave_start(params):
             return 1
 
     # Get domain ip and ping ip to check domain's status
-    if not "noping" in flags:
+    if "noping" not in flags:
         mac = utils.get_dom_mac_addr(domname)
         logger.info("get ip by mac address")
         ip = utils.mac_to_ip(mac, 180)
@@ -141,10 +146,10 @@ def managedsave_start(params):
 
     # Check if domain' managedsave image exists,if not, return 0.
     if not domobj.hasManagedSaveImage(0) and check_savefile_remove(domname):
-        logger.info("Domain %s with managedsave image successfully start" \
+        logger.info("Domain %s with managedsave image successfully start"
                     % domname)
         return 0
     else:
-        logger.error("Fail to start domain s% with managedsave image" \
-                    % domname)
+        logger.error("Fail to start domain %s with managedsave image"
+                     % domname)
         return 1

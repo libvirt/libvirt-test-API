@@ -11,6 +11,7 @@ from src import sharedmod
 required_params = ('guestname', 'memory', )
 optional_params = {}
 
+
 def set_maxmem_config(params):
     """set domain max memory, check with config xml and
        maxMemory API
@@ -31,7 +32,7 @@ def set_maxmem_config(params):
         domobj.setMaxMemory(memory)
 
         guestxml = domobj.XMLDesc(2)
-        logger.debug("domain %s xml is :\n%s" %(guestname, guestxml))
+        logger.debug("domain %s xml is :\n%s" % (guestname, guestxml))
         xml = minidom.parseString(guestxml)
         mem = xml.getElementsByTagName('memory')[0]
         maxmem = int(mem.childNodes[0].data)
@@ -52,7 +53,7 @@ def set_maxmem_config(params):
 
         logger.info("set max memory succeed")
 
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("libvirt call failed: " + str(e))
         return 1
 

@@ -22,6 +22,7 @@ import libvirt
 import sharedmod
 from utils import utils
 
+
 def check_libvirt(logger):
     virsh = 'virsh -v'
     status, output = commands.getstatusoutput(virsh)
@@ -56,10 +57,11 @@ def check_libvirt(logger):
             logger.error("    no qemu-kvm found")
             return 1
     elif 'xen' in output:
-        #TODO need to get xen hypervisor info here
+        # TODO need to get xen hypervisor info here
         pass
 
     return 0
+
 
 def hostinfo(logger):
     command = 'uname -a'
@@ -68,6 +70,7 @@ def hostinfo(logger):
     if status:
         return 1
     return 0
+
 
 def sharemod_init(env_parser, logger):
     """ get connection object from libvirt module
@@ -86,7 +89,9 @@ def sharemod_init(env_parser, logger):
     sharedmod.libvirtobj['conn'] = conn
     return 0
 
+
 class EnvInspect(object):
+
     """to check and collect the testing enviroment infomation
        before performing testing
     """

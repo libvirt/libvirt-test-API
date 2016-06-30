@@ -13,16 +13,19 @@ from src import sharedmod
 required_params = ('poolname', 'volname',)
 optional_params = {}
 
+
 def display_volume_info(poolobj):
     """Display current storage volume information"""
-    logger.debug("current storage volume list: %s" \
-% poolobj.listVolumes())
+    logger.debug("current storage volume list: %s"
+                 % poolobj.listVolumes())
+
 
 def get_storage_volume_number(poolobj):
     """Get storage volume number"""
     vol_num = poolobj.numOfVolumes()
     logger.info("current storage volume number: %s" % vol_num)
     return vol_num
+
 
 def check_volume_delete(volkey):
     """Check storage volume result, volname {volkey} will don't exist
@@ -34,6 +37,7 @@ def check_volume_delete(volkey):
     else:
         logger.debug("%s file don't exist" % volkey)
         return False
+
 
 def delete_netfs_volume(params):
     """Delete a netfs type storage volume"""
@@ -49,7 +53,7 @@ def delete_netfs_volume(params):
     if poolname in pool_names:
         poolobj = conn.storagePoolLookupByName(poolname)
     else:
-        logger.error("%s not found\n" % poolname);
+        logger.error("%s not found\n" % poolname)
         return 1
 
     if not poolobj.isActive():
@@ -73,8 +77,8 @@ def delete_netfs_volume(params):
         else:
             logger.error("%s storage volume is undeleted" % volname)
             return 1
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         return 1
 

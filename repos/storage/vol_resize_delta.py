@@ -11,6 +11,7 @@ from utils import utils
 required_params = ('poolname', 'volname', 'capacity',)
 optional_params = {}
 
+
 def vol_resize_delta(params):
     """test volume resize with delta flags"""
 
@@ -68,7 +69,7 @@ def vol_resize_delta(params):
 
         logger.info("resize succeed")
 
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("libvirt call failed: " + str(e))
         return 1
 

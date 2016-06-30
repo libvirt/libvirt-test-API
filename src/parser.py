@@ -26,9 +26,12 @@ import string
 import exception
 import env_parser
 
+
 class CaseFileParser(object):
+
     """ Parser the case configuration file to generate a data list.
     """
+
     def __init__(self, casefile=None, debug=False):
         self.list = [[]]
         self.variables = {}
@@ -52,7 +55,8 @@ class CaseFileParser(object):
     def parse_file(self, casefile):
         """ Open casefile for parsering. """
         if not os.path.exists(casefile):
-            raise exception.FileDoesNotExist("Config file: %s not found" % casefile)
+            raise exception.FileDoesNotExist(
+                "Config file: %s not found" % casefile)
         self.casefile = casefile
         fh = open(casefile, "r")
         self.list = self.parse(fh, self.list)
@@ -72,7 +76,8 @@ class CaseFileParser(object):
         while True:
             line = fh.readline()
             if line == "" and comflag == 1:
-                raise exception.CaseConfigfileError("comments delimiter error!")
+                raise exception.CaseConfigfileError(
+                    "comments delimiter error!")
             elif line == "" and comflag == 0:
                 return None
 
@@ -82,15 +87,18 @@ class CaseFileParser(object):
                     comflag += 1
                     continue
                 else:
-                    raise exception.CaseConfigfileError("comments delimiter mismatch!")
+                    raise exception.CaseConfigfileError(
+                        "comments delimiter mismatch!")
             if len(stripped_line) > 0 and not stripped_line.endswith('*/'):
                 if comflag == 1:
                     if stripped_line.startswith('*/'):
-                        exception.CaseConfigfileError("comments delimiter mismatch!")
+                        exception.CaseConfigfileError(
+                            "comments delimiter mismatch!")
                     else:
                         continue
                 elif stripped_line.startswith('*/'):
-                    raise exception.CaseConfigfileError("comments delimiter error!")
+                    raise exception.CaseConfigfileError(
+                        "comments delimiter error!")
                 else:
                     pass
             elif len(stripped_line) > 0 and stripped_line.endswith('*/'):
@@ -99,7 +107,8 @@ class CaseFileParser(object):
                     line = fh.readline()
                     stripped_line = line.strip()
                 else:
-                    raise exception.CaseConfigfileError("comments delimiter mismatch!")
+                    raise exception.CaseConfigfileError(
+                        "comments delimiter mismatch!")
 
             if len(stripped_line) > 0 \
                     and not stripped_line.startswith('#') \
@@ -127,7 +136,7 @@ class CaseFileParser(object):
         dictionary = caselist[-1]
         testkey = dictionary.keys()[0]
         if casename == testkey:
-            if not dictionary[testkey].has_key(option):
+            if option not in dictionary[testkey]:
                 dictionary[testkey][option] = value
 
     def debug_print(self, str1, str2=""):
@@ -155,9 +164,9 @@ class CaseFileParser(object):
                         self.missing_variables.append(varname)
                     else:
                         res.append(value)
-                except exception.OptionDoesNotExist, e:
+                except exception.OptionDoesNotExist as e:
                     self.missing_variables.append(varname)
-                except exception.SectionDoesNotExist, e:
+                except exception.SectionDoesNotExist as e:
                     self.missing_variables.append(varname)
                 except:
                     self.missing_variables.append(varname)
@@ -178,7 +187,7 @@ class CaseFileParser(object):
         elif indent == 4:
             raise exception.CaseConfigfileError("case indentation error!")
         elif indent == -1:
-            raise  exception.CaseConfigfileError("option without value error!")
+            raise exception.CaseConfigfileError("option without value error!")
         else:
             pass
 
@@ -210,7 +219,7 @@ class CaseFileParser(object):
                 tripped_valuelist = self.variables_lookup(tripped_valuelist)
                 if len(self.missing_variables) != 0:
                     raise exception.MissingVariable(
-                    "The variables %s referenced in %s could not be found in global.cfg" %
+                        "The variables %s referenced in %s could not be found in global.cfg" %
                         (self.missing_variables, self.casefile))
 
                 tripped_valuename = tripped_valuelist[0]
@@ -218,7 +227,7 @@ class CaseFileParser(object):
                 if self.debug:
                     self.debug_print(
                         "the option_value we are parsing is",
-                         tripped_valuename)
+                        tripped_valuename)
                     self.debug_print("the temp_list is", temp_list)
 
                 filterter_list = []
@@ -230,19 +239,18 @@ class CaseFileParser(object):
                             caselist)
 
                     if len(tripped_valuelist) > 1:
-                        if tripped_valuelist[1] == "only" and \
-                            len(tripped_valuelist) == 3:
+                        if (tripped_valuelist[1] == "only" and
+                                len(tripped_valuelist) == 3):
                             if self.debug:
                                 self.debug_print(
-                                "the value with a keywords which is",
-                                tripped_valuelist[1])
+                                    "the value with a keywords which is", tripped_valuelist[1])
 
                             filterters = tripped_valuelist[2].split("|")
                             for filterter in filterters:
                                 if self.debug:
                                     self.debug_print(
-                                    "the filterter we will filt the \
-                                    temp_list is", filterter)
+                                        "the filterter we will filt the"
+                                        " temp_list is", filterter)
 
                                 if re.findall(filterter, str(caselist)):
                                     self.add_option_value(
@@ -253,18 +261,17 @@ class CaseFileParser(object):
                                     break
                             else:
                                 filterter_list.append(caselist)
-                        elif tripped_valuelist[1] == "no" and \
-                            len(tripped_valuelist) == 2:
+                        elif (tripped_valuelist[1] == "no" and
+                              len(tripped_valuelist) == 2):
                             if self.debug:
                                 self.debug_print(
-                                    "the value with a keywords \
-                                     which is", tripped_valuelist[1])
+                                    "the value with a keywords which is", tripped_valuelist[1])
 
                             if re.findall(tripped_valuename, str(caselist)):
-                                f = lambda s: s.has_key(casename) == False
+                                f = lambda s: (casename in s) is False
                                 temp_list = [filter(f, caselist)]
-                        elif tripped_valuelist[1] == "no" and \
-                            len(tripped_valuelist) == 3:
+                        elif (tripped_valuelist[1] == "no" and
+                              len(tripped_valuelist) == 3):
                             filterters = tripped_valuelist[2].split("|")
                             for filterter in filterters:
                                 if re.findall(filterter, str(caselist)):
@@ -274,8 +281,8 @@ class CaseFileParser(object):
                                 self.add_option_value(caselist, casename,
                                                       tripped_optionname,
                                                       tripped_valuename)
-                        elif tripped_valuelist[1] == "include" and \
-                            len(tripped_valuelist) == 2:
+                        elif (tripped_valuelist[1] == "include" and
+                              len(tripped_valuelist) == 2):
                             if re.findall(tripped_valuename, str(caselist)):
                                 self.add_option_value(caselist,
                                                       casename,
@@ -290,8 +297,7 @@ class CaseFileParser(object):
 
                     if self.debug:
                         self.debug_print(
-                            "after parsing the caselist is",
-                             caselist)
+                            "after parsing the caselist is", caselist)
 
                 trash = [temp_list.remove(i) for i in filterter_list]
 
@@ -314,15 +320,17 @@ class CaseFileParser(object):
                 self.debug_print("the list is", list)
 
             indent = self.get_next_line_indent(fh)
+            tripped_casename = ""
             if indent < 0:
                 break
             elif indent > 0:
-                if  indent == 4:
+                if indent == 4:
                     if self.debug:
                         self.debug_print("we begin to parse the option line")
                     list = self.option_parse(fh, list, tripped_casename)
                 else:
-                    raise exception.CaseConfigfileError("option indentation error!")
+                    raise exception.CaseConfigfileError(
+                        "option indentation error!")
             elif indent == 0:
                 casestring = self.get_next_line(fh)
 
@@ -393,7 +401,7 @@ class CaseFileParser(object):
                     sleepsecs = tripped_caselist[1]
                     for caselist in list:
                         newdict = {}
-                        newdict[tripped_casename] = {'sleep':sleepsecs}
+                        newdict[tripped_casename] = {'sleep': sleepsecs}
                         caselist.append(newdict)
                     continue
 
@@ -407,7 +415,7 @@ class CaseFileParser(object):
                     continue
 
                 if tripped_casename == "options":
-                    option_case = [{'options':{}}]
+                    option_case = [{'options': {}}]
                     option_list = tripped_caselist[1:]
                     for option in option_list:
                         (optionkey, optionvalue) = option.split("=")
@@ -416,7 +424,8 @@ class CaseFileParser(object):
                     continue
 
                 if not re.match(".+:.+", tripped_casename):
-                    raise exception.CaseConfigfileError("%s line format error!" % tripped_casename)
+                    raise exception.CaseConfigfileError(
+                        "%s line format error!" % tripped_casename)
 
                 for caselist in list:
                     newdict = {}
@@ -436,5 +445,5 @@ if __name__ == "__main__":
         list = CaseFileParser(casefile, debug=True).get_list()
         print "The number of generated list is %s" % len(list)
         print list
-    except Exception, e:
+    except Exception as e:
         print e

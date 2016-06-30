@@ -14,6 +14,7 @@ from src import sharedmod
 required_params = ('networkname',)
 optional_params = {}
 
+
 def check_network_status(*args):
     """Check current network status, it will return True if
        current network is active, otherwise, return False
@@ -27,6 +28,7 @@ def check_network_status(*args):
         return True
     else:
         return False
+
 
 def destroy(params):
     """destroy network"""
@@ -47,14 +49,14 @@ def destroy(params):
         netobj.destroy()
         net_num2 = conn.numOfNetworks()
         if not check_network_status(networkname, conn, logger) and \
-            net_num1 > net_num2:
+                net_num1 > net_num2:
             logger.info("current network active number: %s\n" % net_num2)
             logger.info("destroy %s network successful" % networkname)
         else:
             logger.error("the %s network is still running" % networkname)
             return 1
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         logger.error("fail to destroy %s network" % networkname)
         return 1

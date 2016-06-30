@@ -14,12 +14,14 @@ from src import sharedmod
 required_params = ('poolname',)
 optional_params = {}
 
+
 def display_pool_info(conn):
     """Display current storage pool information"""
-    logger.debug("current define storage pool: %s" \
+    logger.debug("current define storage pool: %s"
                  % conn.listDefinedStoragePools())
-    logger.debug("current active storage pool: %s" \
+    logger.debug("current active storage pool: %s"
                  % conn.listStoragePools())
+
 
 def display_physical_volume():
     """Display volume group and physical volume information"""
@@ -36,6 +38,7 @@ def display_physical_volume():
         logger.debug(ret2)
     else:
         logger.error("fail to execute pvdisplay command")
+
 
 def check_delete_pool(poolname):
     """Check delete storage pool result,
@@ -77,8 +80,8 @@ def delete_logical_pool(params):
         else:
             logger.error("fail to delete %s storage pool" % poolname)
             return 1
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         return 1
 

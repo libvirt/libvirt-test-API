@@ -22,6 +22,7 @@ optional_params = {}
 VIRSH_LIST = "virsh list --all"
 RESTART_CMD = "service libvirtd restart"
 
+
 def check_domain_running(conn, guestname, logger):
     """ check if the domain exists, may or may not be active """
     guest_names = []
@@ -35,6 +36,7 @@ def check_domain_running(conn, guestname, logger):
         return 1
     else:
         return 0
+
 
 def libvirtd_check(logger):
     """check libvirtd status
@@ -58,19 +60,21 @@ def libvirtd_check(logger):
 
     return 0
 
+
 def get_domain_pid(logger, guestname):
     """get the pid of running domain"""
-    logger.info("get the pid of running domain %s"  % guestname)
+    logger.info("get the pid of running domain %s" % guestname)
     get_pid_cmd = "cat /var/run/libvirt/qemu/%s.pid" % guestname
     ret, pid = utils.exec_cmd(get_pid_cmd, shell=True)
     if ret:
-        logger.error("fail to get the pid of runnings domain %s" % \
+        logger.error("fail to get the pid of runnings domain %s" %
                      guestname)
         return 1, ""
     else:
-        logger.info("the pid of domain %s is %s" % \
+        logger.info("the pid of domain %s is %s" %
                     (guestname, pid[0]))
         return 0, pid[0]
+
 
 def restart(params):
     """restart libvirtd test"""
@@ -96,7 +100,6 @@ def restart(params):
     logger.info("get ip by mac address")
     ip = utils.mac_to_ip(mac, 180)
     logger.info("the ip address of domain %s is %s" % (guestname, ip))
-
 
     logger.info("ping to domain %s" % guestname)
     if utils.do_ping(ip, 0):
@@ -137,7 +140,7 @@ def restart(params):
         return 1
 
     if pid_before != pid_after:
-        logger.error("%s pid changed during libvirtd restart" % \
+        logger.error("%s pid changed during libvirtd restart" %
                      guestname)
         return 1
     else:

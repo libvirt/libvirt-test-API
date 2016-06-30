@@ -15,6 +15,7 @@ from utils import utils
 required_params = ('guestname', 'vcpu', 'username', 'password')
 optional_params = {}
 
+
 def check_domain_running(conn, guestname):
     """ check if the domain exists, may or may not be active """
     guest_names = []
@@ -29,12 +30,13 @@ def check_domain_running(conn, guestname):
     else:
         return 0
 
+
 def redefine_vcpu_number(domobj, guestname, vcpu):
     """dump domain xml description to change the vcpu number,
        then, define the domain again
     """
     guestxml = domobj.XMLDesc(0)
-    logger.debug('''original guest %s xml :\n%s''' %(guestname, guestxml))
+    logger.debug('''original guest %s xml :\n%s''' % (guestname, guestxml))
 
     doc = minidom.parseString(guestxml)
 
@@ -50,11 +52,12 @@ def redefine_vcpu_number(domobj, guestname, vcpu):
 
     return doc.toxml()
 
+
 def check_current_vcpu(domobj, username, password):
     """dump domain xml description to get current vcpu number
     """
     guestxml = domobj.XMLDesc(1)
-    logger.debug("domain %s xml is :\n%s" %(domobj.name(), guestxml))
+    logger.debug("domain %s xml is :\n%s" % (domobj.name(), guestxml))
 
     xml = minidom.parseString(guestxml)
     vcpu = xml.getElementsByTagName('vcpu')[0]
@@ -92,30 +95,30 @@ def set_vcpus(domobj, guestname, vcpu, username, password):
 
     try:
         domobj.destroy()
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
-                    % (e.message, e.get_error_code()))
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
+                     % (e.message, e.get_error_code()))
         logger.error("fail to destroy domain")
         return 1
 
     newguestxml = redefine_vcpu_number(domobj, guestname, vcpu)
-    logger.debug('''new guest %s xml :\n%s''' %(guestname, newguestxml))
+    logger.debug('''new guest %s xml :\n%s''' % (guestname, newguestxml))
 
     logger.info("undefine the original guest")
     try:
         domobj.undefine()
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
-        logger.error("fail to undefine guest %" % guestname)
+        logger.error("fail to undefine guest %s" % guestname)
         return 1
 
     logger.info("define guest with new xml")
     try:
         conn = domobj._conn
         conn.defineXML(newguestxml)
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         logger.error("fail to define guest %s" % guestname)
         return 1
@@ -123,8 +126,8 @@ def set_vcpus(domobj, guestname, vcpu, username, password):
     try:
         logger.info('boot guest up ...')
         domobj.create()
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         logger.error("fail to start domain %s" % guestname)
         return 1
@@ -158,6 +161,7 @@ def set_vcpus(domobj, guestname, vcpu, username, password):
 
     return 0
 
+
 def cpu_hotplug(params):
     """set vcpu of virtual machine to value of parameter vcpu and
        current cpu as 1, then loop set runnning domain vcpu from
@@ -182,7 +186,7 @@ def cpu_hotplug(params):
     try:
         max_vcpus = int(conn.getMaxVcpus('kvm'))
         logger.debug("hypervisor supported max vcpu is %s" % max_vcpus)
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("libvirt call failed: " + str(e))
         return 1
 
@@ -203,7 +207,7 @@ def cpu_hotplug(params):
     domobj = conn.lookupByName(guestname)
 
     logger.info("set domain vcpu to %s and restart with current cpu as 1" %
-                    vcpu)
+                vcpu)
     ret = set_vcpus(domobj, guestname, vcpu, username, password)
     if ret != 0:
         return 1
@@ -211,7 +215,7 @@ def cpu_hotplug(params):
     try:
         max = domobj.maxVcpus()
         logger.info("max vcpu of domain %s is %s" % (guestname, max))
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("libvirt call failed: " + str(e))
         return 1
 
@@ -221,7 +225,7 @@ def cpu_hotplug(params):
         try:
             domobj.setVcpus(i)
             logger.info("set vcpus to %s" % i)
-        except libvirtError, e:
+        except libvirtError as e:
             logger.error("libvirt call failed: " + str(e))
             return 1
 
@@ -241,7 +245,7 @@ def cpu_hotplug(params):
         logger.info("set vcpus to %s" % i)
         try:
             max = domobj.setVcpus(i)
-        except libvirtError, e:
+        except libvirtError as e:
             logger.error("libvirt call failed: " + str(e))
             return 1
 

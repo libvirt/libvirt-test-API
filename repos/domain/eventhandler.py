@@ -19,27 +19,30 @@ STATE = None
 required_params = ('guestname',)
 optional_params = {}
 
+
 def eventToString(event):
-    eventStrings = ( "Defined",
-                     "Undefined",
-                     "Started",
-                     "Suspended",
-                     "Resumed",
-                     "Stopped",
-                     "Shutdown" );
-    return eventStrings[event];
+    eventStrings = ("Defined",
+                    "Undefined",
+                    "Started",
+                    "Suspended",
+                    "Resumed",
+                    "Stopped",
+                    "Shutdown")
+    return eventStrings[event]
+
 
 def detailToString(event, detail):
     eventStrings = (
-        ( "Added", "Updated" ),
-        ( "Removed", ),
-        ( "Booted", "Migrated", "Restored", "Snapshot" ),
-        ( "Paused", "Migrated", "IOError", "Watchdog" ),
-        ( "Unpaused", "Migrated"),
-        ( "Shutdown", "Destroyed", "Crashed", "Migrated", "Saved", "Failed", "Snapshot"),
-        ( "Finished", )
-        )
+        ("Added", "Updated"),
+        ("Removed", ),
+        ("Booted", "Migrated", "Restored", "Snapshot"),
+        ("Paused", "Migrated", "IOError", "Watchdog"),
+        ("Unpaused", "Migrated"),
+        ("Shutdown", "Destroyed", "Crashed", "Migrated", "Saved", "Failed", "Snapshot"),
+        ("Finished", )
+    )
     return eventStrings[event][detail]
+
 
 def check_domain_running(conn, guestname, logger):
     """ check if the domain exists, may or may not be active """
@@ -55,12 +58,14 @@ def check_domain_running(conn, guestname, logger):
     else:
         return 0
 
+
 def loop_run():
     global looping
     while looping:
         libvirt.virEventRunDefaultImpl()
 
     return 0
+
 
 def loop_stop(conn):
     """stop event thread and deregister domain callback function"""
@@ -70,23 +75,34 @@ def loop_stop(conn):
     conn.domainEventDeregister(lifecycle_callback)
     LoopThread.join()
 
+
 def loop_start():
     """start running default event handler implementation"""
     global LoopThread
     libvirt.virEventRegisterDefaultImpl()
     loop_run_arg = ()
-    LoopThread = threading.Thread(target=loop_run, args=loop_run_arg, name="libvirtEventLoop")
+    LoopThread = threading.Thread(
+        target=loop_run,
+        args=loop_run_arg,
+        name="libvirtEventLoop")
     LoopThread.setDaemon(True)
     LoopThread.start()
+
 
 def lifecycle_callback(conn, domain, event, detail, opaque):
     """domain lifecycle callback function"""
     global STATE
     logger = opaque
-    logger.debug("lifecycle_callback EVENT: Domain %s(%s) %s %s" % (domain.name(), domain.ID(),
-                                                             eventToString(event),
-                                                             detailToString(event, detail)))
+    logger.debug(
+        "lifecycle_callback EVENT: Domain %s(%s) %s %s" %
+        (domain.name(),
+         domain.ID(),
+         eventToString(event),
+         detailToString(
+            event,
+            detail)))
     STATE = eventToString(event)
+
 
 def shutdown_event(domobj, guestname, timeout, logger):
     """shutdown the guest, then check the event infomation"""
@@ -95,8 +111,8 @@ def shutdown_event(domobj, guestname, timeout, logger):
     logger.info("power off %s" % guestname)
     try:
         domobj.shutdown()
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         logger.error("Error: fail to power off %s" % guestname)
         return 1
@@ -105,7 +121,7 @@ def shutdown_event(domobj, guestname, timeout, logger):
         if STATE == "Stopped":
             logger.info("The event is Stopped, PASS")
             break
-        elif STATE != None:
+        elif STATE is not None:
             logger.error("The event is %s, FAIL", STATE)
             break
         else:
@@ -117,6 +133,7 @@ def shutdown_event(domobj, guestname, timeout, logger):
         return 1
 
     return 0
+
 
 def bootup_event(domobj, guestname, timeout, logger):
     """bootup the guest, then check the event infomation"""
@@ -125,8 +142,8 @@ def bootup_event(domobj, guestname, timeout, logger):
     logger.info("boot up guest %s" % guestname)
     try:
         domobj.create()
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         logger.error("Error: fail to bootup %s " % guestname)
         return 1
@@ -135,7 +152,7 @@ def bootup_event(domobj, guestname, timeout, logger):
         if STATE == "Started":
             logger.info("The event is Started, PASS")
             break
-        elif STATE != None:
+        elif STATE is not None:
             logger.error("The event is %s, FAIL", STATE)
             break
         else:
@@ -147,6 +164,7 @@ def bootup_event(domobj, guestname, timeout, logger):
         return 1
 
     return 0
+
 
 def suspend_event(domobj, guestname, timeout, logger):
     """suspend the guest, then check the event infomation"""
@@ -155,8 +173,8 @@ def suspend_event(domobj, guestname, timeout, logger):
     logger.info("suspend guest %s" % guestname)
     try:
         domobj.suspend()
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         logger.error("Error: fail to suspend %s" % guestname)
         return 1
@@ -165,7 +183,7 @@ def suspend_event(domobj, guestname, timeout, logger):
         if STATE == "Suspended":
             logger.info("The event is Suspended, PASS")
             break
-        elif STATE != None:
+        elif STATE is not None:
             logger.error("The event is %s, FAIL", STATE)
             break
         else:
@@ -177,6 +195,7 @@ def suspend_event(domobj, guestname, timeout, logger):
         return 1
 
     return 0
+
 
 def resume_event(domobj, guestname, timeout, logger):
     """resume the guest, then check the event infomation"""
@@ -185,8 +204,8 @@ def resume_event(domobj, guestname, timeout, logger):
     logger.info("resume guest %s" % guestname)
     try:
         domobj.resume()
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         logger.error("Error: fail to resume %s" % guestname)
         return 1
@@ -195,7 +214,7 @@ def resume_event(domobj, guestname, timeout, logger):
         if STATE == "Resumed":
             logger.info("The event is Resumed, PASS")
             break
-        elif STATE != None:
+        elif STATE is not None:
             logger.error("The event is %s, FAIL", STATE)
             break
         else:
@@ -207,6 +226,7 @@ def resume_event(domobj, guestname, timeout, logger):
         return 1
 
     return 0
+
 
 def eventhandler(params):
     """ perform basic operation for a domain, then checking the result

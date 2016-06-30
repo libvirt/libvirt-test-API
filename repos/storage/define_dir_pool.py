@@ -18,13 +18,17 @@ POOL_UNDEFINE = "virsh pool-undefine %s"
 
 required_params = ('poolname',)
 optional_params = {'targetpath': '/var/lib/libvirt/images/dirpool',
-                   'xml' : 'xmls/dir_pool.xml',
-                  }
+                   'xml': 'xmls/dir_pool.xml',
+                   }
+
 
 def display_pool_info(conn, logger):
     """Display current storage pool information"""
-    logger.debug("current define storage pool: %s" % conn.listDefinedStoragePools())
+    logger.debug(
+        "current define storage pool: %s" %
+        conn.listDefinedStoragePools())
     logger.debug("current active storage pool: %s" % conn.listStoragePools())
+
 
 def check_pool_define(poolname, logger):
     """Check define storage pool result, if define storage is successful,
@@ -37,11 +41,12 @@ def check_pool_define(poolname, logger):
     #stat, ret = commands.getstatusoutput(valid)
     #logger.debug("virt-xml-validate exit status: %d" % stat)
     #logger.debug("virt-xml-validate exit result: %s" % ret)
-    #if os.access(path, os.R_OK) and stat == 0:
+    # if os.access(path, os.R_OK) and stat == 0:
     if os.access(path, os.R_OK):
         return True
     else:
         return False
+
 
 def define_dir_pool(params):
     """Define a dir type storage pool from xml"""
@@ -76,31 +81,35 @@ def define_dir_pool(params):
         else:
             logger.error("%s storage pool is undefined" % poolname)
             return 1
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         return 1
 
     return 0
+
 
 def define_dir_pool_clean(params):
     logger = params['logger']
     poolname = params['poolname']
     (status, output) = commands.getstatusoutput(VIRSH_POOLLIST % poolname)
     if not status:
-       logger.info("remove storage pool %s" % poolname)
-       (status, output) = commands.getstatusoutput(POOL_STAT % poolname)
-       if status:
-           (status, output) = commands.getstatusoutput(POOL_DESTROY % poolname)
-           if status:
-               logger.error("failed to destroy storage pool %s" % poolname)
-               logger.error("%s" % output)
-           else:
-               (status, output) = commands.getstatusoutput(POOL_UNDEFINE % poolname)
-               if status:
-                   logger.error("failed to undefine storage pool %s" % poolname)
-                   logger.error("%s" % output)
-       else:
+        logger.info("remove storage pool %s" % poolname)
+        (status, output) = commands.getstatusoutput(POOL_STAT % poolname)
+        if status:
+            (status, output) = commands.getstatusoutput(POOL_DESTROY % poolname)
+            if status:
+                logger.error("failed to destroy storage pool %s" % poolname)
+                logger.error("%s" % output)
+            else:
+                (status, output) = commands.getstatusoutput(
+                    POOL_UNDEFINE % poolname)
+                if status:
+                    logger.error(
+                        "failed to undefine storage pool %s" %
+                        poolname)
+                    logger.error("%s" % output)
+        else:
             (status, output) = commands.getstatusoutput(POOL_UNDEFINE % poolname)
             if status:
                 logger.error("failed to undefine storage pool %s" % poolname)

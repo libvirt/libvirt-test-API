@@ -12,6 +12,7 @@ from src import sharedmod
 required_params = ('poolname',)
 optional_params = {}
 
+
 def check_pool_destroy(conn, poolname, logger):
     """
      Check to verify that the pool is actually gone
@@ -20,13 +21,14 @@ def check_pool_destroy(conn, poolname, logger):
 
     if poolname not in pool_names:
         logger.info("destroy pool %s SUCCESS , " % poolname)
-        logger.info("%s doesn't seem to be an active poolname anymore, " % \
-                     poolname)
+        logger.info("%s doesn't seem to be an active poolname anymore, " %
+                    poolname)
         return True
     else:
         logger.error("destroy pool %s UNSUCCESSFUL" % poolname)
         logger.error("%s is still in the list after destroy" % poolname)
         return True
+
 
 def destroy_pool(params):
     """Function to actually destroy the pool"""
@@ -40,7 +42,7 @@ def destroy_pool(params):
     if poolname in pool_names:
         poolobj = conn.storagePoolLookupByName(poolname)
     else:
-        logger.error("%s not found\n" % poolname);
+        logger.error("%s not found\n" % poolname)
         return 1
 
     if not poolobj.isActive():
@@ -56,9 +58,9 @@ def destroy_pool(params):
             return 1
         else:
             logger.info("%s is destroyed!!!" % poolname)
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
-                    % (e.message, e.get_error_code()))
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
+                     % (e.message, e.get_error_code()))
         return 1
 
     return 0

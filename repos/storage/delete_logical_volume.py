@@ -14,10 +14,12 @@ from src import sharedmod
 required_params = ('poolname', 'volname',)
 optional_params = {}
 
+
 def display_volume_info(poolobj):
     """Display current storage volume information"""
-    logger.info("current storage volume list: %s" \
-% poolobj.listVolumes())
+    logger.info("current storage volume list: %s"
+                % poolobj.listVolumes())
+
 
 def display_physical_volume():
     """Display current physical storage volume information"""
@@ -25,11 +27,13 @@ def display_physical_volume():
     logger.debug("lvdisplay command execute return value: %d" % stat)
     logger.debug("lvdisplay command execute return result: %s" % ret)
 
+
 def get_storage_volume_number(poolobj):
     """Get storage volume number"""
     vol_num = poolobj.numOfVolumes()
     logger.info("current storage volume number: %s" % vol_num)
     return vol_num
+
 
 def check_volume_delete(poolname, volkey):
     """Check storage volume result, poolname will exist under
@@ -40,7 +44,7 @@ def check_volume_delete(poolname, volkey):
     logger.debug("%s file path: %s" % (poolname, path))
     if os.access(path, os.R_OK):
         logger.debug("execute grep lvremove %s command" % path)
-        cmd="grep 'lvremove' %s" % (path)
+        cmd = "grep 'lvremove' %s" % (path)
         logger.debug(cmd)
         stat, ret = commands.getstatusoutput(cmd)
         if stat == 0:
@@ -52,6 +56,7 @@ def check_volume_delete(poolname, volkey):
     else:
         logger.debug("%s file don't exist" % path)
         return False
+
 
 def delete_logical_volume(params):
     """Create a logical type storage volume"""
@@ -67,7 +72,7 @@ def delete_logical_volume(params):
     if poolname in pool_names:
         poolobj = conn.storagePoolLookupByName(poolname)
     else:
-        logger.error("%s not found\n" % poolname);
+        logger.error("%s not found\n" % poolname)
         return 1
 
     if not poolobj.isActive():
@@ -94,8 +99,8 @@ def delete_logical_volume(params):
         else:
             logger.error("fail to delete %s storage volume" % volname)
             return 1
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         return 1
 

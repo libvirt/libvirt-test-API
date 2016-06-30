@@ -21,7 +21,9 @@ import os
 from xml.dom import minidom
 import StringIO
 
+
 class xml_parser(object):
+
     """Class xml_parser. It parses and xml document into a python dictionary.
        The elements of the xml documents will be python dictionary keys. For
        example, the xml document:
@@ -46,12 +48,13 @@ class xml_parser(object):
        which will be set to:
          "/dev/mapper/vg_hpdl120g501-lv_home"
     """
+
     def __init__(self):
         pass
 
     def parse(self, arg):
         out = None
-        if type(arg) == file:
+        if isinstance(arg, file):
             out = self.parsefile(arg)
         elif os.path.exists(arg):
             print "file: %s " % arg
@@ -59,7 +62,7 @@ class xml_parser(object):
         else:
             streamstr = StringIO.StringIO(arg)
             out = self.parsefile(streamstr)
-        if out != None:
+        if out is not None:
             return out
 
     def parsefile(self, filepath):
@@ -69,7 +72,7 @@ class xml_parser(object):
         self.parseintodict(thenode, 0, outdic)
         return outdic
 
-    def parseintodict(self, node, level, out, rootkey = None):
+    def parseintodict(self, node, level, out, rootkey=None):
         for thenode in node.childNodes:
             if thenode.nodeType == node.ELEMENT_NODE:
                 key = thenode.nodeName
@@ -80,35 +83,35 @@ class xml_parser(object):
                         value = None
                 except:
                     value = None
-                newdict = { key:value }
+                newdict = {key: value}
                 attrdic = None
-                if rootkey != None:
+                if rootkey is not None:
                     self.keyfindandset(out, rootkey, thenode)
                 else:
-                    if thenode.attributes != None:
+                    if thenode.attributes is not None:
                         tmpattr = dict()
                         if thenode.attributes.length > 0:
                             for attrkey in thenode.attributes.keys():
                                 tmpattr.update(
-                                {attrkey:thenode.attributes.get(attrkey).nodeValue})
-                            attrdic = { "attr":tmpattr }
+                                    {attrkey: thenode.attributes.get(attrkey).nodeValue})
+                            attrdic = {"attr": tmpattr}
                     if key in out:
-                        if out[key] == None:
-                            if attrdic != None:
-                                if value == None:
+                        if out[key] is None:
+                            if attrdic is not None:
+                                if value is None:
                                     out[key] = attrdic
                                 else:
-                                    valdic = { "value":value }
+                                    valdic = {"value": value}
                                     valdic.update(attrdic)
                                     out[key] = valdic
                             else:
                                 out[key] = value
-                        elif type(out[key]) == list:
-                            if attrdic != None:
+                        elif isinstance(out[key], list):
+                            if attrdic is not None:
                                 newdict.update(attrdic)
                             out[key].append(newdict)
-                        elif type(out[key]) == dict:
-                            if attrdic != None:
+                        elif isinstance(out[key], dict):
+                            if attrdic is not None:
                                 newdict.update(attrdic)
                             out[key].update(newdict)
                         else:
@@ -116,15 +119,15 @@ class xml_parser(object):
                             out[key] = [tmp, value]
                     else:
                         out[key] = value
-                        if attrdic != None:
-                            if value == None:
+                        if attrdic is not None:
+                            if value is None:
                                 newdict[key] = attrdic
                             else:
-                                valdic = { "value":value }
+                                valdic = {"value": value}
                                 valdic.update(attrdic)
                                 newdict = valdic
                             out[key] = newdict
-                self.parseintodict(thenode, level+1, out, key)
+                self.parseintodict(thenode, level + 1, out, key)
         return out
 
     def keyfindandset(self, thedict, thekey, thenode):
@@ -137,32 +140,32 @@ class xml_parser(object):
                 value = None
         except:
             value = None
-        newval = { newvalkey:value }
+        newval = {newvalkey: value}
         attrdic = None
-        if thenode.attributes != None:
+        if thenode.attributes is not None:
             tmpattr = dict()
             if thenode.attributes.length > 0:
                 for key in thenode.attributes.keys():
                     tmpattr.update(
-                    {key:thenode.attributes.get(key).nodeValue})
-                attrdic = { "attr":tmpattr }
-        if attrdic != None:
-            if value == None:
-                newval.update({newvalkey:attrdic})
+                        {key: thenode.attributes.get(key).nodeValue})
+                attrdic = {"attr": tmpattr}
+        if attrdic is not None:
+            if value is None:
+                newval.update({newvalkey: attrdic})
             else:
-                valdic = { "value":value }
+                valdic = {"value": value}
                 newval.update(valdic)
                 newval.update(attrdic)
         for key in thedict.keys():
             if key == thekey:
-                if type(thedict[key]) == dict:
+                if isinstance(thedict[key], dict):
                     if newvalkey in thedict[key]:
-                        if newval[newvalkey] != None:
+                        if newval[newvalkey] is not None:
                             tmpdic = thedict[key][newvalkey]
                             thedict[key][newvalkey] = [tmpdic]
                             thedict[key][newvalkey].append(newval)
                         else:
-                            if type(thedict[key][newvalkey]) == list:
+                            if isinstance(thedict[key][newvalkey], list):
                                 thedict[key][newvalkey].append(dict())
                             else:
                                 tmpdic = thedict[key][newvalkey]
@@ -170,12 +173,12 @@ class xml_parser(object):
                                 thedict[key][newvalkey].append(dict())
                     else:
                         thedict[key].update(newval)
-                elif type(thedict[key]) == list:
+                elif isinstance(thedict[key], list):
                     if newvalkey in thedict[key][-1]:
                         thedict[key].append(newval)
                     else:
                         thedict[key][-1].update(newval)
                 else:
                     thedict[key] = newval
-            if type(thedict[key]) == dict:
+            if isinstance(thedict[key], dict):
                 self.keyfindandset(thedict[key], thekey, thenode)

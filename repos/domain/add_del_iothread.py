@@ -8,11 +8,13 @@ import lxml.etree
 required_params = ('guestname',)
 optional_params = {'conn': 'qemu:///system'}
 
+
 def find_iothreadid_fromxml(vm, running, iothreadid):
     if (running == 1):
         tree = lxml.etree.fromstring(vm.XMLDesc(0))
     else:
-        tree = lxml.etree.fromstring(vm.XMLDesc(libvirt.VIR_DOMAIN_XML_INACTIVE))
+        tree = lxml.etree.fromstring(
+            vm.XMLDesc(libvirt.VIR_DOMAIN_XML_INACTIVE))
 
     set = tree.xpath("//iothreadids/iothread")
     for n in set:
@@ -22,13 +24,14 @@ def find_iothreadid_fromxml(vm, running, iothreadid):
 
     return False
 
+
 def add_del_iothread(params):
     """
        test API for addIOThread and delIOThread in class virDomain
     """
 
     logger = params['logger']
-    fail=0
+    fail = 0
 
     try:
         conn = libvirt.open(params['conn'])
@@ -49,13 +52,14 @@ def add_del_iothread(params):
                     if find_iothreadid_fromxml(vm, 1, i):
                         vm.delIOThread(i, libvirt.VIR_DOMAIN_AFFECT_LIVE)
                         if find_iothreadid_fromxml(vm, 1, i):
-                            logger.info("FAIL: still can find iothread id in XML")
-                            fail=1
+                            logger.info(
+                                "FAIL: still can find iothread id in XML")
+                            fail = 1
 
                         break
                     else:
                         logger.info("FAIL: cannot find iothread id in XML")
-                        fail=1
+                        fail = 1
                         break
 
         """ test effect guest config"""
@@ -68,15 +72,15 @@ def add_del_iothread(params):
                     vm.delIOThread(i, libvirt.VIR_DOMAIN_AFFECT_CONFIG)
                     if find_iothreadid_fromxml(vm, 0, i):
                         logger.info("FAIL: still can find iothread id in XML")
-                        fail=1
+                        fail = 1
 
                     break
                 else:
                     logger.info("FAIL: cannot find iothread id in XML")
-                    fail=1
+                    fail = 1
                     break
 
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("API error message: %s" % e.message)
-        fail=1
+        fail = 1
     return fail

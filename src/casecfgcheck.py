@@ -15,8 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+
 class CaseCfgCheck(object):
+
     """validate the options in testcase config file"""
+
     def __init__(self, proxy_obj, activities_list):
         # XXX to check the first testcase list in activities_list
         self.activity = activities_list[0]
@@ -41,7 +44,8 @@ class CaseCfgCheck(object):
             required_params, optional_params = self.case_params[testcase_name]
 
             case_number += 1
-            ret = self._check_params(required_params, optional_params, actual_params)
+            ret = self._check_params(
+                required_params, optional_params, actual_params)
             if ret:
                 error_flag = 1
                 print "the No.%s : %s\n" % (case_number, testcase_name)

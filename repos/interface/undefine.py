@@ -12,6 +12,7 @@ from src import sharedmod
 required_params = ('ifacename',)
 optional_params = {}
 
+
 def check_undefine_interface(ifacename):
     """Check undefining interface result, if undefine interface is successful,
        ifcfg-ifacename will not exist under /etc/sysconfig/network-scripts/
@@ -43,8 +44,8 @@ def undefine(params):
         else:
             logger.error("fail to check undefine interface")
             return 1
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         logger.error("fail to undefine a interface")
         return 1

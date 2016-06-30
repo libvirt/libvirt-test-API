@@ -12,10 +12,11 @@ from src import sharedmod
 from utils import utils
 
 required_params = ('guestname',)
-optional_params = {'flags' : ''}
+optional_params = {'flags': ''}
 
 NONE = 0
 START_PAUSED = 1
+
 
 def start(params):
     """Start domain
@@ -34,7 +35,8 @@ def start(params):
     flags = params.get('flags', '')
 
     if "none" in flags and "start_paused" in flags:
-        logger.error("Flags error: Can't specify none and start_paused simultaneously")
+        logger.error(
+            "Flags error: Can't specify none and start_paused simultaneously")
         return 1
 
     conn = sharedmod.libvirtobj['conn']
@@ -51,8 +53,8 @@ def start(params):
         else:
             # this covers flags = None as well as flags = 'noping'
             domobj.create()
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         logger.error("start failed")
         return 1
@@ -68,7 +70,10 @@ def start(params):
 
     while timeout:
         state = domobj.info()[0]
-        expect_states = [libvirt.VIR_DOMAIN_RUNNING, libvirt.VIR_DOMAIN_NOSTATE, libvirt.VIR_DOMAIN_BLOCKED]
+        expect_states = [
+            libvirt.VIR_DOMAIN_RUNNING,
+            libvirt.VIR_DOMAIN_NOSTATE,
+            libvirt.VIR_DOMAIN_BLOCKED]
 
         if state in expect_states:
             break
@@ -84,7 +89,7 @@ def start(params):
     logger.info("Guest started")
 
     # Get domain ip and ping ip to check domain's status
-    if not "noping" in flags:
+    if "noping" not in flags:
         mac = utils.get_dom_mac_addr(domname)
         logger.info("get ip by mac address")
         ip = utils.mac_to_ip(mac, 180)

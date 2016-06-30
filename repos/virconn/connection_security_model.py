@@ -11,6 +11,7 @@ from utils import utils
 required_params = ('guestname',)
 optional_params = {}
 
+
 def get_security_driver(logger):
     """get security driver from /etc/libvirt/qemu.conf"""
 
@@ -44,6 +45,7 @@ def get_security_driver(logger):
         else:
             return ""
 
+
 def get_security_model(logger, domname):
     """get security model from process"""
 
@@ -64,6 +66,7 @@ def get_security_model(logger, domname):
     else:
         return "none"
 
+
 def check_security_model(logger, domname, model):
     """ check security model"""
 
@@ -78,6 +81,7 @@ def check_security_model(logger, domname, model):
         return True
     else:
         return False
+
 
 def connection_security_model(params):
     """test API for getSecurityModel"""
@@ -95,6 +99,6 @@ def connection_security_model(params):
         else:
             logger.info("Pass : get security model successful.")
             return 0
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("API error message: %s" % e.message)
         return 1

@@ -27,17 +27,18 @@ HOME_PATH = os.getcwd()
 required_params = ('guestname', 'guestos', 'guestarch',)
 optional_params = {'memory': 1048576,
                    'vcpu': 1,
-                   'disksize' : 20,
-                   'diskpath' : '/var/lib/libvirt/images/libvirt-test-api',
-                   'imageformat' : 'raw',
-                   'hddriver' : 'virtio',
+                   'disksize': 20,
+                   'diskpath': '/var/lib/libvirt/images/libvirt-test-api',
+                   'imageformat': 'raw',
+                   'hddriver': 'virtio',
                    'nicdriver': 'virtio',
                    'macaddr': '52:54:00:97:e4:28',
-                   'type' : 'define',
-                   'uuid' : '05867c1a-afeb-300e-e55e-2673391ae080',
-                   'xml' : 'xmls/kvm_windows_guest_install_cdrom.xml',
+                   'type': 'define',
+                   'uuid': '05867c1a-afeb-300e-e55e-2673391ae080',
+                   'xml': 'xmls/kvm_windows_guest_install_cdrom.xml',
                    'guestmachine': 'pc',
-                  }
+                   }
+
 
 def cleanup(mount):
     """Clean up a previously used mountpoint.
@@ -50,6 +51,7 @@ def cleanup(mount):
             logger.info("Removing mount point %s" % mount)
             os.rmdir(mount)
 
+
 def prepare_iso(iso_file):
     """fetch windows iso file
     """
@@ -59,6 +61,7 @@ def prepare_iso(iso_file):
     urllib.urlretrieve(iso_file, iso_local_path)
 
     return iso_local_path
+
 
 def prepare_floppy_image(guestname, guestos, guestarch,
                          windows_unattended_path, cdkey, FLOOPY_IMG):
@@ -92,13 +95,13 @@ def prepare_floppy_image(guestname, guestos, guestarch,
         (status, text) = commands.getstatusoutput(mount_cmd)
         if status:
             logger.error(
-            "failed to mount /tmp/floppy.img to /mnt/libvirt_floppy")
+                "failed to mount /tmp/floppy.img to /mnt/libvirt_floppy")
             return 1
 
         if '2008' in guestos or '7' in guestos or 'vista' in guestos:
             dest_fname = "autounattend.xml"
             source = os.path.join(windows_unattended_path, "%s_%s.xml" %
-                                 (guestos, guestarch))
+                                  (guestos, guestarch))
 
         elif '2003' in guestos or 'xp' in guestos:
             dest_fname = "winnt.sif"
@@ -131,10 +134,11 @@ def prepare_floppy_image(guestname, guestos, guestarch,
 
         cleanup(floppy_mount)
 
-    os.chmod(FLOOPY_IMG, 0755)
+    os.chmod(FLOOPY_IMG, 0o755)
     logger.info("Boot floppy created successfuly")
 
     return 0
+
 
 def prepare_boot_guest(domobj, xmlstr, guestname, installtype):
     """ After guest installation is over, undefine the guest with
@@ -151,8 +155,8 @@ def prepare_boot_guest(domobj, xmlstr, guestname, installtype):
     try:
         conn = domobj._conn
         domobj = conn.defineXML(xmlstr)
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         logger.error("fail to define domain %s" % guestname)
         return 1
@@ -165,13 +169,14 @@ def prepare_boot_guest(domobj, xmlstr, guestname, installtype):
 
     try:
         domobj.create()
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         logger.error("fail to start domain %s" % guestname)
         return 1
 
     return 0
+
 
 def check_domain_state(conn, guestname):
     """ if a guest with the same name exists, remove it """
@@ -194,6 +199,7 @@ def check_domain_state(conn, guestname):
         domobj = conn.lookupByName(guestname)
         domobj.undefine()
 
+
 def install_windows_cdrom(params):
     """ install a windows guest virtual machine by using iso file """
     # Initiate and check parameters
@@ -213,15 +219,19 @@ def install_windows_cdrom(params):
     logger.info("the macaddress is %s" %
                 params.get('macaddr', '52:54:00:97:e4:28'))
 
-    diskpath = params.get('diskpath', '/var/lib/libvirt/images/libvirt-test-api')
+    diskpath = params.get(
+        'diskpath',
+        '/var/lib/libvirt/images/libvirt-test-api')
     logger.info("disk image is %s" % diskpath)
     seeksize = params.get('disksize', 20)
     imageformat = params.get('imageformat', 'raw')
-    logger.info("create disk image with size %sG, format %s" % (seeksize, imageformat))
+    logger.info(
+        "create disk image with size %sG, format %s" %
+        (seeksize, imageformat))
     disk_create = "qemu-img create -f %s %s %sG" % \
-                    (imageformat, diskpath, seeksize)
-    logger.debug("the command line of creating disk images is '%s'" % \
-                   disk_create)
+        (imageformat, diskpath, seeksize)
+    logger.debug("the command line of creating disk images is '%s'" %
+                 disk_create)
 
     (status, message) = commands.getstatusoutput(disk_create)
     if status != 0:
@@ -249,7 +259,7 @@ def install_windows_cdrom(params):
     cdkey = envparser.get_value("guest", "%s_%s_key" % (guestos, guestarch))
 
     windows_unattended_path = os.path.join(HOME_PATH,
-                              "repos/domain/windows_unattended")
+                                           "repos/domain/windows_unattended")
 
     logger.debug('install source:\n    %s' % iso_file)
     logger.info('prepare pre-installation environment...')
@@ -272,8 +282,8 @@ def install_windows_cdrom(params):
         logger.info('define guest from xml description')
         try:
             domobj = conn.defineXML(xmlstr)
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
+        except libvirtError as e:
+            logger.error("API error message: %s, error code is %s"
                          % (e.message, e.get_error_code()))
             logger.error("fail to define domain %s" % guestname)
             return 1
@@ -282,8 +292,8 @@ def install_windows_cdrom(params):
 
         try:
             domobj.create()
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
+        except libvirtError as e:
+            logger.error("API error message: %s, error code is %s"
                          % (e.message, e.get_error_code()))
             logger.error("fail to start domain %s" % guestname)
             return 1
@@ -291,8 +301,8 @@ def install_windows_cdrom(params):
         logger.info('create guest from xml description')
         try:
             conn.createXML(xmlstr, 0)
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
+        except libvirtError as e:
+            logger.error("API error message: %s, error code is %s"
                          % (e.message, e.get_error_code()))
             logger.error("fail to define domain %s" % guestname)
             return 1
@@ -305,7 +315,8 @@ def install_windows_cdrom(params):
             if(state == libvirt.VIR_DOMAIN_SHUTOFF):
                 logger.info("guest installaton of define type is complete.")
                 logger.info("boot guest vm off harddisk")
-                ret  = prepare_boot_guest(domobj, xmlstr, guestname, installtype)
+                ret = prepare_boot_guest(
+                    domobj, xmlstr, guestname, installtype)
                 if ret:
                     logger.info("booting guest vm off harddisk failed")
                     return 1
@@ -323,7 +334,8 @@ def install_windows_cdrom(params):
             if guestname not in guest_names:
                 logger.info("guest installation of create type is complete.")
                 logger.info("define the vm and boot it up")
-                ret = prepare_boot_guest(domobj, xmlstr, guestname, installtype)
+                ret = prepare_boot_guest(
+                    domobj, xmlstr, guestname, installtype)
                 if ret:
                     logger.info("booting guest vm off harddisk failed")
                     return 1
@@ -366,12 +378,15 @@ def install_windows_cdrom(params):
 
     return 0
 
+
 def install_windows_cdrom_clean(params):
     """ clean testing environment """
     logger = params['logger']
     guestname = params.get('guestname')
 
-    diskpath = params.get('diskpath', '/var/lib/libvirt/images/libvirt-test-api')
+    diskpath = params.get(
+        'diskpath',
+        '/var/lib/libvirt/images/libvirt-test-api')
 
     (status, output) = commands.getstatusoutput(VIRSH_QUIET_LIST % guestname)
     if not status:
@@ -383,7 +398,8 @@ def install_windows_cdrom_clean(params):
                 logger.error("failed to destroy guest %s" % guestname)
                 logger.error("%s" % output)
             else:
-                (status, output) = commands.getstatusoutput(VM_UNDEFINE % guestname)
+                (status, output) = commands.getstatusoutput(
+                    VM_UNDEFINE % guestname)
                 if status:
                     logger.error("failed to undefine guest %s" % guestname)
                     logger.error("%s" % output)

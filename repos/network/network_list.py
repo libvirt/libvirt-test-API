@@ -13,6 +13,7 @@ optional_params = {}
 LS_NETWORK_DIR = "ls /etc/libvirt/qemu/networks/"
 LS_AUTOSTART_NET = "ls /etc/libvirt/qemu/networks/autostart/"
 
+
 def check_persistent_netxml(networkname):
     """
         Check if the network is persistent via checking network xml dir
@@ -29,12 +30,13 @@ def check_persistent_netxml(networkname):
         for i in range(len(output)):
             network_list_dir.append(output[i][:-4])
         del network_list_dir[0]
-        logger.info("Get persistent network name list under dir: %s" \
+        logger.info("Get persistent network name list under dir: %s"
                     % network_list_dir)
         if networkname in network_list_dir:
             return True
         else:
             return False
+
 
 def check_autostart_netxml(networkname):
     """
@@ -51,12 +53,13 @@ def check_autostart_netxml(networkname):
     else:
         for i in range(len(output)):
             autostart_list_dir.append(output[i][:-4])
-        logger.info("Get autostart network name list under dir: %s" \
+        logger.info("Get autostart network name list under dir: %s"
                     % autostart_list_dir)
         if networkname in autostart_list_dir:
             return True
         else:
             return False
+
 
 def network_list(params):
     """ List network with flag """
@@ -84,43 +87,43 @@ def network_list(params):
     try:
         network_list_api = conn.listAllNetworks(flag)
         network_namelist_api = []
-        logger.debug("Traverse the network object list %s" % \
-                    network_list_api)
+        logger.debug("Traverse the network object list %s" %
+                     network_list_api)
         for network in network_list_api:
             networkname = network.name()
             logger.info("Network name: %s " % networkname)
             # Check if the network is active
-            if cmp(flags,"active") == 0:
+            if cmp(flags, "active") == 0:
                 if network.isActive():
                     logger.info("The %s network is active" % networkname)
                 else:
-                    logger.error("Failed ,the %s network isn't active" % \
+                    logger.error("Failed ,the %s network isn't active" %
                                  networkname)
                     return 1
 
             # Check if the network is persistent
-            if cmp(flags,"persistent") == 0:
+            if cmp(flags, "persistent") == 0:
                 if network.isPersistent() and \
-                check_persistent_netxml(networkname):
+                        check_persistent_netxml(networkname):
                     logger.info("The %s network is persistent" % networkname)
                 else:
-                    logger.error("Failed ,the %s network isn't persistent" % \
+                    logger.error("Failed ,the %s network isn't persistent" %
                                  networkname)
                     return 1
 
             # Check if the network is auto start
-            if cmp(flags,"autostart") == 0:
+            if cmp(flags, "autostart") == 0:
                 if check_autostart_netxml(networkname):
                     logger.info("The %s network is autostart" % networkname)
                 else:
-                    logger.error("Failed ,the %s network isn't autostart" % \
+                    logger.error("Failed ,the %s network isn't autostart" %
                                  networkname)
                     return 1
 
             network_namelist_api.append(networkname)
         logger.info("The network list %s" % network_namelist_api)
 
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("API error message: %s" % e.message)
         return 1
 

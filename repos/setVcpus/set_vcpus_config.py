@@ -13,7 +13,8 @@ from src import sharedmod
 required_params = ('guestname', )
 optional_params = {'vcpu': 1,
                    'maxvcpu': 8,
-                  }
+                   }
+
 
 def get_vcpu_number(domobj):
     """dump domain config xml description to get vcpu number, return
@@ -21,7 +22,7 @@ def get_vcpu_number(domobj):
     """
     try:
         guestxml = domobj.XMLDesc(2)
-        logger.debug("domain %s xml is :\n%s" %(domobj.name(), guestxml))
+        logger.debug("domain %s xml is :\n%s" % (domobj.name(), guestxml))
         xml = minidom.parseString(guestxml)
         vcpu = xml.getElementsByTagName('vcpu')[0]
         maxvcpu = int(vcpu.childNodes[0].data)
@@ -36,11 +37,12 @@ def get_vcpu_number(domobj):
 
         logger.info("domain current vcpu number is: %s" % current)
 
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("libvirt call failed: " + str(e))
         return False
 
     return current, maxvcpu
+
 
 def set_vcpus_config(params):
     """set domain vcpu with config flag and check, also set and check
@@ -54,7 +56,7 @@ def set_vcpus_config(params):
     maxvcpu = params.get('maxvcpu', None)
 
     logger.info("the name of virtual machine is %s" % guestname)
-    if vcpu == None and maxvcpu == None:
+    if vcpu is None and maxvcpu is None:
         logger.error("at least one of vcpu or maxvcpu should be provided")
         return 1
 
@@ -80,8 +82,8 @@ def set_vcpus_config(params):
                 return 1
 
         if maxvcpu:
-            flags = libvirt.VIR_DOMAIN_VCPU_MAXIMUM|libvirt.VIR_DOMAIN_AFFECT_CONFIG
-	    logger.info("the given max vcpu number is %s" % maxvcpu)
+            flags = libvirt.VIR_DOMAIN_VCPU_MAXIMUM | libvirt.VIR_DOMAIN_AFFECT_CONFIG
+            logger.info("the given max vcpu number is %s" % maxvcpu)
             logger.info("set domain maximum vcpu as %s with flag: %s" %
                         (maxvcpu, flags))
             domobj.setVcpusFlags(int(maxvcpu), flags)
@@ -96,7 +98,7 @@ def set_vcpus_config(params):
                 logger.error("vcpusFlags check failed")
                 return 1
 
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("libvirt call failed: " + str(e))
         return 1
 

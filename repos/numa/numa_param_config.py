@@ -13,11 +13,12 @@ from utils import utils
 required_params = ('guestname', 'nodeset', 'mode')
 optional_params = {}
 
+
 def check_numa_params(domobj, mode, node_tuple):
     """dump domain config xml description to check numa params
     """
     guestxml = domobj.XMLDesc(2)
-    logger.debug("domain %s xml is :\n%s" %(domobj.name(), guestxml))
+    logger.debug("domain %s xml is :\n%s" % (domobj.name(), guestxml))
     xml = minidom.parseString(guestxml)
     numatune = xml.getElementsByTagName('numatune')[0]
     mem_element = numatune.getElementsByTagName('memory')[0]
@@ -55,6 +56,7 @@ def check_numa_params(domobj, mode, node_tuple):
         return 0
     else:
         return 1
+
 
 def numa_param_config(params):
     """set domain numa parameters with config flag and check

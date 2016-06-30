@@ -13,6 +13,7 @@ from utils import utils
 required_params = ('guestname', 'nodeset', 'mode')
 optional_params = {}
 
+
 def check_numa_params(guestname, mode, node_tuple):
     """dump domain live xml description to check numa params and
        check memory allowed list of domain pid
@@ -26,7 +27,7 @@ def check_numa_params(guestname, mode, node_tuple):
     cmd = "grep Mems_allowed_list /proc/%s/status" % pid[0]
     status, output = utils.exec_cmd(cmd, shell=True)
     nodeval = output[0].split('\t')[1]
-    ret = utils.param_to_tuple(nodeset_val, node_num)
+    ret = utils.param_to_tuple(nodeval, node_num)
     logger.info("Mems_allowed_list in domain pid status is: %s" % nodeval)
     logger.debug("parse nodeset to tuple is:")
     logger.debug(ret)
@@ -40,6 +41,7 @@ def check_numa_params(guestname, mode, node_tuple):
         return 0
     else:
         return 1
+
 
 def numa_param_live(params):
     """set domain numa parameters with live flag and check

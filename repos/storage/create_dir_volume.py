@@ -13,8 +13,9 @@ from libvirt import libvirtError
 from src import sharedmod
 
 required_params = ('poolname', 'volname', 'volformat', 'capacity',)
-optional_params = {'xml' : 'xmls/dir_volume.xml',
-                  }
+optional_params = {'xml': 'xmls/dir_volume.xml',
+                   }
+
 
 def get_pool_path(poolobj):
     """ get pool xml description """
@@ -29,12 +30,14 @@ def get_pool_path(poolobj):
 
     return path_value
 
+
 def virsh_vol_list(poolname):
     """using virsh command list the volume information"""
 
     shell_cmd = "virsh vol-list %s" % poolname
     (status, text) = commands.getstatusoutput(shell_cmd)
     logger.debug(text)
+
 
 def create_dir_volume(params):
     """create a volume in the dir type of pool"""
@@ -48,7 +51,7 @@ def create_dir_volume(params):
     xmlstr = params['xml']
 
     logger.info("the poolname is %s, volname is %s, \
-                 volfomat is %s, capacity is %s" % \
+                 volfomat is %s, capacity is %s" %
                 (poolname, volname, volformat, capacity))
 
     conn = sharedmod.libvirtobj['conn']
@@ -68,8 +71,8 @@ def create_dir_volume(params):
     xmlstr = xmlstr.replace('SUFFIX', capacity[-1])
     xmlstr = xmlstr.replace('CAP', capacity[:-1])
 
-    logger.info("before create the new volume, current volume list is %s" % \
-                 poolobj.listVolumes())
+    logger.info("before create the new volume, current volume list is %s" %
+                poolobj.listVolumes())
 
     logger.info("and using virsh command to ouput \
                  the volume information in the pool %s" % poolname)
@@ -80,8 +83,8 @@ def create_dir_volume(params):
     try:
         logger.info("create %s volume" % volname)
         poolobj.createXML(xmlstr, 0)
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         return 1
 

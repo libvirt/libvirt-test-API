@@ -110,7 +110,7 @@ def connection_version(params):
             logger.error("Failed to check hypervisor version number")
             return 1
 
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("API error message: %s, error code is %s" %
                      e.message)
         logger.error("start failed")

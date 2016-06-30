@@ -15,8 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+
 class Filter(object):
+
     """filter activity list to form various data list"""
+
     def __init__(self, activities_list):
         self.testcase_keys = []
         for activity in activities_list:

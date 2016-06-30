@@ -18,13 +18,14 @@ from utils import utils
 from src import env_parser
 
 required_params = ('guestos', 'guestarch', 'guestnum', 'uri')
-optional_params = {'xml' : 'xmls/domain.xml',
+optional_params = {'xml': 'xmls/domain.xml',
                    'guestmachine': 'pc',
-                  }
+                   }
 
 IMAG_PATH = "/var/lib/libvirt/images/"
 DISK_DD = "dd if=/dev/zero of=%s bs=1 count=1 seek=6G"
 HOME_PATH = os.getcwd()
+
 
 def request_credentials(credentials, user_data):
     for credential in credentials:
@@ -51,6 +52,7 @@ def request_credentials(credentials, user_data):
 class guest_install(Thread):
     """function callable by as a thread to create guest
     """
+
     def __init__(self, name, os, arch, ks, conn, xmlstr, logger):
         Thread.__init__(self)
         self.name = name
@@ -68,7 +70,7 @@ class guest_install(Thread):
         self.xmlstr = self.xmlstr.replace('MACADDR', macaddr)
         self.xmlstr = self.xmlstr.replace('KS', self.ks)
 
-	# prepare disk image file
+        # prepare disk image file
         diskpath = IMAG_PATH + self.name
         (status, message) = commands.getstatusoutput(DISK_DD % diskpath)
         if status != 0:
@@ -83,14 +85,17 @@ class guest_install(Thread):
         self.logger.info('create guest %s from xml description' % self.name)
         try:
             guestobj = self.conn.createXML(self.xmlstr, 0)
-            self.logger.info('guest %s API createXML returned successfuly' % guestobj.name())
-        except libvirtError, e:
-            self.logger.error("API error message: %s, error code is %s" \
-                         % (e.message, e.get_error_code()))
+            self.logger.info(
+                'guest %s API createXML returned successfuly' %
+                guestobj.name())
+        except libvirtError as e:
+            self.logger.error("API error message: %s, error code is %s"
+                              % (e.message, e.get_error_code()))
             self.logger.error("fail to define domain %s" % self.name)
             return 1
 
         return 0
+
 
 def multiple_thread_block_on_domain_create(params):
     """ spawn multiple threads to create guest simultaneously
@@ -109,7 +114,8 @@ def multiple_thread_block_on_domain_create(params):
     hypervisor = utils.get_hypervisor()
     uri = params['uri']
 
-    auth = [[libvirt.VIR_CRED_AUTHNAME, libvirt.VIR_CRED_PASSPHRASE], request_credentials, None]
+    auth = [[libvirt.VIR_CRED_AUTHNAME, libvirt.VIR_CRED_PASSPHRASE],
+            request_credentials, None]
 
     conn = libvirt.openAuth(uri, auth, 0)
 
@@ -120,7 +126,7 @@ def multiple_thread_block_on_domain_create(params):
     envparser = env_parser.Envparser(envfile)
     ostree = envparser.get_value("guest", guestos + "_" + arch)
     ks = envparser.get_value("guest", guestos + "_" + arch +
-                                "_http_ks")
+                             "_http_ks")
 
     # download vmlinuz and initrd.img
     vmlinuzpath = os.path.join(ostree, 'isolinux/vmlinuz')
@@ -129,13 +135,12 @@ def multiple_thread_block_on_domain_create(params):
     urllib.urlretrieve(vmlinuzpath, '/var/lib/libvirt/boot/vmlinuz')
     urllib.urlretrieve(initrdpath, '/var/lib/libvirt/boot/initrd.img')
 
-
     name = "guest"
     start_num = num.split('-')[0]
     end_num = num.split('-')[1]
     thread_pid = []
     for i in range(int(start_num), int(end_num)):
-        guestname =  name + str(i)
+        guestname = name + str(i)
         thr = guest_install(guestname, guestos, arch, ks, conn, xmlstr, logger)
         thread_pid.append(thr)
 

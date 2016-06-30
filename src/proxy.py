@@ -22,7 +22,9 @@
 
 import exception
 
+
 class Proxy(object):
+
     """ The Proxy class is used for getting function reference """
 
     def __init__(self, testcases_names):
@@ -71,7 +73,7 @@ class Proxy(object):
                 func_ref = getattr(casemod_ref, func)
                 func_dict[key] = func_ref
             else:
-                raise exception.TestCaseError("function %s not found in %s" % \
+                raise exception.TestCaseError("function %s not found in %s" %
                                               (func, modcase))
         return func_dict
 
@@ -126,8 +128,9 @@ class Proxy(object):
                 case_params[modcase] = \
                     [casemod_ref.required_params, casemod_ref.optional_params]
             else:
-                raise exception.TestCaseError\
-                      ("required_params or optional_params not found in %s" % modcase)
+                raise exception.TestCaseError(
+                    "required_params or optional_params not found in %s" %
+                    modcase)
         return case_params
 
     def get_testcase_params(self, modcase):
@@ -142,8 +145,8 @@ class Proxy(object):
 
         if 'required_params' not in var_func_names \
            or 'optional_params' not in var_func_names:
-            raise exception.TestCaseError\
-                  ("required_params or optional_params not found in %s" % modcase)
+            raise exception.TestCaseError(
+                "required_params or optional_params not found in %s" % modcase)
 
         return [casemod_ref.required_params, casemod_ref.optional_params]
 
@@ -164,7 +167,7 @@ class Proxy(object):
             return True
         return False
 
-    def get_call_dict(self, module, casename, func = None):
+    def get_call_dict(self, module, casename, func=None):
         """ Return testing function reference dictionary """
         case_abs_path = '%s.%s.%s' % ('repos', module, casename)
 

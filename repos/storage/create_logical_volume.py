@@ -14,8 +14,9 @@ from src import sharedmod
 from utils import utils
 
 required_params = ('poolname', 'volname', 'capacity',)
-optional_params = {'xml' : 'xmls/logical_volume.xml',
-                  }
+optional_params = {'xml': 'xmls/logical_volume.xml',
+                   }
+
 
 def get_pool_path(poolobj):
     """ Get pool target path """
@@ -28,10 +29,12 @@ def get_pool_path(poolobj):
     textnode = path_element.childNodes[0]
     return textnode.data
 
+
 def display_volume_info(poolobj):
     """Display current storage volume information"""
-    logger.debug("current created storage volume: %s" \
-% poolobj.listVolumes())
+    logger.debug("current created storage volume: %s"
+                 % poolobj.listVolumes())
+
 
 def display_physical_volume():
     """Display current physical volume information"""
@@ -39,11 +42,13 @@ def display_physical_volume():
     logger.debug("lvdisplay command execute return value: %d" % stat)
     logger.debug("lvdisplay command execute return result: %s" % ret)
 
+
 def get_storage_volume_number(poolobj):
     """Get storage volume number"""
     vol_num = poolobj.numOfVolumes()
     logger.info("current storage volume number: %s" % vol_num)
     return vol_num
+
 
 def check_volume_create(poolobj, poolname, volname, size):
     """Check storage volume result, poolname will exist under
@@ -67,6 +72,7 @@ def check_volume_create(poolobj, poolname, volname, size):
         logger.debug("%s file don't exist" % path)
         return False
 
+
 def create_logical_volume(params):
     """Create a logical type storage volume from xml"""
     global logger
@@ -83,7 +89,7 @@ def create_logical_volume(params):
     if poolname in pool_names:
         poolobj = conn.storagePoolLookupByName(poolname)
     else:
-        logger.error("%s not found\n" % poolname);
+        logger.error("%s not found\n" % poolname)
         return 1
 
     if not poolobj.isActive():
@@ -108,14 +114,14 @@ def create_logical_volume(params):
         display_physical_volume()
         vol_num2 = get_storage_volume_number(poolobj)
         display_volume_info(poolobj)
-        if check_volume_create(poolobj, poolname, volname, capacity*1024) \
-            and vol_num2 > vol_num1:
+        if check_volume_create(poolobj, poolname, volname, capacity * 1024) \
+                and vol_num2 > vol_num1:
             logger.info("create %s storage volume is successful" % volname)
         else:
             logger.error("fail to crearte %s storage volume" % volname)
             return 1
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         return 1
 

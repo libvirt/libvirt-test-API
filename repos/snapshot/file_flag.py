@@ -18,6 +18,7 @@ optional_params = {}
 FLAG_FILE = "snapshot_flag"
 MAKE_FLAG = "rm -f /tmp/%s; touch /tmp/%s " % (FLAG_FILE, FLAG_FILE)
 
+
 def check_domain_running(conn, guestname, logger):
     """ check if the domain exists and in running state as well """
     guest_names = []
@@ -32,6 +33,7 @@ def check_domain_running(conn, guestname, logger):
     else:
         return True
 
+
 def make_flag(ipaddr, username, password, logger):
     """ enter guest OS, create a file in /tmp folder """
     ret, out = utils.remote_exec_pexpect(ipaddr, username, password, MAKE_FLAG)
@@ -44,6 +46,7 @@ def make_flag(ipaddr, username, password, logger):
     else:
         logger.info("flag %s is created in /tmp folder" % FLAG_FILE)
         return True
+
 
 def file_flag(params):
     """ create a new file in the /tmp folder of the guest

@@ -11,7 +11,7 @@ from libvirt import libvirtError
 from src import sharedmod
 from utils import utils
 
-required_params = ('emulatorbin','arch','machine','virttype',)
+required_params = ('emulatorbin', 'arch', 'machine', 'virttype',)
 optional_params = {}
 
 QEMU_CAPS = ""
@@ -35,6 +35,7 @@ device = False
 scsi_generic = False
 vfio_pci = False
 
+
 def clean_env(logger):
     """
        clean testing environment
@@ -45,7 +46,8 @@ def clean_env(logger):
     else:
         logger.debug("Deleted %s successfully" % API_FILE)
 
-def get_hypervisor_ver(emulatorbin,logger):
+
+def get_hypervisor_ver(emulatorbin, logger):
     """
        Obtain qemu-kvm's version, and return a number value of version
     """
@@ -61,11 +63,12 @@ def get_hypervisor_ver(emulatorbin,logger):
     for item in package:
         if not item.isalnum():
             for v in item.split("."):
-                version = version + v.rjust(3,"0")
+                version = version + v.rjust(3, "0")
             break
     return int(version)
 
-def validate_caps_from_hv(emulatorbin,logger):
+
+def validate_caps_from_hv(emulatorbin, logger):
     """
         Validate the relative caps between libvirt and qemu-kvm
     """
@@ -73,7 +76,7 @@ def validate_caps_from_hv(emulatorbin,logger):
     F2 = "%s -h| grep \"format=\""
     F3 = "%s -h| grep \"readonly=\""
     F4 = "%s -h| grep \"^\\-device\""
-    l = [F1,F2,F3,F4]
+    l = [F1, F2, F3, F4]
     flags = []
     for item in l:
         status, temp = utils.exec_cmd(item % emulatorbin, shell=True)
@@ -83,17 +86,18 @@ def validate_caps_from_hv(emulatorbin,logger):
         else:
             flags.append(False)
             logger.debug("Got: %s from vh" % temp)
-    if get_hypervisor_ver(emulatorbin,logger) >= 11000:
-         flags.append(True)
+    if get_hypervisor_ver(emulatorbin, logger) >= 11000:
+        flags.append(True)
     else:
-         flags.append(False)
-    libvirt_f = [drive,drive_forma,drive_readonly,device,blk_sg_io]
+        flags.append(False)
+    libvirt_f = [drive, drive_forma, drive_readonly, device, blk_sg_io]
     if flags == libvirt_f:
         return True
     else:
         return False
 
-def generate_hash(emulatorbin,logger):
+
+def generate_hash(emulatorbin, logger):
     """
        generate file name using sha256
     """
@@ -103,7 +107,8 @@ def generate_hash(emulatorbin,logger):
     QEMU_CAPS = QEMU_CAPS + file_name + ".xml"
     logger.debug("Cache file is %s" % QEMU_CAPS)
 
-def get_maxcpu(machine,logger):
+
+def get_maxcpu(machine, logger):
     """
        return maxcpu for given machine type from QEMU_CAPS xml
     """
@@ -114,6 +119,7 @@ def get_maxcpu(machine,logger):
         if item.getAttribute('name') == machine:
             maxcpu = int(item.getAttribute('maxCpus'))
     return True
+
 
 def get_os_flags(logger):
     """
@@ -129,15 +135,16 @@ def get_os_flags(logger):
             drive_forma = True
         if item.getAttribute('name') == "drive-readonly":
             drive_readonly = True
-    logger.debug("drive = %s; drive_format = %s; drive_readonly = %s"\
-                % (drive,drive_forma,drive_readonly))
+    logger.debug("drive = %s; drive_format = %s; drive_readonly = %s"
+                 % (drive, drive_forma, drive_readonly))
     return True
+
 
 def get_disk_flags(logger):
     """
        Read results from QEMU_CAPS file and set two flags
     """
-    global blk_sg_io,usb_storage
+    global blk_sg_io, usb_storage
     xml = minidom.parse(QEMU_CAPS)
     qemu = xml.getElementsByTagName('qemuCaps')[0]
     for item in qemu.getElementsByTagName('flag'):
@@ -145,14 +152,15 @@ def get_disk_flags(logger):
             blk_sg_io = True
         if item.getAttribute('name') == "usb-storage":
             usb_storage = True
-    logger.debug("blk_sg_io = %s; usb_storage = %s" % (blk_sg_io,usb_storage))
+    logger.debug("blk_sg_io = %s; usb_storage = %s" % (blk_sg_io, usb_storage))
     return True
+
 
 def get_hostdev_flags(logger):
     """
        Read results from QEMU_CAPS file and set three flags
     """
-    global device, scsi_generic,vfio_pci
+    global device, scsi_generic, vfio_pci
     xml = minidom.parse(QEMU_CAPS)
     for item in xml.getElementsByTagName('flag'):
         if item.getAttribute('name') == "device":
@@ -161,9 +169,10 @@ def get_hostdev_flags(logger):
             scsi_generic = True
         if item.getAttribute('name') == "vfio-pci":
             vfio_pci = True
-    logger.debug("device = %s; scsi_generic = %s; vfio_pci = %s"\
-                 % (device,scsi_generic,vfio_pci))
+    logger.debug("device = %s; scsi_generic = %s; vfio_pci = %s"
+                 % (device, scsi_generic, vfio_pci))
     return True
+
 
 def supportsPassthroughVFIO(logger):
     """
@@ -179,6 +188,7 @@ def supportsPassthroughVFIO(logger):
         return True
     return False
 
+
 def supportsPassthroughKVM(logger):
     """
        check the legacy kvm mode
@@ -187,45 +197,47 @@ def supportsPassthroughKVM(logger):
         logger.error("File %s is not exist" % KVM)
         return False
     with open(KVM, "r") as kvmfd:
-        if fcntl.ioctl(kvmfd,KVM_CHECK_EXTENSION,KVM_CAP_IOMMU) == 1:
+        if fcntl.ioctl(kvmfd, KVM_CHECK_EXTENSION, KVM_CAP_IOMMU) == 1:
             return True
     return False
 
-def check_common_values(given_list,logger):
+
+def check_common_values(given_list, logger):
     """
        Check path/machine/arch/vcpu parameters
     """
     xml = minidom.parse(API_FILE)
     dom = xml.getElementsByTagName('domainCapabilities')[0]
-    #get path/machine/arch/vcpu from xml generated by api
+    # get path/machine/arch/vcpu from xml generated by api
     path = dom.getElementsByTagName('path')[0].childNodes[0].data
     domain = dom.getElementsByTagName('domain')[0].childNodes[0].data
     machine = dom.getElementsByTagName('machine')[0].childNodes[0].data
     arch = dom.getElementsByTagName('arch')[0].childNodes[0].data
     vcpu = dom.getElementsByTagName('vcpu')[0].getAttribute('max')
-    #put all of them to a list
-    list1 = [str(path),str(machine),str(arch),int(vcpu)]
+    # put all of them to a list
+    list1 = [str(path), str(machine), str(arch), int(vcpu)]
     logger.debug("Got 4 common parameters: %s" % list1)
-    if  given_list == list1:
+    if given_list == list1:
         logger.debug("Checking common value: Pass")
     else:
         logger.debug("Checking common value: Fail")
         return False
     return True
 
+
 def check_os(arch, logger):
     """
        check the os part
     """
-    alltype = ["rom","pflash"]
-    allreadonly = ["yes","no"]
+    alltype = ["rom", "pflash"]
+    allreadonly = ["yes", "no"]
     type_api = []
     readonly_api = []
     xml = minidom.parse(API_FILE)
     dom = xml.getElementsByTagName('domainCapabilities')[0]
     os = dom.getElementsByTagName('os')[0]
     loader = os.getElementsByTagName('loader')[0]
-    ovmf1 =  os.getElementsByTagName('value')[0]
+    ovmf1 = os.getElementsByTagName('value')[0]
     ovmf1 = ovmf1.childNodes[0].data
     logger.debug("Got OVMF path is %s" % ovmf1)
     if ovmf_f and ovmf1 != OVMF:
@@ -252,12 +264,13 @@ def check_os(arch, logger):
         return False
     return True
 
+
 def check_disk(logger):
     """
        check the disk part in <devices>
     """
-    alldevice = ["disk","cdrom","floppy","lun"]
-    allbus = ["ide","fdc","scsi","virtio","usb"]
+    alldevice = ["disk", "cdrom", "floppy", "lun"]
+    allbus = ["ide", "fdc", "scsi", "virtio", "usb"]
     device_api = []
     bus_api = []
     xml = minidom.parse(API_FILE)
@@ -286,14 +299,15 @@ def check_disk(logger):
         return False
     return True
 
+
 def check_hostdev(logger):
     """
        check the hostdev part in <devices>
     """
     allmode = ["subsystem"]
-    allpolicy = ["default","mandatory","requisite","optional"]
-    allsubsys = ["usb","pci","scsi"]
-    allbackend = ["default","default","vfio","kvm"]
+    allpolicy = ["default", "mandatory", "requisite", "optional"]
+    allsubsys = ["usb", "pci", "scsi"]
+    allbackend = ["default", "default", "vfio", "kvm"]
     mode_api = []
     policy_api = []
     subsys_api = []
@@ -325,7 +339,7 @@ def check_hostdev(logger):
             value = item.getElementsByTagName("value")
             for temp in value:
                 backend_api.append(str(temp.childNodes[0].data))
-    #WIP, we need more codes to check vfio
+    # WIP, we need more codes to check vfio
     if not (drive & device & scsi_generic):
         allsubsys.remove("scsi")
     if not (supportsPassthroughKVM(logger) & device):
@@ -349,6 +363,7 @@ def check_hostdev(logger):
         return False
     return True
 
+
 def connection_getDomainCapabilities(params):
     """
        test API for getDomainCapabilities in class virConnect
@@ -361,13 +376,13 @@ def connection_getDomainCapabilities(params):
     virttype = params['virttype']
 
     try:
-        logger.info("The specified emulatorbin is %s" \
+        logger.info("The specified emulatorbin is %s"
                     % emulatorbin)
-        logger.info("The specified architecture is %s" \
+        logger.info("The specified architecture is %s"
                     % arch)
-        logger.info("The specified machine is %s" \
+        logger.info("The specified machine is %s"
                     % machine)
-        logger.info("The specified virttype is %s" \
+        logger.info("The specified virttype is %s"
                     % virttype)
 
         generate_hash(emulatorbin, logger)
@@ -378,7 +393,7 @@ def connection_getDomainCapabilities(params):
             ovmf_f = True
         else:
             logger.warning("cache file, %s is not exist" % OVMF)
-        if not get_maxcpu(machine,logger):
+        if not get_maxcpu(machine, logger):
             logger.debug("get maxcpu: Fail")
             return 1
         if not get_os_flags(logger):
@@ -390,28 +405,28 @@ def connection_getDomainCapabilities(params):
         if not get_hostdev_flags(logger):
             logger.debug("get hostdev: Fail")
             return 1
-        if not validate_caps_from_hv(emulatorbin,logger):
+        if not validate_caps_from_hv(emulatorbin, logger):
             logger.error("Failed to compare caps")
             return 1
         else:
             logger.debug("Successed to compare caps")
 
         conn = sharedmod.libvirtobj['conn']
-        caps_from_api = conn.getDomainCapabilities\
-(emulatorbin,arch,machine,virttype,0)
+        caps_from_api = conn.getDomainCapabilities(
+            emulatorbin, arch, machine, virttype, 0)
 
         logger.debug("The return of API: %s" % caps_from_api)
-        fd = open(API_FILE,"w+")
+        fd = open(API_FILE, "w+")
         fd.write(caps_from_api)
         fd.flush()
 
-        given_list = [emulatorbin,machine,arch,maxcpu]
-        if not check_common_values(given_list,logger):
+        given_list = [emulatorbin, machine, arch, maxcpu]
+        if not check_common_values(given_list, logger):
             logger.info("Failed to validate common elements")
             return 1
         else:
             logger.info("Successed to validate common elements")
-        if not check_os(arch,logger):
+        if not check_os(arch, logger):
             logger.info("Failed to validate os block")
             return 1
         else:
@@ -427,7 +442,7 @@ def connection_getDomainCapabilities(params):
         else:
             logger.info("Successed to validate hostdev block")
 
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("API error message: %s" % e.message)
         clean_env(logger)
         return 1

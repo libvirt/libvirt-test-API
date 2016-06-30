@@ -8,11 +8,13 @@ import lxml.etree
 required_params = ('guestname',)
 optional_params = {'conn': 'qemu:///system'}
 
+
 def find_iothreadid_fromxml(vm, running, iothreadid):
     if (running == 1):
         tree = lxml.etree.fromstring(vm.XMLDesc(0))
     else:
-        tree = lxml.etree.fromstring(vm.XMLDesc(libvirt.VIR_DOMAIN_XML_INACTIVE))
+        tree = lxml.etree.fromstring(
+            vm.XMLDesc(libvirt.VIR_DOMAIN_XML_INACTIVE))
 
     set = tree.xpath("//iothreadids/iothread")
     for n in set:
@@ -22,13 +24,14 @@ def find_iothreadid_fromxml(vm, running, iothreadid):
 
     return False
 
+
 def info_iothread(params):
     """
        test API for ioThreadInfo in class virDomain
     """
 
     logger = params['logger']
-    fail=0
+    fail = 0
 
     try:
         conn = libvirt.open(params['conn'])
@@ -55,7 +58,7 @@ def info_iothread(params):
             for n in ret:
                 if not find_iothreadid_fromxml(vm, 1, n[0]):
                     logger.info("FAIL: cannot find iothread id in XML")
-                    fail=1
+                    fail = 1
 
         """ test effect guest config"""
         logger.info("test with guest inactive XML")
@@ -72,9 +75,9 @@ def info_iothread(params):
         for n in ret:
             if not find_iothreadid_fromxml(vm, 0, n[0]):
                 logger.info("FAIL: cannot find iothread id in XML")
-                fail=1
+                fail = 1
 
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("API error message: %s" % e.message)
-        fail=1
+        fail = 1
     return fail

@@ -11,14 +11,18 @@ from libvirt import libvirtError
 from src import sharedmod
 
 required_params = ('poolname', 'sourcehost', 'sourcepath',)
-optional_params = {'targetpath' : '/mnt',
-                   'xml' : 'xmls/netfs_pool.xml',
-                  }
+optional_params = {'targetpath': '/mnt',
+                   'xml': 'xmls/netfs_pool.xml',
+                   }
+
 
 def display_pool_info(conn, logger):
     """Display current storage pool information"""
-    logger.debug("current define storage pool: %s" % conn.listDefinedStoragePools())
+    logger.debug(
+        "current define storage pool: %s" %
+        conn.listDefinedStoragePools())
     logger.debug("current active storage pool: %s" % conn.listStoragePools())
+
 
 def check_pool_define(poolname, logger):
     """Check define storage pool result, if define storage is successful,
@@ -32,6 +36,7 @@ def check_pool_define(poolname, logger):
         return True
     else:
         return False
+
 
 def define_netfs_pool(params):
     """Define a netfs type storage pool from xml"""
@@ -62,8 +67,8 @@ def define_netfs_pool(params):
         else:
             logger.error("%s storage pool is undefined" % poolname)
             return 1
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         return 1
 

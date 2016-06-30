@@ -12,8 +12,9 @@ from src import sharedmod
 from utils import utils
 
 required_params = ('poolname', 'volname', 'volformat', 'capacity',)
-optional_params = {'xml' : 'xmls/dir_volume.xml',
-                  }
+optional_params = {'xml': 'xmls/dir_volume.xml',
+                   }
+
 
 def get_pool_path(poolobj):
     """ get pool xml description
@@ -29,6 +30,7 @@ def get_pool_path(poolobj):
 
     return path_value
 
+
 def write_file(path, capacity):
     """write test data to file
     """
@@ -41,6 +43,7 @@ def write_file(path, capacity):
     data = ''.join(repeat * datastr)
     f.write(data)
     f.close()
+
 
 def dir_vol_wipe(params):
     """test volume download and check"""
@@ -85,14 +88,14 @@ def dir_vol_wipe(params):
         cmd = "dd if=/dev/zero of=%s bs=1024 count=%s" % (test_path, count)
         utils.exec_cmd(cmd, shell=True)
         cmpdigest = utils.digest(test_path, 0, 0)
-	logger.debug("the compare volume digest is: %s" % cmpdigest)
+        logger.debug("the compare volume digest is: %s" % cmpdigest)
 
         logger.info("wipe volume %s" % volume_path)
         vol.wipe(0)
 
         newdigest = utils.digest(volume_path, 0, 0)
         logger.debug("the volum digest of data read from %s after wipe is: %s"
-                      % (volume_path, newdigest))
+                     % (volume_path, newdigest))
 
         logger.info("check the digest before and after wipe")
         if newdigest == origdigest:
@@ -111,11 +114,12 @@ def dir_vol_wipe(params):
 
         logger.info("wipe succeed")
 
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("libvirt call failed: " + str(e))
         return 1
 
     return 0
+
 
 def dir_vol_wipe_clean(params):
     """clean testing environment"""

@@ -18,16 +18,17 @@ START_PAUSED = 1
 required_params = ('guestname', 'diskpath',)
 optional_params = {'memory': 1048576,
                    'vcpu': 1,
-                   'imageformat' : 'raw',
-                   'hddriver' : 'virtio',
+                   'imageformat': 'raw',
+                   'hddriver': 'virtio',
                    'nicdriver': 'virtio',
                    'macaddr': '52:54:00:97:e4:28',
-                   'uuid' : '05867c1a-afeb-300e-e55e-2673391ae080',
+                   'uuid': '05867c1a-afeb-300e-e55e-2673391ae080',
                    'virt_type': 'kvm',
-                   'flags' : 'none',
+                   'flags': 'none',
                    'xml': 'xmls/kvm_guest_define.xml',
                    'guestmachine': 'pc',
-                  }
+                   }
+
 
 def create(params):
     """create a domain from xml"""
@@ -37,7 +38,7 @@ def create(params):
 
     flags = params.get('flags', 'none')
     if flags != "none" and flags != "start_paused":
-        logger.error("flags value either \"none\" or \"start_paused\"");
+        logger.error("flags value either \"none\" or \"start_paused\"")
         return 1
 
     conn = sharedmod.libvirtobj['conn']
@@ -50,8 +51,8 @@ def create(params):
             domobj = conn.createXML(xmlstr, START_PAUSED)
         else:
             logger.error("flags error")
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         logger.error("fail to create domain %s" % guestname)
         return 1

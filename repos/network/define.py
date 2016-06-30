@@ -18,12 +18,13 @@ required_params = ('networkname',
                    'netstart',
                    'netend',
                    'netmode',)
-optional_params = {'xml' : 'xmls/network.xml',
-                   'netip6addr' : '2001:db8:ca2:98::1',
-                   'netip6prefix' : '64',
-                   'netip6start' : '2001:db8:ca2:98::11',
-                   'netip6end' : '2001:db8:ca2:98::ff',
-                  }
+optional_params = {'xml': 'xmls/network.xml',
+                   'netip6addr': '2001:db8:ca2:98::1',
+                   'netip6prefix': '64',
+                   'netip6start': '2001:db8:ca2:98::11',
+                   'netip6end': '2001:db8:ca2:98::ff',
+                   }
+
 
 def check_network_define(networkname, logger):
     """Check define network result, if define network is successful,
@@ -36,11 +37,12 @@ def check_network_define(networkname, logger):
     #stat, ret = commands.getstatusoutput(valid)
     #logger.debug("virt-xml-validate exit status: %d" % stat)
     #logger.debug("virt-xml-validate exit result: %s" % ret)
-    #if os.access(path, os.R_OK) and stat == 0:
+    # if os.access(path, os.R_OK) and stat == 0:
     if os.access(path, os.R_OK):
         return True
     else:
         return False
+
 
 def define(params):
     """Define a network from xml"""
@@ -72,8 +74,8 @@ def define(params):
         else:
             logger.error("%s network is undefined" % networkname)
             return 1
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         logger.error("define a network from xml: \n%s" % xmlstr)
         return 1

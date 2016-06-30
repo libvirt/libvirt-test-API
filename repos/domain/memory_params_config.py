@@ -9,10 +9,16 @@ from libvirt import libvirtError
 
 from src import sharedmod
 
-required_params = ('guestname', 'hard_limit', 'soft_limit', 'swap_hard_limit', )
+required_params = (
+    'guestname',
+    'hard_limit',
+    'soft_limit',
+    'swap_hard_limit',
+)
 optional_params = {}
 
 UNLIMITED = 9007199254740991
+
 
 def get_memory_config(domobj, param_dict):
     """get domain config memory parameters
@@ -20,7 +26,7 @@ def get_memory_config(domobj, param_dict):
     new_dict = {}
     try:
         guestxml = domobj.XMLDesc(2)
-        logger.debug("domain %s xml is :\n%s" %(domobj.name(), guestxml))
+        logger.debug("domain %s xml is :\n%s" % (domobj.name(), guestxml))
         xml = minidom.parseString(guestxml)
         logger.info("get domain memory parameters in config xml")
         for i in param_dict.keys():
@@ -33,11 +39,12 @@ def get_memory_config(domobj, param_dict):
                 logger.info("%s is not in config xml" % i)
                 new_dict[i] = 0
 
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("libvirt call failed: " + str(e))
         return False
 
     return new_dict
+
 
 def memory_params_config(params):
     """set domain memory parameters with config flag and check
@@ -53,7 +60,7 @@ def memory_params_config(params):
     param_dict = {'hard_limit': hard_limit,
                   'soft_limit': soft_limit,
                   'swap_hard_limit': swap_hard_limit
-                 }
+                  }
 
     for i in param_dict.keys():
         if param_dict[i] == -1:
@@ -89,7 +96,7 @@ def memory_params_config(params):
             logger.error("memory parameters is not as expected in config xml")
             return 1
 
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("libvirt call failed: " + str(e))
         return 1
 

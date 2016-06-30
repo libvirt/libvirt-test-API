@@ -15,8 +15,9 @@ from utils import utils
 required_params = ('guestname', 'macaddr', 'nicdriver',)
 optional_params = {'ifacetype': 'network',
                    'network': 'default',
-                   'xml' : 'xmls/nic.xml',
-                  }
+                   'xml': 'xmls/nic.xml',
+                   }
+
 
 def check_detach_interface(num1, num2):
     """Check detach interface result via simple interface number
@@ -26,6 +27,7 @@ def check_detach_interface(num1, num2):
         return True
     else:
         return False
+
 
 def detach_interface(params):
     """Detach a interface to domain from xml"""
@@ -51,14 +53,14 @@ def detach_interface(params):
         domobj.detachDevice(xmlstr)
         iface_num2 = utils.dev_num(guestname, "interface")
         logger.debug("update interface number to %s" % iface_num2)
-        if  check_detach_interface(iface_num1, iface_num2):
+        if check_detach_interface(iface_num1, iface_num2):
             logger.info("current interface number: %s" % iface_num2)
         else:
             logger.error("fail to detach a interface to guest: %s" %
-                          iface_num2)
+                         iface_num2)
             return 1
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         logger.error("detach the interface from guest %s" % guestname)
         return 1

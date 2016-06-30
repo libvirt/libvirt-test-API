@@ -15,6 +15,7 @@ from utils import utils
 required_params = ('pciaddress',)
 optional_params = {}
 
+
 def check_node_reattach(pciaddress):
     """Check node device reattach result, if reattachment is successful, the
        device will be removed from pci-stub driver and return original driver
@@ -32,6 +33,7 @@ def check_node_reattach(pciaddress):
 
     driver = os.path.basename(retval)
     return driver
+
 
 def reattach(params):
     """Reattach a specific node device and removed it
@@ -81,13 +83,13 @@ def reattach(params):
         current_driver = check_node_reattach(pciaddress)
         logger.info("current device driver: %s" % current_driver)
         if original_driver == pciback and current_driver != pciback:
-            logger.info("the node %s device reattach is successful" \
+            logger.info("the node %s device reattach is successful"
                         % device_name)
         else:
             logger.info("the node %s device reattach is failed" % device_name)
             return 1
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         return 1
 

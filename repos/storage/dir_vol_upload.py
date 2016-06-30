@@ -15,8 +15,9 @@ from utils import utils
 
 required_params = ('poolname', 'volname', 'volformat', 'capacity',
                    'offset', 'length',)
-optional_params = {'xml' : 'xmls/dir_volume.xml',
-                  }
+optional_params = {'xml': 'xmls/dir_volume.xml',
+                   }
+
 
 def get_pool_path(poolobj):
     """ get pool xml description
@@ -32,6 +33,7 @@ def get_pool_path(poolobj):
 
     return path_value
 
+
 def write_file(path):
     """write 1M test data to file
     """
@@ -43,8 +45,10 @@ def write_file(path):
     f.write(data)
     f.close()
 
+
 def handler(stream, data, file_):
     return file_.read(data)
+
 
 def dir_vol_upload(params):
     """test volume download and check"""
@@ -133,11 +137,12 @@ def dir_vol_upload(params):
             logger.error("file post region digests not match")
             return 1
 
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("libvirt call failed: " + str(e))
         return 1
 
     return 0
+
 
 def dir_vol_upload_clean(params):
     """clean testing environment"""

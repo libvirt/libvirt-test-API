@@ -14,11 +14,12 @@ RUNNING_DIR = '/var/run/libvirt/qemu'
 VIRSH_QUIET_LIST = "virsh --quiet list %s|awk '{print $2}'"
 VIRSH_LIST = "virsh list %s"
 
+
 def get_option_list(params):
     """return options we need to test
     """
     logger = params['logger']
-    option_list=[]
+    option_list = []
 
     value = params['listopt']
 
@@ -32,6 +33,7 @@ def get_option_list(params):
 
     return 0, option_list
 
+
 def check_all_option(logger):
     """check the output of virsh list with --all option
     """
@@ -39,7 +41,7 @@ def check_all_option(logger):
     logger.debug("%s in %s" % (entries, CONFIG_DIR))
     status, ret = commands.getstatusoutput(VIRSH_QUIET_LIST % '--all')
     if status:
-        logger.error("executing "+ "\"" +  VIRSH_QUIET_LIST % "--all" + "\"" \
+        logger.error("executing " + "\"" + VIRSH_QUIET_LIST % "--all" + "\""
                      + " failed")
         logger.error(ret)
         return 1
@@ -50,9 +52,12 @@ def check_all_option(logger):
         else:
             guest = entry[:-4]
             if guest not in ret:
-                logger.error("guest %s not in the output of virsh list" % guest)
+                logger.error(
+                    "guest %s not in the output of virsh list" %
+                    guest)
                 return 1
     return 0
+
 
 def check_inactive_option(logger):
     """check the output of virsh list with --inactive option
@@ -65,8 +70,13 @@ def check_inactive_option(logger):
 
     status, ret = commands.getstatusoutput(VIRSH_QUIET_LIST % '--inactive')
     if status:
-        logger.error("executing "+ "\"" +  VIRSH_QUIET_LIST % "--inactive" + "\"" \
-                     + " failed")
+        logger.error(
+            "executing " +
+            "\"" +
+            VIRSH_QUIET_LIST %
+            "--inactive" +
+            "\"" +
+            " failed")
         logger.error(ret)
         return 1
 
@@ -92,13 +102,14 @@ def check_inactive_option(logger):
 
     return 0
 
+
 def check_default_option(logger):
     """check the output of virsh list"""
     running_dir_entries = os.listdir(RUNNING_DIR)
     logger.debug("%s in %s" % (running_dir_entries, RUNNING_DIR))
     status, ret = commands.getstatusoutput(VIRSH_QUIET_LIST % '')
     if status:
-        logger.error("executing "+ "\"" +  VIRSH_QUIET_LIST % " " + "\"" \
+        logger.error("executing " + "\"" + VIRSH_QUIET_LIST % " " + "\""
                      + " failed")
         logger.error(ret)
         return 1
@@ -121,17 +132,19 @@ def check_default_option(logger):
 
     return 0
 
+
 def execute_virsh_list(logger, option):
     """execute virsh list command with appropriate option given
     """
     status, ret = commands.getstatusoutput(VIRSH_LIST % option)
     if status:
-        logger.error("executing " + "\"" + VIRSH_LIST % option + "\"" \
+        logger.error("executing " + "\"" + VIRSH_LIST % option + "\""
                      + " failed")
         logger.error(ret)
         return 1
 
     logger.info(ret)
+
 
 def domain_list(params):
     """test list command to virsh with default, --all, --inactive

@@ -13,6 +13,7 @@ from utils import utils
 required_params = ('guestname',)
 optional_params = {}
 
+
 def resume(params):
     """Resume domain
 
@@ -33,14 +34,17 @@ def resume(params):
     logger.info('resume domain')
     try:
         domobj.resume()
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         logger.error("resume failed")
         return 1
 
     state = domobj.info()[0]
-    expect_states = [libvirt.VIR_DOMAIN_RUNNING, libvirt.VIR_DOMAIN_NOSTATE, libvirt.VIR_DOMAIN_BLOCKED]
+    expect_states = [
+        libvirt.VIR_DOMAIN_RUNNING,
+        libvirt.VIR_DOMAIN_NOSTATE,
+        libvirt.VIR_DOMAIN_BLOCKED]
 
     if state not in expect_states:
         logger.error('The domain state is not equal to "paused"')

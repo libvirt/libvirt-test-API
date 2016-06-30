@@ -13,16 +13,18 @@ from src import sharedmod
 required_params = ('guestname',)
 optional_params = {'vcpu', 1,
                    'memory', 1048576,
-                  }
+                   }
 
 # The check function is optional. This is for some testcases that
 # need to check whether specific hardware is present on box or
 # testing environment is good before testing.
 # Return value 0 means check pass, 1 means to skip the
 # testcase during running.
+
+
 def TESTCASE_check(params):
     logger = params['logger']
-    ...
+    # ...
     return 0
 
 # This is the main testing function, The function name must be
@@ -30,9 +32,11 @@ def TESTCASE_check(params):
 # provided by framework for logging.
 # Return value 0 means the success of testing, 1 means testing failure.
 # It is mandatory.
+
+
 def TESTCASE(params):
     logger = params['logger']
-    ...
+    # ...
     return 0
 
 # The clean function is optional. This is for testcases that dirtied
@@ -42,7 +46,9 @@ def TESTCASE(params):
 # cleaning job.
 # Return value is optional too, 1 means clean failure, but will not
 # stop the run of testing.
+
+
 def TESTCASE_clean(params):
     logger = params['logger']
-    ...
+    # ...
     return 0

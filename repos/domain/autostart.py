@@ -13,6 +13,7 @@ from src import sharedmod
 required_params = ('guestname', 'autostart',)
 optional_params = {}
 
+
 def check_guest_autostart(*args):
     """Check domain start automatically result, if setting domain is
        successful, guestname.xml will exist under
@@ -23,7 +24,7 @@ def check_guest_autostart(*args):
         domxml = "/etc/%s/auto/%s" % (hypervisor, guestname)
     else:
         domxml = "/etc/libvirt/%s/autostart/%s.xml" % (hypervisor, guestname)
-    logger.debug("guest xml file is: %s" %domxml)
+    logger.debug("guest xml file is: %s" % domxml)
 
     if flag == 1:
         if os.access(domxml, os.F_OK):
@@ -37,6 +38,7 @@ def check_guest_autostart(*args):
             return False
     else:
         return False
+
 
 def autostart(params):
     """Set domain autostart capability"""
@@ -66,10 +68,10 @@ def autostart(params):
         else:
             logger.error("Error: fail to check autostart domain")
             return 1
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
-        logger.error("Error: fail to autostart %s domain" %guestname)
+        logger.error("Error: fail to autostart %s domain" % guestname)
         return 1
 
     return 0

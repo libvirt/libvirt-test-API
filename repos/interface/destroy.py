@@ -14,16 +14,18 @@ from utils import utils
 required_params = ('ifacename',)
 optional_params = {}
 
+
 def display_current_interface(conn):
     """Display current host interface information"""
-    logger.debug("current active host interface number: %s " \
-% conn.numOfInterfaces)
-    logger.debug("current active host interface list: %s " \
-% conn.listInterfaces())
-    logger.debug("current defined host interface number: %s " \
-% conn.numOfDefinedInterfaces())
-    logger.debug("current defined host interface list: %s " \
-% conn.listDefinedInterfaces())
+    logger.debug("current active host interface number: %s "
+                 % conn.numOfInterfaces)
+    logger.debug("current active host interface list: %s "
+                 % conn.listInterfaces())
+    logger.debug("current defined host interface number: %s "
+                 % conn.numOfDefinedInterfaces())
+    logger.debug("current defined host interface list: %s "
+                 % conn.listDefinedInterfaces())
+
 
 def check_destroy_interface(hostip):
     """Check destroying interface result, it will can't ping itself
@@ -65,15 +67,15 @@ def destroy(params):
         ifaceobj.destroy(0)
         logger.info("destroy host interface %s" % ifacename)
         display_current_interface(conn)
-        if  check_destroy_interface(hostip):
+        if check_destroy_interface(hostip):
             logger.info("destroy host interface %s is successful" % ifacename)
         else:
             logger.error("fail to check destroy interface")
             return 1
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
-        logger.error("fail to destroy interface %s" %ifacename)
+        logger.error("fail to destroy interface %s" % ifacename)
         return 1
 
     return 0

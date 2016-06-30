@@ -8,7 +8,8 @@ import crypt
 from utils import utils
 
 required_params = ('guestname', 'username', 'userpassword',)
-optional_params = {'conn': 'qemu:///system', 'flags': '',}
+optional_params = {'conn': 'qemu:///system', 'flags': '', }
+
 
 def get_guest_mac(vm):
     tree = lxml.etree.fromstring(vm.XMLDesc(0))
@@ -25,12 +26,14 @@ def check_agent_status(vm):
 
     tree = lxml.etree.fromstring(vm.XMLDesc(0))
 
-    set = tree.xpath("//channel[@type='unix']/target[@name='org.qemu.guest_agent.0']")
+    set = tree.xpath(
+        "//channel[@type='unix']/target[@name='org.qemu.guest_agent.0']")
     for n in set:
         if n.attrib['state'] == 'connected':
             return True
 
     return False
+
 
 def create_new_user(ipaddr, newusername, username, userpasswd, logger):
     cmd = "useradd %s" % newusername
@@ -41,11 +44,13 @@ def create_new_user(ipaddr, newusername, username, userpasswd, logger):
         logger.error("Fail: cannot create a new user: %s" % retinfo)
         return 1
 
+
 def verify_cur_user(ipaddr, username, userpasswd):
     cmd = "whoami"
     ret, retinfo = utils.remote_exec_pexpect(ipaddr, username, userpasswd, cmd)
 
     return ret
+
 
 def set_user_passwd(params):
     """
@@ -94,8 +99,12 @@ def set_user_passwd(params):
         else:
             passwd = "123456"
 
-
-        if create_new_user(ipaddr, "usertestapi", username, userpasswd, logger) != 0:
+        if create_new_user(
+            ipaddr,
+            "usertestapi",
+            username,
+            userpasswd,
+                logger) != 0:
             return 1
 
         vm.setUserPassword("usertestapi", passwd, flags)
@@ -104,7 +113,7 @@ def set_user_passwd(params):
             logger.error("cannot login guest via new user")
             return 1
 
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("API error message: %s" % e.message)
         return 1
 

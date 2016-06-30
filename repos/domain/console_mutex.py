@@ -8,7 +8,8 @@ from exception import TestError
 from src import sharedmod
 
 required_params = ('guestname',)
-optional_params = {'device' : 'serial0'}
+optional_params = {'device': 'serial0'}
+
 
 def console_mutex(params):
     """Attach to console"""
@@ -32,10 +33,11 @@ def console_mutex(params):
         logger.info("Creating another stream object")
         stream2 = conn.newStream(0)
 
-        logger.info("Open safe console connection while an existing one is open")
+        logger.info(
+            "Open safe console connection while an existing one is open")
         try:
             dom.openConsole(device, stream2, libvirt.VIR_DOMAIN_CONSOLE_SAFE)
-        except libvirtError, e:
+        except libvirtError as e:
             if e.get_error_code() == libvirt.VIR_ERR_OPERATION_FAILED:
                 logger.info("Opening failed - OK")
             else:
@@ -61,20 +63,21 @@ def console_mutex(params):
 
         try:
             stream2.finish()
-        except libvirtError, e:
+        except libvirtError as e:
             if e.get_error_code() == libvirt.VIR_ERR_RPC and \
                e.get_error_domain() == libvirt.VIR_FROM_STREAMS:
                 logger.info("Stream was aborted successfuly")
             else:
                 raise e
         else:
-            raise TestError("stream2 should be aborted after forced console connection")
+            raise TestError(
+                "stream2 should be aborted after forced console connection")
 
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("Libvirt call failed: " + str(e))
         ret = 1
 
-    except TestError, e:
+    except TestError as e:
         logger.error("Test failed: " + str(e))
         ret = 1
 

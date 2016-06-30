@@ -12,6 +12,7 @@ from src import sharedmod
 required_params = ('guestname', 'snapshotname',)
 optional_params = {}
 
+
 def check_domain_state(conn, guestname, logger):
     """ check if the domain exists and in shutdown state as well """
     guest_names = conn.listDefinedDomains()
@@ -21,6 +22,7 @@ def check_domain_state(conn, guestname, logger):
         return False
     else:
         return True
+
 
 def revert(params):
     """ snapshot revert a snapshot for a given guest,
@@ -44,8 +46,8 @@ def revert(params):
         snap = domobj.snapshotLookupByName(snapshotname, 0)
         domobj.revertToSnapshot(snap, 0)
         logger.info("revert snapshot succeeded")
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         return 1
 

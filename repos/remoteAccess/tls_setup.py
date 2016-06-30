@@ -37,31 +37,38 @@ SERVERCERT = os.path.join(TEMP_TLS_FOLDER, 'servercert.pem')
 CLIENTKEY = os.path.join(TEMP_TLS_FOLDER, 'clientkey.pem')
 CLIENTCERT = os.path.join(TEMP_TLS_FOLDER, 'clientcert.pem')
 
+
 def CA_setting_up(logger):
     """ setting up a Certificate Authority """
     # Create a private key for CA
     logger.info("generate CA certificates")
 
     cakey_fd = open(CAKEY, 'w')
-    ret, out = utils.exec_cmd([CERTTOOL, '--generate-privkey'], outfile=cakey_fd)
+    ret, out = utils.exec_cmd(
+        [CERTTOOL, '--generate-privkey'], outfile=cakey_fd)
     cakey_fd.close()
     if ret != 0:
         logger.error("failed to create CA private key")
         return 1
 
-
     # ca.info file
     cainfo = os.path.join(TEMP_TLS_FOLDER, 'ca.info')
     cainfo_fd = open(cainfo, 'w')
-    cainfo_str = "cn = Libvirt_test_API\n"  + \
-                 "ca\n"                     + \
+    cainfo_str = "cn = Libvirt_test_API\n" + \
+                 "ca\n" + \
                  "cert_signing_key\n"
 
     cainfo_fd.write(cainfo_str)
     cainfo_fd.close()
 
     # Generate cacert.pem
-    cacert_args = [CERTTOOL, '--generate-self-signed', '--load-privkey', CAKEY, '--template', cainfo]
+    cacert_args = [
+        CERTTOOL,
+        '--generate-self-signed',
+        '--load-privkey',
+        CAKEY,
+        '--template',
+        cainfo]
     cacert_fd = open(CACERT, 'w')
     ret, out = utils.exec_cmd(cacert_args, outfile=cacert_fd)
     cacert_fd.close()
@@ -72,13 +79,15 @@ def CA_setting_up(logger):
     logger.info("done the CA certificates job")
     return 0
 
+
 def tls_server_cert(target_machine, logger):
     """ generating server certificates """
     # Create tls server key
     logger.info("generate server certificates")
 
     serverkey_fd = open(SERVERKEY, 'w')
-    ret, out = utils.exec_cmd([CERTTOOL, '--generate-privkey'], outfile=serverkey_fd)
+    ret, out = utils.exec_cmd(
+        [CERTTOOL, '--generate-privkey'], outfile=serverkey_fd)
     serverkey_fd.close()
     if ret != 0:
         logger.error("failed to create server key")
@@ -88,9 +97,9 @@ def tls_server_cert(target_machine, logger):
     serverinfo = os.path.join(TEMP_TLS_FOLDER, 'server.info')
     serverinfo_fd = open(serverinfo, 'w')
     serverinfo_str = "organization = Libvirt_test_API\n" + \
-                     "cn = %s\n" % target_machine        + \
-                     "tls_www_server\n"                  + \
-                     "encryption_key\n"                  + \
+                     "cn = %s\n" % target_machine + \
+                     "tls_www_server\n" + \
+                     "encryption_key\n" + \
                      "signing_key\n"
 
     serverinfo_fd.write(serverinfo_str)
@@ -103,7 +112,7 @@ def tls_server_cert(target_machine, logger):
                        '--load-ca-certificate', CACERT,
                        '--load-ca-privkey', CAKEY,
                        '--template', serverinfo
-                      ]
+                       ]
     servercert_fd = open(SERVERCERT, 'w')
     ret, out = utils.exec_cmd(servercert_args, outfile=servercert_fd)
     servercert_fd.close()
@@ -114,13 +123,15 @@ def tls_server_cert(target_machine, logger):
     logger.info("done the server certificates job")
     return 0
 
+
 def tls_client_cert(local_machine, logger):
     """ generating client certificates """
     # Create tls client key
     logger.info("generate client certificates")
 
     clientkey_fd = open(CLIENTKEY, 'w')
-    ret, out = utils.exec_cmd([CERTTOOL, '--generate-privkey'], outfile=clientkey_fd)
+    ret, out = utils.exec_cmd(
+        [CERTTOOL, '--generate-privkey'], outfile=clientkey_fd)
     clientkey_fd.close()
     if ret != 0:
         logger.error("failed to create client key")
@@ -129,13 +140,13 @@ def tls_client_cert(local_machine, logger):
     # client.info
     clientinfo = os.path.join(TEMP_TLS_FOLDER, 'client.info')
     clientinfo_fd = open(clientinfo, 'w')
-    clientinfo_str = "country = xxx\n"                   + \
-                     "state = xxx\n"                     + \
-                     "locality = xxx\n"                  + \
+    clientinfo_str = "country = xxx\n" + \
+                     "state = xxx\n" + \
+                     "locality = xxx\n" + \
                      "organization = Libvirt_test_API\n" + \
-                     "cn = %s\n" % local_machine         + \
-                     "tls_www_client\n"                  + \
-                     "encryption_key\n"                  + \
+                     "cn = %s\n" % local_machine + \
+                     "tls_www_client\n" + \
+                     "encryption_key\n" + \
                      "signing_key\n"
 
     clientinfo_fd.write(clientinfo_str)
@@ -148,7 +159,7 @@ def tls_client_cert(local_machine, logger):
                        '--load-ca-certificate', CACERT,
                        '--load-ca-privkey', CAKEY,
                        '--template', clientinfo,
-                      ]
+                       ]
 
     clientcert_fd = open(CLIENTCERT, 'w')
     ret, out = utils.exec_cmd(clientcert_args, outfile=clientcert_fd)
@@ -160,10 +171,12 @@ def tls_client_cert(local_machine, logger):
     logger.info("done the client certificates job")
     return 0
 
+
 def deliver_cert(target_machine, username, password, pkipath, logger):
     """ deliver CA, server and client certificates """
     # transmit cacert.pem to remote host
-    logger.info("deliver CA, server and client certificates to both local and remote server")
+    logger.info(
+        "deliver CA, server and client certificates to both local and remote server")
     ret = utils.scp_file(target_machine, username, password, CA_FOLDER, CACERT)
     if ret:
         logger.error("scp cacert.pem to %s error" % target_machine)
@@ -178,19 +191,32 @@ def deliver_cert(target_machine, username, password, pkipath, logger):
 
     # mkdir /etc/pki/libvirt/private on remote host
     libvirt_priv_cmd = "mkdir -p %s" % PRIVATE_KEY_FOLDER
-    ret, output = utils.remote_exec_pexpect(target_machine, username, password, libvirt_priv_cmd)
+    ret, output = utils.remote_exec_pexpect(
+        target_machine, username, password, libvirt_priv_cmd)
     if ret:
-        logger.error("failed to make /etc/pki/libvirt/private on %s" % target_machine)
+        logger.error(
+            "failed to make /etc/pki/libvirt/private on %s" %
+            target_machine)
         return 1
 
     # transmit serverkey.pem to remote host
-    ret = utils.scp_file(target_machine, username, password, PRIVATE_KEY_FOLDER, SERVERKEY)
+    ret = utils.scp_file(
+        target_machine,
+        username,
+        password,
+        PRIVATE_KEY_FOLDER,
+        SERVERKEY)
     if ret:
         logger.error("failed to scp serverkey.pem to %s" % target_machine)
         return 1
 
     # transmit servercert.pem to remote host
-    ret = utils.scp_file(target_machine, username, password, CERTIFICATE_FOLDER, SERVERCERT)
+    ret = utils.scp_file(
+        target_machine,
+        username,
+        password,
+        CERTIFICATE_FOLDER,
+        SERVERCERT)
     if ret:
         logger.error("failed to scp servercert.pem to %s" % target_machine)
         return 1
@@ -202,33 +228,40 @@ def deliver_cert(target_machine, username, password, pkipath, logger):
         return 1
 
     # copy clientkey.pem to local folder
-    clientkey_cp = [CP, '-f', CLIENTKEY, (pkipath and pkipath) or PRIVATE_KEY_FOLDER]
+    clientkey_cp = [CP, '-f', CLIENTKEY,
+                    (pkipath and pkipath) or PRIVATE_KEY_FOLDER]
     ret, out = utils.exec_cmd(clientkey_cp)
     if ret:
         logger.error("failed to copy clientkey.pem to %s" % PRIVATE_KEY_FOLDER)
         return 1
 
     # copy clientcert.pem to local folder
-    clientcert_cp = [CP, '-f', CLIENTCERT, (pkipath and pkipath) or CERTIFICATE_FOLDER]
+    clientcert_cp = [CP, '-f', CLIENTCERT,
+                     (pkipath and pkipath) or CERTIFICATE_FOLDER]
     ret, out = utils.exec_cmd(clientcert_cp)
     if ret:
-        logger.error("failed to copy clientcert.pem to %s" % CERTIFICATE_FOLDER)
+        logger.error(
+            "failed to copy clientcert.pem to %s" %
+            CERTIFICATE_FOLDER)
         return 1
 
     logger.info("done to delivery")
     return 0
 
+
 def sasl_user_add(target_machine, username, password, logger):
     """ execute saslpasswd2 to add sasl user """
     logger.info("add sasl user on server side")
-    saslpasswd2_add = "echo %s | %s -a libvirt %s" % (password, SASLPASSWD2, username)
+    saslpasswd2_add = "echo %s | %s -a libvirt %s" % (
+        password, SASLPASSWD2, username)
     ret, output = utils.remote_exec_pexpect(target_machine, username,
-                                    password, saslpasswd2_add)
+                                            password, saslpasswd2_add)
     if ret:
         logger.error("failed to add sasl user")
         return 1
 
     return 0
+
 
 def tls_libvirtd_set(target_machine, username, password,
                      listen_tls, auth_tls, logger):
@@ -237,7 +270,7 @@ def tls_libvirtd_set(target_machine, username, password,
     # open libvirtd --listen option
     listen_open_cmd = "echo 'LIBVIRTD_ARGS=\"--listen\"' >> /etc/sysconfig/libvirtd"
     ret, output = utils.remote_exec_pexpect(target_machine, username,
-                                    password, listen_open_cmd)
+                                            password, listen_open_cmd)
     if ret:
         logger.error("failed to uncomment --listen in /etc/sysconfig/libvirtd")
         return 1
@@ -246,7 +279,7 @@ def tls_libvirtd_set(target_machine, username, password,
         logger.info("set listen_tls to 0 in %s" % LIBVIRTD_CONF)
         listen_tls_disable = "echo \"listen_tls = 0\" >> %s" % LIBVIRTD_CONF
         ret, output = utils.remote_exec_pexpect(target_machine, username,
-                                        password, listen_tls_disable)
+                                                password, listen_tls_disable)
         if ret:
             logger.error("failed to set listen_tls to 0 in %s" % LIBVIRTD_CONF)
             return 1
@@ -255,16 +288,18 @@ def tls_libvirtd_set(target_machine, username, password,
         logger.info("enable auth_tls = sasl in %s" % LIBVIRTD_CONF)
         auth_tls_set = "echo 'auth_tls = \"sasl\"' >> %s" % LIBVIRTD_CONF
         ret, output = utils.remote_exec_pexpect(target_machine, username,
-                                       password, auth_tls_set)
+                                                password, auth_tls_set)
         if ret:
-            logger.error("failed to set auth_tls to sasl in %s" % LIBVIRTD_CONF)
+            logger.error(
+                "failed to set auth_tls to sasl in %s" %
+                LIBVIRTD_CONF)
             return 1
 
     # restart remote libvirtd service
     libvirtd_restart_cmd = "service libvirtd restart"
     logger.info("libvirtd restart")
     ret, output = utils.remote_exec_pexpect(target_machine, username,
-                                    password, libvirtd_restart_cmd)
+                                            password, libvirtd_restart_cmd)
     if ret:
         logger.error("failed to restart libvirtd service")
         return 1
@@ -272,12 +307,13 @@ def tls_libvirtd_set(target_machine, username, password,
     logger.info("done to libvirtd configuration")
     return 0
 
+
 def iptables_stop(target_machine, username, password, logger):
     """ This is a temprory method in favor of migration """
     logger.info("stop local and remote iptables temprorily")
     iptables_stop_cmd = "service iptables stop"
     ret, output = utils.remote_exec_pexpect(target_machine, username,
-                                   password, iptables_stop_cmd)
+                                            password, iptables_stop_cmd)
     if ret:
         logger.error("failed to stop remote iptables service")
         return 1
@@ -290,6 +326,7 @@ def iptables_stop(target_machine, username, password, logger):
 
     logger.info("done the iptables stop job")
     return 0
+
 
 def request_credentials(credentials, user_data):
     for credential in credentials:
@@ -305,8 +342,9 @@ def request_credentials(credentials, user_data):
 
     return 0
 
+
 def hypervisor_connecting_test(uri, auth_tls, username,
-                                password, logger, expected_result):
+                               password, logger, expected_result):
     """ connect remote server """
     ret = 0
     try:
@@ -314,10 +352,13 @@ def hypervisor_connecting_test(uri, auth_tls, username,
             conn = libvirt.open(uri)
         elif auth_tls == 'sasl':
             user_data = [username, password]
-            auth = [[libvirt.VIR_CRED_AUTHNAME, libvirt.VIR_CRED_PASSPHRASE], request_credentials, user_data]
+            auth = [[libvirt.VIR_CRED_AUTHNAME,
+                     libvirt.VIR_CRED_PASSPHRASE],
+                    request_credentials,
+                    user_data]
             conn = libvirt.openAuth(uri, auth, 0)
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         ret = 1
 
@@ -338,6 +379,7 @@ def hypervisor_connecting_test(uri, auth_tls, username,
 
     return 0
 
+
 def tls_setup(params):
     """ generate tls certificates and configure libvirt """
     logger = params['logger']
@@ -348,7 +390,7 @@ def tls_setup(params):
     auth_tls = params['auth_tls']
 
     pkipath = ""
-    if params.has_key('pkipath'):
+    if 'pkipath' in params:
         pkipath = params['pkipath']
         if os.path.exists(pkipath):
             shutil.rmtree(pkipath)
@@ -388,7 +430,7 @@ def tls_setup(params):
         return 1
 
     if deliver_cert(target_machine, username,
-                     password, pkipath, logger):
+                    password, pkipath, logger):
         return 1
 
     if auth_tls == 'sasl':
@@ -401,14 +443,15 @@ def tls_setup(params):
 
     if listen_tls == 'disable':
         if hypervisor_connecting_test(uri, auth_tls, username,
-                                       password, logger, 'fail'):
+                                      password, logger, 'fail'):
             return 1
     elif listen_tls == 'enable':
         if hypervisor_connecting_test(uri, auth_tls, username,
-                                       password, logger, 'success'):
+                                      password, logger, 'success'):
             return 1
 
     return 0
+
 
 def tls_setup_clean(params):
     """ cleanup testing enviroment """
@@ -424,13 +467,13 @@ def tls_setup_clean(params):
 
     cacert_rm = "rm -f %s/cacert.pem" % CA_FOLDER
     ret, output = utils.remote_exec_pexpect(target_machine, username,
-                                    password, cacert_rm)
+                                            password, cacert_rm)
     if ret:
         logger.error("failed to remove cacert.pem on remote machine")
 
     ca_libvirt_rm = "rm -rf %s" % CERTIFICATE_FOLDER
     ret, output = utils.remote_exec_pexpect(target_machine, username,
-                                    password, ca_libvirt_rm)
+                                            password, ca_libvirt_rm)
     if ret:
         logger.error("failed to remove libvirt folder")
 
@@ -440,7 +483,6 @@ def tls_setup_clean(params):
     if auth_tls == 'sasl':
         saslpasswd2_delete = "%s -a libvirt -d %s" % (SASLPASSWD2, username)
         ret, output = utils.remote_exec_pexpect(target_machine, username,
-                                        password, saslpasswd2_delete)
+                                                password, saslpasswd2_delete)
         if ret:
             logger.error("failed to delete sasl user")
-

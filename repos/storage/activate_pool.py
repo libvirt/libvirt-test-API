@@ -10,6 +10,7 @@ from src import sharedmod
 required_params = ('poolname',)
 optional_params = {}
 
+
 def activate_pool(params):
     """activate a storage pool that's been defined
        and inactive
@@ -25,7 +26,7 @@ def activate_pool(params):
         if poolname in pool_names:
             poolobj = conn.storagePoolLookupByName(poolname)
         else:
-            logger.error("%s not found\n" % poolname);
+            logger.error("%s not found\n" % poolname)
             return 1
 
         if poolobj.isActive():
@@ -34,7 +35,7 @@ def activate_pool(params):
 
         poolobj.create(0)
         time.sleep(5)
-        if  poolobj.isActive():
+        if poolobj.isActive():
             logger.info("activating %s storage pool is SUCCESSFUL!!!" %
                         poolname)
         else:
@@ -42,7 +43,7 @@ def activate_pool(params):
                         poolname)
             return 1
 
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("libvirt call failed: " + str(e))
         return 1
 

@@ -15,6 +15,7 @@ from src import sharedmod
 required_params = ('networkname',)
 optional_params = {}
 
+
 def start(params):
     """activate a defined network"""
 
@@ -22,8 +23,8 @@ def start(params):
     logger = params['logger']
     params.pop('logger')
     networkname = params['networkname']
-    logger.info("the name of virtual network to be activated is %s" % \
-                 networkname)
+    logger.info("the name of virtual network to be activated is %s" %
+                networkname)
 
     conn = sharedmod.libvirtobj['conn']
 
@@ -36,14 +37,14 @@ def start(params):
     else:
         netobj = conn.networkLookupByName(networkname)
         netxmldesc = netobj.XMLDesc(0)
-        logger.debug("the xml description of the virtual network is %s" % \
-                      netxmldesc)
+        logger.debug("the xml description of the virtual network is %s" %
+                     netxmldesc)
 
     try:
         logger.info("begin to activate virtual network %s" % networkname)
         netobj.create()
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         logger.error("fail to destroy domain")
         return 1
@@ -51,7 +52,9 @@ def start(params):
     net_activated_list = conn.listNetworks()
 
     if networkname not in net_activated_list:
-        logger.error("virtual network %s failed to be activated." % networkname)
+        logger.error(
+            "virtual network %s failed to be activated." %
+            networkname)
         return 1
     else:
         shell_cmd = "virsh net-list --all"

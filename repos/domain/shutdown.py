@@ -14,6 +14,7 @@ from utils import utils
 required_params = ('guestname',)
 optional_params = {}
 
+
 def shutdown(params):
     """Shutdown domain
 
@@ -41,8 +42,8 @@ def shutdown(params):
     # Shutdown domain
     try:
         domobj.shutdown()
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         logger.error("shutdown failed")
         return 1

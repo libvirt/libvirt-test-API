@@ -23,6 +23,7 @@ INITCTL_RELOAD_CMD = "initctl reload-configuration"
 SYSTEMCTL_RELOAD_CMD = "systemctl daemon-reload"
 INIT_CONF = "/etc/init/libvirtd.conf"
 
+
 def libvirtd_check(logger):
     """check libvirtd status
     """
@@ -44,6 +45,7 @@ def libvirtd_check(logger):
             logger.info(out[i])
 
     return 0
+
 
 def upstart(params):
     """Set libvirtd upstart"""
@@ -159,6 +161,7 @@ def upstart(params):
         logger.info("the libvirtd process successfully restarted after kill")
 
     return 0
+
 
 def upstart_clean(params):
     """clean testing environment"""

@@ -23,14 +23,16 @@ import sys
 
 import exception
 
+
 class Envparser(object):
+
     def __init__(self, configfile):
         self.cfg = ConfigParser.ConfigParser()
         if os.path.isfile(configfile):
             self.cfg.read(configfile)
         else:
             raise exception.FileDoesNotExist(
-            "global.cfg is not a regular file or nonexist")
+                "global.cfg is not a regular file or nonexist")
 
     def has_section(self, section):
         if self.cfg.has_section(section):
@@ -46,7 +48,7 @@ class Envparser(object):
                 return False
         else:
             raise exception.SectionDoesNotExist(
-            "In global.cfg, the section %s is nonexist" % section)
+                "In global.cfg, the section %s is nonexist" % section)
 
     def sections_list(self):
         return self.cfg.sections()
@@ -56,7 +58,7 @@ class Envparser(object):
             return self.cfg.options(section)
         else:
             raise exception.SectionDoesNotExist(
-            "In global.cfg, the section %s is nonexist" % section)
+                "In global.cfg, the section %s is nonexist" % section)
 
     def get_value(self, section, option):
         if self.has_section:
@@ -64,22 +66,22 @@ class Envparser(object):
                 return self.cfg.get(section, option)
             else:
                 raise exception.OptionDoesNotExist(
-                "In global.cfg, the option %s is nonexist" % option)
+                    "In global.cfg, the option %s is nonexist" % option)
         else:
             raise exception.SectionDoesNotExist(
-            "In global.cfg, the section %s is nonexist" % section)
+                "In global.cfg, the section %s is nonexist" % section)
 
     def get_items(self, section):
         if self.has_section:
             return self.cfg.items(section)
         else:
             raise exception.SectionDoesNotExist(
-            "In global.cfg, the section %s is nonexist" % section)
+                "In global.cfg, the section %s is nonexist" % section)
 
     def add_section(self, section):
         if self.has_section:
             raise exception.SectionExist(
-            "Section %s exists already" % section)
+                "Section %s exists already" % section)
         else:
             self.cfg.add_section(section)
             return True
@@ -91,10 +93,10 @@ class Envparser(object):
                 return True
             else:
                 raise exception.OptionDoesNotExist(
-                "In global.cfg, the option %s is nonexist" % option)
+                    "In global.cfg, the option %s is nonexist" % option)
         else:
             raise exception.SectionDoesNotExist(
-            "In global.cfg, the section %s is nonexist" % section)
+                "In global.cfg, the section %s is nonexist" % section)
 
     def remove_section(self, section):
         if self.has_section:
@@ -102,7 +104,7 @@ class Envparser(object):
             return True
         else:
             raise exception.SectionDoesNotExist(
-            "In global.cfg, the section %s is nonexist" % section)
+                "In global.cfg, the section %s is nonexist" % section)
 
     def set_value(self, section, option, value):
         if self.has_section:
@@ -111,6 +113,6 @@ class Envparser(object):
                 return True
             else:
                 raise exception.OptionDoesNotExist(
-                "In global.cfg, the option %s is nonexist" % option)
+                    "In global.cfg, the option %s is nonexist" % option)
         raise exception.SectionDoesNotExist(
-        "In global.cfg, the section %s is nonexist" % section)
+            "In global.cfg, the section %s is nonexist" % section)

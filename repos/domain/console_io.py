@@ -15,14 +15,16 @@ from src import sharedmod
 
 required_params = ('guestname',)
 optional_params = {'device': 'serial0',
-                   'timeout':5,
+                   'timeout': 5,
                    'input': None,
                    'output': None,
                    'expect': None
-                  }
+                   }
+
 
 def alarm_handler(signum, frame):
     raise TestError("Timed out while waiting for console")
+
 
 def console_io(params):
     """Attach to console"""
@@ -34,7 +36,7 @@ def console_io(params):
     expect = params.get('expect', None)
     timeout = params.get('timeout', 5)
 
-    #store the old signal handler
+    # store the old signal handler
     oldhandler = signal.getsignal(signal.SIGALRM)
 
     try:
@@ -49,19 +51,24 @@ def console_io(params):
         logger.info("Open a new console connection")
         dom.openConsole(device, stream, libvirt.VIR_DOMAIN_CONSOLE_FORCE)
 
-        if infile != None:
+        if infile is not None:
             try:
                 f = open(infile, 'r')
                 instr = f.read()
                 f.close()
-            except e:
-                raise TestError("Can't read input file '%s': %s" % (infile, str(e)))
+            except Exception as e:
+                raise TestError(
+                    "Can't read input file '%s': %s" % (infile, str(e)))
 
-            logger.info("Sending %d bytes of contents of file '%s' to console '%s'" % (len(instr), infile, device))
+            logger.info(
+                "Sending %d bytes of contents of file '%s' to console '%s'" %
+                (len(instr), infile, device))
             stream.send(instr)
 
-        if expect != None or outfile != None:
-            logger.info("Recieving data from console device. Timeout %d seconds." % timeout)
+        if expect is not None or outfile is not None:
+            logger.info(
+                "Recieving data from console device. Timeout %d seconds." %
+                timeout)
 
             # register a new signal handler
             logger.info("Registering custom SIGALRM handler")
@@ -78,32 +85,35 @@ def console_io(params):
 
             logger.info("Recieved %d bytes." % len(reply))
 
-            if outfile != None:
+            if outfile is not None:
                 try:
                     f = open(outfile, 'w')
                     f.write(reply)
                     f.close()
-                except e:
-                    raise TestError("Can't write output to file '%s': %s" % (outfile, str(e)))
+                except Exception as e:
+                    raise TestError(
+                        "Can't write output to file '%s': %s" % (outfile, str(e)))
 
-            if expect != None:
+            if expect is not None:
                 try:
                     f = open(expect, 'r')
                     expectstr = f.read()
                     f.close()
-                except Exception, e:
-                    raise TestError("Can't read expected output file '%s': '%s'" % (expect, str(e)))
+                except Exception as e:
+                    raise TestError(
+                        "Can't read expected output file '%s': '%s'" % (expect, str(e)))
 
                 if reply.startswith(expectstr):
                     logger.info("Recieved expected output from the host")
                 else:
-                    raise TestError("Reply from the guest doesn't match with expected reply")
+                    raise TestError(
+                        "Reply from the guest doesn't match with expected reply")
 
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("Libvirt call failed: " + str(e))
         ret = 1
 
-    except TestError, e:
+    except TestError as e:
         logger.error("Test failed: " + str(e))
         ret = 1
 

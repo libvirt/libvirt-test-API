@@ -15,22 +15,25 @@ from src import sharedmod
 required_params = ('poolname',)
 optional_params = {}
 
+
 def display_pool_info(conn):
     """Display current storage pool information"""
-    logger.debug("current define storage pool: %s" \
+    logger.debug("current define storage pool: %s"
                  % conn.listDefinedStoragePools())
-    logger.debug("current active storage pool: %s" \
+    logger.debug("current active storage pool: %s"
                  % conn.listStoragePools())
+
 
 def check_pool_defined(conn, poolname):
     """Check to make sure that the pool is defined"""
     pool_names = conn.listDefinedStoragePools()
     if poolname in pool_names:
-        logger.debug("the pool %s is defined " %poolname)
+        logger.debug("the pool %s is defined " % poolname)
         return True
     else:
         logger.error("the pool %s is active or undefine" % poolname)
         return False
+
 
 def check_build_pool(path):
     """Check poolname directory if exist, it will exist
@@ -43,6 +46,7 @@ def check_build_pool(path):
     else:
         logger.debug("%s directory don't exist" % path)
         return False
+
 
 def build_dir_pool(params):
     """Build a storage pool"""
@@ -78,8 +82,8 @@ def build_dir_pool(params):
         else:
             logger.error("fail to build %s storage pool" % poolname)
             return 1
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         return 1
 

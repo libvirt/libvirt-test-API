@@ -24,9 +24,11 @@ from xml.dom.minidom import Document
 
 import exception
 
+
 class LogGenerator(object):
     """ Generate and parser log xml file
     """
+
     def __init__(self, logxml):
         self.logxml = logxml
         self.doc = Document()
@@ -138,7 +140,7 @@ class LogGenerator(object):
                             itemresult = self.doc.createElement('case')
                             caseresulttext = self.doc.createTextNode(retstr)
                             itemresult.appendChild(caseresulttext)
-                            caseresult.childNodes.insert(0,itemresult)
+                            caseresult.childNodes.insert(0, itemresult)
 
         self. __write_to_file(xmldoc, self.logxml)
 
@@ -205,8 +207,8 @@ class LogGenerator(object):
                         (testrunid, testid))
         if len(testrunattrlist) == 0:
             raise exception.NoTestRunFound(
-                      "In the xmllog file no testrunid %s found" %
-                       testrunid)
+                "In the xmllog file no testrunid %s found" %
+                testrunid)
 
         self. __write_to_file(xmldoc, self.logxml)
 
@@ -224,8 +226,8 @@ class LogGenerator(object):
 
         if len(testrunattrlist) == 0:
             raise exception.NoTestRunFound(
-                      "In the xmllog file no testrunid %s found" %
-                      testrunid)
+                "In the xmllog file no testrunid %s found" %
+                testrunid)
 
         self. __write_to_file(xmldoc, self.logxml)
 

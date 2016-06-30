@@ -19,14 +19,16 @@ VIRSH_DOMBLKINFO = "virsh domblkinfo %s %s"
 required_params = ('guestname', 'blockdev',)
 optional_params = {}
 
+
 def get_output(command, logger):
     """execute shell command
     """
     status, ret = commands.getstatusoutput(command)
     if status:
-        logger.error("executing "+ "\"" +  command  + "\"" + " failed")
+        logger.error("executing " + "\"" + command + "\"" + " failed")
         logger.error(ret)
     return status, ret
+
 
 def check_domain_exists(conn, guestname, logger):
     """ check if the domain exists, may or may not be active """
@@ -44,17 +46,18 @@ def check_domain_exists(conn, guestname, logger):
     else:
         return True
 
+
 def check_block_data(blockdev, blkdata, logger):
     """ check data about capacity,allocation,physical """
     status, apparent_size = get_output(GET_CAPACITY % blockdev, logger)
     if not status:
         if apparent_size == blkdata[0]:
-            logger.info("the capacity of '%s' is %s, checking succeeded" % \
+            logger.info("the capacity of '%s' is %s, checking succeeded" %
                         (blockdev, apparent_size))
         else:
             logger.error("apparent-size from 'du' is %s, \n\
-                         but from 'domblkinfo' is %s, checking failed" % \
-                        (apparent_size, blkdata[0]))
+                         but from 'domblkinfo' is %s, checking failed" %
+                         (apparent_size, blkdata[0]))
             return 1
     else:
         return 1
@@ -66,8 +69,8 @@ def check_block_data(blockdev, blkdata, logger):
         # Allocation value is equal to Physical value
         if str(block_size_b) == blkdata[1] and str(block_size_b) == blkdata[2]:
             logger.info("the block size of '%s' is %s, same with \n\
-                        Allocation and Physical value, checking succeeded" % \
-                         (blockdev, block_size_b))
+                        Allocation and Physical value, checking succeeded" %
+                        (blockdev, block_size_b))
         else:
             logger.error("the block size from 'du' is %s, \n\
                           the Allocation value is %s, Physical value is %s, \n\
@@ -95,13 +98,17 @@ def domain_blkinfo(params):
         return 1
 
     logger.info("the output of virsh domblkinfo is:")
-    status, output = get_output(VIRSH_DOMBLKINFO % (guestname, blockdev), logger)
+    status, output = get_output(
+        VIRSH_DOMBLKINFO %
+        (guestname, blockdev), logger)
     if not status:
         logger.info("\n" + output)
     else:
         return 1
 
-    status, data_str = get_output(GET_DOMBLKINFO_MAC % (guestname, blockdev), logger)
+    status, data_str = get_output(
+        GET_DOMBLKINFO_MAC %
+        (guestname, blockdev), logger)
     if not status:
         blkdata = data_str.rstrip().split('\n')
         logger.info("capacity,allocation,physical list: %s" % blkdata)

@@ -21,6 +21,7 @@ required_params = ('guestname',
                    'threads',)
 optional_params = {}
 
+
 def check_domain_running(conn, guestname, logger):
     """check if the domain exists"""
     defined_guest_names = conn.listDefinedDomains()
@@ -31,11 +32,12 @@ def check_domain_running(conn, guestname, logger):
     else:
         return 0
 
+
 def add_cpu_xml(domobj, guestname, sockets, cores, threads, logger):
     """edit domain xml description and insert <cpu> element"""
 
     guestxml = domobj.XMLDesc(0)
-    logger.debug('''original guest %s xml :\n%s''' %(guestname, guestxml))
+    logger.debug('''original guest %s xml :\n%s''' % (guestname, guestxml))
 
     doc = minidom.parseString(guestxml)
     cpu = doc.createElement('cpu')
@@ -57,34 +59,37 @@ def add_cpu_xml(domobj, guestname, sockets, cores, threads, logger):
 
     return doc.toxml()
 
+
 def guest_undefine(domobj, logger):
     """undefine original guest"""
     try:
         logger.info("undefine guest")
         domobj.undefine()
         logger.info("undefine the domain is successful")
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
-                    % (e.message, e.get_error_code()))
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
+                     % (e.message, e.get_error_code()))
         logger.error("fail to undefine domain")
         return 1
 
     return 0
 
+
 def guest_define(domobj, domxml, logger):
     """define new guest xml"""
     try:
         logger.info("define guest")
-        conn = domobj._conn;
+        conn = domobj._conn
         conn.defineXML(domxml)
         logger.info("success to define new domain xml description")
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
-                    % (e.message, e.get_error_code()))
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
+                     % (e.message, e.get_error_code()))
         logger.error("fail to define domain")
         return 1
 
     return 0
+
 
 def guest_start(domobj, guestname, logger):
     """start guest"""
@@ -95,9 +100,9 @@ def guest_start(domobj, guestname, logger):
     try:
         logger.info("start guest")
         domobj.create()
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
-                    % (e.message, e.get_error_code()))
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
+                     % (e.message, e.get_error_code()))
         logger.error("fail to start domain")
         return 1
 
@@ -120,8 +125,9 @@ def guest_start(domobj, guestname, logger):
 
     return 0, ip
 
+
 def cpu_topology_chk(ip, username, password,
-                       sockets, cores, threads, logger):
+                     sockets, cores, threads, logger):
     """login the guest, run lscpu command to check the result"""
     lscpu = "lscpu"
     # sleep for 5 seconds
@@ -150,14 +156,15 @@ def cpu_topology_chk(ip, username, password,
         int += 1
 
     if actual_thread == '' or actual_core == '' or actual_socket == '':
-       logger.error("No data was retrieved")
-       return 1
+        logger.error("No data was retrieved")
+        return 1
 
     if actual_thread == threads and actual_core == cores and actual_socket == sockets:
-       return 0
+        return 0
     else:
-       logger.error("The data doesn't match!!!")
-       return 1
+        logger.error("The data doesn't match!!!")
+        return 1
+
 
 def cpu_topology(params):
     """ edit domain xml description according to the values
@@ -195,7 +202,7 @@ def cpu_topology(params):
         return 1
 
     if cpu_topology_chk(ip, username, password,
-                          sockets, cores, threads, logger):
-       return 1
+                        sockets, cores, threads, logger):
+        return 1
 
     return 0

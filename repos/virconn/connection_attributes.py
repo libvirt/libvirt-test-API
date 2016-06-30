@@ -83,7 +83,7 @@ def connection_attributes(params):
         conn_caps = conn.getCapabilities()
         logger.info("The connection's capabilities is:\n %s" % conn_caps)
 
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("API error message: %s, error code is %s" %
                      e.message)
         logger.error("start failed")

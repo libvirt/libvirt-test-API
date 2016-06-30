@@ -8,26 +8,29 @@ from src import sharedmod
 
 
 required_params = ('action',)
-optional_params = {'networkname' : 'testnetcb',
-                   'bridgename' : 'testnetcbbr',
-                   'bridgeip' : '192.168.123.1',
-                   'bridgenetmask' : '255.255.255.0',
-                   'netstart' : '192.168.123.2',
-                   'netend' : '192.168.123.254',
-                   'netmode' : 'nat',
-                   'xml' : 'xmls/network.xml',
-                  }
+optional_params = {'networkname': 'testnetcb',
+                   'bridgename': 'testnetcbbr',
+                   'bridgeip': '192.168.123.1',
+                   'bridgenetmask': '255.255.255.0',
+                   'netstart': '192.168.123.2',
+                   'netend': '192.168.123.254',
+                   'netmode': 'nat',
+                   'xml': 'xmls/network.xml',
+                   }
+
 
 def net_define(conn, net_name, xmlstr):
     """ define a network
     """
     conn.networkDefineXML(xmlstr)
 
+
 def net_undefine(conn, net_name, xmlstr):
     """ undefine a network
     """
     netobj = conn.networkLookupByName(net_name)
     netobj.undefine()
+
 
 def net_start(conn, net_name, xmlstr):
     """ start a network
@@ -45,18 +48,21 @@ def net_destroy(conn, net_name, xmlstr):
     netobj = conn.networkLookupByName(net_name)
     netobj.destroy()
 
-event_func_map = {"define"      : net_define,
-                  "undefine"    : net_undefine,
-                  "start"       : net_start,
-                  "destroy"     : net_destroy,
+event_func_map = {"define": net_define,
+                  "undefine": net_undefine,
+                  "start": net_start,
+                  "destroy": net_destroy,
                   }
+
 
 def net_str_to_func(action):
     """ convert string to net function
     """
     return event_func_map[action]
 
+
 class event_loop(object):
+
     def __init__(self):
         self._thread = None
         self.running = False
@@ -75,14 +81,16 @@ class event_loop(object):
         libvirt.virEventRegisterDefaultImpl()
         self.running = True
         self._thread = threading.Thread(target=self._event_loop_native,
-                                       name="libvirtEventLoop")
+                                        name="libvirtEventLoop")
         self._thread.setDaemon(True)
         self._thread.start()
 
     def wait(self, timeout=None):
         self._thread.join(timeout)
 
+
 class event_lifecycle_callback(object):
+
     def __init__(self, net_name, action):
         self._net_name = net_name
         self._action = action
@@ -96,11 +104,11 @@ class event_lifecycle_callback(object):
         self.finished = False
 
     def _net_event_str(self, event):
-        netEventStrings = ( "define",
-                            "undefine",
-                            "start",
-                            "destroy",
-                            )
+        netEventStrings = ("define",
+                           "undefine",
+                           "start",
+                           "destroy",
+                           )
         return netEventStrings[event]
 
     def callback_func(self, conn, net, event, detail, opaque):
@@ -110,7 +118,9 @@ class event_lifecycle_callback(object):
                 self._net_event_str(event) == self._action:
             self.finished = True
 
+
 class event_trigger(object):
+
     def __init__(self, conn, args):
         self._conn = conn
         self._net = args[0]
@@ -140,6 +150,7 @@ class event_trigger(object):
         self._thread.setDaemon(True)
         self._thread.start()
 
+
 def check_event_callback(callback, logger):
     """ check event callback result, returns True if success,
         or False if timeout. threading.Event.wait() always return None in
@@ -154,6 +165,7 @@ def check_event_callback(callback, logger):
             return False
 
     return True
+
 
 def event_callback(params):
     """ test event callback
@@ -172,7 +184,7 @@ def event_callback(params):
     conn = sharedmod.libvirtobj['conn']
     logger.info("begin to %s network: %s" % (action, net_name))
 
-    if not action in event_func_map:
+    if action not in event_func_map:
         logger.error("wrong action specified: %s" % action)
         return 1
 
@@ -215,7 +227,7 @@ def event_callback(params):
     try:
         ec.callback_id = conn.networkEventRegisterAny(None, event_id,
                                                       ec.callback_func, None)
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("API error message: %s, error code is %s" %
                      (e.message, e.get_error_code()))
         logger.error("fail to destroy domain")

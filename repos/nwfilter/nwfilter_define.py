@@ -1,13 +1,13 @@
 #! /usr/bin/env python
 
 
-
 from libvirt import libvirtError
 from src import sharedmod
 
 
-required_params = ('nwfiltername','chain','action','direction')
-optional_params = {'xml' : 'xmls/nwfilter.xml',}
+required_params = ('nwfiltername', 'chain', 'action', 'direction')
+optional_params = {'xml': 'xmls/nwfilter.xml', }
+
 
 def nwfilter_define(params):
     """ Define network filters."""
@@ -19,24 +19,23 @@ def nwfilter_define(params):
     action = params['action']
     direction = params['direction']
 
-
     xmlstr = xmlstr.replace('NWFILTERNAME', nwfiltername)
     xmlstr = xmlstr.replace('CHAIN', chain)
     xmlstr = xmlstr.replace('ACTION', action)
     xmlstr = xmlstr.replace('DIRECTION', direction)
     try:
-        logger.info("nwfiltername:%s chain:%s action:%s direction:%s" % \
-                    (nwfiltername,chain,action,direction))
+        logger.info("nwfiltername:%s chain:%s action:%s direction:%s" %
+                    (nwfiltername, chain, action, direction))
         logger.info("The nwfilter's xml is %s" % xmlstr)
 
-        #Define the nwfilter with given attribute value from nwfilter.conf"""
+        # Define the nwfilter with given attribute value from nwfilter.conf"""
         conn.nwfilterDefineXML(xmlstr)
         nwfilterxml = conn.nwfilterLookupByName(nwfiltername).XMLDesc(0)
 
         if nwfiltername in conn.listNWFilters():
             logger.info("The nwfilter list includes the defined nwfilter")
-            if cmp(xmlstr,nwfilterxml):
-                logger.info("Successfully define the nwfilter %s" % \
+            if cmp(xmlstr, nwfilterxml):
+                logger.info("Successfully define the nwfilter %s" %
                             nwfiltername)
                 return 0
             else:
@@ -47,7 +46,7 @@ def nwfilter_define(params):
             nwfilter")
             return 1
 
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("API error message: %s" % e.message)
         return 1
 

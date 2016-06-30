@@ -12,7 +12,8 @@ from src import sharedmod
 from utils import utils
 
 required_params = ('guestname',)
-optional_params = {'flags' : 'noping','bridgename' : 'virbr0',}
+optional_params = {'flags': 'noping', 'bridgename': 'virbr0', }
+
 
 def destroy(params):
     """destroy domain
@@ -32,9 +33,9 @@ def destroy(params):
     logger = params['logger']
     params.pop('logger')
     guestname = params['guestname']
-    br = params.get('bridgename','virbr0')
+    br = params.get('bridgename', 'virbr0')
     flags = ""
-    if params.has_key('flags'):
+    if 'flags' in params:
         flags = params['flags']
 
     conn = sharedmod.libvirtobj['conn']
@@ -55,24 +56,24 @@ def destroy(params):
     timeout = 60
     logger.info('destroy domain')
 
-    if not "noping" in flags:
+    if "noping" not in flags:
         # Get domain ip
         mac = utils.get_dom_mac_addr(guestname)
         logger.info("get ip by mac address")
-        ip = utils.mac_to_ip(mac,180,br)
+        ip = utils.mac_to_ip(mac, 180, br)
         logger.info("the ip address of guest is %s" % ip)
 
     # Destroy domain
     try:
         domobj.destroy()
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         logger.error("failed to destroy domain")
         return 1
 
     # Check domain status by ping ip
-    if not "noping" in flags:
+    if "noping" not in flags:
         while timeout:
             time.sleep(10)
             timeout -= 10

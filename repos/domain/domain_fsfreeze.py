@@ -13,7 +13,7 @@ optional_params = {'mountpoint': ''}
 
 def check_frozen_num(mp, num):
     """check the number of frozen fs"""
-    if mp == None:
+    if mp is None:
         return True
 
     if len(mp) == num:
@@ -24,7 +24,7 @@ def check_frozen_num(mp, num):
 
 def parse_mountpoint(mp):
     """parse the argument mountpoint"""
-    if mp == None:
+    if mp is None:
         return None
 
     return [p.strip() for p in mp.split(',')]
@@ -34,7 +34,7 @@ def check_guest_status(domobj):
     """Check guest current status"""
     state = domobj.info()[0]
     if state == libvirt.VIR_DOMAIN_SHUTOFF or \
-        state == libvirt.VIR_DOMAIN_SHUTDOWN:
+            state == libvirt.VIR_DOMAIN_SHUTDOWN:
         # add check function
         return False
     else:
@@ -68,7 +68,7 @@ def domain_fsfreeze(params):
             logger.error("Check frozen fs num: failed")
             return 1
 
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         return 1

@@ -18,17 +18,18 @@ def parse_flags(flags):
     """
     if flags == 'skipauth':
         return libvirt.VIR_DOMAIN_OPEN_GRAPHICS_SKIPAUTH
-    elif flags == None:
+    elif flags is None:
         return 0
     else:
         return -1
+
 
 def check_guest_status(domobj):
     """ check guest current status
     """
     state = domobj.info()[0]
     if state == libvirt.VIR_DOMAIN_SHUTOFF or \
-        state == libvirt.VIR_DOMAIN_SHUTDOWN:
+            state == libvirt.VIR_DOMAIN_SHUTDOWN:
         return False
     else:
         return True
@@ -81,7 +82,7 @@ def open_graphicsfd(params):
             logger.error("check graphicsfd: failed.")
             return 1
 
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         return 1

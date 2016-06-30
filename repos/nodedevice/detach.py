@@ -15,6 +15,7 @@ from utils import utils
 required_params = ('pciaddress',)
 optional_params = {}
 
+
 def check_node_detach(pciaddress):
     """Check node device detach result, if detachment is successful, the
        device host driver should be hided and the device should be bound
@@ -33,6 +34,7 @@ def check_node_detach(pciaddress):
 
     driver = os.path.basename(retval)
     return driver
+
 
 def detach(params):
     """Dettach a specific node device and bind it to pci-stub driver, argument
@@ -81,13 +83,13 @@ def detach(params):
         current_driver = check_node_detach(pciaddress)
         logger.info("current device driver: %s" % current_driver)
         if current_driver != original_driver and current_driver == pciback:
-            logger.info("the node %s device detach is successful" \
+            logger.info("the node %s device detach is successful"
                         % device_name)
         else:
             logger.info("the node %s device detach is failed" % device_name)
             return 1
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         return 1
 

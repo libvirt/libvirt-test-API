@@ -14,11 +14,12 @@ from utils import utils
 required_params = ('guestname', 'vcpu', 'cpulist',)
 optional_params = {}
 
+
 def vcpupin_check(domobj, vcpu, cpumap):
     """check domain config xml with vcpupin element
     """
     guestxml = domobj.XMLDesc(2)
-    logger.debug("domain %s xml :\n%s" %(domobj.name(), guestxml))
+    logger.debug("domain %s xml :\n%s" % (domobj.name(), guestxml))
 
     doc = minidom.parseString(guestxml)
     vcpupin = doc.getElementsByTagName('vcpupin')
@@ -50,6 +51,7 @@ def vcpupin_check(domobj, vcpu, cpumap):
         if i == len(vcpupin) - 1:
             logger.error("the vcpupin element with given vcpu is not found")
             return 1
+
 
 def vcpupin_config(params):
     """pin domain vcpu to host cpu with config flag
@@ -95,7 +97,7 @@ def vcpupin_config(params):
         else:
             logger.error("vcpu pin info is not expected")
             return 1
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("libvirt call failed: " + str(e))
         return 1
 

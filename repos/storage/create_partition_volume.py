@@ -14,6 +14,7 @@ from src import sharedmod
 required_params = ('poolname', 'volname', 'volformat', 'capacity',)
 optional_params = {}
 
+
 def partition_volume_check(poolobj, volname):
     """check the new created volume, the way of checking is to get
        the path of the newly created volume, then grep /proc/partitions
@@ -56,8 +57,8 @@ def create_partition_volume(params):
     xmlstr = params['xml']
 
     logger.info("the poolname is %s, volname is %s, \
-                 volfomat is %s, capacity is %s" % \
-                 (poolname, volname, volformat, capacity))
+                 volfomat is %s, capacity is %s" %
+                (poolname, volname, volformat, capacity))
 
     conn = sharedmod.libvirtobj['conn']
     storage_pool_list = conn.listStoragePools()
@@ -72,8 +73,8 @@ def create_partition_volume(params):
     xmlstr = xmlstr.replace('CAP', capacity[:-1])
 
     logger.info("before create the new volume, \
-                 current volume list is %s" % \
-                 poolobj.listVolumes())
+                 current volume list is %s" %
+                poolobj.listVolumes())
 
     logger.info("and using virsh command to \
                  ouput the volume information in the pool %s" % poolname)
@@ -84,9 +85,9 @@ def create_partition_volume(params):
     try:
         logger.info("create %s volume" % volname)
         poolobj.createXML(xmlstr, 0)
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
-                    % (e.message, e.get_error_code()))
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
+                     % (e.message, e.get_error_code()))
         return 1
 
     logger.info("volume create successfully, and output the volume information")

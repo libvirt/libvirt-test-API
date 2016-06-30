@@ -11,16 +11,18 @@ from libvirt import libvirtError
 from src import sharedmod
 
 required_params = ('poolname', 'sourcename',)
-optional_params = {'targetpath' : '/dev/disk/by-path',
-                   'xml' : 'xmls/scsi_pool.xml',
-                  }
+optional_params = {'targetpath': '/dev/disk/by-path',
+                   'xml': 'xmls/scsi_pool.xml',
+                   }
+
 
 def display_pool_info(conn):
     """Display current storage pool information"""
-    logger.debug("current define storage pool: %s" % \
-                  conn.listDefinedStoragePools())
-    logger.debug("current active storage pool: %s" % \
-                  conn.listStoragePools())
+    logger.debug("current define storage pool: %s" %
+                 conn.listDefinedStoragePools())
+    logger.debug("current active storage pool: %s" %
+                 conn.listStoragePools())
+
 
 def check_pool_define(poolname):
     """This function will check if the storage pool with
@@ -36,6 +38,7 @@ def check_pool_define(poolname):
     else:
         return False
 
+
 def define_scsi_pool(params):
     """Define a scsi type storage pool from xml"""
 
@@ -45,7 +48,7 @@ def define_scsi_pool(params):
     sourcename = params['sourcename']
     xmlstr = params['xml']
 
-    logger.info("the poolname is %s, pooltype is scsi, sourcename is %s" % \
+    logger.info("the poolname is %s, pooltype is scsi, sourcename is %s" %
                 (poolname, sourcename))
 
     conn = sharedmod.libvirtobj['conn']
@@ -67,13 +70,15 @@ def define_scsi_pool(params):
         logger.info("current storage pool define number: %s" % pool_num2)
         display_pool_info(conn)
         if check_pool_define(poolname) and pool_num2 > pool_num1:
-            logger.info("It is successful to define %s storage pool" % poolname)
+            logger.info(
+                "It is successful to define %s storage pool" %
+                poolname)
         else:
-            logger.error("%s storage pool was not defined successfully" % \
-                          poolname)
+            logger.error("%s storage pool was not defined successfully" %
+                         poolname)
             return 1
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         return 1
 

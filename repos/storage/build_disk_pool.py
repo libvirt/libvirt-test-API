@@ -15,6 +15,7 @@ from src import sharedmod
 required_params = ('poolname',)
 optional_params = {}
 
+
 def get_pool_devicename_type(poolobj):
     """ get device name and partition table of the pool
         from its xml description """
@@ -31,6 +32,7 @@ def get_pool_devicename_type(poolobj):
 
     return source_device, device_type
 
+
 def check_pool_built(source_device, device_type):
     """using parted command tool to check the validation of final result"""
 
@@ -45,6 +47,7 @@ def check_pool_built(source_device, device_type):
         return 0
     else:
         return 1
+
 
 def build_disk_pool(params):
     """ build a defined and inactive pool"""
@@ -61,7 +64,7 @@ def build_disk_pool(params):
     if poolname in pool_names:
         poolobj = conn.storagePoolLookupByName(poolname)
     else:
-        logger.error("%s not found\n" % poolname);
+        logger.error("%s not found\n" % poolname)
         return 1
 
     if poolobj.isActive():
@@ -70,8 +73,8 @@ def build_disk_pool(params):
 
     source_device, device_type = get_pool_devicename_type(poolobj)
     logger.info("the source device of the pool is %s, \
-                 the partition table type is %s" % \
-                 (source_device, device_type))
+                 the partition table type is %s" %
+                (source_device, device_type))
 
     try:
         logger.info("begin to build the storage pool")
@@ -80,11 +83,11 @@ def build_disk_pool(params):
         if not check_pool_built(source_device, device_type):
             logger.info("building %s storage pool is SUCCESSFUL!!!" % poolname)
         else:
-            logger.info("building %s storage pool is UNSUCCESSFUL!!!" % \
-                         poolname)
+            logger.info("building %s storage pool is UNSUCCESSFUL!!!" %
+                        poolname)
             return 1
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         return 1
 

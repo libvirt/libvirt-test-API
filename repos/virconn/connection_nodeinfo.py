@@ -137,7 +137,7 @@ def connection_nodeinfo(params):
 
         check_conn_nodeinfo(conn_nodeinfo, logger)
 
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("API error message: %s, error code is %s" %
                      e.message)
         logger.error("start failed")

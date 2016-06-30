@@ -32,6 +32,7 @@ from src.log_generator import LogGenerator
 from src.activityfilter import Filter
 from src.casecfgcheck import CaseCfgCheck
 
+
 def usage():
     print "Usage: libvirt-test-api <OPTIONS> <ARGUMENTS>"
     print "\noptions: -h, --help : Display usage information \
@@ -44,7 +45,6 @@ def usage():
            \n         -m, --merge: Merge two log xmlfiles \
            \n         -r, --rerun: Rerun one or more test"
 
-
     print "example: \
            \n         libvirt-test-api -l 0|1 -c TEST.CONF    \
            \n         libvirt-test-api -c TEST.CONF -f TEST.XML \
@@ -56,6 +56,7 @@ def usage():
            \n         libvirt-test-api -f TEST.XML \
 -r TESTRUNID TESTID ..."
 
+
 def append_path():
     """Append root path of package"""
     pwd = os.getcwd()
@@ -64,10 +65,12 @@ def append_path():
     else:
         sys.path.append(pwd)
 
+
 class Main(object):
     """ The class provides methods to run a new test and manage
         testing log and records
     """
+
     def __init__(self, casefile, logxml, loglevel):
         self.casefile = casefile
         self.logxml = logxml
@@ -78,20 +81,20 @@ class Main(object):
 
         # if it's a new test, parsing the case configuration file to generate
         # a list of activities and options for the test instance.
-        if activities_options_list == None:
+        if activities_options_list is None:
             activities_options_list = \
                 parser.CaseFileParser(self.casefile).get_list()
 
-        if activities_options_list[-1][0].has_key("options"):
+        if "options" in activities_options_list[-1][0]:
             activities_list = activities_options_list[:-1]
             options_list = activities_options_list[-1]
         else:
             activities_list = activities_options_list
-            options_list = [{'options':{}}]
+            options_list = [{'options': {}}]
 
         # generate testrunid from time point runing a testrun
         testrunid = time.strftime("%Y%m%d%H%M%S")
-        os.makedirs('log/%s' %testrunid)
+        os.makedirs('log/%s' % testrunid)
 
         log_xml_parser = LogGenerator(self.logxml)
 
@@ -105,7 +108,7 @@ class Main(object):
             log_xml_parser.add_testrun_xml(testrunid)
 
         # multiply the activities list if option "times" given
-        if options_list[0]['options'].has_key("times"):
+        if "times" in options_list[0]['options']:
             times = int(options_list[0]['options']["times"])
             activities_list = activities_list * times
 
@@ -124,10 +127,12 @@ class Main(object):
         # get a list of unique testcase
         # with 'clean' flag appended to its previous testcase
         unique_testcase_keys = filterobj.unique_testcase_cleansuffix()
-        cases_func_ref_dict = proxy_obj.get_func_call_dict(unique_testcase_keys)
+        cases_func_ref_dict = proxy_obj.get_func_call_dict(
+            unique_testcase_keys)
 
         # get check function reference if that is defined in testcase file
-        cases_checkfunc_ref_dict = proxy_obj.get_optionalfunc_call_dict('check')
+        cases_checkfunc_ref_dict = proxy_obj.get_optionalfunc_call_dict(
+            'check')
 
         # create a null list, then, initilize generator to
         # get the callable testcase function
@@ -140,9 +145,12 @@ class Main(object):
             logname = log.Log.get_log_name()
             testid = logname[-3:]
             log_xml_parser.add_test_xml(testrunid, testid)
-            if os.environ.has_key('AUTODIR'):
-                autotest_testdir = os.path.join(os.environ['AUTODIR'],'tests/libvirt_test_API')
-                logfile = os.path.join('%s/src/log/%s' % (autotest_testdir, testrunid), logname)
+            if 'AUTODIR' in os.environ:
+                autotest_testdir = os.path.join(
+                    os.environ['AUTODIR'], 'tests/libvirt_test_API')
+                logfile = os.path.join(
+                    '%s/src/log/%s' %
+                    (autotest_testdir, testrunid), logname)
             else:
                 logfile = os.path.join('log/%s' % testrunid, logname)
             procs.append(generator.FuncGen(cases_func_ref_dict,
@@ -155,7 +163,7 @@ class Main(object):
                                            log_xml_parser,
                                            lockfile,
                                            self.loglevel)
-                        )
+                         )
 
         totalnum = len(procs)
         passnum = 0
@@ -164,10 +172,10 @@ class Main(object):
 
         # if the value of option multiprocess is enable,
         # will call the module process to run the testcases
-	# which stored in the list of procs, if disable,
-	# will call them one by one
-        if options_list[0]['options'].has_key("multiprocess"):
-            if  options_list[0]['options']["multiprocess"] == "enable":
+        # which stored in the list of procs, if disable,
+        # will call them one by one
+        if "multiprocess" in options_list[0]['options']:
+            if options_list[0]['options']["multiprocess"] == "enable":
                 proc = process.Process(procs)
                 proc.fork()
                 passnum, failnum = proc.wait()
@@ -201,15 +209,20 @@ class Main(object):
 
         lockfile.close()
 
-        if options_list[0]['options'].has_key("cleanup"):
+        if "cleanup" in options_list[0]['options']:
             if options_list[0]['options']["cleanup"] == "enable":
                 print "Clean up Testing Environment..."
-                cases_clearfunc_ref_dict = proxy_obj.get_optionalfunc_call_dict('clean')
+                cases_clearfunc_ref_dict = proxy_obj.get_optionalfunc_call_dict(
+                    'clean')
                 log.Log.counter = 0
                 for activity in activities_list:
                     logname = log.Log.get_log_name()
                     logfile = os.path.join('log/%s' % testrunid, logname)
-                    env_clear.EnvClear(cases_clearfunc_ref_dict, activity, logfile, self.loglevel)()
+                    env_clear.EnvClear(
+                        cases_clearfunc_ref_dict,
+                        activity,
+                        logfile,
+                        self.loglevel)()
                 print "Done"
             elif options_list[0]['options']["cleanup"] == "disable":
                 pass
@@ -241,7 +254,7 @@ class Main(object):
             string += "%s\n" % key
             required_params, optional_params = case_params[key]
             for p in required_params:
-                string += " " * 4  + p + "\n"
+                string += " " * 4 + p + "\n"
                 string += " " * 8 + p.upper() + "\n"
             for p in optional_params:
                 string += " " * 4 + "[" + p + "]\n"
@@ -255,7 +268,7 @@ class Main(object):
         print string
         return 0
 
-    def remove_log(self, testrunid, testid = None):
+    def remove_log(self, testrunid, testid=None):
         """  to remove log item in the log xmlfile """
         log_xml_parser = LogGenerator(self.logxml)
 
@@ -301,8 +314,8 @@ class Main(object):
         CASEINFO = open(caseinfo_file, "r")
         activities_list = []
         for testid in testid_list:
-            activities = eval(CASEINFO.readlines()[testid-1])
-            activities_list.append(activites)
+            activities = eval(CASEINFO.readlines()[testid - 1])
+            activities_list.append(activities)
 
         self.run(activities_list)
 
@@ -314,9 +327,9 @@ if __name__ == "__main__":
 
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hc:tl:dmr",
-                    ["help", "casefile=", "template", "logxml=",
-                    "delete-log=", "merge=", "rerun="])
-    except getopt.GetoptError, err:
+                                   ["help", "casefile=", "template", "logxml=",
+                                    "delete-log=", "merge=", "rerun="])
+    except getopt.GetoptError as err:
         print str(err)
         usage()
         sys.exit(2)

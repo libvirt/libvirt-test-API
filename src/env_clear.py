@@ -21,10 +21,13 @@
 from utils import log
 import mapper
 
+
 class EnvClear(object):
+
     """ Generate a callable class of executing clearing function in
         each testcase.
     """
+
     def __init__(self, cases_clearfunc_ref_dict, activity, logfile, loglevel):
         self.cases_clearfunc_ref_dict = cases_clearfunc_ref_dict
         self.logfile = logfile
@@ -61,7 +64,7 @@ class EnvClear(object):
             case_params = self.case_params_list[i]
 
             case_params['logger'] = logger
-            if self.cases_clearfunc_ref_dict.has_key(mod_case_func):
+            if mod_case_func in self.cases_clearfunc_ref_dict:
                 self.cases_clearfunc_ref_dict[mod_case_func](case_params)
 
         return 0

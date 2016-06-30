@@ -23,6 +23,7 @@ QEMU_CONF = "/etc/libvirt/qemu.conf"
 SAVE_FILE = "/mnt/test.save"
 TEMP_FILE = "/tmp/test.save"
 
+
 def check_domain_running(conn, guestname, logger):
     """ check if the domain exists, may or may not be active """
     guest_names = []
@@ -36,6 +37,7 @@ def check_domain_running(conn, guestname, logger):
         return 1
     else:
         return 0
+
 
 def nfs_setup(logger):
     """setup nfs on localhost
@@ -58,6 +60,7 @@ def nfs_setup(logger):
             logger.info(out[i])
 
     return 0
+
 
 def chown_file(filepath, logger):
     """touch a file and setting the chown
@@ -89,6 +92,7 @@ def chown_file(filepath, logger):
 
     return 0
 
+
 def prepare_env(dynamic_ownership, use_nfs, logger):
     """configure dynamic_ownership in /etc/libvirt/qemu.conf,
        set chown of the file to save
@@ -101,10 +105,10 @@ def prepare_env(dynamic_ownership, use_nfs, logger):
         logger.error("wrong dynamic_ownership value")
         return 1
 
-    logger.info("set the dynamic ownership in %s as %s" % \
+    logger.info("set the dynamic ownership in %s as %s" %
                 (QEMU_CONF, d_ownership))
     set_cmd = "echo dynamic_ownership = %s >> %s" % \
-               (d_ownership, QEMU_CONF)
+        (d_ownership, QEMU_CONF)
     ret, out = utils.exec_cmd(set_cmd, shell=True)
     if ret:
         logger.error("failed to set dynamic ownership")
@@ -155,6 +159,7 @@ def prepare_env(dynamic_ownership, use_nfs, logger):
 
     return 0
 
+
 def ownership_get(logger):
     """check the ownership of file"""
 
@@ -162,9 +167,10 @@ def ownership_get(logger):
     uid = statinfo.st_uid
     gid = statinfo.st_gid
 
-    logger.info("the uid and gid of %s is %s:%s" %(SAVE_FILE, uid, gid))
+    logger.info("the uid and gid of %s is %s:%s" % (SAVE_FILE, uid, gid))
 
     return 0, uid, gid
+
 
 def ownership_test(params):
     """Save a domain to a file, check the ownership of
@@ -197,8 +203,8 @@ def ownership_test(params):
     try:
         domobj.save(SAVE_FILE)
         logger.info("Success save domain %s to %s" % (guestname, SAVE_FILE))
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         return 1
 
@@ -208,22 +214,22 @@ def ownership_test(params):
         if uid == 107 and gid == 107:
             logger.info("As expected, the chown not change.")
         else:
-            logger.error("The chown of %s is %s:%s, it's not as expected" % \
-                             (SAVE_FILE, uid, gid))
+            logger.error("The chown of %s is %s:%s, it's not as expected" %
+                         (SAVE_FILE, uid, gid))
             return 1
     elif use_nfs == 'disable':
         if dynamic_ownership == 'enable':
             if uid == 0 and gid == 0:
                 logger.info("As expected, the chown changed to root:root")
             else:
-                logger.error("The chown of %s is %s:%s, it's not as expected" % \
+                logger.error("The chown of %s is %s:%s, it's not as expected" %
                              (SAVE_FILE, uid, gid))
                 return 1
         elif dynamic_ownership == 'disable':
             if uid == 107 and gid == 107:
                 logger.info("As expected, the chown not change.")
             else:
-                logger.error("The chown of %s is %s:%s, it's not as expected" % \
+                logger.error("The chown of %s is %s:%s, it's not as expected" %
                              (SAVE_FILE, uid, gid))
                 return 1
 
@@ -231,13 +237,13 @@ def ownership_test(params):
     logger.info("restore the domain from the file")
     try:
         conn.restore(SAVE_FILE)
-        logger.info("Success restore domain %s from %s" % \
-                     (guestname, SAVE_FILE))
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+        logger.info("Success restore domain %s from %s" %
+                    (guestname, SAVE_FILE))
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
-        logger.error("Error: fail to restore domain %s from %s" % \
-                      (guestname, SAVE_FILE))
+        logger.error("Error: fail to restore domain %s from %s" %
+                     (guestname, SAVE_FILE))
         return 1
 
     logger.info("check the ownership of %s after restore" % SAVE_FILE)
@@ -245,17 +251,17 @@ def ownership_test(params):
     if uid == 107 and gid == 107:
         logger.info("As expected, the chown not change.")
     else:
-        logger.error("The chown of %s is %s:%s, not change back as expected" % \
+        logger.error("The chown of %s is %s:%s, not change back as expected" %
                      (SAVE_FILE, uid, gid))
         return 1
 
     return 0
 
+
 def ownership_test_clean(params):
     """clean testing environment"""
     logger = params['logger']
     use_nfs = params['use_nfs']
-
 
     if use_nfs == 'enable':
         if os.path.ismount("/mnt"):

@@ -10,15 +10,17 @@ from libvirt import libvirtError
 from src import sharedmod
 
 required_params = ('poolname',)
-optional_params = {'targetpath' : '/dev/mapper',
-                   'xml' : 'xmls/mpath_pool.xml',
-                  }
+optional_params = {'targetpath': '/dev/mapper',
+                   'xml': 'xmls/mpath_pool.xml',
+                   }
+
 
 def display_pool_info(conn):
     """Display current storage pool information"""
-    logger.debug("current define storage pool: %s" % \
-                  conn.listDefinedStoragePools())
+    logger.debug("current define storage pool: %s" %
+                 conn.listDefinedStoragePools())
     logger.debug("current active storage pool: %s" % conn.listStoragePools())
+
 
 def check_pool_define(poolname):
     """This function will check if the storage pool with
@@ -33,6 +35,7 @@ def check_pool_define(poolname):
         return True
     else:
         return False
+
 
 def define_mpath_pool(params):
     """Define a mpath type storage pool from xml"""
@@ -63,13 +66,15 @@ def define_mpath_pool(params):
         logger.info("current storage pool define number: %s" % pool_num2)
         display_pool_info(conn)
         if check_pool_define(poolname) and pool_num2 > pool_num1:
-            logger.info("It is successful to define %s storage pool" % poolname)
+            logger.info(
+                "It is successful to define %s storage pool" %
+                poolname)
         else:
-            logger.error("%s storage pool was not defined successfully" % \
-                          poolname)
+            logger.error("%s storage pool was not defined successfully" %
+                         poolname)
             return 1
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         return 1
 

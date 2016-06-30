@@ -29,6 +29,7 @@ optional_params = {}
 SSH_KEYGEN = "ssh-keygen -t rsa"
 SSH_COPY_ID = "ssh-copy-id"
 
+
 def get_state(state):
     dom_state = ''
     if state == libvirt.VIR_DOMAIN_NOSTATE:
@@ -49,12 +50,13 @@ def get_state(state):
         dom_state = 'no sure'
     return dom_state
 
+
 def exec_command(logger, command, flag):
     """execute shell command
     """
     status, ret = commands.getstatusoutput(command)
     if not flag and status:
-        logger.error("executing "+ "\"" +  command  + "\"" + " failed")
+        logger.error("executing " + "\"" + command + "\"" + " failed")
         logger.error(ret)
     return status, ret
 
@@ -64,9 +66,11 @@ def env_clean(srcconn, dstconn, target_machine, guestname, logger):
     logger.info("destroy and undefine %s on both side if it exsits", guestname)
     exec_command(logger, "virsh destroy %s" % guestname, 1)
     exec_command(logger, "virsh undefine %s" % guestname, 1)
-    REMOTE_DESTROY = "ssh %s \"virsh destroy %s\"" % (target_machine, guestname)
+    REMOTE_DESTROY = "ssh %s \"virsh destroy %s\"" % (
+        target_machine, guestname)
     exec_command(logger, REMOTE_DESTROY, 1)
-    REMOTE_UNDEFINE = "ssh %s \"virsh undefine %s\"" % (target_machine, guestname)
+    REMOTE_UNDEFINE = "ssh %s \"virsh undefine %s\"" % (
+        target_machine, guestname)
     exec_command(logger, REMOTE_UNDEFINE, 1)
 
     dstconn.close()
@@ -84,6 +88,7 @@ def env_clean(srcconn, dstconn, target_machine, guestname, logger):
     if status:
         logger.error("failed to remove local ssh key")
 
+
 def ssh_keygen(logger):
     """using pexpect to generate RSA"""
     logger.info("generate ssh RSA \"%s\"" % SSH_KEYGEN)
@@ -92,8 +97,8 @@ def ssh_keygen(logger):
         index = child.expect(['Enter file in which to save the key ',
                               'Enter passphrase ',
                               'Enter same passphrase again: ',
-                               pexpect.EOF,
-                               pexpect.TIMEOUT])
+                              pexpect.EOF,
+                              pexpect.TIMEOUT])
         if index == 0:
             child.sendline("\r")
         elif index == 1:
@@ -112,15 +117,16 @@ def ssh_keygen(logger):
 
     return 0
 
+
 def ssh_tunnel(hostname, username, password, logger):
     """setup a tunnel to a give host"""
     logger.info("setup ssh tunnel with host %s" % hostname)
     user_host = "%s@%s" % (username, hostname)
-    child = pexpect.spawn(SSH_COPY_ID, [ user_host])
+    child = pexpect.spawn(SSH_COPY_ID, [user_host])
     while True:
         index = child.expect(['yes\/no', 'password: ',
-                               pexpect.EOF,
-                               pexpect.TIMEOUT])
+                              pexpect.EOF,
+                              pexpect.TIMEOUT])
         if index == 0:
             child.sendline("yes")
         elif index == 1:
@@ -137,6 +143,7 @@ def ssh_tunnel(hostname, username, password, logger):
 
     return 0
 
+
 def migrate(params):
     """ migrate a guest back and forth between two machines"""
     logger = params['logger']
@@ -152,7 +159,6 @@ def migrate(params):
     predstconfig = params['predstconfig']
     postdstconfig = params['postdstconfig']
     flags = params['flags']
-
 
     logger.info("the flags is %s" % flags)
     flags_string = flags.split("|")
@@ -177,15 +183,17 @@ def migrate(params):
             logger.error("unknown flag")
             return 1
 
-    #generate ssh key pair
+    # generate ssh key pair
     ret = ssh_keygen(logger)
     if ret:
         logger.error("failed to generate RSA key")
         return 1
-    #setup ssh tunnel with target machine
+    # setup ssh tunnel with target machine
     ret = ssh_tunnel(target_machine, username, password, logger)
     if ret:
-        logger.error("faild to setup ssh tunnel with target machine %s" % target_machine)
+        logger.error(
+            "faild to setup ssh tunnel with target machine %s" %
+            target_machine)
         return 1
 
     commands.getstatusoutput("ssh-add")
@@ -203,7 +211,8 @@ def migrate(params):
         if guestname in guest_names:
             logger.info("Dst VM exists")
         else:
-            logger.error("Dst VM missing config, should define VM on Dst first")
+            logger.error(
+                "Dst VM missing config, should define VM on Dst first")
             env_clean(srcconn, dstconn, target_machine, guestname, logger)
             return 1
 
@@ -214,8 +223,8 @@ def migrate(params):
         else:
             logger.info("use migrate() to migrate")
             srcdom.migrate(dstconn, migflags, None, None, 0)
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         logger.error("Migration Failed")
         env_clean(srcconn, dstconn, target_machine, guestname, logger)
@@ -257,7 +266,10 @@ def migrate(params):
 
     dstdom_state = dstdom.info()[0]
     if get_state(dstdom_state) != poststate:
-        logger.error("Dst VM wrong state %s, should be %s", get_state(dstdom_state), poststate)
+        logger.error(
+            "Dst VM wrong state %s, should be %s",
+            get_state(dstdom_state),
+            poststate)
         env_clean(srcconn, dstconn, target_machine, guestname, logger)
         return 1
 

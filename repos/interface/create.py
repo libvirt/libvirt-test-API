@@ -14,16 +14,18 @@ from utils import utils
 required_params = ('ifacename',)
 optional_params = {}
 
+
 def display_current_interface(conn):
     """Display current host interface information"""
-    logger.debug("current active host interface number: %s " \
-% conn.numOfInterfaces)
-    logger.debug("current active host interface list: %s " \
-% conn.listInterfaces())
-    logger.debug("current defined host interface number: %s " \
-% conn.numOfDefinedInterfaces())
-    logger.debug("current defined host interface list: %s " \
-% conn.listDefinedInterfaces())
+    logger.debug("current active host interface number: %s "
+                 % conn.numOfInterfaces)
+    logger.debug("current active host interface list: %s "
+                 % conn.listInterfaces())
+    logger.debug("current defined host interface number: %s "
+                 % conn.numOfDefinedInterfaces())
+    logger.debug("current defined host interface list: %s "
+                 % conn.listDefinedInterfaces())
+
 
 def check_create_interface(ifacename):
     """Check creating interface result, it will can ping itself
@@ -72,10 +74,10 @@ def create(params):
         else:
             logger.error("fail to check create interface")
             return 1
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
-                      % (e.message, e.get_error_code()))
-        logger.error("fail to create interface %s" %ifacename)
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
+                     % (e.message, e.get_error_code()))
+        logger.error("fail to create interface %s" % ifacename)
         return 1
 
     return 0

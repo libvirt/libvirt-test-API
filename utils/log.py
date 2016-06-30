@@ -21,7 +21,9 @@ import time
 import os
 import logging
 
+
 class Log(object):
+
     """Log file operation"""
     counter = 0
 
@@ -49,6 +51,7 @@ class Log(object):
         self.filehd = logging.FileHandler(self.name, 'a+')
         self.console = logging.StreamHandler()
 
+
 class CaseLog(Log):
 
     def __init__(self, logname, loglevel):
@@ -69,7 +72,6 @@ class CaseLog(Log):
                'autotest_formatter':
                '    %(message)s'}
 
-
         datefmt = '%H:%M:%S'
         self.filehd.setLevel(logging.DEBUG)
         file_formatter = logging.Formatter(fmt['file_formatter'], datefmt)
@@ -80,10 +82,12 @@ class CaseLog(Log):
         if int(self.loglevel) != 1:
             self.console.setLevel(logging.INFO)
 
-            if os.environ.has_key('AUTODIR'):
-                console_formatter = logging.Formatter(fmt['autotest_formatter'], datefmt)
+            if 'AUTODIR' in os.environ:
+                console_formatter = logging.Formatter(
+                    fmt['autotest_formatter'], datefmt)
             else:
-                console_formatter = logging.Formatter(fmt['console_formatter'], datefmt)
+                console_formatter = logging.Formatter(
+                    fmt['console_formatter'], datefmt)
 
             self.console.setFormatter(console_formatter)
             self.logger.addHandler(self.console)
@@ -102,8 +106,8 @@ class EnvLog(Log):
 
     def env_log(self):
         """Initialize log file"""
-        fmt = {'file_formatter':'%(message)s',
-               'console_formatter':'%(message)s'}
+        fmt = {'file_formatter': '%(message)s',
+               'console_formatter': '%(message)s'}
 
         self.filehd.setLevel(logging.DEBUG)
         file_formatter = logging.Formatter(fmt['file_formatter'])

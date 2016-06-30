@@ -12,10 +12,14 @@ from src import sharedmod
 required_params = ('poolname',)
 optional_params = {}
 
+
 def display_pool_info(conn):
     """Display current storage pool information"""
-    logger.debug("current define storage pool: %s" % conn.listDefinedStoragePools())
+    logger.debug(
+        "current define storage pool: %s" %
+        conn.listDefinedStoragePools())
     logger.debug("current active storage pool: %s" % conn.listStoragePools())
+
 
 def check_pool_undefine(poolname):
     """Check undefine storage pool result, if undefine storage is successful,
@@ -27,6 +31,7 @@ def check_pool_undefine(poolname):
         return True
     else:
         return False
+
 
 def undefine_pool(params):
     """Undefine a specific name storage pool"""
@@ -41,7 +46,7 @@ def undefine_pool(params):
     if poolname in pool_names:
         poolobj = conn.storagePoolLookupByName(poolname)
     else:
-        logger.error("%s not found\n" % poolname);
+        logger.error("%s not found\n" % poolname)
         return 1
 
     if poolobj.isActive():
@@ -63,8 +68,8 @@ def undefine_pool(params):
         else:
             logger.error("%s storage pool is undefined" % poolname)
             return 1
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         return 1
 

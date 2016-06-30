@@ -14,15 +14,16 @@ from utils import utils
 required_params = ('guestname', 'filepath',)
 optional_params = {}
 
+
 def get_guest_ipaddr(*args):
     """Get guest ip address"""
     (guestname, logger) = args
 
     mac = utils.get_dom_mac_addr(guestname)
-    logger.debug("guest mac address: %s" %mac)
+    logger.debug("guest mac address: %s" % mac)
 
     ipaddr = utils.mac_to_ip(mac, 15)
-    logger.debug("guest ip address: %s" %ipaddr)
+    logger.debug("guest ip address: %s" % ipaddr)
 
     if utils.do_ping(ipaddr, 20) == 1:
         logger.info("ping current guest successfull")
@@ -30,6 +31,7 @@ def get_guest_ipaddr(*args):
     else:
         logger.error("Error: can't ping current guest")
         return None
+
 
 def check_guest_status(*args):
     """Check guest current status"""
@@ -45,6 +47,7 @@ def check_guest_status(*args):
     else:
         return True
 
+
 def check_guest_save(*args):
     """Check save domain result, if save domain is successful,
        guestname.save will exist under /tmp directory and guest
@@ -59,6 +62,7 @@ def check_guest_save(*args):
             return False
     else:
         return False
+
 
 def save(params):
     """Save domain to a disk file"""
@@ -83,17 +87,18 @@ def save(params):
     try:
         domobj.save(filepath)
         if check_guest_save(guestname, domobj, logger):
-            logger.info("save %s domain successful" %guestname)
+            logger.info("save %s domain successful" % guestname)
         else:
             logger.error("Error: fail to check save domain")
             return 1
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
-        logger.error("Error: fail to save %s domain" %guestname)
+        logger.error("Error: fail to save %s domain" % guestname)
         return 1
 
     return 0
+
 
 def save_clean(params):
     """ clean testing environment """

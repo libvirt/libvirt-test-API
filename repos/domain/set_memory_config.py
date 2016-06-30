@@ -13,13 +13,15 @@ from src import sharedmod
 required_params = ('guestname', )
 optional_params = {'memory': 1048576,
                    'maxmem': 4194304,
-                  }
+                   }
+
+
 def get_memory_config(domobj):
     """get domain config current memory and max memory
     """
     try:
         guestxml = domobj.XMLDesc(2)
-        logger.debug("domain %s xml is :\n%s" %(domobj.name(), guestxml))
+        logger.debug("domain %s xml is :\n%s" % (domobj.name(), guestxml))
         xml = minidom.parseString(guestxml)
 
         logger.info("get domain memory info in config xml")
@@ -31,11 +33,12 @@ def get_memory_config(domobj):
         max_memory = int(mem.childNodes[0].data)
         logger.info("max memory in config xml is: %s" % max_memory)
 
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("libvirt call failed: " + str(e))
         return False
 
     return current, max_memory
+
 
 def set_memory_config(params):
     """set domain memory with live flag and check
@@ -47,7 +50,7 @@ def set_memory_config(params):
     maxmem = params.get('maxmem', None)
 
     logger.info("the name of virtual machine is %s" % guestname)
-    if memory == None and maxmem == None:
+    if memory is None and maxmem is None:
         logger.error("at least one of memory or maxmem should be provided")
         return 1
 
@@ -87,7 +90,7 @@ def set_memory_config(params):
                 logger.error("set max memory failed")
                 return 1
 
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("libvirt call failed: " + str(e))
         return 1
 

@@ -12,10 +12,11 @@ from src import sharedmod
 from utils import xml_parser
 
 required_params = ('poolname', 'sourcepath',)
-optional_params = {'sourceformat' : 'ext3',
-                   'targetpath' : '/mnt',
-                   'xml' : 'xmls/fs_pool.xml',
-                  }
+optional_params = {'sourceformat': 'ext3',
+                   'targetpath': '/mnt',
+                   'xml': 'xmls/fs_pool.xml',
+                   }
+
 
 def check_pool_create_libvirt(conn, poolname, logger):
     """Check the result of create storage pool on libvirt level.  """
@@ -29,6 +30,7 @@ def check_pool_create_libvirt(conn, poolname, logger):
                      doesn't exist in libvirt!!!!" % poolname)
         return False
 
+
 def check_pool_create_OS(poolobj, logger):
     """Check the result of create storage pool on OS level.  """
     poolxml = poolobj.XMLDesc(0)
@@ -38,7 +40,7 @@ def check_pool_create_OS(poolobj, logger):
     logger.info("src path: %s tgt path: %s" % (src_path, dest_path))
     pat = src_path + "\s+" + dest_path
     found = 0
-    fd = open("/proc/mounts","r")
+    fd = open("/proc/mounts", "r")
     for line in fd:
         if re.match(pat, line):
             found = 1
@@ -48,10 +50,14 @@ def check_pool_create_OS(poolobj, logger):
     else:
         return False
 
+
 def display_pool_info(conn, logger):
     """Display current storage pool information"""
-    logger.debug("current define storage pool: %s" % conn.listDefinedStoragePools())
+    logger.debug(
+        "current define storage pool: %s" %
+        conn.listDefinedStoragePools())
     logger.debug("current active storage pool: %s" % conn.listStoragePools())
+
 
 def create_fs_pool(params):
     """ Create a fs type storage pool from xml"""
@@ -77,17 +83,19 @@ def create_fs_pool(params):
         if check_pool_create_libvirt(conn, poolname, logger):
             logger.info("creating %s storage pool is in libvirt" % poolname)
             if check_pool_create_OS(poolobj, logger):
-                logger.info("creating %s storage pool is SUCCESSFUL!!!" % poolname)
+                logger.info(
+                    "creating %s storage pool is SUCCESSFUL!!!" %
+                    poolname)
             else:
-                logger.info("creating %s storage pool is UNSUCCESSFUL!!!" % \
-                             poolname)
+                logger.info("creating %s storage pool is UNSUCCESSFUL!!!" %
+                            poolname)
                 return 1
         else:
             logger.info("creating %s storage pool is \
                          UNSUCCESSFUL in libvirt!!!" % poolname)
             return 1
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         return 1
 

@@ -12,20 +12,22 @@ VIRSH_QUIET_IFACE_LIST = "virsh --quiet iface-list --all | awk '{print ""$%s""}'
 GET_MAC = "ip link show %s |sed -n '2p'| awk '{print $2}'"
 VIRSH_IFACE_MAC = "virsh iface-mac %s"
 
+
 def get_output(command, logger):
     """execute shell command
     """
     status, ret = commands.getstatusoutput(command)
     if status:
-        logger.error("executing "+ "\"" +  command  + "\"" + " failed")
+        logger.error("executing " + "\"" + command + "\"" + " failed")
         logger.error(ret)
     return status, ret
+
 
 def get_name_list(params):
     """return mac we need to test
     """
     logger = params['logger']
-    name_list=[]
+    name_list = []
 
     if 'ifacename' in params:
         ifacename = params['ifacename']
@@ -39,6 +41,7 @@ def get_name_list(params):
 
     logger.info("list of mac we are going to test: %s" % name_list)
     return 0, name_list
+
 
 def iface_mac(params):
     """ test iface_mac, if optional option 'ifacename' is given
@@ -55,14 +58,14 @@ def iface_mac(params):
         status, mac_str = get_output(VIRSH_IFACE_MAC % name, logger)
         if not status:
             interface_mac = mac_str.rstrip()
-            logger.info("the interface mac generated from " \
+            logger.info("the interface mac generated from "
                         + VIRSH_IFACE_MAC % name + " is: '%s'" % interface_mac)
         else:
             return 1
 
         status, mac = get_output(GET_MAC % name, logger)
-        logger.info("the interace %s's mac from ip link is address: '%s'" % \
-                   (name, mac))
+        logger.info("the interace %s's mac from ip link is address: '%s'" %
+                    (name, mac))
 
         if not status:
             if interface_mac == mac:

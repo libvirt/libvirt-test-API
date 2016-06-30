@@ -14,6 +14,7 @@ from utils import utils
 required_params = ('guestname', 'filepath',)
 optional_params = {}
 
+
 def get_guest_ipaddr(*args):
     """Get guest ip address"""
     (guestname, logger) = args
@@ -31,6 +32,7 @@ def get_guest_ipaddr(*args):
         logger.error("Error: can't ping current guest")
         return None
 
+
 def check_guest_status(*args):
     """Check guest current status"""
     (domobj, logger) = args
@@ -42,6 +44,7 @@ def check_guest_status(*args):
         return False
     else:
         return True
+
 
 def check_guest_restore(*args):
     """Check restore domain result, if restore domain is successful,
@@ -56,6 +59,7 @@ def check_guest_restore(*args):
             return False
     else:
         return False
+
 
 def restore(params):
     """Save domain to a disk file"""
@@ -78,8 +82,8 @@ def restore(params):
         else:
             logger.error("Error: fail to check restore domain")
             return 1
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         logger.error("Error: fail to restore %s domain" % guestname)
         return 1

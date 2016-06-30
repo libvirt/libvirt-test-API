@@ -37,6 +37,7 @@ from urlparse import urlparse
 
 subproc_flag = 0
 
+
 def get_hypervisor():
     if commands.getoutput("lsmod | grep kvm"):
         return 'kvm'
@@ -44,6 +45,7 @@ def get_hypervisor():
         return 'xen'
     else:
         return 'no any hypervisor is running.'
+
 
 def get_uri(ip):
     """Get hypervisor uri"""
@@ -60,6 +62,7 @@ def get_uri(ip):
             uri = "qemu+ssh://%s/system" % ip
     return uri
 
+
 def request_credentials(credentials, user_data):
     for credential in credentials:
         if credential[0] == libvirt.VIR_CRED_AUTHNAME:
@@ -74,28 +77,34 @@ def request_credentials(credentials, user_data):
 
     return 0
 
+
 def get_conn(uri='', username='', password=''):
     """ get connection object from libvirt module
     """
     user_data = [username, password]
-    auth = [[libvirt.VIR_CRED_AUTHNAME, libvirt.VIR_CRED_PASSPHRASE], request_credentials, user_data]
+    auth = [[libvirt.VIR_CRED_AUTHNAME, libvirt.VIR_CRED_PASSPHRASE],
+            request_credentials, user_data]
     conn = libvirt.openAuth(uri, auth, 0)
     return conn
+
 
 def parse_uri(uri):
     # This is a simple parser for uri
     return urlparse(uri)
+
 
 def get_host_arch():
     ret = commands.getoutput('uname -a')
     arch = ret.split(" ")[-2]
     return arch
 
+
 def get_local_hostname():
     """ get local host name """
     return socket.gethostname()
 
-def get_libvirt_version(ver = ''):
+
+def get_libvirt_version(ver=''):
     ver = commands.getoutput("rpm -q libvirt|head -1")
     if ver.split('-')[0] == 'libvirt':
         return ver
@@ -103,7 +112,8 @@ def get_libvirt_version(ver = ''):
         print "Missing libvirt package!"
         sys.exit(1)
 
-def get_hypervisor_version(ver = ''):
+
+def get_hypervisor_version(ver=''):
     hypervisor = get_hypervisor()
 
     if 'kvm' in hypervisor:
@@ -123,14 +133,16 @@ def get_hypervisor_version(ver = ''):
 
     return ver
 
+
 def get_host_kernel_version():
     kernel_ver = commands.getoutput('uname -r')
     return kernel_ver
 
+
 def get_ip_address(ifname):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    return socket.inet_ntoa(fcntl.ioctl(s.fileno(),0x8915, # SIOCGIFADDR
-                            struct.pack('256s', ifname[:15]))[20:24])
+    return socket.inet_ntoa(fcntl.ioctl(s.fileno(), 0x8915,  # SIOCGIFADDR
+                                        struct.pack('256s', ifname[:15]))[20:24])
 
 
 def get_host_cpus():
@@ -145,6 +157,7 @@ def get_host_cpus():
         else:
             print "warnning:don't get system cpu number"
 
+
 def get_host_frequency():
     if not os.access("/proc/cpuinfo", os.R_OK):
         print "warning:os error"
@@ -157,6 +170,7 @@ def get_host_frequency():
             return freq
         else:
             print "warnning:don't get system cpu frequency"
+
 
 def get_host_memory():
     if not os.access("/proc/meminfo", os.R_OK):
@@ -173,31 +187,36 @@ def get_host_memory():
         else:
             print "warnning:don't get os memory"
 
+
 def get_vcpus_list():
     host_cpus = get_host_cpus()
     max_vcpus = host_cpus * 4
     vcpus_list = []
     n = 0
-    while 2**n <= max_vcpus:
-        vcpus_list.append(2**n)
+    while 2 ** n <= max_vcpus:
+        vcpus_list.append(2 ** n)
         n += 1
     return vcpus_list
+
 
 def get_memory_list():
     host_mem = get_host_memory()
     mem_list = []
     i = 10
-    while 2**i*1024 <= host_mem:
-        mem_list.append(2**i)
+    while 2 ** i * 1024 <= host_mem:
+        mem_list.append(2 ** i)
         i += 1
     return mem_list
+
 
 def get_curr_time():
     curr_time = time.strftime('%Y-%m-%d %H:%M:%S')
     return curr_time
 
+
 def get_rand_uuid():
     return file('/proc/sys/kernel/random/uuid').readline().strip()
+
 
 def get_rand_mac():
     mac = []
@@ -208,7 +227,8 @@ def get_rand_mac():
     while i < 3:
         mac.append(random.randint(0x00, 0xff))
         i += 1
-    return ':'.join(map (lambda x: "%02x" % x, mac))
+    return ':'.join(map(lambda x: "%02x" % x, mac))
+
 
 def get_dom_mac_addr(domname):
     """Get mac address of a domain
@@ -216,40 +236,43 @@ def get_dom_mac_addr(domname):
        Return mac address on SUCCESS or None on FAILURE
     """
     cmd = \
-    "virsh dumpxml " + domname \
-    + " | grep 'mac address' | awk -F'=' '{print $2}' | tr -d \"[\'/>]\""
+        "virsh dumpxml " + domname \
+        + " | grep 'mac address' | awk -F'=' '{print $2}' | tr -d \"[\'/>]\""
 
     (ret, out) = commands.getstatusoutput(cmd)
     if ret == 0:
         return out
     else:
         return None
+
 
 def get_num_vcpus(domname):
     """Get mac address of a domain
        Return mac address on SUCCESS or None on FAILURE
     """
     cmd = "virsh dumpxml " + domname + \
-    " | grep 'vcpu' | awk -F'<' '{print $2}' | awk -F'>' '{print $2}'"
+        " | grep 'vcpu' | awk -F'<' '{print $2}' | awk -F'>' '{print $2}'"
 
     (ret, out) = commands.getstatusoutput(cmd)
     if ret == 0:
         return out
     else:
         return None
+
 
 def get_size_mem(domname):
     """Get mem size of a domain
        Return mem size on SUCCESS or None on FAILURE
     """
     cmd = "virsh dumpxml " + domname + \
-    " | grep 'currentMemory'|awk -F'<' '{print $2}'|awk -F'>' '{print $2}'"
+        " | grep 'currentMemory'|awk -F'<' '{print $2}'|awk -F'>' '{print $2}'"
 
     (ret, out) = commands.getstatusoutput(cmd)
     if ret == 0:
         return out
     else:
         return None
+
 
 def get_disk_path(dom_xml):
     """Get full path of bootable disk image of domain
@@ -262,17 +285,19 @@ def get_disk_path(dom_xml):
 
     return source.attributes[attribute].value
 
+
 def get_capacity_suffix_size(capacity):
     dicts = {}
-    change_to_byte = {'K':pow(2, 10), 'M':pow(2, 20), 'G':pow(2, 30),
-                      'T':pow(2, 40)}
+    change_to_byte = {'K': pow(2, 10), 'M': pow(2, 20), 'G': pow(2, 30),
+                      'T': pow(2, 40)}
     for suffix in change_to_byte.keys():
         if capacity.endswith(suffix):
             dicts['suffix'] = suffix
             dicts['capacity'] = capacity.split(suffix)[0]
             dicts['capacity_byte'] = \
-            int(dicts['capacity']) * change_to_byte[suffix]
+                int(dicts['capacity']) * change_to_byte[suffix]
     return dicts
+
 
 def dev_num(guestname, device):
     """Get disk or interface number in the guest"""
@@ -283,6 +308,7 @@ def dev_num(guestname, device):
         return num
     else:
         return None
+
 
 def stop_selinux():
     selinux_value = commands.getoutput("getenforce")
@@ -295,24 +321,28 @@ def stop_selinux():
     else:
         return "selinux is disabled"
 
+
 def stop_firewall(ip):
     stopfire = ""
     if ip == "127.0.0.1":
         stopfire = commands.getoutput("service iptables stop")
     else:
-        stopfire = commands.getoutput("ssh %s service iptables stop") %ip
+        stopfire = commands.getoutput("ssh %s service iptables stop") % ip
     if stopfire.find("stopped"):
         print "Firewall is stopped."
     else:
         print "Failed to stop firewall"
         sys.exit(1)
 
+
 def print_section(title):
     print "\n%s" % title
     print "=" * 60
 
+
 def print_entry(key, value):
     print "%-10s %-10s" % (key, value)
+
 
 def print_xml(key, ctx, path):
     res = ctx.xpathEval(path)
@@ -323,12 +353,14 @@ def print_xml(key, ctx, path):
     print_entry(key, value)
     return value
 
+
 def print_title(info, delimiter, num):
     curr_time = get_curr_time()
-    blank = ' '*(num/2 - (len(info) + 8 + len(curr_time))/2)
+    blank = ' ' * (num / 2 - (len(info) + 8 + len(curr_time)) / 2)
     print delimiter * num
     print "%s%s\t%s" % (blank, info, curr_time)
     print delimiter * num
+
 
 def file_read(file):
     if os.path.exists(file):
@@ -339,10 +371,12 @@ def file_read(file):
     else:
         print "The FILE %s doesn't exist." % file
 
+
 def parse_xml(file, element):
     xmldoc = minidom.parse(file)
     elementlist = xmldoc.getElementsByTagName(element)
     return elementlist
+
 
 def locate_utils():
     """Get the directory path of 'utils'"""
@@ -350,7 +384,8 @@ def locate_utils():
     result = re.search('(.*)libvirt-test-API(.*)', pwd)
     return result.group(0) + "/utils"
 
-def mac_to_ip(mac, timeout, br = 'virbr0'):
+
+def mac_to_ip(mac, timeout, br='virbr0'):
     """Map mac address to ip under a specified brige
 
        Return None on FAILURE and the mac address on SUCCESS
@@ -371,6 +406,7 @@ def mac_to_ip(mac, timeout, br = 'virbr0'):
         timeout -= 10
 
     return timeout and out or None
+
 
 def do_ping(ip, timeout):
     """Ping some host
@@ -394,35 +430,44 @@ def do_ping(ip, timeout):
 
     return (timeout and 1) or 0
 
-def exec_cmd(command, sudo=False, cwd=None, infile=None, outfile=None, shell=False, data=None):
+
+def exec_cmd(
+        command,
+        sudo=False,
+        cwd=None,
+        infile=None,
+        outfile=None,
+        shell=False,
+        data=None):
     """
     Executes an external command, optionally via sudo.
     """
     if sudo:
-        if type(command) == type(""):
+        if isinstance(command, type("")):
             command = "sudo " + command
         else:
             command = ["sudo"] + command
-    if infile == None:
+    if infile is None:
         infile = subprocess.PIPE
-    if outfile == None:
+    if outfile is None:
         outfile = subprocess.PIPE
     p = subprocess.Popen(command, shell=shell, close_fds=True, cwd=cwd,
-                    stdin=infile, stdout=outfile, stderr=subprocess.PIPE)
+                         stdin=infile, stdout=outfile, stderr=subprocess.PIPE)
     (out, err) = p.communicate(data)
-    if out == None:
+    if out is None:
         # Prevent splitlines() from barfing later on
         out = ""
     return (p.returncode, out.splitlines())
+
 
 def remote_exec_pexpect(hostname, username, password, cmd):
     """ Remote exec function via pexpect """
     user_hostname = "%s@%s" % (username, hostname)
     child = pexpect.spawn("/usr/bin/ssh", [user_hostname, cmd],
-                          timeout = 60, maxread = 2000, logfile = None)
+                          timeout=60, maxread=2000, logfile=None)
     while True:
         index = child.expect(['(yes\/no)', 'password:', pexpect.EOF,
-                             pexpect.TIMEOUT])
+                              pexpect.TIMEOUT])
         if index == 0:
             child.sendline("yes")
         elif index == 1:
@@ -436,14 +481,15 @@ def remote_exec_pexpect(hostname, username, password, cmd):
 
     return 0
 
+
 def scp_file(hostname, username, password, target_path, file):
     """ Scp file to remote host """
     user_hostname = "%s@%s:%s" % (username, hostname, target_path)
     child = pexpect.spawn("/usr/bin/scp", [file, user_hostname])
     while True:
         index = child.expect(['yes\/no', 'password: ',
-                               pexpect.EOF,
-                               pexpect.TIMEOUT])
+                              pexpect.EOF,
+                              pexpect.TIMEOUT])
         if index == 0:
             child.sendline("yes")
         elif index == 1:
@@ -457,6 +503,7 @@ def scp_file(hostname, username, password, target_path, file):
 
     return 0
 
+
 def support_virt(self):
     cmd = "cat /proc/cpuinfo | egrep '(vmx|svm)'"
     if commands.getoutput(cmd) is None:
@@ -465,9 +512,11 @@ def support_virt(self):
     else:
         return True
 
+
 def subproc(a, b):
     global subproc_flag
     subproc_flag = 1
+
 
 def remote_exec(hostname, username, password, cmd):
     """Remote execution on specified host"""
@@ -476,8 +525,8 @@ def remote_exec(hostname, username, password, cmd):
     if pid == 0:
         try:
             os.execv("/usr/bin/ssh", ["/usr/bin/ssh", "-l",
-                     username, hostname, cmd])
-        except OSError, e:
+                                      username, hostname, cmd])
+        except OSError as e:
             print "OSError: " + str(e)
             return -1
     else:
@@ -485,7 +534,7 @@ def remote_exec(hostname, username, password, cmd):
         try:
             timeout = 50
             i = 0
-            while  i <= timeout:
+            while i <= timeout:
 
                 time.sleep(1)
                 str = os.read(fd, 10240)
@@ -503,14 +552,15 @@ def remote_exec(hostname, username, password, cmd):
                     print "TIMEOUT!!!!"
                     return -1
 
-                i = i+1
+                i = i + 1
 
             subproc_flag = 0
             return ret
-        except Exception, e:
+        except Exception as e:
             print e
             subproc_flag = 0
             return -1
+
 
 def get_remote_vcpus(hostname, username, password):
     """Get cpu number of specified host"""
@@ -525,6 +575,7 @@ def get_remote_vcpus(hostname, username, password):
         else:
             break
     return cpunum
+
 
 def get_remote_memory(hostname, username, password):
     """Get memory statics of specified host"""
@@ -541,6 +592,7 @@ def get_remote_memory(hostname, username, password):
             break
     return memsize
 
+
 def get_remote_kernel(hostname, username, password):
     """Get kernel info of specified host"""
     cmd = "uname -r"
@@ -555,7 +607,8 @@ def get_remote_kernel(hostname, username, password):
             continue
     return kernel
 
-def install_package(package = ''):
+
+def install_package(package=''):
     """Install specified package"""
     if package:
         cmd = "rpm -qa " + package
@@ -576,7 +629,8 @@ def install_package(package = ''):
     else:
         return "please input package name"
 
-def libvirt_version(latest_ver = ''):
+
+def libvirt_version(latest_ver=''):
     """Get libvirt version info"""
     query_virt_ver = 'rpm -qa|grep libvirt'
     ret = commands.getoutput(query_virt_ver)
@@ -594,6 +648,7 @@ def libvirt_version(latest_ver = ''):
     else:
         return (False, '')
 
+
 def create_dir(hostname, username, password):
     """Create new dir"""
     cmd = "mkdir /tmp/test"
@@ -610,6 +665,7 @@ def create_dir(hostname, username, password):
     else:
         print "mkdir_ret = ", mkdir_ret
         return 1
+
 
 def write_file(hostname, username, password):
     """Simple test for writting file on specified host"""
@@ -630,6 +686,7 @@ def write_file(hostname, username, password):
         print "write_file_ret = ", write_file_ret
         return 1
 
+
 def run_mount_app(hostname, username, password,
                   target_mount, mount_point):
     """Simple test for mount operation on specified host"""
@@ -646,6 +703,7 @@ def run_mount_app(hostname, username, password,
     else:
         print "mount fail"
         return 1
+
 
 def format_parammap(paramlist, map_test, length):
     """paramlist contains numbers which can be divided by '-', '^' and
@@ -675,7 +733,7 @@ def format_parammap(paramlist, map_test, length):
                 return False
 
             for i in range(length):
-                if i in range(int(param[0]), int(param[1])+1):
+                if i in range(int(param[0]), int(param[1]) + 1):
                     parammap += (True,)
                 else:
                     parammap += (map_test[i],)
@@ -688,9 +746,10 @@ def format_parammap(paramlist, map_test, length):
                     parammap += (map_test[i],)
 
         return parammap
-    except ValueError, e:
+    except ValueError as e:
         print "ValueError: " + str(e)
         return False
+
 
 def param_to_tuple(paramlist, length):
     """paramlist contains numbers which can be divided by '-', '^' and
@@ -718,6 +777,7 @@ def param_to_tuple(paramlist, length):
         else:
             return False
 
+
 def digest(path, offset, length):
     """read data from file with length bytes, begin at offset
        and return md5 hexdigest
@@ -741,6 +801,7 @@ def digest(path, offset, length):
     f.close()
     return m.hexdigest()
 
+
 def run_wget_app(hostname, username, password, file_url, logger):
     """Simple test for wget app on specified host"""
     cmd_line = "wget -P /tmp %s -o /tmp/wget.log" % (file_url)
@@ -763,6 +824,7 @@ def run_wget_app(hostname, username, password, file_url, logger):
             logger.info("check_retrun: %s" % (check_ret))
             return 1
 
+
 def validate_remote_nic_type(hostname, username,
                              password, nic_type, logger):
     """Validate network interface type on specified host"""
@@ -770,9 +832,9 @@ def validate_remote_nic_type(hostname, username,
                              '82540EM Gigabit Ethernet Controller',
                              'rtl8139':
                              'RTL-8139/8139C/8139C+',
-                             'virtio':'Virtio network device'}
-    nic_type_to_driver_dict = {'e1000':'e1000', 'rtl8139':'8139cp',
-                              'virtio':'virtio_net'}
+                             'virtio': 'Virtio network device'}
+    nic_type_to_driver_dict = {'e1000': 'e1000', 'rtl8139': '8139cp',
+                               'virtio': 'virtio_net'}
     nic_name = nic_type_to_name_dict[nic_type]
     nic_driver = nic_type_to_driver_dict[nic_type]
     logger.info("nic_name = %s" % (nic_name))
@@ -812,8 +874,8 @@ def validate_remote_nic_type(hostname, username,
                 logger.info("now try to grep other nic type \
                           in lsmod output: %s" % key)
                 other_driver_cmd = """echo '%s' | grep '%s'""" % \
-                               (lsmod_cmd_ret,
-                                nic_type_to_driver_dict[key])
+                    (lsmod_cmd_ret,
+                     nic_type_to_driver_dict[key])
                 ret1, out1 = commands.getstatusoutput(other_driver_cmd)
                 if ret1 == 0:
                     logger.info("unspecified nic driver is seen \
@@ -822,7 +884,7 @@ def validate_remote_nic_type(hostname, username,
 
             logger.info("lspci ouput about nic is: \n %s; \n \
                         lsmod output about nic is \n %s \n" %
-                        (output1,output2))
+                        (output1, output2))
             return 0
         else:
             logger.info("lspci and lsmod and grep fail")
@@ -831,18 +893,19 @@ def validate_remote_nic_type(hostname, username,
         logger.info("lspci and lsmod return nothing")
         return 1
 
+
 def validate_remote_blk_type(hostname, username, password,
                              blk_type, logger):
     """Validate block device type on specified host"""
-    blk_type_to_name_dict = {'ide':'Intel Corporation 82371SB PIIX3 IDE',
-                             'virtio':'Virtio block device'}
-    blk_type_to_driver_dict = {'ide':'unknow', 'virtio':'virtio_blk'}
+    blk_type_to_name_dict = {'ide': 'Intel Corporation 82371SB PIIX3 IDE',
+                             'virtio': 'Virtio block device'}
+    blk_type_to_driver_dict = {'ide': 'unknow', 'virtio': 'virtio_blk'}
     lspci_cmd = "lspci"
     lsmod_cmd = "lsmod"
     ret, lspci_cmd_ret = remote_exec_pexpect(hostname, username,
                                              password, lspci_cmd)
     ret, lsmod_cmd_ret = remote_exec_pexpect(hostname, username,
-                                            password, lsmod_cmd)
+                                             password, lsmod_cmd)
     logger.info("------------")
     logger.info("lspci_cmd_ret:\n %s" % (lspci_cmd_ret))
     logger.info("------------")
@@ -886,7 +949,7 @@ def validate_remote_blk_type(hostname, username, password,
                     key)
                 other_driver_cmd = """echo '%s' | grep '%s'""" % \
                                    (lsmod_cmd_ret,
-                                   blk_type_to_driver_dict[key])
+                                    blk_type_to_driver_dict[key])
                 ret1, out1 = commands.getstatusoutput(other_driver_cmd)
                 if ret1 == 0:
                     logger.info("unspecified blk driver is seen \
@@ -898,7 +961,8 @@ def validate_remote_blk_type(hostname, username, password,
         logger.info("lspci and lsmod return nothing")
         return 1
 
-def get_standard_deviation(cb1, cb2, opaque1, opaque2, number = 1000):
+
+def get_standard_deviation(cb1, cb2, opaque1, opaque2, number=1000):
     """ pass two callback functions and opaque return Standard Deviation,
         this function will be useful when need equal some quick change
         value (like memory, cputime), default loop times are 1000,
@@ -909,8 +973,9 @@ def get_standard_deviation(cb1, cb2, opaque1, opaque2, number = 1000):
         a1 = cb1(opaque1)
         b = cb2(opaque2)
         a2 = cb1(opaque1)
-        D += ((int(a1) + int(a2))/2 - int(b))**2
-    return math.sqrt(D/number)
+        D += ((int(a1) + int(a2)) / 2 - int(b)) ** 2
+    return math.sqrt(D / number)
+
 
 def param_to_tuple_nolength(paramlist):
     """paramlist contains numbers which can be divided by '-', '^' and
@@ -925,6 +990,7 @@ def param_to_tuple_nolength(paramlist):
     lengh = max(d)
 
     return param_to_tuple(paramlist, int(lengh) + 1)
+
 
 def parse_mountinfo(string):
     """a helper to parse mountinfo in /proc/self/mountinfo

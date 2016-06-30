@@ -13,6 +13,7 @@ from utils import utils
 required_params = ('guestname', 'vcpu', 'cpulist',)
 optional_params = {}
 
+
 def vcpupin_check(guestname, vcpu, cpulist):
     """check vcpu subprocess status of the running virtual machine
        grep Cpus_allowed_list /proc/PID/task/*/status
@@ -24,21 +25,22 @@ def vcpupin_check(guestname, vcpu, cpulist):
         return 1
 
     cmd_vcpu_task_id = "virsh qemu-monitor-command %s --hmp info cpus|grep '#%s'|cut -d '=' -f3"\
-                                % (guestname,vcpu)
+        % (guestname, vcpu)
     status, vcpu_task_id = utils.exec_cmd(cmd_vcpu_task_id, shell=True)
     if status:
         logger.error("failed to get the threadid of domain %s" % guestname)
         return 1
 
     logger.debug("vcpu id %s:" % vcpu_task_id[0])
-    cmd_cpus_allowed_list = "grep Cpus_allowed_list /proc/%s/task/%s/status" % (pid[0] , vcpu_task_id[0])
+    cmd_cpus_allowed_list = "grep Cpus_allowed_list /proc/%s/task/%s/status" % (pid[
+                                                                                0], vcpu_task_id[0])
     status, output = utils.exec_cmd(cmd_cpus_allowed_list, shell=True)
     if status:
         logger.error("failed to get the cpu_allowed_list of vcpu %s")
         return 1
 
     logger.debug("the output of command 'grep Cpus_allowed_list \
-                          /proc/%s/task/%s/status' is %s" % (pid[0],vcpu_task_id[0],output))
+                          /proc/%s/task/%s/status' is %s" % (pid[0], vcpu_task_id[0], output))
 
     if output[0].split('\t')[1] == cpulist:
         logger.info("vcpu process cpus allowed list is expected")
@@ -46,6 +48,7 @@ def vcpupin_check(guestname, vcpu, cpulist):
     else:
         logger.error("vcpu process cpus allowed list is not expected")
         return 1
+
 
 def vcpupin_live(params):
     """pin domain vcpu to host cpu with live flag
@@ -91,7 +94,7 @@ def vcpupin_live(params):
             logger.error("vcpus info is not expected")
             return 1
 
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("libvirt call failed: " + str(e))
         return 1
 

@@ -10,8 +10,9 @@ from libvirt import libvirtError
 from src import sharedmod
 
 required_params = ('ifacename', 'ifacetype',)
-optional_params = {'xml' : 'xmls/iface_ethernet.xml',
-                  }
+optional_params = {'xml': 'xmls/iface_ethernet.xml',
+                   }
+
 
 def check_define_interface(ifacename):
     """Check defining interface result, if define interface is successful,
@@ -46,8 +47,8 @@ def define(params):
         else:
             logger.error("fail to check define interface")
             return 1
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         logger.error("fail to define a interface from xml")
         return 1

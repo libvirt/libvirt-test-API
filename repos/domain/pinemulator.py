@@ -12,6 +12,7 @@ from utils import utils
 required_params = ('guestname', 'cpulist',)
 optional_params = {}
 
+
 def check_pinemulator(guestname, maxcpu, pininfo_after):
     """check emulator status of the running virtual machine
     """
@@ -66,19 +67,19 @@ def pinemulator(params):
         domobj = conn.lookupByName(guestname)
 
         pininfo_original = str(domobj.emulatorPinInfo())
-        logger.info("the original emulator pin of the domain is: %s" % \
+        logger.info("the original emulator pin of the domain is: %s" %
                     pininfo_original)
 
         logger.info("pin domain emulator to host cpu %s" % cpulist)
         domobj.pinEmulator(cpumap)
 
         pininfo_after = str(domobj.emulatorPinInfo())
-        logger.info("the revised emulator pin of the domain is: %s" % \
+        logger.info("the revised emulator pin of the domain is: %s" %
                     pininfo_after)
 
         ret = check_pinemulator(guestname, maxcpu, pininfo_after)
         return ret
 
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("libvirt call failed: " + str(e))
         return 1

@@ -12,6 +12,7 @@ from src import sharedmod
 required_params = ('guestname',)
 optional_params = {}
 
+
 def check_undefine_domain(guestname):
     """Check undefine domain result, if undefine domain is successful,
        guestname.xml will don't exist under /etc/libvirt/qemu/
@@ -21,6 +22,7 @@ def check_undefine_domain(guestname):
         return True
     else:
         return False
+
 
 def undefine(params):
     """Undefine a domain"""
@@ -37,8 +39,8 @@ def undefine(params):
         else:
             logger.error("fail to check domain undefine")
             return 1
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         return 1
 

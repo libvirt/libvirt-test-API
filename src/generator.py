@@ -31,8 +31,11 @@ import env_parser
 import env_inspect
 import format
 
+
 class FuncGen(object):
+
     """ To generate a callable testcase"""
+
     def __init__(self, cases_func_ref_dict,
                  cases_checkfunc_ref_dict,
                  proxy_obj,
@@ -118,7 +121,7 @@ class FuncGen(object):
             case_params = self.case_params_list[i]
             case_params['logger'] = case_logger
 
-            if self.cases_checkfunc_ref_dict.has_key(mod_case_func):
+            if mod_case_func in self.cases_checkfunc_ref_dict:
                 if self.cases_checkfunc_ref_dict[mod_case_func](case_params):
                     case_logger.info("Failed to meet testing requirement")
                     self.fmt.print_end(mod_case, 2, env_logger)
@@ -138,21 +141,27 @@ class FuncGen(object):
                     else:
                         xml_file_to_str(self.proxy_obj, mod_case, case_params)
 
-                        ret = self.cases_func_ref_dict[mod_case_func](case_params)
+                        ret = self.cases_func_ref_dict[
+                            mod_case_func](case_params)
                         # In the case where testcase return -1 on error
-                        if ret < 0: ret = 1
+                        if ret < 0:
+                            ret = 1
 
                         if clean_flag:
                             clean_func = mod_case_func + '_clean'
-                            self.fmt.print_string(12*" " + "Cleaning...", env_logger)
+                            self.fmt.print_string(
+                                12 * " " + "Cleaning...", env_logger)
                             # the return value of clean function is optional
-                            clean_ret = self.cases_func_ref_dict[clean_func](case_params)
+                            clean_ret = self.cases_func_ref_dict[
+                                clean_func](case_params)
                             if clean_ret and clean_ret == 1:
-                                self.fmt.print_string(21*" " + "Fail", env_logger)
+                                self.fmt.print_string(
+                                    21 * " " + "Fail", env_logger)
                                 continue
 
-                            self.fmt.print_string(21*" " + "Done", env_logger)
-                except Exception, e:
+                            self.fmt.print_string(
+                                21 * " " + "Done", env_logger)
+                except Exception as e:
                     case_logger.error(traceback.format_exc())
                     continue
             finally:
@@ -171,8 +180,8 @@ class FuncGen(object):
         end_time = time.strftime("%Y-%m-%d %H:%M:%S")
 
         env_logger.info("\nSummary:")
-        env_logger.info("    Total:%s [Pass:%s Fail:%s Skip:%s]" % \
-                     (casenumber, retflag[0], retflag[1], retflag[2]))
+        env_logger.info("    Total:%s [Pass:%s Fail:%s Skip:%s]" %
+                        (casenumber, retflag[0], retflag[1], retflag[2]))
 
         result = (retflag[1] and "FAIL") or "PASS"
         fcntl.lockf(self.lockfile.fileno(), fcntl.LOCK_EX)

@@ -9,19 +9,20 @@ from libvirt import libvirtError
 from src import sharedmod
 from utils import utils
 
-required_params = ('guestname','topath','dumpformat','flags',)
+required_params = ('guestname', 'topath', 'dumpformat', 'flags',)
 optional_params = {}
 
 df = {"raw": libvirt.VIR_DOMAIN_CORE_DUMP_FORMAT_RAW,
-       "zlib": libvirt.VIR_DOMAIN_CORE_DUMP_FORMAT_KDUMP_ZLIB,
-       "lzo": libvirt.VIR_DOMAIN_CORE_DUMP_FORMAT_KDUMP_LZO,
-       "snappy": libvirt.VIR_DOMAIN_CORE_DUMP_FORMAT_KDUMP_SNAPPY}
+      "zlib": libvirt.VIR_DOMAIN_CORE_DUMP_FORMAT_KDUMP_ZLIB,
+      "lzo": libvirt.VIR_DOMAIN_CORE_DUMP_FORMAT_KDUMP_LZO,
+      "snappy": libvirt.VIR_DOMAIN_CORE_DUMP_FORMAT_KDUMP_SNAPPY}
 
 fg = {"mem": libvirt.VIR_DUMP_MEMORY_ONLY,
       "reset": libvirt.VIR_DUMP_RESET,
       "bypass": libvirt.VIR_DUMP_BYPASS_CACHE,
       "live": libvirt.VIR_DUMP_LIVE,
       "crash": libvirt.VIR_DUMP_CRASH}
+
 
 def check_crash_command(logger):
     """
@@ -35,7 +36,8 @@ def check_crash_command(logger):
     else:
         return True
 
-def check_dumpfile_type(topath,flags,logger):
+
+def check_dumpfile_type(topath, flags, logger):
     """
        check file type of generated file
     """
@@ -49,7 +51,7 @@ def check_dumpfile_type(topath,flags,logger):
         else:
             logger.info("Check type of %s: Fail, %s" % (topath, output[0]))
             return False
-    elif flags >=  libvirt.VIR_DUMP_MEMORY_ONLY:
+    elif flags >= libvirt.VIR_DUMP_MEMORY_ONLY:
         status, output = utils.exec_cmd(GREP2 % topath, shell=True)
         if not status:
             logger.info("Check type of %s: Pass, %s" % (topath, output[0]))
@@ -57,6 +59,7 @@ def check_dumpfile_type(topath,flags,logger):
         else:
             logger.info("Check type of %s: Fail, %s" % (topath, output[0]))
             return False
+
 
 def check_dump_file(*args):
     """
@@ -70,7 +73,8 @@ def check_dump_file(*args):
         logger.info("Check core dump file %s: Fail" % core_file_path)
         return False
 
-def compare_compress_type(topath,dumpformat,logger):
+
+def compare_compress_type(topath, dumpformat, logger):
     """
        check the compress type of file
     """
@@ -79,40 +83,42 @@ def compare_compress_type(topath,dumpformat,logger):
     if not status:
         temp1 = output[0].strip()[:-1].split("_")[-1]
         if temp1 == dumpformat:
-            logger.info("Check compress type %s of %s: Pass" %(temp1,topath))
+            logger.info("Check compress type %s of %s: Pass" % (temp1, topath))
             return True
         else:
-            logger.info("Check compress type %s of %s: Fail, %s" \
-%(temp1,topath,dumpformat))
+            logger.info("Check compress type %s of %s: Fail, %s"
+                        % (temp1, topath, dumpformat))
             return False
     else:
         logger.error("Can not get compress type from given file %s" % topath)
         return False
 
-def check_domain_state(vmstate,flags,logger):
+
+def check_domain_state(vmstate, flags, logger):
     """
        check domain state after doing coredump
     """
-    if libvirt.VIR_DUMP_CRASH  == libvirt.VIR_DUMP_CRASH&flags:
-        if vmstate == [libvirt.VIR_DOMAIN_SHUTOFF,\
-                libvirt.VIR_DOMAIN_SHUTOFF_CRASHED]:
-            logger.info("domain status is %s,shut off (crashed): Pass" \
-% vmstate)
+    if libvirt.VIR_DUMP_CRASH == libvirt.VIR_DUMP_CRASH & flags:
+        if vmstate == [libvirt.VIR_DOMAIN_SHUTOFF,
+                       libvirt.VIR_DOMAIN_SHUTOFF_CRASHED]:
+            logger.info("domain status is %s,shut off (crashed): Pass"
+                        % vmstate)
             return True
         else:
             logger.info("domain status is %s: Fail" % vmstate)
             return False
     else:
-        if vmstate == [libvirt.VIR_DOMAIN_RUNNING,\
-                libvirt.VIR_DOMAIN_RUNNING_UNPAUSED]:
-            logger.info("domain status is %s,running (unpaused): Pass" \
-% vmstate)
+        if vmstate == [libvirt.VIR_DOMAIN_RUNNING,
+                       libvirt.VIR_DOMAIN_RUNNING_UNPAUSED]:
+            logger.info("domain status is %s,running (unpaused): Pass"
+                        % vmstate)
             return True
         else:
             logger.info("domain status is %s: Fail" % vmstate)
             return False
 
-def get_fileflags(topath,logger):
+
+def get_fileflags(topath, logger):
     """
        Get the file flags of coredump file
     """
@@ -132,7 +138,8 @@ def get_fileflags(topath,logger):
 
     thread.exit_thread()
 
-def check_fileflag(fileflags,logger):
+
+def check_fileflag(fileflags, logger):
     """
       Check the file flags of file if include O_DIRECT
     """
@@ -142,6 +149,7 @@ def check_fileflag(fileflags,logger):
     else:
         logger.error("File flags doesn't include O_DIRECT: Fail")
         return False
+
 
 def coredump_with_format(params):
     """
@@ -190,41 +198,42 @@ def coredump_with_format(params):
         conn = sharedmod.libvirtobj['conn']
 
         if conn.lookupByName(domain_name):
-           dom = conn.lookupByName(domain_name)
+            dom = conn.lookupByName(domain_name)
         else:
-           logger.error("Domain %s is not exist" % domain_name)
-           return 1
+            logger.error("Domain %s is not exist" % domain_name)
+            return 1
         if not dom.isActive():
-           logger.error("Domain %s is not running" % domain_name)
-           return 1
+            logger.error("Domain %s is not running" % domain_name)
+            return 1
         logger.info("The given path is %s" % topath)
-        if bypass_f == True:
-            thread.start_new_thread(get_fileflags,(topath,logger,))
+        if bypass_f:
+            thread.start_new_thread(get_fileflags, (topath, logger,))
         logger.info("Call the coreDumpWithFormat API")
-        if dom.coreDumpWithFormat(topath,dumpformat,flags) == 0:
+        if dom.coreDumpWithFormat(topath, dumpformat, flags) == 0:
 
-            if not check_dump_file(topath,logger):
+            if not check_dump_file(topath, logger):
                 return 1
             if Udumpformat == "RAW":
-                 if not check_dumpfile_type(topath,flags,logger):
-                     return 1
+                if not check_dumpfile_type(topath, flags, logger):
+                    return 1
             else:
                 if not check_crash_command(logger):
                     return 1
-                if not compare_compress_type(topath,Udumpformat,logger):
+                if not compare_compress_type(topath, Udumpformat, logger):
                     return 1
             vmstate = dom.state()
-            if not check_domain_state(vmstate,flags,logger):
+            if not check_domain_state(vmstate, flags, logger):
                 return 1
-            if bypass_f == True:
-                if not check_fileflag(fileflags,logger):
+            if bypass_f:
+                if not check_fileflag(fileflags, logger):
                     return 1
 
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("API error message: %s" % e.message)
         return 1
 
     return 0
+
 
 def coredump_with_format_clean(params):
     """clean testing environment"""

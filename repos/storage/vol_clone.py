@@ -12,6 +12,7 @@ from src import sharedmod
 required_params = ('poolname', 'volname', 'clonevolname',)
 optional_params = {}
 
+
 def prepare_clone_xml(xmlstr, volname):
     """prepare clone xmldesc by replace name element
        with clone souce volume xml
@@ -29,6 +30,7 @@ def prepare_clone_xml(xmlstr, volname):
     newxmlstr = doc.toxml()
 
     return newxmlstr
+
 
 def vol_clone(params):
     """volume clone testing"""
@@ -74,7 +76,7 @@ def vol_clone(params):
             logger.error("clone failed")
             return 1
 
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("libvirt call failed: " + str(e))
         return 1
 

@@ -10,8 +10,9 @@ from src import sharedmod
 from utils import utils
 
 required_params = ('sourcepath',)
-optional_params = {'xml' : 'xmls/logical_pool.xml',
-                  }
+optional_params = {'xml': 'xmls/logical_pool.xml',
+                   }
+
 
 def check_pool_sources(xmlstr):
     """check the logical sources with command:
@@ -52,6 +53,7 @@ def check_pool_sources(xmlstr):
         logger.error("source dict did not match with pvs command output")
         return 1
 
+
 def find_logical_pool_sources(params):
     """Find logical type storage pool sources from xml"""
     global logger
@@ -75,7 +77,7 @@ def find_logical_pool_sources(params):
         else:
             logger.info("pool sources check succeed")
 
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("libvirt call failed: " + str(e))
         return 1
 

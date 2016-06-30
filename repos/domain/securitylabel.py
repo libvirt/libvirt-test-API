@@ -10,6 +10,7 @@ from utils import utils
 required_params = ('guestname',)
 optional_params = {}
 
+
 def check_qemu_conf(logger):
     """
        If security_driver is not equal to "selinux", report an error
@@ -24,6 +25,7 @@ def check_qemu_conf(logger):
         else:
             logger.error("Not a default setting in qemu.conf")
             return False
+
 
 def get_security_policy(logger):
     """
@@ -46,7 +48,8 @@ def get_security_policy(logger):
         return False
     return sevalue
 
-def get_pid(name,logger):
+
+def get_pid(name, logger):
     """
        get process id of specified domain.
     """
@@ -61,11 +64,12 @@ def get_pid(name,logger):
         return False
     return output[0]
 
-def get_pid_context(domain,logger):
+
+def get_pid_context(domain, logger):
     """
        return context of domain's pid
     """
-    pid = get_pid(domain,logger)
+    pid = get_pid(domain, logger)
     CONTEXT = "ls -nZd /proc/%s"
     status, output = utils.exec_cmd(CONTEXT % pid, shell=True)
     if not status:
@@ -74,13 +78,14 @@ def get_pid_context(domain,logger):
         logger.error("\"" + CONTEXT + "\"" + "error")
         logger.error(output)
         return False
-    return pid,output[0]
+    return pid, output[0]
 
-def check_selinux_label(api,domain,logger):
+
+def check_selinux_label(api, domain, logger):
     """
        check vaules in selinux mode
     """
-    pid,context = get_pid_context(domain,logger)
+    pid, context = get_pid_context(domain, logger)
     logger.debug("The context of %d is %s" % (int(pid), context))
     get_enforce = get_security_policy(logger)
     if api[0] in context:
@@ -91,24 +96,25 @@ def check_selinux_label(api,domain,logger):
             logger.debug("Fail: '%s'" % api[1])
             return False
     else:
-         logger.debug("Fail: '%s'" % api[0])
-         return False
+        logger.debug("Fail: '%s'" % api[0])
+        return False
 
-def check_DAC_label(api,domain,logger):
+
+def check_DAC_label(api, domain, logger):
     """
        check vaules in DAC mode
     """
     tmp = []
-    pid,context = get_pid_context(domain,logger)
+    pid, context = get_pid_context(domain, logger)
     logger.debug("The context of %d is %s" % (int(pid), context))
-    #enforcing is always false in DAC mode
+    # enforcing is always false in DAC mode
     for item in api:
-         tmp.append(item)
+        tmp.append(item)
     get_enforce = False
-    tmp1 = tmp[0].strip().replace("+","")
+    tmp1 = tmp[0].strip().replace("+", "")
     tmp[0] = tmp1.split(':')
     tmp1 = context.split()
-    context = str(tmp1.pop(1) +" "+ tmp1.pop(1)).split()
+    context = str(tmp1.pop(1) + " " + tmp1.pop(1)).split()
     if tmp[0] == context:
         if tmp[1] == get_enforce:
             logger.debug("PASS: '%s'" % api)
@@ -117,8 +123,9 @@ def check_DAC_label(api,domain,logger):
             logger.debug("Fail: '%s'" % api[1])
             return False
     else:
-         logger.debug("Fail: '%s'" % api[0])
-         return False
+        logger.debug("Fail: '%s'" % api[0])
+        return False
+
 
 def securitylabel(params):
     """
@@ -127,18 +134,18 @@ def securitylabel(params):
     logger = params['logger']
     domain_name = params['guestname']
     if not check_qemu_conf(logger):
-       return 1
+        return 1
     try:
         conn = sharedmod.libvirtobj['conn']
 
         if conn.lookupByName(domain_name):
-           dom = conn.lookupByName(domain_name)
+            dom = conn.lookupByName(domain_name)
         else:
-           logger.error("Domain %s is not exist" % domain_name)
-           return 1
+            logger.error("Domain %s is not exist" % domain_name)
+            return 1
         if not dom.isActive():
-           logger.error("Domain %s is not running" % domain_name)
-           return 1
+            logger.error("Domain %s is not running" % domain_name)
+            return 1
 
         first_label_api = dom.securityLabel()
         logger.info("The first lable is %s" % first_label_api)
@@ -163,7 +170,7 @@ def securitylabel(params):
             logger.error("FAIL, %s" % all_label_api[1])
             return 1
 
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("API error message: %s" % e.message)
         return 1
 

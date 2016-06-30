@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-#To test "virsh net-uuid" command and related APIs
-#To test 2 APIs in this case:
+# To test "virsh net-uuid" command and related APIs
+# To test 2 APIs in this case:
 #      networkLookupByUUIDString
 #      networkLookupByUUID
 
@@ -22,6 +22,7 @@ optional_params = {}
 VIRSH_NETUUID = "virsh net-uuid"
 NWPATH = "/etc/libvirt/qemu/networks/"
 
+
 def check_network_exists(conn, networkname, logger):
     """ check if the network exists, may or may not be active """
     network_names = conn.listNetworks()
@@ -33,25 +34,28 @@ def check_network_exists(conn, networkname, logger):
     else:
         return True
 
+
 def check_network_uuid(networkname, UUIDString, logger):
     """ check UUID String of a network """
-    status, ret = commands.getstatusoutput(VIRSH_NETUUID + ' %s' \
-% networkname)
+    status, ret = commands.getstatusoutput(VIRSH_NETUUID + ' %s'
+                                           % networkname)
     if status:
-        logger.error("executing "+ "\"" +  VIRSH_NETUUID + ' %s' % networkname\
- + "\"" + " failed")
+        logger.error("executing " + "\"" + VIRSH_NETUUID + ' %s' % networkname
+                     + "\"" + " failed")
         logger.error(ret)
         return False
     else:
         UUIDString_virsh = ret[:-1]
         logger.debug("UUIDString from API is %s" % UUIDString)
-        logger.debug("UUIDString from " + "\"" + VIRSH_NETUUID + "\"" " is %s"\
- % UUIDString_virsh)
+        logger.debug("UUIDString from " + "\"" + VIRSH_NETUUID + "\"" " is %s"
+                     % UUIDString_virsh)
         if UUIDString_virsh == UUIDString:
             return True
         else:
             return False
-def checking_uuid(logger,nwname,nwuuid):
+
+
+def checking_uuid(logger, nwname, nwuuid):
     """ compare two UUIDs, one is from API, another is from network XML"""
     global NWPATH
     NWPATH = NWPATH + nwname + ".xml"
@@ -61,7 +65,8 @@ def checking_uuid(logger,nwname,nwuuid):
     if uuid == nwuuid:
         return True
     else:
-       return False
+        return False
+
 
 def network_uuid(params):
     """ 1.call appropriate API to generate the UUIDStirng
@@ -86,30 +91,31 @@ def network_uuid(params):
     try:
         UUIDString = netobj.UUIDString()
 
-        #For a transient network, set another path
+        # For a transient network, set another path
         if not netobj.isPersistent() == 1:
-           NWPATH = "/var/run/libvirt/network/"
+            NWPATH = "/var/run/libvirt/network/"
 
-        logger.info("the UUID string of network \"%s\" is \"%s\""\
- % (networkname, UUIDString))
-        #allowing '-' and ' ' anywhere between character pairs, just
-        #check one of them.
-        UUIDString1 = UUIDString.replace("-"," ")
+        logger.info("the UUID string of network \"%s\" is \"%s\""
+                    % (networkname, UUIDString))
+        # allowing '-' and ' ' anywhere between character pairs, just
+        # check one of them.
+        UUIDString1 = UUIDString.replace("-", " ")
         network1 = conn.networkLookupByUUIDString(UUIDString1)
         nw_name1 = network1.name()
         logger.debug("The given UUID is \"%s\", the network is \"%s\" using\
- networkLookupByUUIDString" %(UUIDString1,nw_name1))
+ networkLookupByUUIDString" % (UUIDString1, nw_name1))
 
-        UUIDString2 = UUIDString.replace("-","")
+        UUIDString2 = UUIDString.replace("-", "")
         UUID_ascii = binascii.a2b_hex(UUIDString2)
         network2 = conn.networkLookupByUUID(UUID_ascii)
         nw_name2 = network2.name()
         logger.debug("The given UUID is \"%s\", the network is \"%s\" using \
-networkLookupByUUID" %(UUIDString2,nw_name2))
+networkLookupByUUID" % (UUIDString2, nw_name2))
 
-        if nw_name1 == nw_name2 and checking_uuid(logger,nw_name1,UUIDString):
-            logger.info("Successed to get network name \"%s\" using \"%s\""\
- %(nw_name1,UUIDString))
+        if nw_name1 == nw_name2 and checking_uuid(
+                logger, nw_name1, UUIDString):
+            logger.info("Successed to get network name \"%s\" using \"%s\""
+                        % (nw_name1, UUIDString))
 
         if check_network_uuid(networkname, UUIDString, logger):
             logger.info(VIRSH_NETUUID + " test succeeded.")
@@ -117,8 +123,8 @@ networkLookupByUUID" %(UUIDString2,nw_name2))
         else:
             logger.error(VIRSH_NETUUID + " test failed.")
             return 1
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         return 1
 

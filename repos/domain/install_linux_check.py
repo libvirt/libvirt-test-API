@@ -20,6 +20,7 @@ optional_params = {}
 
 HOME_PATH = os.getcwd()
 
+
 def install_linux_check(params):
     """check guest status after installation, including network ping,
        read/write option in guest. return value: 0 - ok; 1 - bad
@@ -70,9 +71,9 @@ def install_linux_check(params):
 
     logger.info("Now checking guest health after installation")
 
-    domain_name=guestname
-    blk_type=params['hddriver']
-    nic_type=params['nicdriver']
+    domain_name = guestname
+    blk_type = params['hddriver']
+    nic_type = params['nicdriver']
     Test_Result = 0
 
     # Ping guest from host
@@ -103,11 +104,11 @@ def install_linux_check(params):
     logger.info("check point3: check cpu number in guest equals to \
                  the value set in domain config xml")
     vcpunum_expect = int(utils.get_num_vcpus(domain_name))
-    logger.info("vcpu number in domain config xml - %s is %s" % \
-                 (domain_name, vcpunum_expect))
+    logger.info("vcpu number in domain config xml - %s is %s" %
+                (domain_name, vcpunum_expect))
     vcpunum_actual = int(utils.get_remote_vcpus(ipaddr, "root", "redhat"))
     logger.info("The actual vcpu number in guest - %s is %s" %
-                 (domain_name, vcpunum_actual))
+                (domain_name, vcpunum_actual))
     if vcpunum_expect == vcpunum_actual:
         logger.info("The actual vcpu number in guest is \
                      equal to the setting your domain config xml")
@@ -122,7 +123,7 @@ def install_linux_check(params):
                  the value set in domain config xml")
     mem_expect = utils.get_size_mem(domain_name)
     logger.info("current mem size in domain config xml - %s is %s" %
-                 (domain_name, mem_expect))
+                (domain_name, mem_expect))
     mem_actual = utils.get_remote_memory(ipaddr, "root", "redhat")
     logger.info("The actual mem size in guest - %s is %s" %
                 (domain_name, mem_actual))
@@ -158,14 +159,14 @@ def install_linux_check(params):
         logger.info("check point6: check nic and blk driver in guest is \
                      expected as your config:")
         if utils.validate_remote_nic_type(ipaddr, "root", "redhat",
-           nic_type, logger) == 0 and \
+                                          nic_type, logger) == 0 and \
            utils.validate_remote_blk_type(ipaddr, "root", "redhat",
-                                        blk_type, logger) == 0:
+                                          blk_type, logger) == 0:
             logger.info("nic type - %s and blk type - %s check successfully" %
-                       (nic_type, blk_type))
+                        (nic_type, blk_type))
         else:
             logger.error("Error: nic type - %s or blk type - %s check failed" %
-                        (nic_type, blk_type))
+                         (nic_type, blk_type))
             Test_Result = 1
             return Test_Result
 

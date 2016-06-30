@@ -10,8 +10,9 @@ from src import sharedmod
 from utils import utils
 
 required_params = ('sourcehost',)
-optional_params = {'xml' : 'xmls/iscsi_pool_source.xml',
-                  }
+optional_params = {'xml': 'xmls/iscsi_pool_source.xml',
+                   }
+
 
 def check_pool_sources(host, xmlstr):
     """check the iscsi sources with command:
@@ -42,6 +43,7 @@ def check_pool_sources(host, xmlstr):
         logger.error("source list did not match with iscsiadm command output")
         return 1
 
+
 def find_iscsi_pool_sources(params):
     """Find iscsi type storage pool sources from xml"""
     global logger
@@ -65,7 +67,7 @@ def find_iscsi_pool_sources(params):
         else:
             logger.info("pool sources check succeed")
 
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("libvirt call failed: " + str(e))
         return 1
 

@@ -16,6 +16,7 @@ optional_params = {}
 
 VIRSH_DOMUUID = "virsh domuuid"
 
+
 def check_domain_exists(conn, guestname, logger):
     """ check if the domain exists, may or may not be active """
     guest_names = []
@@ -32,11 +33,19 @@ def check_domain_exists(conn, guestname, logger):
     else:
         return True
 
+
 def check_domain_uuid(guestname, UUIDString, logger):
     """ check UUID String of guest """
     status, ret = commands.getstatusoutput(VIRSH_DOMUUID + ' %s' % guestname)
     if status:
-        logger.error("executing "+ "\"" +  VIRSH_DOMUUID + ' %s' % guestname + "\"" + " failed")
+        logger.error(
+            "executing " +
+            "\"" +
+            VIRSH_DOMUUID +
+            ' %s' %
+            guestname +
+            "\"" +
+            " failed")
         logger.error(ret)
         return False
     else:
@@ -47,6 +56,7 @@ def check_domain_uuid(guestname, UUIDString, logger):
             return True
         else:
             return False
+
 
 def domain_uuid(params):
     """check virsh domuuid command
@@ -67,14 +77,16 @@ def domain_uuid(params):
         logger.info("get the UUID string of %s" % guestname)
         UUIDString = domobj.UUIDString()
         if check_domain_uuid(guestname, UUIDString, logger):
-            logger.info("UUIDString from API is the same as the one from virsh")
+            logger.info(
+                "UUIDString from API is the same as the one from virsh")
             logger.info("UUID String is %s" % UUIDString)
             return 0
         else:
-            logger.error("UUIDString from API is not the same as the one from virsh")
+            logger.error(
+                "UUIDString from API is not the same as the one from virsh")
             return 1
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         return 1
 

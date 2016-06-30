@@ -16,6 +16,7 @@ from utils import utils
 required_params = ('guestname', 'memory', 'username', 'password', )
 optional_params = {}
 
+
 def compare_memory(expect_memory, actual_memory):
     """ comparing expected memory size with actual memory size """
 
@@ -23,10 +24,11 @@ def compare_memory(expect_memory, actual_memory):
     logger.info("actual memory size is %s" % actual_memory)
     diff = int(expect_memory) - int(actual_memory)
 
-    if math.fabs(diff)/expect_memory < 0.05:
+    if math.fabs(diff) / expect_memory < 0.05:
         return 0
     else:
         return 1
+
 
 def get_current_memory(guestname, username, password):
     """get domain current memory inside domain
@@ -38,6 +40,7 @@ def get_current_memory(guestname, username, password):
     current = utils.get_remote_memory(ip, username, password)
 
     return current
+
 
 def set_memory_live(params):
     """set domain memory with live flag and check
@@ -79,7 +82,7 @@ def set_memory_live(params):
             logger.error("set domain memory failed")
             return 1
 
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("libvirt call failed: " + str(e))
         return 1
 

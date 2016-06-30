@@ -15,6 +15,7 @@ from utils import utils
 required_params = ('guestname', 'vcpu', 'username', 'password', )
 optional_params = {}
 
+
 def get_current_vcpu(domobj, username, password):
     """dump domain live xml description to get current vcpu number
        and check in domain to confirm
@@ -22,7 +23,7 @@ def get_current_vcpu(domobj, username, password):
     try:
         guestxml = domobj.XMLDesc(1)
         guestname = domobj.name()
-        logger.debug("domain %s xml is :\n%s" %(guestname, guestxml))
+        logger.debug("domain %s xml is :\n%s" % (guestname, guestxml))
         xml = minidom.parseString(guestxml)
         vcpu = xml.getElementsByTagName('vcpu')[0]
 
@@ -35,7 +36,7 @@ def get_current_vcpu(domobj, username, password):
 
         logger.info("domain current vcpu number in live xml is: %s" % current)
 
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("libvirt call failed: " + str(e))
         return False
 
@@ -60,6 +61,7 @@ def get_current_vcpu(domobj, username, password):
         return False
 
     return current
+
 
 def set_vcpus_live(params):
     """set domain vcpu with live flag and check
@@ -90,7 +92,7 @@ def set_vcpus_live(params):
         else:
             logger.error("vcpusFlags check failed")
             return 1
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("libvirt call failed: " + str(e))
         return 1
 

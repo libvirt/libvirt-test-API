@@ -3,15 +3,16 @@
 import os
 import exception
 
+
 def xml_file_to_str(proxy_obj, mod_case, case_params):
     """ get xml string from xml file in case_params
         return a new case_params with the string in it
     """
     optional_params = proxy_obj.get_testcase_params(mod_case)[1]
 
-    if case_params.has_key('xml'):
+    if 'xml' in case_params:
         file_name = case_params.pop('xml')
-    elif optional_params.has_key('xml'):
+    elif 'xml' in optional_params:
         file_name = optional_params['xml']
     else:
         return None
@@ -27,11 +28,13 @@ def xml_file_to_str(proxy_obj, mod_case, case_params):
 
     text = ''
     if os.path.exists(file_path):
-        fh = open(file_path,'r')
+        fh = open(file_path, 'r')
         text = fh.read()
         fh.close()
     else:
-        raise exception.FileDoesNotExist("xml file %s doesn't exist" % file_path)
+        raise exception.FileDoesNotExist(
+            "xml file %s doesn't exist" %
+            file_path)
 
     # replace the params that in testcase.conf first
     for (key, value) in case_params.items():
@@ -49,7 +52,7 @@ def xml_file_to_str(proxy_obj, mod_case, case_params):
             continue
 
         key = key.upper()
-        if value == None:
+        if value is None:
             value = ''
 
         text = text.replace(key, str(value))

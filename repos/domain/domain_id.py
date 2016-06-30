@@ -16,14 +16,16 @@ VIRSH_DOMID = "virsh domid"
 VIRSH_IDS = "virsh --quiet list |awk '{print $1}'"
 VIRSH_DOMS = "virsh --quiet list |awk '{print $2}'"
 
+
 def get_output(logger, command):
     """execute shell command
     """
     status, ret = commands.getstatusoutput(command)
     if status:
-        logger.error("executing "+ "\"" +  command  + "\"" + " failed")
+        logger.error("executing " + "\"" + command + "\"" + " failed")
         logger.error(ret)
     return status, ret
+
 
 def check_domain_exists(conn, guestname, logger):
     """ check if the domain exists, may or may not be active """
@@ -38,6 +40,7 @@ def check_domain_exists(conn, guestname, logger):
         return False
     else:
         return True
+
 
 def domain_id(params):
     """check virsh domid command
@@ -77,7 +80,7 @@ def domain_id(params):
         return 1
 
     domname_id = {}
-    for dom  in doms_list:
+    for dom in doms_list:
         index = doms_list.index(dom)
         domname_id[dom] = ids_list[index]
 

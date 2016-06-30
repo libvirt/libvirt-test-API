@@ -10,6 +10,7 @@ from utils import utils
 required_params = ('guestname',)
 optional_params = {}
 
+
 def check_savefile_remove(*args):
     """Check if guest's managedsave file be removed """
 
@@ -20,9 +21,10 @@ def check_savefile_remove(*args):
     if status != 0:
         logger.info("No managed save file")
         return True
-    else :
+    else:
         logger.error("managed save file exits")
         return False
+
 
 def managedsave_remove(params):
     """Remove an existing managed save state file from a domain"""
@@ -42,16 +44,16 @@ def managedsave_remove(params):
 
     try:
         domobj.managedSaveRemove(0)
-        #Check if domain has managedsave image
+        # Check if domain has managedsave image
         if not domobj.hasManagedSaveImage(0) and \
            check_savefile_remove(guestname):
-            logger.info("Domain %s's managedsave image has been removed"\
-                         % guestname)
+            logger.info("Domain %s's managedsave image has been removed"
+                        % guestname)
         else:
             logger.error("Fail to remove managedsave domain")
             return 1
 
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("API error message: %s, error code is %s" % e.message)
         logger.error("Fail to managedsave %s domain" % guestname)
         return 1

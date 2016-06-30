@@ -14,6 +14,7 @@ from utils import utils
 required_params = ('guestname', 'capshares',)
 optional_params = {}
 
+
 def check_guest_status(domobj):
     """Check guest current status"""
     state = domobj.info()[0]
@@ -25,15 +26,16 @@ def check_guest_status(domobj):
     else:
         return True
 
+
 def check_sched_params(*args):
     """Check scheduler parameters validity after setting"""
     hypervisor, dicts, guestname, domobj = args
     sched_dict = {}
     if hypervisor == "xen":
         sched_dict = eval(commands.getoutput('xm sched-credit -d %s'
-                          % guestname))
+                                             % guestname))
         if sched_dict['weight'] == dicts['weight'] and \
-          sched_dict['cap'] == dicts['cap']:
+                sched_dict['cap'] == dicts['cap']:
             return 0
         else:
             return 1
@@ -43,6 +45,7 @@ def check_sched_params(*args):
             return 0
         else:
             return 1
+
 
 def sched_params(params):
     """Setting scheduler parameters, argument params is a
@@ -71,7 +74,9 @@ def sched_params(params):
                 logger.info("setting scheduler parameters: %s" % dicts)
                 domobj.setSchedulerParameters(dicts)
                 sched_params = domobj.schedulerParameters()
-                logger.info("current scheduler parameters: %s\n" % sched_params)
+                logger.info(
+                    "current scheduler parameters: %s\n" %
+                    sched_params)
 
                 retval = check_sched_params(hypervisor, dicts,
                                             guestname, domobj)

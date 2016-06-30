@@ -20,8 +20,11 @@
 import os
 from string import Template
 
+
 class Format(object):
+
     """This class is used for output kinds of format string"""
+
     def __init__(self, logname):
         self.logname = logname
 
@@ -34,15 +37,15 @@ class Format(object):
     def print_string(self, msg, env_logger):
         """Only print a simple string"""
         env_logger.info(msg)
-        self.write_log('\n%s' %msg)
+        self.write_log('\n%s' % msg)
 
     def print_start(self, msg, env_logger):
         """When test case starting,this function is called"""
         console = "    %s" % msg
-        num = (128 - len(msg))/2 - 2
+        num = (128 - len(msg)) / 2 - 2
         tpl = Template("\n$sep   $str  $sep\n")
-        msgs = tpl.substitute(sep = '-'*num, str = msg)
-        if os.environ.has_key('AUTODIR'):
+        msgs = tpl.substitute(sep='-' * num, str=msg)
+        if 'AUTODIR' in os.environ:
             env_logger.info(msg)
         else:
             env_logger.info(console)
@@ -63,10 +66,10 @@ class Format(object):
 
         console = "            Result: %s\n" % console_result
         msg = msg + ' ' + result
-        num = (128 - len(msg))/2 - 2
+        num = (128 - len(msg)) / 2 - 2
         tpl = Template("$sep   $str  $sep")
-        msgs = tpl.substitute(sep = '-'*num, str = msg)
-        if os.environ.has_key('AUTODIR'):
+        msgs = tpl.substitute(sep='-' * num, str=msg)
+        if 'AUTODIR' in os.environ:
             env_logger.info(result)
         else:
             print console

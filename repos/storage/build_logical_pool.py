@@ -13,12 +13,14 @@ from src import sharedmod
 required_params = ('poolname',)
 optional_params = {}
 
+
 def display_pool_info(conn):
     """Display current storage pool information"""
-    logger.debug("current define storage pool: %s" \
-% conn.listDefinedStoragePools())
-    logger.debug("current active storage pool: %s" \
-% conn.listStoragePools())
+    logger.debug("current define storage pool: %s"
+                 % conn.listDefinedStoragePools())
+    logger.debug("current active storage pool: %s"
+                 % conn.listStoragePools())
+
 
 def display_physical_volume():
     """Display volume group and physical volume information"""
@@ -35,6 +37,7 @@ def display_physical_volume():
         logger.debug(ret2)
     else:
         logger.error("fail to execute pvdisplay command")
+
 
 def check_build_pool(poolname):
     """Check build storage pool result, poolname will exist under
@@ -54,6 +57,7 @@ def check_build_pool(poolname):
     else:
         logger.debug("%s file don't exist" % path)
         return False
+
 
 def build_logical_pool(params):
     """Build a storage pool"""
@@ -81,8 +85,8 @@ def build_logical_pool(params):
         else:
             logger.error("fail to build %s storage pool" % poolname)
             return 1
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         return 1
 

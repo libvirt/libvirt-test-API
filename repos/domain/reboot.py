@@ -14,6 +14,7 @@ from utils import utils
 required_params = ('guestname',)
 optional_params = {}
 
+
 def reboot(params):
     """Reboot virtual machine
        Return 0 on SUCCESS or 1 on FAILURE
@@ -46,8 +47,8 @@ def reboot(params):
     # Reboot domain
     try:
         domobj = reboot(0)
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         logger.error("fail to reboot domain")
         return 1

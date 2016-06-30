@@ -13,11 +13,12 @@ from src import sharedmod
 from utils import utils
 
 required_params = ('guestname',)
-optional_params = {'snapshotname' : '',
-                   'xml' : 'xmls/snapshot.xml',
-                  }
+optional_params = {'snapshotname': '',
+                   'xml': 'xmls/snapshot.xml',
+                   }
 
 QEMU_IMAGE_FORMAT = "qemu-img info %s |grep format |awk -F': ' '{print $2}'"
+
 
 def check_domain_image(domobj, guestname, logger):
     """ensure that the state of guest is poweroff
@@ -27,7 +28,13 @@ def check_domain_image(domobj, guestname, logger):
     disk_path = utils.get_disk_path(dom_xml)
     status, ret = commands.getstatusoutput(QEMU_IMAGE_FORMAT % disk_path)
     if status:
-        logger.error("executing "+ "\"" + QEMU_IMAGE_FORMAT % guestname + "\"" + " failed")
+        logger.error(
+            "executing " +
+            "\"" +
+            QEMU_IMAGE_FORMAT %
+            guestname +
+            "\"" +
+            " failed")
         logger.error(ret)
         return False
     else:
@@ -36,9 +43,10 @@ def check_domain_image(domobj, guestname, logger):
             return True
         else:
             logger.error("%s has a disk %s with type %s, \
-                          only qcow2 supports internal snapshot" % \
-                          (guestname, disk_path, format))
+                          only qcow2 supports internal snapshot" %
+                         (guestname, disk_path, format))
             return False
+
 
 def internal_create(params):
     """ create an internal snapshot for a given guest,
@@ -49,7 +57,7 @@ def internal_create(params):
     guestname = params['guestname']
     xmlstr = params['xml']
 
-    if not params.has_key('snapshotname'):
+    if 'snapshotname' not in params:
         xmlstr = xmlstr.replace('SNAPSHOTNAME', str(int(time.time())))
 
     conn = sharedmod.libvirtobj['conn']
@@ -71,8 +79,8 @@ def internal_create(params):
         logger.info("create a snapshot for %s" % guestname)
         domobj.snapshotCreateXML(xmlstr, 0)
         logger.info("creating snapshot succeeded")
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         return 1
 

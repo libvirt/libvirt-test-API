@@ -17,16 +17,17 @@ required_params = ('guestname',
                    'imageformat',
                    'hddriver',)
 optional_params = {'imagesize': 1,
-                   'diskpath' : '/var/lib/libvirt/images/attacheddisk',
-                   'xml' : 'xmls/disk.xml',
-                  }
+                   'diskpath': '/var/lib/libvirt/images/attacheddisk',
+                   'xml': 'xmls/disk.xml',
+                   }
+
 
 def create_image(diskpath, seeksize, imageformat, logger):
     """Create a image file"""
     disk_create = "qemu-img create -f %s %s %sG" % \
-                    (imageformat, diskpath, seeksize)
-    logger.debug("the command line of creating disk images is '%s'" % \
-                   disk_create)
+        (imageformat, diskpath, seeksize)
+    logger.debug("the command line of creating disk images is '%s'" %
+                 disk_create)
 
     (status, message) = commands.getstatusoutput(disk_create)
     if status != 0:
@@ -35,12 +36,14 @@ def create_image(diskpath, seeksize, imageformat, logger):
 
     return 0
 
+
 def check_attach_disk(num1, num2):
     """Check attach disk result via simple disk number comparison """
     if num2 > num1:
         return True
     else:
         return False
+
 
 def attach_disk(params):
     """Attach a disk to domain from xml"""
@@ -69,24 +72,23 @@ def attach_disk(params):
     elif hddriver == 'scsi':
         xmlstr = xmlstr.replace('DEV', 'sdb')
 
-
     logger.debug("disk xml:\n%s" % xmlstr)
 
     disk_num1 = utils.dev_num(guestname, "disk")
-    logger.debug("original disk number: %s" %disk_num1)
+    logger.debug("original disk number: %s" % disk_num1)
 
     # Attach disk to domain
     try:
         domobj.attachDevice(xmlstr)
         disk_num2 = utils.dev_num(guestname, "disk")
-        logger.debug("update disk number to %s" %disk_num2)
-        if  check_attach_disk(disk_num1, disk_num2):
-            logger.info("current disk number: %s\n" %disk_num2)
+        logger.debug("update disk number to %s" % disk_num2)
+        if check_attach_disk(disk_num1, disk_num2):
+            logger.info("current disk number: %s\n" % disk_num2)
         else:
-            logger.error("fail to attach a disk to guest: %s\n" %disk_num2)
+            logger.error("fail to attach a disk to guest: %s\n" % disk_num2)
             return 1
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         logger.error("attach %s disk to guest %s" % (diskpath, guestname))
         return 1

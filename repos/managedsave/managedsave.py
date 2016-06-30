@@ -14,6 +14,7 @@ from utils import utils
 required_params = ('guestname', 'flags',)
 optional_params = {}
 
+
 def check_guest_status(*args):
     """Check guest current status"""
     (domobj, logger) = args
@@ -27,6 +28,7 @@ def check_guest_status(*args):
     else:
         return True
 
+
 def check_savefile_create(*args):
     """Check guest's managed save file be created"""
 
@@ -37,27 +39,29 @@ def check_savefile_create(*args):
     if status != 0:
         logger.error("No managed save file")
         return False
-    else :
+    else:
         logger.info("managed save file exists")
         return True
 
+
 def get_fileflags():
     """Get the file flags of managed save file"""
-    cmds = "cat /proc/$(lsof -w /var/lib/libvirt/qemu/save/"+guestname+".save"\
-    "|awk '/libvirt_i/{print $2}')/fdinfo/1|grep flags|awk '{print $NF}'"
+    cmds = "cat /proc/$(lsof -w /var/lib/libvirt/qemu/save/" + guestname + ".save"\
+        "|awk '/libvirt_i/{print $2}')/fdinfo/1|grep flags|awk '{print $NF}'"
     global fileflags
     while True:
         (status, output) = utils.exec_cmd(cmds, shell=True)
         if status == 0:
-	    if len(output) == 1:
-	        logger.info("The flags of saved file %s " % output[0])
+            if len(output) == 1:
+                logger.info("The flags of saved file %s " % output[0])
                 fileflags = output[0][-5]
-		break
+                break
         else:
             logger.error("Fail to get the flags of saved file")
             return 1
 
     thread.exit_thread()
+
 
 def check_fileflag(fileflags):
     """Check the file flags of managed save file if include O_DIRECT"""
@@ -68,6 +72,7 @@ def check_fileflag(fileflags):
         logger.error("file flags doesn't include O_DIRECT")
         return False
 
+
 def managedsave(params):
     """Managed save a running domain"""
 
@@ -75,14 +80,14 @@ def managedsave(params):
     logger = params['logger']
     global guestname
     guestname = params['guestname']
-    flags = params ['flags']
+    flags = params['flags']
     global fileflags
     fileflags = ''
-    #Save given flags to sharedmod.data
+    # Save given flags to sharedmod.data
     sharedmod.data['flagsave'] = flags
 
     logger.info("The given flags are %s " % flags)
-    if not '|' in flags:
+    if '|' not in flags:
         flagn = int(flags)
     else:
         # bitwise-OR of flags of managedsave
@@ -109,13 +114,13 @@ def managedsave(params):
         elif flagn == 2:
             logger.info("managedsave %s domain --running" % guestname)
         elif flagn == 3:
-            logger.info("managedsave %s domain --running --bypass-cache"\
-                         % guestname)
+            logger.info("managedsave %s domain --running --bypass-cache"
+                        % guestname)
         elif flagn == 4:
             logger.info("managedsave %s domain --paused" % guestname)
         elif flagn == 5:
-            logger.info("managedsave %s domain --paused --bypass-cache"\
-                         % guestname)
+            logger.info("managedsave %s domain --paused --bypass-cache"
+                        % guestname)
         elif flagn == 6:
             logger.error("--running and --paused are mutually exclusive")
             return 1
@@ -126,12 +131,12 @@ def managedsave(params):
             logger.error("Wrong flags be given and fail to managedsave domain")
             return 1
 
-        #If given flags include bypass-cache,check if bypass file system cache
+        # If given flags include bypass-cache,check if bypass file system cache
         if flagn % 2 == 1:
             logger.info("Given flags include --bypass-cache")
-            thread.start_new_thread(get_fileflags,())
+            thread.start_new_thread(get_fileflags, ())
 
-	    # Guarantee get_fileflags shell has run before managed save
+            # Guarantee get_fileflags shell has run before managed save
             time.sleep(5)
             domobj.managedSave(flagn)
 
@@ -143,17 +148,17 @@ def managedsave(params):
         else:
             domobj.managedSave(flagn)
 
-        #Check if domain has managedsave image
-        if  domobj.hasManagedSaveImage(0) and \
-            domobj.info()[0]==libvirt.VIR_DOMAIN_SHUTOFF and \
-            check_savefile_create(guestname):
+        # Check if domain has managedsave image
+        if (domobj.hasManagedSaveImage(0) and
+                domobj.info()[0] == libvirt.VIR_DOMAIN_SHUTOFF and
+                check_savefile_create(guestname)):
             logger.info("Domain %s managedsave successfully " % guestname)
         else:
             logger.error("Fail to managedsave domain")
             return 1
 
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % e.message)
         logger.error("Fail to managedsave %s domain" % guestname)
         return 1

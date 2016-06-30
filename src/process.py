@@ -22,7 +22,9 @@ import sys
 import time
 import errno
 
+
 class Process:
+
     def __init__(self, list):
         self.procs = list
         self.pids = []

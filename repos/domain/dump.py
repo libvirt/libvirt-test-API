@@ -16,6 +16,7 @@ from utils import utils
 required_params = ('guestname', 'file',)
 optional_params = {}
 
+
 def check_guest_status(*args):
     """Check guest current status"""
     (guestname, domobj, logger) = args
@@ -30,27 +31,29 @@ def check_guest_status(*args):
     else:
         return True
 
+
 def check_guest_kernel(*args):
     """Check guest kernel version"""
     (guestname, logger) = args
 
     mac = utils.get_dom_mac_addr(guestname)
-    logger.debug("guest mac address: %s" %mac)
+    logger.debug("guest mac address: %s" % mac)
 
     ipaddr = utils.mac_to_ip(mac, 15)
-    if ipaddr == None:
+    if ipaddr is None:
         logger.error("can't get guest ip")
         return None
 
-    logger.debug("guest ip address: %s" %ipaddr)
+    logger.debug("guest ip address: %s" % ipaddr)
 
     kernel = utils.get_remote_kernel(ipaddr, "root", "redhat")
-    logger.debug("current kernel version: %s" %kernel)
+    logger.debug("current kernel version: %s" % kernel)
 
     if kernel:
         return kernel
     else:
         return None
+
 
 def check_dump(*args):
     """Check dumpping core file validity"""
@@ -60,13 +63,13 @@ def check_dump(*args):
     (big, other) = kernel.split("-")
     small = other.split(".")
     arch = small[-1]
-    pkgs  = ["kernel-debuginfo-%s" % (kernel),
-             "kernel-debuginfo-common-%s-%s" % (arch, kernel)]
+    pkgs = ["kernel-debuginfo-%s" % (kernel),
+            "kernel-debuginfo-common-%s-%s" % (arch, kernel)]
 
     req_pkgs = ""
     for pkg in pkgs:
         req_pkgs = req_pkgs + pkg + ".rpm "
-        status, output = commands.getstatusoutput("rpm -q %s" %pkg)
+        status, output = commands.getstatusoutput("rpm -q %s" % pkg)
         down = "wget \
                 http://download.devel.redhat.com/brewroot/packages/kernel\
                 /%s/%s.%s/%s/%s.rpm" % (big, small[0], small[1], arch, pkg)
@@ -74,33 +77,33 @@ def check_dump(*args):
             logger.info("Please waiting for some time,downloading...")
             stat, ret = commands.getstatusoutput(down)
             if stat != 0:
-                logger.error("download failed: %s" %ret)
+                logger.error("download failed: %s" % ret)
             else:
                 logger.info(ret)
         else:
             logger.debug(output)
 
-    st, res = commands.getstatusoutput("rpm -ivh %s" % req_pkgs )
+    st, res = commands.getstatusoutput("rpm -ivh %s" % req_pkgs)
     if st != 0:
         logger.error("fail to install %s" % req_pkgs)
     else:
         logger.info(res)
 
-
     if file:
         cmd = "crash /usr/lib/debug/lib/modules/%s/vmlinux %s" % \
               (kernel, file)
-        logger.info("crash cmd line: %s" %cmd)
+        logger.info("crash cmd line: %s" % cmd)
         status, output = commands.getstatusoutput(cmd)
         if status == 0:
-            logger.info("crash executes result: %d" %status)
+            logger.info("crash executes result: %d" % status)
             return 0
         else:
-            logger.info("screen output information: %s" %output)
+            logger.info("screen output information: %s" % output)
             return 1
     else:
         logger.debug("file argument is required")
         return 1
+
 
 def check_dump1(*args):
     """check whether core dump file is generated"""
@@ -110,8 +113,9 @@ def check_dump1(*args):
         return 0
     else:
         logger.info("core dump file path: %s is NOT existing!!!" %
-                     core_file_path)
+                    core_file_path)
         return 1
+
 
 def dump(params):
     """This method will dump the core of a domain on a given file
@@ -127,28 +131,29 @@ def dump(params):
 
     if check_guest_status(guestname, domobj, logger):
         kernel = check_guest_kernel(guestname, logger)
-        if kernel == None:
+        if kernel is None:
             logger.error("can't get guest kernel version")
             return 1
 
-        logger.info("dump the core of %s to file %s\n" %(guestname, file))
+        logger.info("dump the core of %s to file %s\n" % (guestname, file))
 
     try:
         domobj.coreDump(file, 0)
         retval = check_dump1(file, logger)
 
         if retval == 0:
-            logger.info("check core dump: %d\n" %retval)
+            logger.info("check core dump: %d\n" % retval)
         else:
-            logger.error("check core dump: %d\n" %retval)
+            logger.error("check core dump: %d\n" % retval)
             return 1
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
-        logger.error("Error: fail to core dump %s domain" %guestname)
+        logger.error("Error: fail to core dump %s domain" % guestname)
         return 1
 
     return 0
+
 
 def dump_clean(params):
     """ clean testing environment """
@@ -157,4 +162,3 @@ def dump_clean(params):
     if os.path.exists(filepath):
         logger.info("remove dump file from core dump %s" % filepath)
         os.remove(filepath)
-

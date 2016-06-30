@@ -11,6 +11,7 @@ optional_params = {}
 
 VIRSH_HOSTNAME = "virsh hostname"
 
+
 def hostname(params):
     """check virsh hostname command
     """
@@ -20,7 +21,13 @@ def hostname(params):
     if status:
         logger.error("executing " + "\"" + VIRSH_HOSTNAME + "\"" + " failed")
         return 1
-    logger.info("the output of " + "\"" +  VIRSH_HOSTNAME + "\"" + " is %s" % virsh_ret)
+    logger.info(
+        "the output of " +
+        "\"" +
+        VIRSH_HOSTNAME +
+        "\"" +
+        " is %s" %
+        virsh_ret)
 
     status, host_ret = commands.getstatusoutput("hostname")
     if status:
@@ -28,7 +35,7 @@ def hostname(params):
         return 1
 
     if virsh_ret[:-1] != host_ret:
-        logger.error("the output of " + VIRSH_HOSTNAME + " is not right" )
+        logger.error("the output of " + VIRSH_HOSTNAME + " is not right")
         return 1
     else:
         logger.info(VIRSH_HOSTNAME + " testing succeeded")

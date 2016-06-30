@@ -15,7 +15,7 @@ def check_guest_status(domobj):
     """Check guest current status"""
     state = domobj.info()[0]
     if state == libvirt.VIR_DOMAIN_SHUTOFF or \
-        state == libvirt.VIR_DOMAIN_SHUTDOWN:
+            state == libvirt.VIR_DOMAIN_SHUTDOWN:
         # add check function
         return False
     else:
@@ -41,7 +41,7 @@ def domain_fsthaw(params):
     try:
         num = domobj.fsThaw()
         logger.info("fsThaw %s fs" % num)
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         return 1

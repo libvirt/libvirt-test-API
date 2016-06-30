@@ -14,6 +14,7 @@ optional_params = {}
 
 SNAPSHOT_DIR = "/var/lib/libvirt/qemu/snapshot"
 
+
 def check_domain_state(conn, guestname, logger):
     """ check if the domain exists and in shutdown state as well """
     guest_names = conn.listDefinedDomains()
@@ -23,6 +24,7 @@ def check_domain_state(conn, guestname, logger):
         return False
     else:
         return True
+
 
 def check_xml(guestname, snapshotname, expected_flag, logger):
     """ after deleting, check if appropriate xml file exists or not"""
@@ -70,8 +72,8 @@ def delete(params):
             return 1
         else:
             logger.info("delete snapshot %s succeeded" % snapshotname)
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         return 1
 

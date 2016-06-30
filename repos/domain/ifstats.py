@@ -16,18 +16,21 @@ from utils import utils
 required_params = ('guestname',)
 optional_params = {}
 
+
 def check_guest_status(domobj):
     """Check guest current status"""
     state = domobj.info()[0]
     if state == libvirt.VIR_DOMAIN_SHUTOFF or state == libvirt.VIR_DOMAIN_SHUTDOWN:
-    # add check function
+        # add check function
         return False
     else:
         return True
 
+
 def check_interface_stats():
     """Check interface statistic result"""
     pass
+
 
 def ifstats(params):
     """Domain interface statistic"""
@@ -43,8 +46,8 @@ def ifstats(params):
         try:
             logger.info("%s is not running , power on it" % guestname)
             domobj.create()
-        except libvirtError, e:
-            logger.error("API error message: %s, error code is %s" \
+        except libvirtError as e:
+            logger.error("API error message: %s, error code is %s"
                          % (e.message, e.get_error_code()))
             logger.error("start failed")
             return 1
@@ -66,7 +69,7 @@ def ifstats(params):
     ifstats = domobj.interfaceStats(path)
 
     if ifstats:
-    # check_interface_stats()
+        # check_interface_stats()
         logger.debug(ifstats)
         logger.info("%s rx_bytes %s" % (path, ifstats[0]))
         logger.info("%s rx_packets %s" % (path, ifstats[1]))

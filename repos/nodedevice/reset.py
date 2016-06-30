@@ -15,9 +15,11 @@ from utils import utils
 required_params = ('pciaddress',)
 optional_params = {}
 
+
 def check_node_reset():
     """Check node device reset result, I have no idea how to check it now"""
     pass
+
 
 def reset(params):
     """Reset a specific node device and return clean & certain status to it"""
@@ -50,8 +52,8 @@ def reset(params):
         nodeobj.reset()
         logger.info("reset the node device")
         logger.info("the node %s device reset is successful" % device_name)
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         logger.error("Error: fail to reset %s node device" % device_name)
         return 1

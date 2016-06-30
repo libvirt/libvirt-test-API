@@ -16,20 +16,21 @@ from utils import utils
 required_params = ('guestname', 'diskpath',)
 optional_params = {'memory': 1048576,
                    'vcpu': 1,
-                   'imageformat' : 'raw',
-                   'hddriver' : 'virtio',
+                   'imageformat': 'raw',
+                   'hddriver': 'virtio',
                    'nicdriver': 'virtio',
                    'macaddr': '52:54:00:97:e4:28',
-                   'uuid' : '05867c1a-afeb-300e-e55e-2673391ae080',
+                   'uuid': '05867c1a-afeb-300e-e55e-2673391ae080',
                    'username': None,
                    'password': None,
                    'virt_type': 'kvm',
                    'xml': 'xmls/kvm_guest_define.xml',
                    'guestarch': 'x86_64',
                    'guestmachine': 'pc',
-                  }
+                   }
 
-def check_define_domain(guestname, virt_type, hostname, username, \
+
+def check_define_domain(guestname, virt_type, hostname, username,
                         password, logger):
     """Check define domain result, if define domain is successful,
        guestname.xml will exist under /etc/libvirt/qemu/
@@ -44,8 +45,8 @@ def check_define_domain(guestname, virt_type, hostname, username, \
 
     if hostname:
         cmd = "ls %s" % path
-        ret, output = utils.remote_exec_pexpect(hostname, username, \
-                                               password, cmd)
+        ret, output = utils.remote_exec_pexpect(hostname, username,
+                                                password, cmd)
         if ret:
             logger.error("guest %s xml file doesn't exsits" % guestname)
             return False
@@ -56,6 +57,7 @@ def check_define_domain(guestname, virt_type, hostname, username, \
             return True
         else:
             return False
+
 
 def define(params):
     """Define a domain from xml"""
@@ -78,14 +80,14 @@ def define(params):
     # Define domain from xml
     try:
         conn.defineXML(xmlstr)
-        if check_define_domain(guestname, virt_type, hostname, \
+        if check_define_domain(guestname, virt_type, hostname,
                                username, password, logger):
             logger.info("define a domain form xml is successful")
         else:
             logger.error("fail to check define domain")
             return 1
-    except libvirtError, e:
-        logger.error("API error message: %s, error code is %s" \
+    except libvirtError as e:
+        logger.error("API error message: %s, error code is %s"
                      % (e.message, e.get_error_code()))
         return 1
 

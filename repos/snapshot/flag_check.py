@@ -12,10 +12,11 @@ from src import sharedmod
 from utils import utils
 
 required_params = ('guestname', 'username', 'password',)
-optional_params = {'expectedret' : ''}
+optional_params = {'expectedret': ''}
 
 FLAG_FILE = "/tmp/snapshot_flag"
 FLAG_CHECK = "ls %s" % FLAG_FILE
+
 
 def check_domain_running(conn, guestname, logger):
     """ check if the domain exists and in running state as well """
@@ -31,6 +32,7 @@ def check_domain_running(conn, guestname, logger):
     else:
         return True
 
+
 def flag_check(params):
     """ check if the flag file is present or not"""
     logger = params['logger']
@@ -38,7 +40,7 @@ def flag_check(params):
     username = params['username']
     password = params['password']
 
-    if params.has_key('expectedret'):
+    if 'expectedret' in params:
         expected_result = params['expectedret']
     else:
         expected_result = "exist"
@@ -68,7 +70,8 @@ def flag_check(params):
         logger.info("vm %s failed to get ip address" % guestname)
         return 1
 
-    ret, out = utils.remote_exec_pexpect(ipaddr, username, password, FLAG_CHECK)
+    ret, out = utils.remote_exec_pexpect(
+        ipaddr, username, password, FLAG_CHECK)
     if ret:
         logger.error("connecting to guest OS timeout")
         return 1
@@ -78,10 +81,12 @@ def flag_check(params):
     elif out == FLAG_FILE and expected_result == 'noexist':
         logger.error("flag %s still exist, FAILED." % FLAG_FILE)
         return 1
-    elif out != None and expected_result == "exist":
-        logger.error("no flag %s exists in the guest %s " % (FLAG_FILE,guestname))
+    elif out is not None and expected_result == "exist":
+        logger.error(
+            "no flag %s exists in the guest %s " %
+            (FLAG_FILE, guestname))
         return 1
-    elif out != None and expected_result == 'noexist':
+    elif out is not None and expected_result == 'noexist':
         logger.info("flag %s is not present, checking succeeded" % FLAG_FILE)
         return 0
 

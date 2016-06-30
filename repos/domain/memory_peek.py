@@ -9,13 +9,14 @@ from src import sharedmod
 required_params = ('guestname', )
 optional_params = {}
 
+
 def memory_peek(params):
     """domain memory peek
     """
     logger = params['logger']
     guestname = params['guestname']
 
-    flag_dict = {'1':"VIR_MEMORY_VIRTUAL", '2':"VIR_MEMORY_PHYSICAL"}
+    flag_dict = {'1': "VIR_MEMORY_VIRTUAL", '2': "VIR_MEMORY_PHYSICAL"}
 
     logger.info("the name of virtual machine is %s" % guestname)
 
@@ -41,7 +42,7 @@ def memory_peek(params):
             logger.info("8 bytes start with 0 with flag %s is: %s" %
                         (flag_dict[flag], mem))
 
-    except libvirtError, e:
+    except libvirtError as e:
         logger.error("libvirt call failed: " + str(e))
         return 1
 

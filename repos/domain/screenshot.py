@@ -9,12 +9,14 @@ import libvirt
 from src import sharedmod
 
 required_params = ('guestname', 'filename',)
-optional_params = {'screen' : 0}
+optional_params = {'screen': 0}
 
 last_filename = None
 
+
 def saver(stream, data, file_):
     return file_.write(data)
+
 
 def screenshot(params):
     """This method takes a screenshot of a running machine and saves
@@ -40,6 +42,7 @@ def screenshot(params):
     ret = st.finish()
 
     return ret
+
 
 def cleanup(params):
     if last_filename:
