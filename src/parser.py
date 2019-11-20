@@ -21,7 +21,6 @@ import re
 import os
 import sys
 import copy
-import string
 
 from . import exception
 from . import env_parser
@@ -55,8 +54,7 @@ class CaseFileParser(object):
     def parse_file(self, casefile):
         """ Open casefile for parsering. """
         if not os.path.exists(casefile):
-            raise exception.FileDoesNotExist(
-                "Config file: %s not found" % casefile)
+            raise exception.FileDoesNotExist("Config file: %s not found" % casefile)
         self.casefile = casefile
         with open(casefile, "r") as fh:
             self.list = self.parse(fh, self.list)
@@ -145,8 +143,7 @@ class CaseFileParser(object):
                 varname = val[1:]
                 self.debug_print("found variable %s" % varname)
                 try:
-                    value = self.env.get_value("variables", varname)
-                    value = string.strip(value)
+                    value = self.env.get_value("variables", varname).strip()
                     self.variables[varname] = value
                     if value == "":
                         self.debug_print("variable %s is empty" % varname)
@@ -358,7 +355,6 @@ class CaseFileParser(object):
             self.debug_print("the list is", list)
 
             indent = self.get_next_line_indent(fh)
-            tripped_casename = ""
             if indent < 0:
                 break
             elif indent == 0:
@@ -451,8 +447,7 @@ class CaseFileParser(object):
                     continue
 
                 if not re.match(".+:.+", tripped_casename):
-                    raise exception.CaseConfigfileError(
-                        "%s line format error!" % tripped_casename)
+                    raise exception.CaseConfigfileError("%s line format error!" % tripped_casename)
 
                 for caselist in list:
                     newdict = {}
