@@ -21,9 +21,11 @@ import re
 import os
 import sys
 import copy
+import string
 
 from . import exception
 from . import env_parser
+from ..utils import utils
 
 
 class CaseFileParser(object):
@@ -37,7 +39,9 @@ class CaseFileParser(object):
         self.missing_variables = []
         self.debug = debug
         self.casefile = casefile
-        self.env = env_parser.Envparser("global.cfg")
+        base_path = utils.get_base_path()
+        cfg_file = os.path.join(base_path, 'usr/share/libvirt-test-api/config', 'global.cfg')
+        self.env = env_parser.Envparser(cfg_file)
         self.loop_finish = False
         self.loop_start = 0
         self.loop_end = 0

@@ -22,9 +22,11 @@ import time
 import fcntl
 import sys
 import traceback
+import os
 
-from libvirttestapi.utils import log
-from libvirttestapi.utils import virtlab
+from ..utils import log
+from ..utils import utils
+from ..utils import virtlab
 
 from . import mapper
 from .testcasexml import xml_file_to_str
@@ -65,7 +67,9 @@ class FuncGen(object):
         # Save case information to a file in a format
         self.__case_info_save(activity, testrunid)
 
-        self.env = env_parser.Envparser("global.cfg")
+        base_path = utils.get_base_path()
+        cfg_file = os.path.join(base_path, 'usr/share/libvirt-test-api/config', 'global.cfg')
+        self.env = env_parser.Envparser(cfg_file)
 
         mapper_obj = mapper.Mapper(activity)
         case_list = mapper_obj.module_casename_func_map()

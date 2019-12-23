@@ -30,7 +30,7 @@ VM_STAT = "virsh --quiet list --all| grep \"\\b%s\\b\"|grep off"
 VM_DESTROY = "virsh destroy %s"
 VM_UNDEFINE = "virsh undefine %s"
 
-HOME_PATH = os.getcwd()
+HOME_PATH = utils.get_base_path()
 
 TFTPPATH = "/var/lib/tftpboot"
 
@@ -75,7 +75,7 @@ def prepare_install(default_file, logger):
     logger.info("%s" % cmd)
     ret = process.run(cmd, shell=True, ignore_status=True)
 
-    xmlpath = os.path.join(HOME_PATH, 'repos/installation/xmls/pxeboot.xml')
+    xmlpath = os.path.join(HOME_PATH, 'usr/share/libvirt-test-api/xmls/installation/pxeboot.xml')
     cmd = "virsh net-define %s" % xmlpath
     logger.info("%s" % cmd)
     ret = process.run(cmd, shell=True, ignore_status=True)

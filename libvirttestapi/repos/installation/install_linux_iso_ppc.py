@@ -41,7 +41,8 @@ optional_params = {
 BOOT_DIR = "/var/lib/libvirt/boot"
 VMLINUZ = os.path.join(BOOT_DIR, 'vmlinuz')
 INITRD = os.path.join(BOOT_DIR, 'initrd.img')
-HOME_PATH = os.getcwd()
+HOME_PATH = utils.get_base_path()
+
 
 
 def prepare_iso(isolink, cache_floder):
@@ -227,7 +228,7 @@ def install_linux_iso_ppc(params):
         xmlstr = xmlstr.replace("VIDEO", video)
 
     logger.info("get system environment information")
-    envfile = os.path.join(HOME_PATH, 'global.cfg')
+    envfile = os.path.join(HOME_PATH, 'usr/share/libvirt-test-api/config', 'global.cfg')
     logger.info("the environment file is %s" % envfile)
 
     envparser = env_parser.Envparser(envfile)
@@ -391,7 +392,8 @@ def install_linux_iso_ppc_clean(params):
     guestos = params.get('guestos')
     guestarch = params.get('guestarch')
 
-    envfile = os.path.join(HOME_PATH, 'global.cfg')
+    envfile = os.path.join(HOME_PATH, 'usr/share/libvirt-test-api/config', 'global.cfg')
+
     os_arch = guestos + "_" + guestarch
     envparser = env_parser.Envparser(envfile)
     rhelnewest = params.get('rhelnewest')

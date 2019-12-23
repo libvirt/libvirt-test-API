@@ -36,7 +36,7 @@ import lxml.etree
 import locale
 
 from xml.dom import minidom
-from libvirttestapi.src import env_parser
+from ..src import env_parser
 from . import process
 
 try:
@@ -1730,6 +1730,25 @@ def get_version():
     return release.split('.')
 
 
+def Is_Fedora():
+    cmd = "cat /etc/redhat-release"
+    ret, out = exec_cmd(cmd, shell=True)
+    if ret != 0:
+        return False
+    if out[0].startswith("Fedora"):
+        return True
+
+
+def get_fedora_dist():
+    cmd = "cat /etc/redhat-release"
+    ret, out = exec_cmd(cmd, shell=True)
+    if ret != 0:
+        logger.error("cmd: %s, out: %s" % (cmd, out))
+        return None
+    out_list = out[0].split()
+    return out_list[2]
+
+
 def isPower():
     cmd = "lscpu | grep 'Architecture:'"
     ret, out = exec_cmd(cmd, shell=True)
@@ -1748,3 +1767,12 @@ def check_qemu_package(package):
         return False
     else:
         return True
+    
+def get_base_path():
+    #fixme working on a better one
+    if os.path.isdir('/usr/share/libvirt-test-api'):
+        base_path = '/'
+    else:
+        base_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    return base_path
+

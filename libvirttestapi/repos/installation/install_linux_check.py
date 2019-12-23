@@ -11,7 +11,7 @@ from libvirttestapi.utils import utils
 required_params = ('guestname', 'virt_type', 'hddriver', 'nicdriver',)
 optional_params = {}
 
-HOME_PATH = os.getcwd()
+HOME_PATH = utils.get_base_path()
 
 
 def install_linux_check(params):

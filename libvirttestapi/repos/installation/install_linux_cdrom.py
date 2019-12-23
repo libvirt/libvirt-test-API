@@ -40,7 +40,7 @@ optional_params = {
                    'rhelalt': '',
 }
 
-HOME_PATH = os.getcwd()
+HOME_PATH = utils.get_base_path()
 
 
 # bootload file is processed due to different arch.
@@ -227,10 +227,8 @@ def prepare_cdrom(ostree, kscfg, guestname, guestos, cache_folder, logger):
 
     os.makedirs(new_dir)
     logger.info("the directory is %s" % new_dir)
-
     boot_path = os.path.join(ostree, 'images/boot.iso')
     logger.info("the url of downloading boot.iso file is %s" % boot_path)
-
     urllib.request.urlretrieve(boot_path, '%s/boot.iso' % new_dir)
     time.sleep(10)
 
@@ -356,7 +354,7 @@ def install_linux_cdrom(params):
     xmlstr = xmlstr.replace('GRAPHIC', graphic)
 
     logger.info("get system environment information")
-    envfile = os.path.join(HOME_PATH, 'global.cfg')
+    envfile = os.path.join(base_path, 'usr/share/libvirt-test-api/config', 'global.cfg')
     logger.info("the environment file is %s" % envfile)
 
     envparser = env_parser.Envparser(envfile)
@@ -484,8 +482,7 @@ def install_linux_cdrom_clean(params):
     domain_common.guest_clean(conn, guestname, logger)
     if os.path.exists(diskpath):
         os.remove(diskpath)
-
-    envfile = os.path.join(HOME_PATH, 'global.cfg')
+    envfile = os.path.join(HOME_PATH, 'usr/share/libvirt-test-api/config', 'global.cfg')
     envparser = env_parser.Envparser(envfile)
     cache_folder = envparser.get_value("variables", "domain_cache_folder")
 

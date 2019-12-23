@@ -41,7 +41,8 @@ optional_params = {'memory': 2097152,
 BOOT_DIR = "/var/lib/libvirt/boot"
 VMLINUZ = os.path.join(BOOT_DIR, 'vmlinuz')
 INITRD = os.path.join(BOOT_DIR, 'initrd.img')
-HOME_PATH = os.getcwd()
+HOME_PATH = utils.get_base_path()
+
 
 
 def get_interface(logger):
@@ -245,7 +246,7 @@ def install_linux_net_remote_ppc(params):
         xmlstr = xmlstr.replace('DEV', 'sda')
 
     logger.info("get system environment information")
-    envfile = os.path.join(HOME_PATH, 'global.cfg')
+    envfile = os.path.join(HOME_PATH, 'usr/share/libvirt-test-api/config', 'global.cfg')
     logger.info("the environment file is %s" % envfile)
 
     # Setting grahoic work

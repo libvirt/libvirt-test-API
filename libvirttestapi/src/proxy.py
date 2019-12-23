@@ -168,7 +168,7 @@ class Proxy(object):
 
     def get_call_dict(self, module, casename, func=None):
         """ Return testing function reference dictionary """
-        case_abs_path = '%s.%s.%s' % ('repos', module, casename)
+        case_abs_path = '%s.%s.%s' % ('libvirttestapi.repos', module, casename)
 
         # import tescase file
         casemod_ref = __import__(case_abs_path)

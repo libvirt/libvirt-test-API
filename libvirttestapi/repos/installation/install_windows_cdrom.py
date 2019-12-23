@@ -20,7 +20,7 @@ VM_DESTROY = "virsh destroy %s"
 VM_UNDEFINE = "virsh undefine %s"
 
 FLOOPY_IMG = "/tmp/floppy.img"
-HOME_PATH = os.getcwd()
+HOME_PATH = utils.get_base_path()
 
 required_params = ('guestname', 'guestos', 'guestarch',)
 optional_params = {'memory': 4194304,
@@ -142,7 +142,7 @@ def prepare_floppy_image(guestname, guestos, guestarch,
 
         cleanup(floppy_mount)
 
-    os.chmod(FLOOPY_IMG, 0755)
+    os.chmod(FLOOPY_IMG, 0o755)
     logger.info("Boot floppy created successfuly")
 
     return 0
@@ -288,7 +288,7 @@ def install_windows_cdrom(params):
                                     driverpath)
 
     logger.info("get system environment information")
-    envfile = os.path.join(HOME_PATH, 'global.cfg')
+    envfile = os.path.join(HOME_PATH, 'usr/share/libvirt-test-api/config', 'global.cfg')
     logger.info("the environment file is %s" % envfile)
 
     # Graphic type
@@ -461,7 +461,8 @@ def install_windows_cdrom_clean(params):
     guestos = params.get('guestos')
     guestarch = params.get('guestarch')
 
-    envfile = os.path.join(HOME_PATH, 'global.cfg')
+    envfile = os.path.join(HOME_PATH, 'usr/share/libvirt-test-api/config', 'global.cfg')
+
     envparser = env_parser.Envparser(envfile)
     iso_file = envparser.get_value("guest", guestos + '_' + guestarch)
 

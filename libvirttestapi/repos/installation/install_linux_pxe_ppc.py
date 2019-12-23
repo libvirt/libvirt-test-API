@@ -34,7 +34,7 @@ optional_params = {
                    'rhelalt': '',
                   }
 
-HOME_PATH = os.getcwd()
+HOME_PATH = utils.get_base_path()
 
 TFTPPATH = "/var/lib/tftpboot"
 
@@ -116,9 +116,9 @@ def prepare_conf_ppc(ostree, kscfg, newest, envparser):
 
 
 def prepare_network_ppc(ostree, logger):
-    xmlpath = os.path.join(HOME_PATH, 'repos/installation/xmls/pxeboot.xml')
+    xmlpath = os.path.join(HOME_PATH, 'usr/share/libvirt-test-api/xmls/installation/pxeboot.xml')
     xml_fp = open(xmlpath, 'r')
-    tmppath = os.path.join(HOME_PATH, 'repos/installation/xmls/tmp.xml')
+    tmppath = os.path.join(HOME_PATH, 'usr/share/libvirt-test-api/xmls/installation/tmp.xml')
     tmp_fp = open(tmppath, 'w')
     prodlist = ['RHEL', 'RHEL-ALT']
 
@@ -273,7 +273,7 @@ def install_linux_pxe_ppc(params):
     xmlstr = install_common.set_disk_xml(hddriver, xmlstr, diskpath, logger)
 
     logger.info("get system environment information")
-    envfile = os.path.join(HOME_PATH, 'global.cfg')
+    envfile = os.path.join(HOME_PATH, 'usr/share/libvirt-test-api/config', 'global.cfg')
     logger.info("the environment file is %s" % envfile)
 
     os_arch = guestos + "_" + guestarch

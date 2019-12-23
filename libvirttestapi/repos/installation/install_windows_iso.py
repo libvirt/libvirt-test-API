@@ -23,7 +23,7 @@ VIRTIO_WIN10_32 = "/usr/share/virtio-win/virtio-win_w10_x86.vfd"
 VIRTIO_WIN_ISO = "/usr/share/virtio-win/virtio-win.iso"
 
 WIN_UNATTENDED_IMG = "/tmp/win_unattended.img"
-HOME_PATH = os.getcwd()
+HOME_PATH = utils.get_base_path()
 
 required_params = ('guestname', 'guestos', 'guestarch',)
 optional_params = {'memory': 4194304,
@@ -78,7 +78,7 @@ def prepare_win_unattended(guestname, guestos, guestarch, envparser, hddriver, l
         cdkey = ""
 
     windows_unattended_path = os.path.join(HOME_PATH,
-                                           "repos/installation/windows_unattended")
+                                           "libvirttestapi/repos/installation/windows_unattended")
 
     if os.path.exists(WIN_UNATTENDED_IMG):
         os.remove(WIN_UNATTENDED_IMG)

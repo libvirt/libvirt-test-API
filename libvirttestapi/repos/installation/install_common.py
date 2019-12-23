@@ -16,6 +16,7 @@ brickpath = "/test-api-brick"
 imagename = "libvirt-test-api"
 
 BOOT_DIR = "/var/lib/libvirt/boot"
+HOME_PATH = utils.get_base_path()
 VMLINUZ = os.path.join(BOOT_DIR, 'vmlinuz')
 INITRD = os.path.join(BOOT_DIR, 'initrd.img')
 
@@ -101,6 +102,9 @@ def get_path_from_url(url, key):
 
 
 def get_iso_link(rhelnewest, guestos, guestarch, logger):
+    if utils.Is_Fedora():
+        isolink = 'http://10.66.128.21/Fedora-Server-dvd-x86_64-31_Beta-1.1.iso'
+    return isolink
     local_url = get_value_from_global("other", "local_url")
     remote_url = get_value_from_global("other", "remote_url")
     location = utils.get_local_hostname()
@@ -166,6 +170,11 @@ def get_version(rhelnewest):
 
 
 def get_ostree(rhelnewest, guestos, guestarch, logger):
+    if utils.Is_Fedora():
+        release = utils.get_fedora_dist()
+        arch = utils.get_host_arch()
+        ostree = 'https://mirrors.fedoraproject.org/mirrorlist?repo=fedora-%s&arch=%s' % (release,arch)
+    return ostree
     ostree = ""
     if rhelnewest is None:
         ostree = get_release_ostree(guestos, guestarch)
@@ -187,6 +196,9 @@ def get_ostree(rhelnewest, guestos, guestarch, logger):
 
 
 def get_kscfg(rhelnewest, guestos, guestarch, installmethod, logger):
+    if utils.Is_Fedora():
+        kscfg = 'http://10.66.128.21/ana-ks.cfg'
+    return kscfg
     os_arch = guestos + "_" + guestarch
     kscfg = ""
     if rhelnewest is None:
@@ -233,8 +245,7 @@ def clean_guest(guestname, logger):
 
 
 def get_value_from_global(section, option):
-    pwd = os.getcwd()
-    envfile = os.path.join(pwd, 'global.cfg')
+    envfile = os.path.join(HOME_PATH, 'usr/share/libvirt-test-api/config', 'global.cfg')
     envparser = env_parser.Envparser(envfile)
     return envparser.get_value(section, option)
 
@@ -603,6 +614,5 @@ def remove_vmlinuz_initrd(logger):
 
 
 def get_env_parser():
-    home_path = os.getcwd()
-    envfile = os.path.join(home_path, 'global.cfg')
+    envfile = os.path.join(HOME_PATH, 'usr/share/libvirt-test-api/config', 'global.cfg')
     return env_parser.Envparser(envfile)

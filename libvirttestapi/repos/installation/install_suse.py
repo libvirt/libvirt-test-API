@@ -41,7 +41,7 @@ VM_STAT = "virsh --quiet list --all| grep \"\\b%s\\b\"|grep off"
 VM_DESTROY = "virsh destroy %s"
 VM_UNDEFINE = "virsh undefine %s"
 
-HOME_PATH = os.getcwd()
+HOME_PATH = utils.get_base_path()
 
 
 def cleanup(mount, logger):
