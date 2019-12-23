@@ -1,0 +1,5 @@
+<interface type="IFACETYPE">
+  <mac address="MACADDR"/>
+  <source network="NETWORK"/>
+  <model type="NICDRIVER"/>
+</interface>

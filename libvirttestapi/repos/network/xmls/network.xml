@@ -1,0 +1,15 @@
+<network>
+  <name>NETWORKNAME</name>
+  <forward mode="NETMODE"/>
+  <bridge forwardDelay="0" name="BRIDGENAME" stp="on"/>
+  <ip address="BRIDGEIP" netmask="BRIDGENETMASK">
+    <dhcp>
+      <range start="NETSTART" end="NETEND"/>
+    </dhcp>
+  </ip>
+  <ip family="ipv6" address="NETIP6ADDR" prefix="NETIP6PREFIX" >
+    <dhcp>
+      <range start="NETIP6START" end="NETIP6END" />
+    </dhcp>
+  </ip>
+</network>

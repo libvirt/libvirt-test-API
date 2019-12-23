@@ -1,0 +1,6 @@
+<interface name="IFACENAME" type="IFACETYPE">
+  <start mode="none"/>
+  <protocol family="ipv4">
+    <dhcp peerdns="no"/>
+  </protocol>
+</interface>

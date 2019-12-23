@@ -1,0 +1,10 @@
+<pool type="iscsi">
+  <name>POOLNAME</name>
+  <source>
+    <host name="SOURCEHOST"/>
+    <device path="SOURCEPATH"/>
+  </source>
+  <target>
+    <path>TARGETPATH</path>
+  </target>
+</pool>
