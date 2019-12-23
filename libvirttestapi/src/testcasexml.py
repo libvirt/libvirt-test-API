@@ -3,7 +3,8 @@
 import os
 
 from . import exception
-
+from ..utils import log
+from ..utils import utils
 
 def xml_file_to_str(proxy_obj, mod_case, case_params):
     """ get xml string from xml file in case_params
@@ -26,7 +27,12 @@ def xml_file_to_str(proxy_obj, mod_case, case_params):
     # if it is absolute use it directly
     if not os.path.isabs(file_name):
         mod = mod_case.split(':')[0]
-        file_path = os.path.join('repos', mod, file_name)
+        file_name = os.path.basename(file_name)
+        if os.path.isdir('/usr/share/libvirt-test-api'):
+            base_path = '/'
+        else:
+            base_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        file_path = os.path.join(base_path, 'usr/share/libvirt-test-api/xmls', mod, file_name)
     else:
         file_path = file_name
 
@@ -36,7 +42,8 @@ def xml_file_to_str(proxy_obj, mod_case, case_params):
         text = fh.read()
         fh.close()
     else:
-        raise exception.FileDoesNotExist("xml file %s doesn't exist" % file_path)
+        #raise exception.FileDoesNotExist("xml file %s doesn't exist" % file_path)
+        raise exception.FileDoesNotExist("xml file %s doesn't exist" % mod)
 
     # replace the params that in testcase.conf first
     for (key, value) in list(case_params.items()):

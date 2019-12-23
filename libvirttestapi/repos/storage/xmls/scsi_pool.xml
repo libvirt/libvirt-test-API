@@ -1,9 +1,0 @@
-<pool type="scsi">
-  <name>POOLNAME</name>
-  <source>
-    <adapter name="SOURCENAME"/>
-  </source>
-  <target>
-    <path>/dev/disk/by-path</path>
-  </target>
-</pool>

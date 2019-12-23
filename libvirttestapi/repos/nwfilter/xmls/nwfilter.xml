@@ -1,3 +1,0 @@
-<filter name='NWFILTERNAME' chain='CHAIN'>
-  <rule action='ACTION' direction='DIRECTION' priority='500'/>
-</filter>

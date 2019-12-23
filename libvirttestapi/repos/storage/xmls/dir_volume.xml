@@ -1,9 +1,0 @@
-<volume>
-  <name>VOLNAME</name>
-  <capacity unit="SUFFIX">CAP</capacity>
-  <allocation>0</allocation>
-  <target>
-    <path>VOLPATH</path>
-    <format type="VOLFORMAT"/>
-  </target>
-</volume>

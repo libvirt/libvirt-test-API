@@ -1,7 +1,0 @@
-<volume type='network'>
-  <name>VOLNAME</name>
-  <source>
-  </source>
-  <capacity unit='SUFFIX'>CAPACITY</capacity>
-  <allocation unit='SUFFIX'>ALLOCATION</allocation>
-</volume>

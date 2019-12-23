@@ -1,8 +1,0 @@
-<domainsnapshot>
-  <name>SNAPSHOTNAME</name>
-  <memory snapshot='MEMORYTYPE' file='SNAPSHOTMEM'/>
-  <disk name='vda' snapshot='DISKTYPE'>
-    <source file='SNAPSHOTDISK'/>
-  </disk>
-</domainsnapshot>
-
