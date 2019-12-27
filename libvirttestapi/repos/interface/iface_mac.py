@@ -4,7 +4,7 @@ from libvirt import libvirtError
 
 from libvirttestapi.src import sharedmod
 from libvirttestapi.utils import utils
-
+import operator
 required_params = ()
 optional_params = {'ifacename': ''}
 
@@ -43,7 +43,7 @@ def check_iface_mac(iface_name, iface_mac):
         mac_string = mac_string[0]
         logger.debug("mac from cmd of interface %s is %s" %
                      (iface_name, mac_string))
-        if cmp(iface_mac, mac_string) == 0:
+        if operator.eq(iface_mac, mac_string):
             return True
         else:
             return False

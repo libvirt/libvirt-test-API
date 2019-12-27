@@ -129,7 +129,7 @@ def install_linux_iso(params):
     kscfg = install_common.get_kscfg(rhelnewest, guestos, guestarch, "iso", logger)
     isolink = install_common.get_iso_link(rhelnewest, guestos, guestarch, logger)
 
-    nfs_server = install_common.get_value_from_global("other", "nfs_server")
+    nfs_server = utils.get_value_from_global("other", "nfs_server")
     sourcehost = params.get('sourcehost', '')
     sourcepath = params.get('sourcepath', '')
     xmlstr = set_xml(sourcehost, sourcepath, xmlstr, hddriver, diskpath, kscfg, nfs_server, logger)
@@ -175,8 +175,8 @@ def install_linux_iso_clean(params):
     guestarch = params.get('guestarch')
 
     os_arch = guestos + "_" + guestarch
-    local_url = install_common.get_value_from_global("other", "local_url")
-    remote_url = install_common.get_value_from_global("other", "remote_url")
+    local_url = utils.get_value_from_global("other", "local_url")
+    remote_url = utils.get_value_from_global("other", "remote_url")
     location = utils.get_local_hostname()
     rhelnewest = params.get('rhelnewest')
     if rhelnewest is not None:
@@ -188,7 +188,7 @@ def install_linux_iso_clean(params):
                    (repo_name, guestarch))
     else:
         os_arch = guestos + "_" + guestarch
-        isolink = install_common.get_value_from_global("guest", os_arch + "_iso")
+        isolink = utils.get_value_from_global("guest", os_arch + "_iso")
         isopath = '/var/lib/libvirt/images/' + isolink.split('/')[-1]
 
     if os.path.exists(isopath):

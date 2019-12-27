@@ -9,6 +9,7 @@ import sys
 
 from libvirttestapi.src import env_parser
 from libvirttestapi.utils import utils
+from libvirttestapi.utils.utils import get_value_from_global 
 from libvirt import libvirtError
 from six.moves import urllib
 
@@ -103,7 +104,7 @@ def get_path_from_url(url, key):
 
 def get_iso_link(rhelnewest, guestos, guestarch, logger):
     if utils.Is_Fedora():
-        isolink = 'http://10.66.128.21/Fedora-Server-dvd-x86_64-31_Beta-1.1.iso'
+        isolink = get_value_from_global("guest", "%s_%s_iso" % (guestos, guestarch))
     return isolink
     local_url = get_value_from_global("other", "local_url")
     remote_url = get_value_from_global("other", "remote_url")
@@ -171,9 +172,8 @@ def get_version(rhelnewest):
 
 def get_ostree(rhelnewest, guestos, guestarch, logger):
     if utils.Is_Fedora():
-        release = utils.get_fedora_dist()
-        arch = utils.get_host_arch()
-        ostree = 'https://mirrors.fedoraproject.org/mirrorlist?repo=fedora-%s&arch=%s' % (release,arch)
+        guestos = get_value_from_global("variables", "fedoraos")
+        ostree = get_value_from_global("guest", "%s_%s" % (guestos, guestarch))
     return ostree
     ostree = ""
     if rhelnewest is None:
@@ -197,7 +197,8 @@ def get_ostree(rhelnewest, guestos, guestarch, logger):
 
 def get_kscfg(rhelnewest, guestos, guestarch, installmethod, logger):
     if utils.Is_Fedora():
-        kscfg = 'http://10.66.128.21/ana-ks.cfg'
+        guestos = get_value_from_global("variables", "fedoraos")
+        kscfg = get_value_from_global("guest", "%s_%s_http_ks" % (guestos ,guestarch))
     return kscfg
     os_arch = guestos + "_" + guestarch
     kscfg = ""
@@ -242,12 +243,6 @@ def clean_guest(guestname, logger):
         domobj = conn.lookupByName(guestname)
         domobj.undefine()
     conn.close()
-
-
-def get_value_from_global(section, option):
-    envfile = os.path.join(HOME_PATH, 'usr/share/libvirt-test-api/config', 'global.cfg')
-    envparser = env_parser.Envparser(envfile)
-    return envparser.get_value(section, option)
 
 
 def remove_all(path, logger):

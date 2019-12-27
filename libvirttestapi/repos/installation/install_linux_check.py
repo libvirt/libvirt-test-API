@@ -81,7 +81,11 @@ def install_linux_check(params):
     # Creat file and read file in guest.
     if not utils.isPower() and not utils.isRelease("8", logger):
         logger.info("check point2: creat and read dirctory/file in guest")
-        if utils.create_dir(ipaddr, "root", "redhat") == 0:
+        if utils.Is_Fedora():
+            user = "test"
+        else:
+            user = "root"
+        if utils.create_dir(ipaddr, user, "redhat") == 0:
             logger.info("create dir - /tmp/test successfully")
             if utils.write_file(ipaddr, "root", "redhat") == 0:
                 logger.info("write and read file: /tmp/test/test.log successfully")

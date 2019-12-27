@@ -22,11 +22,13 @@ def vcpupin_check(guestname, vcpu, cpulist):
     if status:
         logger.error("failed to get the pid of domain %s" % guestname)
         return 1
-
-    major, minor = utils.get_version()
-    cmd = "rpm -q qemu-kvm-rhev"
+    if utils.Is_Fedora():
+        cmd = "rpm -q qemu-kvm"
+    else:
+        major, minor = utils.get_version()
+        cmd = "rpm -q qemu-kvm-rhev"
     ret = process.run(cmd, shell=True, ignore_status=True)
-    if int(major) == 8 or (int(major) == 7 and int(minor) >= 6 and not ret.exit_status):
+    if utils.Is_Fedora() or int(major) == 8 or (int(major) == 7 and int(minor) >= 6 and not ret.exit_status):
         cmd_vcpu_task_id = ("virsh qemu-monitor-command %s --hmp info cpus|grep '#%s'|cut -d '=' -f2"
                             % (guestname, vcpu))
     else:

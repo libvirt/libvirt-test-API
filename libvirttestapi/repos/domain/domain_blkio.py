@@ -12,14 +12,17 @@ from libvirttestapi.utils.utils import get_xml_value
 from libvirttestapi.utils import utils
 
 BLKIO_PATH1 = "/cgroup/blkio/libvirt/qemu/%s"
-BLKIO_PATH2 = "/sys/fs/cgroup/blkio/machine.slice/machine-qemu\\x2d%s.scope"
-BLKIO_PATH_BASE = "/sys/fs/cgroup/blkio/machine.slice"
 BLKIO_PATH_RE = "machine-qemu.*?%s.scope"
 GET_PARTITION = "df -P %s | tail -1 | awk {'print $1'}"
 
 required_params = ('guestname', 'weight',)
 optional_params = {}
-
+if utils.Is_Fedora():
+    BLKIO_PATH_BASE = "/sys/fs/cgroup/machine.slice"
+    BLKIO_PATH2 = "/sys/fs/cgroup/machine.slice/machine-qemu\x2d1\x2d%s.scope"
+else:
+    BLKIO_PATH_BASE = "/sys/fs/cgroup/blkio/machine.slice"
+    BLKIO_PATH2 = "/sys/fs/cgroup/blkio/machine.slice/machine-qemu\\x2d%s.scope"
 
 def get_blkio_path(guestname, logger):
     logger.info("Check " + BLKIO_PATH1 % guestname)
@@ -98,7 +101,9 @@ def check_blkio_paras(blkio_path, blkio_paras, logger):
     logger.info("checking blkio parameters from cgroup")
     if 'weight' in blkio_paras:
         expected_weight = blkio_paras['weight']
-        if utils.isRelease(8, logger):
+        if utils.Is_Fedora():
+            status, output = get_output("cat %s/io.bfq.weight" % blkio_path, logger)
+        elif utils.isRelease(8, logger):
             status, output = get_output("cat %s/blkio.bfq.weight" % blkio_path, logger)
         else:
             status, output = get_output("cat %s/blkio.weight" % blkio_path, logger)
@@ -185,7 +190,7 @@ def domain_blkio(params):
             return 1
 
         # Don't support blkio device weight on RHEL 8
-        if not utils.isRelease('8', logger):
+        if not ( utils.Is_Fedora() or utils.isRelease('8', logger)):
             device_weight = "%s,%s" % (device, expected_weight)
             logger.info("set device_weight to %s" % device_weight)
             blkio_paras = {'device_weight': device_weight}

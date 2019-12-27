@@ -118,9 +118,9 @@ def install_linux_pxe(params):
 
     os_arch = guestos + "_" + guestarch
     if rhelnewest is None:
-        default_file = install_common.get_value_from_global("guest", os_arch + "_pxe_default")
+        default_file = utils.get_value_from_global("guest", os_arch + "_pxe_default")
     else:
-        release_ver_list = install_common.get_value_from_global("other", "release_ver").split()
+        release_ver_list = utils.get_value_from_global("other", "release_ver").split()
         location = utils.get_local_hostname()
         if "pek2" in location or "nay" in location:
             if "RHEL-ALT" in rhelnewest:
@@ -137,9 +137,9 @@ def install_linux_pxe(params):
             if version == release_ver:
                 release_ver_flag = 1
         if release_ver_flag:
-            default_file = install_common.get_value_from_global("guest", os_arch + "_pxe_default")
+            default_file = utils.get_value_from_global("guest", os_arch + "_pxe_default")
         else:
-            default_file = install_common.get_value_from_global("guest", "rhel%s_newest_%s_pxe_default" %
+            default_file = utils.get_value_from_global("guest", "rhel%s_newest_%s_pxe_default" %
                                                                 (version.split(".")[0], guestarch))
 
     logger.debug('default file:\n    %s' % default_file)

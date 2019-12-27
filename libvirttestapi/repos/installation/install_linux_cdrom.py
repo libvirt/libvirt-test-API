@@ -30,7 +30,7 @@ optional_params = {
                    'uuid': '7c502278-af7d-4c5a-9a35-1c79ebdd974b',
                    'type': 'define',
                    'xml': 'xmls/install_cdrom_ppc.xml',
-                   'guestmachine': 'pseries',
+                   'guestmachine': 'pc',
                    'networksource': 'default',
                    'bridgename': 'virbr0',
                    'graphic': "spice",
@@ -175,7 +175,7 @@ def mk_kickstart_iso(kscfg, guestos, logger):
             new_cfg.write(line)
 
         # use different isolinux.cfg for rhel7 ,rhel6 and rhel5 guest
-        if 'rhel7' in guestos:
+        if 'rhel7' in guestos or utils.Is_Fedora():
             # Disable new style of network interface naming on rhel7
             kernel_args = kernel_args + ' net.ifnames=0'
 
@@ -328,13 +328,14 @@ def install_linux_cdrom(params):
     hddriver = params.get('hddriver', 'virtio')
     diskpath = params.get('diskpath', '/var/lib/libvirt/images/libvirt-test-api')
     seeksize = params.get('disksize', 14)
-    imageformat = params.get('imageformat', 'raw')
+    imageformat = params.get('imageformat', 'qcow2')
     graphic = params.get('graphic', 'spice')
     video = params.get('video', 'qxl')
     installtype = params.get('type', 'define')
     rhelnewest = params.get('rhelnewest')
     rhelalt = params.get('rhelalt')
-
+    if utils.Is_Fedora():
+        guestos = utils.get_value_from_global("variables", "fedoraos")
     logger.info("guestname: %s" % guestname)
     params_info = "%s, %s, " % (guestos, guestarch)
     params_info += "%s(network), %s(disk), " % (nicdriver, hddriver)
@@ -354,7 +355,7 @@ def install_linux_cdrom(params):
     xmlstr = xmlstr.replace('GRAPHIC', graphic)
 
     logger.info("get system environment information")
-    envfile = os.path.join(base_path, 'usr/share/libvirt-test-api/config', 'global.cfg')
+    envfile = os.path.join(HOME_PATH, 'usr/share/libvirt-test-api/config', 'global.cfg')
     logger.info("the environment file is %s" % envfile)
 
     envparser = env_parser.Envparser(envfile)

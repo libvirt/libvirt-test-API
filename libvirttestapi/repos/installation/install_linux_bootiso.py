@@ -9,7 +9,7 @@ import shutil
 from libvirttestapi.src.exception import TestError
 
 from libvirttestapi.src import sharedmod
-from libvirttestapi.utils import process
+from libvirttestapi.utils import process, utils
 from libvirttestapi.repos.installation import install_common
 from six.moves import urllib
 
@@ -238,7 +238,8 @@ def install_linux_bootiso(params):
     video = params.get('video', 'qxl')
     installtype = params.get('type', 'define')
     rhelnewest = params.get('rhelnewest')
-
+    if utils.Is_Fedora():
+        guestos = utils.get_value_from_global("variables", "fedoraos")
     options = [guestname, guestos, guestarch, nicdriver, hddriver,
                imageformat, graphic, video, diskpath, seeksize, "local"]
     install_common.prepare_env(options, logger)
@@ -252,7 +253,7 @@ def install_linux_bootiso(params):
     xmlstr = install_common.set_video_xml(video, xmlstr)
     ostree = install_common.get_ostree(rhelnewest, guestos, guestarch, logger)
     kscfg = install_common.get_kscfg(rhelnewest, guestos, guestarch, "http", logger)
-    cache_folder = install_common.get_value_from_global("variables", "domain_cache_folder")
+    cache_folder = utils.get_value_from_global("variables", "domain_cache_folder")
 
     try:
         logger.info("begin to customize the custom.iso file")
@@ -288,5 +289,5 @@ def install_linux_bootiso_clean(params):
     install_common.clean_guest(guestname, logger)
     install_common.remove_all(diskpath, logger)
 
-    cache_folder = install_common.get_value_from_global("variables", "domain_cache_folder")
+    cache_folder = utils.get_value_from_global("variables", "domain_cache_folder")
     install_common.remove_all(cache_folder + '/' + guestname + "_folder", logger)

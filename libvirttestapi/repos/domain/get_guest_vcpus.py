@@ -53,8 +53,8 @@ def check_domain_running(conn, guestname, logger):
 
 
 def check_guest_vcpus(ip, info, logger):
-    username = install_common.get_value_from_global("variables", "username")
-    passwd = install_common.get_value_from_global("variables", "password")
+    username = utils.get_value_from_global("variables", "username")
+    passwd = utils.get_value_from_global("variables", "password")
     cmd = "lscpu | grep 'On-line CPU(s) list' | awk '{print $4}'"
     ret, out = utils.remote_exec_pexpect(ip, username, passwd, cmd)
     if ret:

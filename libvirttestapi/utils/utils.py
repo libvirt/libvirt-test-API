@@ -482,7 +482,9 @@ def mac_to_ips(mac, timeout, bridge='virbr0'):
 
     if timeout < 9:
         timeout = 9
-
+    if Is_Fedora():
+        cmd = "dnf install nmap -y"
+        result = process.run(cmd, shell=True, ignore_status=True)
     cmd = "nmap -sP -n %s" % bridge_ip
     while timeout > 0:
         result = process.run(cmd, shell=True, ignore_status=True)
@@ -1775,4 +1777,9 @@ def get_base_path():
     else:
         base_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     return base_path
+
+def get_value_from_global(section, option):
+    envfile = os.path.join(get_base_path(), 'usr/share/libvirt-test-api/config', 'global.cfg')
+    envparser = env_parser.Envparser(envfile)
+    return envparser.get_value(section, option)
 
