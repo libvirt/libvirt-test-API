@@ -33,7 +33,7 @@ def detach(params):
     if hypervisor == 'xen':
         pciback = 'pciback'
 
-    if utils.version_compare("libvirt-python", 3, 9, 0, logger):
+    if utils.Is_Fedora or utils.version_compare("libvirt-python", 3, 9, 0, logger):
         pciback = 'vfio-pci'
 
     if 'el5' in kernel_version:

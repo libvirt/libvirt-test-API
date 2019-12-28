@@ -68,7 +68,6 @@ def guest_import(params):
     logger.info("guest name: %s" % guestname)
     logger.info("image path: %s" % imagepath)
     logger.info("disk path: %s" % diskpath)
-
     if os.path.exists(diskpath):
         os.remove(diskpath)
     backup_img_format = utils.get_image_format(imagepath, logger)

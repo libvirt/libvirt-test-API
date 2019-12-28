@@ -1266,13 +1266,16 @@ def version_compare(package_name, major, minor, update, logger):
                   equal to the input package version
     """
     if package_name == "libvirt-python":
-        cmd = "cat /etc/redhat-release"
-        ret, out = exec_cmd(cmd, shell=True)
-        if ret != 0:
-            logger.error("cmd: %s, out: %s" % (cmd, out))
-            return False
-        if "release 8" in out[0]:
+        if Is_Fedora():
             package_name = "python3-libvirt"
+        else:
+            cmd = "cat /etc/redhat-release"
+            ret, out = exec_cmd(cmd, shell=True)
+            if ret != 0:
+                logger.error("cmd: %s, out: %s" % (cmd, out))
+                return False
+            if "release 8" in out[0]:
+                package_name = "python3-libvirt"
 
     package_ver = 0
     if package_ver == 0:

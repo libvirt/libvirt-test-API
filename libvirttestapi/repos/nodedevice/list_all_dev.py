@@ -157,7 +157,7 @@ def list_all_dev(params):
         if check_mdev(devs, logger):
             return 1
     elif "ccw" in flag:
-        if not utils.version_compare("libvirt-python", 3, 8, 0, logger):
+        if not (utils.Is_Fedora() or utils.version_compare("libvirt-python", 3, 8, 0, logger)):
             logger.info("Current libvirt-python don't support ccw dev.")
             return 0
 

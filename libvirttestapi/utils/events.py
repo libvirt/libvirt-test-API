@@ -5,7 +5,7 @@ import select
 import threading
 import libvirt
 
-from .utils import version_compare
+from .utils import version_compare, Is_Fedora
 
 
 class eventListenerThread(threading.Thread):
@@ -239,7 +239,7 @@ class virEventLoopPureThread(threading.Thread):
         self.timers = []
         self.quit = False
         self.logger = logger
-        if version_compare("libvirt-python", 3, 7, 0, logger):
+        if Is_Fedora() or version_compare("libvirt-python", 3, 7, 0, logger):
             self.cleanup = []
 
         # The event loop can be used from multiple threads at once.

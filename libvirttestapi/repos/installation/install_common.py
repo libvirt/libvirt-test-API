@@ -326,7 +326,6 @@ def create_image(diskpath, seeksize, imageformat, logger, ver='v3'):
             options = "-o compat=1.1"
             if ver.endswith('lazy_refcounts'):
                 options = options + " -o lazy_refcounts=on"
-
     cmd = "qemu-img create -f %s %s %s %sG" % (imageformat, options, diskpath, seeksize)
     logger.info("cmd: %s" % cmd)
     ret, out = utils.exec_cmd(cmd, shell=True)

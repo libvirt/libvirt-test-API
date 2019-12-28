@@ -47,7 +47,7 @@ def nfs_setup(logger):
         return 1
 
     logger.info("restart nfs service")
-    if utils.isRelease("8", logger):
+    if utils.Is_Fedora() or utils.isRelease("8", logger):
         cmd = "systemctl restart nfs-server"
     else:
         cmd = "systemctl restart nfs"
