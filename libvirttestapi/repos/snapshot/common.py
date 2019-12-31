@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 
-from libvirttestapi.utils.utils import get_disk_path, exec_cmd, version_compare, isRelease
+from libvirttestapi.utils.utils import get_disk_path, exec_cmd, version_compare, isRelease, Is_Fedora
 
 
 def check_domain_image(domobj, guestname, format_required, logger):
     """ Check the format of disk image """
     dom_xml = domobj.XMLDesc(0)
     disk_path = get_disk_path(dom_xml)
-    if isRelease("8", logger) or version_compare("qemu-kvm-rhev", 2, 10, 0, logger):
+    if Is_Fedora() or isRelease("8", logger) or version_compare("qemu-kvm-rhev", 2, 10, 0, logger):
         qemu_img_format = "qemu-img info -U %s |grep format |awk -F': ' '{print $2}'"
     else:
         qemu_img_format = "qemu-img info %s |grep format |awk -F': ' '{print $2}'"

@@ -69,7 +69,7 @@ def domain_event_any(params):
         conn.domainEventRegisterAny(domobj, event_id, eventListener.callback, random_str)
 
         event_runner_entry = event_runner.split(':')[-1]
-        event_runner = importlib.import_module('repos.' + event_runner.replace(":", "."))
+        event_runner = importlib.import_module('libvirttestapi.repos.' + event_runner.replace(":", "."))
         event_runner_params = dict(eval(str(event_runner_params)))
         event_runner_params.update({"logger": logger})
         #TODO: Multilevel param parsing instead of use eval to convert string to dict
