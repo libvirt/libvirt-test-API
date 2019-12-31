@@ -11,11 +11,17 @@ optional_params = {}
 
 
 def detach(params):
+
+    logger = params['logger']
+    vf_num = params['vf_num']
+
+    "Check if there is SR-IOV device on the test machine"
+    if not utils.check_sr_iov():
+        logger.info("There is no SR-IOV device!")
+        return 1
     """Dettach a specific node device and bind it to pci-stub driver, argument
        'params' is a dictionary type and includes 'vf_num' key
     """
-    logger = params['logger']
-    vf_num = params['vf_num']
 
     if not sriov.create_vf(vf_num, logger):
         logger.error("create vf fail.")

@@ -16,10 +16,16 @@ def check_node_reset():
 
 
 def reset(params):
-    """Reset a specific node device and return clean & certain status to it"""
+
     logger = params['logger']
     vf_num = params['vf_num']
+    
+    "Check if there is SR-IOV device on the test machine"
+    if not utils.check_sr_iov():
+        logger.info("There is no SR-IOV device!")
+        return 1
 
+    """Reset a specific node device and return clean & certain status to it"""
     if not sriov.create_vf(vf_num, logger):
         logger.error("create vf fail.")
         return 1

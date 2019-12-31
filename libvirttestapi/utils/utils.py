@@ -1786,3 +1786,11 @@ def get_value_from_global(section, option):
     envparser = env_parser.Envparser(envfile)
     return envparser.get_value(section, option)
 
+def check_sr_iov():
+    cmd = "lspci -v | grep 'Single Root I/O Virtualization'"
+    ret = process.run(cmd, shell=True, ignore_status=True)
+    if not ret.exit_status:
+        return True
+    elif ret.exit_status:
+        return False
+
