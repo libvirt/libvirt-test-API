@@ -14,7 +14,7 @@ def check_filter_list(all_filter_list, logger):
     cmd = "ebtables -t nat -L"
     ret = process.run(cmd, shell=True, ignore_status=True)
     if ret.exit_status:
-        logger.error("%s failed: %s." % (cmd, ret.stdout))
+        logger.error("%s failed: %s." % (cmd, ret.stderr))
         return False
     filter_num = 0
     for filter_list in all_filter_list:

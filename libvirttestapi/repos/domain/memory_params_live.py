@@ -33,7 +33,7 @@ def get_cgroup_setting(guestname):
     cmd = "lscgroup | grep %s | grep memory:" % (guestname_cgroup)
     ret = process.run(cmd, shell=True, ignore_status=True)
     if ret.exit_status:
-        logger.error(ret.stdout)
+        logger.error(ret.stderr)
         return 1
     else:
         mem_cgroup_path = "%s%s" % (cgroup_path, ret.stdout.replace(':', ''))
@@ -141,6 +141,6 @@ def memory_params_live_check(params):
     cmd = 'lscgroup'
     ret = process.run(cmd, shell=True, ignore_status=True)
     if ret.exit_status and 'command not found' in ret.stdout:
-        logger.error(ret.stdout)
+        logger.error(ret.stderr)
         logger.error("package libcgroup or libcgroup-tools is not installed")
         return 1

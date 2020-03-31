@@ -98,6 +98,6 @@ def get_vf_driver(vf_addr, logger):
     logger.debug("cmd: %s" % cmd)
     ret = process.run(cmd, shell=True, ignore_status=True)
     if ret.exit_status != 0:
-        logger.error("cmd result: %s" % ret.stdout)
+        logger.error("cmd result: %s" % ret.stderr)
         return 1
     return os.path.basename(ret.stdout)

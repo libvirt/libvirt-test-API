@@ -36,7 +36,7 @@ def check_network_uuid(networkname, UUIDString, logger):
     if ret.exit_status:
         logger.error("executing " + "\"" + VIRSH_NETUUID + ' %s' % networkname +
                      "\"" + " failed")
-        logger.error(ret.stdout)
+        logger.error(ret.stderr)
         return False
     else:
         UUIDString_virsh = ret.stdout

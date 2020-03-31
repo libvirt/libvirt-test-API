@@ -71,7 +71,7 @@ def check_num_virsh(num, logger, cap=""):
         cmd = "virsh nodedev-list --cap '%s' | wc -l" % cap
     ret = process.run(cmd, shell=True, ignore_status=True)
     if ret.exit_status != 0:
-        logger.error("virsh error: %s" % ret.stdout)
+        logger.error("virsh error: %s" % ret.stderr)
     vir_num = int(ret.stdout) - 1
     if num == vir_num:
         return True

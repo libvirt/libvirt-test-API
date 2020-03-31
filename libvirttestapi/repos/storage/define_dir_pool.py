@@ -72,14 +72,14 @@ def define_dir_pool_clean(params):
             ret = process.run(POOL_DESTROY % poolname, shell=True, ignore_status=True)
             if ret.exit_status:
                 logger.error("failed to destroy storage pool %s" % poolname)
-                logger.error("%s" % ret.stdout)
+                logger.error("%s" % ret.stderr)
             else:
                 ret = process.run(POOL_UNDEFINE % poolname, shell=True, ignore_status=True)
                 if ret.exit_status:
                     logger.error("failed to undefine storage pool %s" % poolname)
-                    logger.error("%s" % ret.stdout)
+                    logger.error("%s" % ret.stderr)
         else:
             ret = process.run(POOL_UNDEFINE % poolname, shell=True, ignore_status=True)
             if ret.exit_status:
                 logger.error("failed to undefine storage pool %s" % poolname)
-                logger.error("%s" % ret.stdout)
+                logger.error("%s" % ret.stderr)

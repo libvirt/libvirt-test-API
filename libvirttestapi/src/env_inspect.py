@@ -27,7 +27,7 @@ def check_libvirt(logger):
     virsh = 'virsh -v'
     result = process.run(virsh, shell=True, ignore_status=True)
     if result.exit_status:
-        logger.error(result.stdout)
+        logger.error(result.stderr)
         return 1
     else:
         logger.info("    Virsh command line tool of libvirt: %s" % result.stdout)
@@ -35,7 +35,7 @@ def check_libvirt(logger):
     libvirtd = 'libvirtd --version'
     result = process.run(libvirtd, shell=True, ignore_status=True)
     if result.exit_status:
-        logger.error(result.stdout)
+        logger.error(result.stderr)
         return 1
     else:
         logger.info("    %s" % result.stdout)
@@ -43,7 +43,7 @@ def check_libvirt(logger):
     default_uri = 'virsh uri'
     result = process.run(default_uri, shell=True, ignore_status=True)
     if result.exit_status:
-        logger.error(result.stdout)
+        logger.error(result.stderr)
         return 1
     else:
         logger.info("    Default URI: %s" % result.stdout.strip())

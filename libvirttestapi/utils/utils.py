@@ -1428,7 +1428,7 @@ def set_fusefs(logger):
     result = process.run(cmd, shell=True, ignore_status=True)
     if result.exit_status:
         logger.error("cmd failed: %s" % cmd)
-        logger.error("out: %s" % result.stdout)
+        logger.error("out: %s" % result.stderr)
         return 1
     return 0
 
@@ -1458,7 +1458,7 @@ def mount_gluster(vol_name, ip, path, logger):
     result = process.run(cmd, shell=True, ignore_status=True)
     if result.exit_status:
         logger.error("cmd failed: %s" % cmd)
-        logger.error("out: %s" % result.stdout)
+        logger.error("out: %s" % result.stderr)
         return 1
     return 0
 
@@ -1468,7 +1468,7 @@ def umount_gluster(path, logger):
     result = process.run(cmd, shell=True, ignore_status=True)
     if result.exit_status:
         logger.error("cmd failed: %s" % cmd)
-        logger.error("out: %s" % result.stdout)
+        logger.error("out: %s" % result.stderr)
         return 1
     return 0
 
@@ -1482,7 +1482,7 @@ def setup_nfs(ip, nfspath, mountpath, logger):
     result = process.run(cmd, shell=True, ignore_status=True)
     if result.exit_status:
         logger.error("cmd failed: %s" % cmd)
-        logger.error("out: %s" % result.stdout)
+        logger.error("out: %s" % result.stderr)
         return 1
     return 0
 
@@ -1492,7 +1492,7 @@ def cleanup_nfs(path, logger):
     result = process.run(cmd, shell=True, ignore_status=True)
     if result.exit_status:
         logger.error("cmd failed: %s" % cmd)
-        logger.error("out: %s" % result.stdout)
+        logger.error("out: %s" % result.stderr)
         return 1
     return 0
 
@@ -1503,7 +1503,7 @@ def iscsi_login(target, portal, logger):
     result = process.run(cmd, shell=True, ignore_status=True)
     if result.exit_status:
         logger.error("cmd failed: %s" % cmd)
-        logger.error("out: %s" % result.stdout)
+        logger.error("out: %s" % result.stderr)
     if "successful" in result.stdout:
         return True
     else:
@@ -1518,7 +1518,7 @@ def iscsi_logout(logger, target=None):
     result = process.run(cmd, shell=True, ignore_status=True)
     if result.exit_status:
         logger.error("cmd failed: %s" % cmd)
-        logger.error("out: %s" % result.stdout)
+        logger.error("out: %s" % result.stderr)
     if "successful" in result.stdout:
         return True
     else:
@@ -1530,7 +1530,7 @@ def iscsi_discover(portal, logger):
     result = process.run(cmd, shell=True, ignore_status=True)
     if result.exit_status:
         logger.error("cmd failed: %s" % cmd)
-        logger.error("out: %s" % result.stdout)
+        logger.error("out: %s" % result.stderr)
         return False
     return True
 
@@ -1561,7 +1561,7 @@ def get_device_name(target, logger):
         result = process.run(cmd, shell=True, ignore_status=True)
         if result.exit_status:
             logger.error("cmd failed: %s" % cmd)
-            logger.error("out: %s" % result.stdout)
+            logger.error("out: %s" % result.stderr)
         pattern = r"Target:\s+%s.*?disk\s(\w+)\s+\S+\srunning" % target
         device_name = re.findall(pattern, result.stdout, re.S)
         try:
@@ -1579,20 +1579,20 @@ def create_partition(device, logger):
     result = process.run(cmd, shell=True, ignore_status=True)
     if result.exit_status:
         logger.error("cmd failed: %s" % cmd)
-        logger.error("out: %s" % result.stdout)
+        logger.error("out: %s" % result.stderr)
     while timeout > 0:
         if os.path.exists(device):
             cmd = "dd if=/dev/zero of=%s bs=512 count=10000; sync" % device
             result = process.run(cmd, shell=True, ignore_status=True)
             if result.exit_status:
                 logger.error("cmd failed: %s" % cmd)
-                logger.error("out: %s" % result.stdout)
+                logger.error("out: %s" % result.stderr)
             return True
         cmd = "partprobe %s" % device
         result = process.run(cmd, shell=True, ignore_status=True)
         if result.exit_status:
             logger.error("cmd failed: %s" % cmd)
-            logger.error("out: %s" % result.stdout)
+            logger.error("out: %s" % result.stderr)
         time.sleep(1)
         timeout = timeout - 1
     return False
@@ -1603,7 +1603,7 @@ def create_fs(device, logger):
     result = process.run(cmd, shell=True, ignore_status=True)
     if result.exit_status:
         logger.error("cmd failed: %s" % cmd)
-        logger.error("out: %s" % result.stdout)
+        logger.error("out: %s" % result.stderr)
         return False
     return True
 
@@ -1613,7 +1613,7 @@ def mount_iscsi(device, mountpath, logger):
     result = process.run(cmd, shell=True, ignore_status=True)
     if result.exit_status:
         logger.error("cmd failed: %s" % cmd)
-        logger.error("out: %s" % result.stdout)
+        logger.error("out: %s" % result.stderr)
         return 1
     return 0
 
@@ -1623,7 +1623,7 @@ def umount_iscsi(mountpath, logger):
     result = process.run(cmd, shell=True, ignore_status=True)
     if result.exit_status:
         logger.error("cmd failed: %s" % cmd)
-        logger.error("out: %s" % result.stdout)
+        logger.error("out: %s" % result.stderr)
         return 1
     return 0
 

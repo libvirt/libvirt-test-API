@@ -46,7 +46,7 @@ def get_output(command, logger):
     ret = process.run(command, shell=True, ignore_status=True)
     if ret.exit_status:
         logger.error("executing " + "\"" + command + "\"" + " failed")
-        logger.error(ret.stdout)
+        logger.error(ret.stderr)
     return ret.exit_status, ret.stdout
 
 
@@ -80,7 +80,7 @@ def set_device_scheduler(dev, logger):
     cmd = "cat %s" % scheduler
     ret = process.run(cmd, shell=True, ignore_status=True)
     if ret.exit_status:
-        logger.error("check scheduler file failed: %s" % ret.stdout)
+        logger.error("check scheduler file failed: %s" % ret.stderr)
         return 1
     if "cfq" in ret.stdout:
         logger.info("set scheduler to cfq.")

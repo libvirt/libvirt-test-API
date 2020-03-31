@@ -75,7 +75,7 @@ def check_conn(params_list, logger):
     ret = process.run(cmd, shell=True, ignore_status=True)
     logger.info("out: %s" % ret.stdout)
     if ret.exit_status:
-        logger.error("%s failed." % ret.stdout)
+        logger.error("%s failed." % ret.stderr)
         test_result = False
         return 1
     out_conn = len(ret.stdout.split('\n'))

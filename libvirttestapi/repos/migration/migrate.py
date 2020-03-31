@@ -54,7 +54,7 @@ def exec_command(logger, command, flag):
     ret = process.run(command, shell=True, ignore_status=True)
     if not flag and ret.exit_status:
         logger.error("executing " + "\"" + command + "\"" + " failed")
-        logger.error(ret.stdout)
+        logger.error(ret.stderr)
     return ret.exit_status, ret.stdout
 
 

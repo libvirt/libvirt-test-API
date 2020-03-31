@@ -17,7 +17,7 @@ def get_output(logger, command):
     ret = process.run(command, shell=True, ignore_status=True)
     if ret.exit_status:
         logger.error("executing " + "\"" + command + "\"" + " failed")
-        logger.error(ret.stdout)
+        logger.error(ret.stderr)
     return ret.exit_status, ret.stdout
 
 

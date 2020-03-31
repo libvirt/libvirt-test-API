@@ -17,7 +17,7 @@ def local_nfs_exported(nfs_path, logger):
         cmd = "echo '%s *(rw,fsid=1,no_root_squash,async)\n%s *(rw,fsid=1,no_root_squash,async)' >> /etc/exports" % (dir_name, nfs_path)
         ret = process.run(cmd, shell=True, ignore_status=True)
         if ret.exit_status:
-            logger.error("%s failed: %s." % (cmd, ret.stdout))
+            logger.error("%s failed: %s." % (cmd, ret.stderr))
             return False
     else:
         logger.info("%s already set in /etc/exports." % nfs_path)
@@ -30,7 +30,7 @@ def local_nfs_exported_clean(nfs_path, logger):
     cmd = "sed '/%s/d' /etc/exports" % nfs_path
     ret = process.run(cmd, shell=True, ignore_status=True)
     if ret.exit_status:
-        logger.error("%s failed: %s." % (cmd, ret.stdout))
+        logger.error("%s failed: %s." % (cmd, ret.stderr))
         return False
     return True
 
@@ -43,13 +43,13 @@ def local_restart_service(logger):
         cmd = "systemctl restart nfs"
     ret = process.run(cmd, shell=True, ignore_status=True)
     if ret.exit_status:
-        logger.error("start nfs service failed: %s." % ret.stdout)
+        logger.error("start nfs service failed: %s." % ret.stderr)
         return False
     logger.info("Restart rpcbind server.")
     cmd = "systemctl restart rpcbind"
     ret = process.run(cmd, shell=True, ignore_status=True)
     if ret.exit_status:
-        logger.error("start rpcbind service failed: %s." % ret.stdout)
+        logger.error("start rpcbind service failed: %s." % ret.stderr)
         return False
     return True
 
@@ -72,7 +72,7 @@ def local_mount(nfs_path, mount_path, logger):
     cmd = "mount %s -t nfs %s %s" % (options, nfs_path, mount_path)
     ret = process.run(cmd, shell=True)
     if ret.exit_status:
-        logger.error("mount %s failed: %s" % (nfs_path, ret.stdout))
+        logger.error("mount %s failed: %s" % (nfs_path, ret.stderr))
         return False
     return True
 
@@ -82,7 +82,7 @@ def local_umount(mount_path, logger):
     cmd = "umount -lf %s" % mount_path
     ret = process.run(cmd, shell=True, ignore_status=True)
     if ret.exit_status:
-        logger.error("%s failed: %s." % (cmd, ret.stdout))
+        logger.error("%s failed: %s." % (cmd, ret.stderr))
         return False
     return True
 
@@ -165,7 +165,7 @@ def nfs_setup(server_ip, remote_ip, username, password, nfs_path, mount_path, lo
     cmd = "setsebool virt_use_nfs 1 -P"
     ret = process.run(cmd, shell=True, ignore_status=True)
     if ret.exit_status:
-        logger.error("%s failed: %s." % (cmd, ret.stdout))
+        logger.error("%s failed: %s." % (cmd, ret.stderr))
         return False
 
     if remote_ip is not None:

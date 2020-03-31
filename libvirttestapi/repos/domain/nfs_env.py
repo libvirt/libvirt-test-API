@@ -30,7 +30,7 @@ def nfs_env(params):
            "service libvirtd restart")
     ret = process.run(cmd, shell=True, ignore_status=True)
     if ret.exit_status:
-        logger.error("Failed to add nfs service to firewalld: %s." % ret.stdout)
+        logger.error("Failed to add nfs service to firewalld: %s." % ret.stderr)
         return 1
     if target_machine is not None:
         ret, out = utils.remote_exec_pexpect(target_machine, username, password, cmd, 120)

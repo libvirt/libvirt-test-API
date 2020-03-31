@@ -35,7 +35,7 @@ def check_domain_uuid_with_virsh(guestname, UUIDString, logger):
     ret = process.run(cmd, shell=True, ignore_status=True)
     if ret.exit_status:
         logger.error("executing " + "\"" + VIRSH_DOMUUID + ' %s' % guestname + "\"" + " failed")
-        logger.error(ret.stdout)
+        logger.error(ret.stderr)
         return False
     else:
         UUIDString_virsh = ret.stdout

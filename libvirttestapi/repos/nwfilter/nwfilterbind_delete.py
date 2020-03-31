@@ -14,7 +14,7 @@ def check_ebtables_rule(portdev, logger):
     cmd = "ebtables -t nat -L"
     ret = process.run(cmd, shell=True, ignore_status=True)
     if ret.exit_status:
-        logger.error("%s failed: %s." % (cmd, ret.stdout))
+        logger.error("%s failed: %s." % (cmd, ret.stderr))
         return False
     if portdev in ret.stdout:
         logger.error("%s still exist in ebtables rule." % portdev)

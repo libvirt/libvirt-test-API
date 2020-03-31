@@ -43,7 +43,7 @@ def get_interface(logger):
     ret = process.run(cmd, shell=True, ignore_status=True)
     logger.info("get interface: %s" % ret.stdout)
     if ret.exit_status == 1:
-        logger.error("fail to get interface. %s" % ret.stdout)
+        logger.error("fail to get interface. %s" % ret.stderr)
         return 1
 
     interface = ret.stdout.split('\n')

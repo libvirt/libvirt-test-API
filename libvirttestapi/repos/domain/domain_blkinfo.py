@@ -21,7 +21,7 @@ def get_output(command, logger):
     logger.debug("cmd: %s" % command)
     if ret.exit_status:
         logger.error("executing " + "\"" + command + "\"" + " failed")
-        logger.error(ret.stdout)
+        logger.error(ret.stderr)
     logger.debug("out: %s" % ret.stdout)
     return ret.exit_status, ret.stdout
 
