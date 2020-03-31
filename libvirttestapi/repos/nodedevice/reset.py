@@ -23,7 +23,7 @@ def reset(params):
     "Check if there is SR-IOV device on the test machine"
     if not utils.check_sr_iov():
         logger.info("There is no SR-IOV device!")
-        return 1
+        return 2
 
     """Reset a specific node device and return clean & certain status to it"""
     if not sriov.create_vf(vf_num, logger):

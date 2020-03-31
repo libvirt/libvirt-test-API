@@ -21,7 +21,7 @@ def reattach(params):
     "Check if there is SR-IOV device on the test machine"
     if not utils.check_sr_iov():
         logger.info("There is no SR-IOV device!")
-        return 1
+        return 2
 
     """Reattach a specific node device and removed it
        from pci-stub driver, argument 'params' is a dictionary type
