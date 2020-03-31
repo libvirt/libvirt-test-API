@@ -126,11 +126,11 @@ class CaseFileParser(object):
 
     def add_option_value(self, caselist, casename, option, value):
         """ Add option to the data list. """
-        dictionary = caselist[-1]
-        testkey = list(dictionary.keys())[0]
-        if casename == testkey:
-            if option not in dictionary[testkey]:
-                dictionary[testkey][option] = value
+        for dictionary in caselist:
+            testkey = list(dictionary.keys())[0]
+            if casename == testkey:
+                if option not in dictionary[testkey]:
+                    dictionary[testkey][option] = value
 
     def debug_print(self, str1, str2=""):
         """Nicely print two strings and an arrow.  For internal use."""
@@ -228,7 +228,7 @@ class CaseFileParser(object):
             value_list.append(value)
         return value_list
 
-    def option_parse(self, fh, list, casename):
+    def option_parse(self, fh, case_lists, casename):
         """ For options of a case parsing. """
         new_list = []
 
@@ -254,7 +254,7 @@ class CaseFileParser(object):
             if indent == -1:
                 break
 
-            for caselist in list:
+            for caselist in case_lists:
                 new_dict = copy.deepcopy(caselist)
                 temp_list.append(new_dict)
 
@@ -352,12 +352,12 @@ class CaseFileParser(object):
 
         return new_list
 
-    def parse(self, fh, list):
+    def parse(self, fh, case_lists):
         """ For the testcase name parsing. """
 
         tripped_casename = ''
         while True:
-            self.debug_print("the list is", list)
+            self.debug_print("the list is", case_lists)
 
             indent = self.get_next_line_indent(fh)
             if indent < 0:
@@ -371,11 +371,11 @@ class CaseFileParser(object):
                 self.debug_print("we begin to handle the case", tripped_casename)
 
                 if self.loop_finish:
-                    for i in range(len(list)):
+                    for i in range(len(case_lists)):
                         self.loop_list.append([])
 
                     i = 0
-                    for caselist in list:
+                    for caselist in case_lists:
                         for j in range(self.loop_start, self.loop_end):
                             self.loop_list[i].append(caselist.pop())
 
@@ -389,7 +389,7 @@ class CaseFileParser(object):
 
                 if len(tripped_caselist) == 2 and \
                         tripped_caselist[1] == "start_loop":
-                    for caselist in list:
+                    for caselist in case_lists:
                         newdict = {}
                         newdict[tripped_casename] = {}
                         caselist.append(newdict)
@@ -402,7 +402,7 @@ class CaseFileParser(object):
                     self.debug_print("looptimes is", looptimes)
                     self.loop_times = int(looptimes)
                     self.loop_finish = True
-                    for caselist in list:
+                    for caselist in case_lists:
                         newdict = {}
                         newdict[tripped_casename] = {}
                         caselist.append(newdict)
@@ -418,8 +418,8 @@ class CaseFileParser(object):
                          keywords_value is %s" %
                         (tripped_caselist[1], times))
 
-                    for i in range(int(times)):
-                        for caselist in list:
+                    for i in range(int(times)-1):
+                        for caselist in case_lists:
                             newdict = {}
                             newdict[tripped_casename] = {}
                             caselist.append(newdict)
@@ -427,7 +427,7 @@ class CaseFileParser(object):
                 if len(tripped_caselist) == 2 and \
                         tripped_casename == "sleep":
                     sleepsecs = tripped_caselist[1]
-                    for caselist in list:
+                    for caselist in case_lists:
                         newdict = {}
                         newdict[tripped_casename] = {'sleep': sleepsecs}
                         caselist.append(newdict)
@@ -436,7 +436,7 @@ class CaseFileParser(object):
                 if len(tripped_caselist) == 1 and \
                         tripped_casename == "clean":
                     cleanflag = 'yes'
-                    for caselist in list:
+                    for caselist in case_lists:
                         newdict = {}
                         newdict[tripped_casename] = {'clean': cleanflag}
                         caselist.append(newdict)
@@ -448,23 +448,23 @@ class CaseFileParser(object):
                     for option in option_list:
                         (optionkey, optionvalue) = option.split("=")
                         option_case[0]['options'][optionkey] = optionvalue
-                    list.append(option_case)
+                    case_lists.append(option_case)
                     continue
 
                 if not re.match(".+:.+", tripped_casename):
                     raise exception.CaseConfigfileError("%s line format error!" % tripped_casename)
 
-                for caselist in list:
+                for caselist in case_lists:
                     newdict = {}
                     newdict[tripped_casename] = {}
                     caselist.append(newdict)
             elif indent > 0:
                 if indent == 4:
                     self.debug_print("we begin to parse the option line")
-                    list = self.option_parse(fh, list, tripped_casename)
+                    case_lists = self.option_parse(fh, case_lists, tripped_casename)
                 else:
                     raise exception.CaseConfigfileError("option indentation error!")
-        return list
+        return case_lists
 
 
 if __name__ == "__main__":
