@@ -72,14 +72,18 @@ class CaseLog(Log):
                '    %(message)s'}
 
         datefmt = '%H:%M:%S'
+        self.console.setLevel(logging.DEBUG)
         self.filehd.setLevel(logging.DEBUG)
         file_formatter = logging.Formatter(fmt['file_formatter'], datefmt)
-
+        console_formatter = logging.Formatter(fmt['console_formatter'], datefmt)
+        self.console.setFormatter(console_formatter)
         self.filehd.setFormatter(file_formatter)
         self.logger.addHandler(self.filehd)
+        self.logger.addHandler(self.console)
 
-        if int(self.loglevel) != 1:
+        if int(self.loglevel) == 0:
             self.console.setLevel(logging.INFO)
+            self.filehd.setLevel(logging.INFO)
 
             if "AUTODIR" in os.environ:
                 console_formatter = logging.Formatter(fmt['autotest_formatter'], datefmt)
@@ -118,3 +122,25 @@ class EnvLog(Log):
         self.console.setFormatter(console_formatter)
         self.logger.addHandler(self.console)
         return self.logger
+
+"""Initialize libvirt-test-api logging with default values which do not
+   rely on a config file or other configuration. Only stream logging is
+   enabled here.This is used before case_logger and env_logger are initialized"""
+class PriorInitLog(object):
+
+    def __init__(self):
+        self.logger = logging.getLogger("libvirt-test-api")
+        self.logger.setLevel(logging.DEBUG)
+        self.console = logging.StreamHandler()
+    
+    def priorinit_log(self):
+        fmt = {'file_formatter': '%(message)s',
+               'console_formatter': '%(message)s'}
+        console_formatter = logging.Formatter(fmt['console_formatter'])
+        self.console.setFormatter(console_formatter)
+        self.logger.addHandler(self.console)
+        return self.logger
+
+
+initlog = PriorInitLog()
+priorinit_logger = initlog.priorinit_log()

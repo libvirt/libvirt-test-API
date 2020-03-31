@@ -28,13 +28,12 @@ from . import env_parser
 from ..utils import utils
 
 
-
 class CaseFileParser(object):
 
     """ Parser the case configuration file to generate a data list.
     """
 
-    def __init__(self, casefile=None, debug=False):
+    def __init__(self, casefile=None, debug=0, case_logger=None):
         self.list = [[]]
         self.variables = {}
         self.missing_variables = []
@@ -48,6 +47,7 @@ class CaseFileParser(object):
         self.loop_end = 0
         self.loop_times = 0
         self.loop_list = []
+        self.case_logger = case_logger
 
         if casefile:
             self.parse_file(casefile)
@@ -134,12 +134,12 @@ class CaseFileParser(object):
 
     def debug_print(self, str1, str2=""):
         """Nicely print two strings and an arrow.  For internal use."""
-        if self.debug:
+        if self.debug == 2:
             if str2:
                 str = "%-50s ---> %s" % (str1, str2)
             else:
                 str = str1
-            print(str)
+            self.case_logger.debug(str)
 
     def variables_lookup(self, values):
         res = []

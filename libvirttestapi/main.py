@@ -27,7 +27,9 @@ from .src import proxy
 from .src import generator
 from .src import env_clear
 from .src import process
-from .utils import log
+from .src import env_parser, env_inspect
+from .utils import log, utils
+from .utils.log import priorinit_logger
 from .src.log_generator import LogGenerator
 from .src.activityfilter import Filter
 from .src.casecfgcheck import CaseCfgCheck
@@ -40,13 +42,13 @@ def usage():
           "\n         -t, --template: Print testcase config file template"
           "\n         -f, --logxml: Specify log file with type xml,"
           "\n                       defaults to log.xml in current directory"
-          "\n         -l, --log-level: 0 or 1 currently"
+          "\n         -l, --log-level: 0 or 1 or 2"
           "\n         -d, --delete-log: Delete log items"
           "\n         -m, --merge: Merge two log xmlfiles"
           "\n         -r, --rerun: Rerun one or more test")
 
     print("example:"
-          "\n         libvirt-test-api -l 0|1 -c TEST.CONF"
+          "\n         libvirt-test-api -l 0|1|2 -c TEST.CONF"
           "\n         libvirt-test-api -c TEST.CONF -f TEST.XML"
           "\n         libvirt-test-api -t repos/domain/start.py ..."
           "\n         libvirt-test-api -m TESTONE.XML TESTTWO.XML"
@@ -55,15 +57,6 @@ def usage():
           "\n         libvirt-test-api -d TEST.XML all"
           "\n         libvirt-test-api -f TEST.XML"
           "\n         libvirt-test-api -r TESTRUNID TESTID ...")
-
-
-def append_path():
-    """Append root path of package"""
-    pwd = os.getcwd()
-    if pwd in sys.path:
-        pass
-    else:
-        sys.path.append(pwd)
 
 
 class Main(object):
@@ -79,19 +72,6 @@ class Main(object):
 
     def run(self, activities_options_list=None):
         """ Run a test instance """
-
-        # if it's a new test, parsing the case configuration file to generate
-        # a list of activities and options for the test instance.
-        if activities_options_list is None:
-            activities_options_list = parser.CaseFileParser(self.casefile).get_list()
-
-        if "options" in activities_options_list[-1][0]:
-            activities_list = activities_options_list[:-1]
-            options_list = activities_options_list[-1]
-        else:
-            activities_list = activities_options_list
-            options_list = [{'options': {}}]
-
         # generate testrunid from time point runing a testrun
         testrunid = time.strftime("%Y%m%d%H%M%S")
         while os.path.exists('log/%s' % testrunid):
@@ -109,6 +89,41 @@ class Main(object):
             log_xml_parser.generate_logxml()
             log_xml_parser.add_testrun_xml(testrunid)
 
+        logfile = None
+        logname = log.Log.get_log_name()
+        if "AUTODIR" in os.environ:
+            autotest_testdir = os.path.join(os.environ['AUTODIR'], 'tests/libvirt_test_API')
+            logfile = os.path.join('%s/src/log/%s' % (autotest_testdir, testrunid), logname)
+        else:
+            logfile = os.path.join('log/%s' % testrunid, logname)
+        envlog = log.EnvLog(logfile, self.loglevel)
+        env_logger = envlog.env_log()
+        caselog = log.CaseLog(logfile, self.loglevel)
+        case_logger = caselog.case_log()
+        start_time = time.strftime("%Y-%m-%d %H:%M:%S")
+        env_logger.info("\nStarted test at :%s", start_time)
+        env_logger.info("    Log File: %s\n" % logfile)
+        env_logger.info("Checking Testing Environment... ")
+        base_path = utils.get_base_path()
+        cfg_file = os.path.join(base_path, 'usr/share/libvirt-test-api/config', 'global.cfg')
+        env = env_parser.Envparser(cfg_file)
+        envck = env_inspect.EnvInspect(env, env_logger)
+        if envck.env_checking() == 1:
+            sys.exit(1)
+
+        # if it's a new test, parsing the case configuration file to generate
+        # a list of activities and options for the test instance.
+        if activities_options_list is None:
+            case_logger.debug('Parser the case configuration file to generate a data list')
+            activities_options_list = parser.CaseFileParser(self.casefile, int(self.loglevel), case_logger).get_list()
+
+        if "options" in activities_options_list[-1][0]:
+            activities_list = activities_options_list[:-1]
+            options_list = activities_options_list[-1]
+        else:
+            activities_list = activities_options_list
+            options_list = [{'options': {}}]
+
         # multiply the activities list if option "times" given
         if "times" in options_list[0]['options']:
             times = int(options_list[0]['options']["times"])
@@ -122,7 +137,7 @@ class Main(object):
         proxy_obj = proxy.Proxy(unique_testcases)
 
         # check the options to each testcase in case config file
-        casechk = CaseCfgCheck(proxy_obj, activities_list)
+        casechk = CaseCfgCheck(proxy_obj, activities_list, case_logger)
         if casechk.check():
             return 1
 
@@ -139,27 +154,19 @@ class Main(object):
         # and put it into procs list for running.
         procs = []
         lockfile = tempfile.NamedTemporaryFile()
-        logfile = None
-
+        testid = int(logname[-3:])-1
         for activity in activities_list:
-            logname = log.Log.get_log_name()
-            testid = logname[-3:]
-            log_xml_parser.add_test_xml(testrunid, testid)
-            if "AUTODIR" in os.environ:
-                autotest_testdir = os.path.join(os.environ['AUTODIR'], 'tests/libvirt_test_API')
-                logfile = os.path.join('%s/src/log/%s' % (autotest_testdir, testrunid), logname)
-            else:
-                logfile = os.path.join('log/%s' % testrunid, logname)
+            testid = testid+1
+            log_xml_parser.add_test_xml(testrunid, str(testid))
             procs.append(generator.FuncGen(cases_func_ref_dict,
                                            cases_checkfunc_ref_dict,
                                            proxy_obj,
-                                           activity,
-                                           logfile,
+                                           activity, logfile,
                                            testrunid,
                                            testid,
                                            log_xml_parser,
                                            lockfile,
-                                           self.loglevel)
+                                           env_logger, case_logger)
                          )
 
         totalnum = len(procs)
@@ -194,7 +201,8 @@ class Main(object):
                     passnum += 1
 
         testrunend_time = time.strftime("%Y-%m-%d %H:%M:%S")
-
+        # close hypervisor connection
+        envck.close_hypervisor_connection()
         # after running a testrun , add the summary of
         # the testrun in the format of xml into xmlfile
         log_xml_parser.add_testrun_summary(testrunid,
@@ -208,14 +216,13 @@ class Main(object):
 
         if "cleanup" in options_list[0]['options']:
             if options_list[0]['options']["cleanup"] == "enable":
-                print("Clean up Testing Environment...")
+                env_logger.info("Clean up Testing Environment...")
                 cases_clearfunc_ref_dict = proxy_obj.get_optionalfunc_call_dict('clean')
-                log.Log.counter = 0
+                logname = log.Log.get_log_name()
+                logfile = os.path.join('log/%s' % testrunid, logname)
                 for activity in activities_list:
-                    logname = log.Log.get_log_name()
-                    logfile = os.path.join('log/%s' % testrunid, logname)
                     env_clear.EnvClear(cases_clearfunc_ref_dict, activity, logfile, self.loglevel)()
-                print("Done")
+                env_logger.info("Done")
             elif options_list[0]['options']["cleanup"] == "disable":
                 pass
             else:
@@ -230,7 +237,7 @@ class Main(object):
         modcasename = []
         for case in testcases:
             if not os.path.isfile(case) or not case.endswith('.py'):
-                print("testcase %s couldn't be recognized" % case)
+                priorinit_logger.error("testcase %s couldn't be recognized" % case)
                 return 1
 
             paths = case.split('/')
@@ -257,7 +264,7 @@ class Main(object):
 
             string += "\n"
 
-        print(string)
+        priorinit_logger.info(string)
         return 0
 
     def remove_log(self, testrunid, testid=None):
@@ -266,11 +273,11 @@ class Main(object):
 
         # remove a test in a testrun
         if testrunid and testid:
-            print("testrunid is %s" % testrunid)
-            print("testid is %s" % testid)
+            priorinit_logger.info("testrunid is %s" % testrunid)
+            priorinit_logger.info("testid is %s" % testid)
             log_xml_parser.remove_test_xml(testrunid, testid)
             os.remove("log/%s/libvirt_test%s" % (testrunid, testid))
-            print("Item testid %s in testrunid %s deleted successfully" %
+            priorinit_logger.info("Item testid %s in testrunid %s deleted successfully" %
                   (testid, testrunid))
 
         # delete all of records in a log xmlfile
@@ -278,18 +285,18 @@ class Main(object):
             testrunids = log_xml_parser.remove_alltestrun_xml()
             for testrunid in testrunids:
                 shutil.rmtree("log/%s" % testrunid)
-            print("All testruns deleted successfully")
+            priorinit_logger.info("All testruns deleted successfully")
 
         # delete record of a whole testrun
         elif testrunid.startswith("2") and not testid:
-            print("testrunid is %s" % testrunid)
+            priorinit_logger.info("testrunid is %s" % testrunid)
             log_xml_parser.remove_testrun_xml(testrunid)
             shutil.rmtree("log/%s" % testrunid)
-            print("Testrun with testrunid %s deleted successfully" % testrunid)
+            priorinit_logger.info("Testrun with testrunid %s deleted successfully" % testrunid)
 
         # report error if arguments given wrong
         else:
-            print("Arguments error")
+            priorinit_logger.info("Arguments error")
             usage()
             sys.exit(0)
 
@@ -297,7 +304,7 @@ class Main(object):
         """ to merge two log xml files of log into one"""
         log_xml_parser = LogGenerator(self.logxml)
         log_xml_parser.merge_xmlfiles(logxml_two)
-        print("Merge the second log xml file %s to %s successfully " %
+        priorinit_logger.info("Merge the second log xml file %s to %s successfully " %
               (logxml_two, self.logxml))
 
     def rerun(self, testrunid, testid_list):
@@ -323,7 +330,7 @@ def main():
                                    ["help", "casefile=", "template", "logxml=", "log-level=",
                                     "delete-log", "merge", "rerun"])
     except getopt.GetoptError as err:
-        print(str(err))
+        priorinit_logger.error(str(err))
         usage()
         sys.exit(2)
 
@@ -386,9 +393,6 @@ def main():
                 maincase = Main(casefile, logxml, loglevel)
                 maincase.rerun(testrunid, testid_list)
                 sys.exit(0)
-
-    # Add root path of libvirt-test-API into sys.path
-    append_path()
 
     maincase = Main(casefile, logxml, loglevel)
     if maincase.run():

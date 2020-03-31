@@ -20,11 +20,12 @@ class CaseCfgCheck(object):
 
     """validate the options in testcase config file"""
 
-    def __init__(self, proxy_obj, activities_list):
+    def __init__(self, proxy_obj, activities_list, case_logger):
         # XXX to check the first testcase list in activities_list
         self.activity = activities_list[0]
 
         self.case_params = proxy_obj.get_params_variables()
+        self.case_logger = case_logger
 
     def check(self):
         """check options to each testcase in case config file"""
@@ -47,7 +48,7 @@ class CaseCfgCheck(object):
             ret = self._check_params(required_params, optional_params, actual_params)
             if ret:
                 error_flag = 1
-                print("the No.%s : %s\n" % (case_number, testcase_name))
+                self.case_logger.error("the No.%s : %s\n" % (case_number, testcase_name))
 
             passed_testcase.append(testcase)
 
@@ -58,12 +59,12 @@ class CaseCfgCheck(object):
     def _check_params(self, required_params, optional_params, actual_params):
         for p in required_params:
             if p not in list(actual_params.keys()):
-                print("Parameter %s is required" % p)
+                self.case_logger.error("Parameter %s is required" % p)
                 return 1
 
         for p in list(actual_params.keys()):
             if p not in required_params and p not in optional_params:
-                print("Unknown parameter '%s'" % p)
+                self.case_logger.error("Unknown parameter '%s'" % p)
                 return 1
 
         return 0

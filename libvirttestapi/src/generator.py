@@ -30,8 +30,6 @@ from ..utils import virtlab
 
 from . import mapper
 from .testcasexml import xml_file_to_str
-from . import env_parser
-from . import env_inspect
 from . import format
 
 # for virtlab
@@ -50,27 +48,23 @@ class FuncGen(object):
                  proxy_obj,
                  activity, logfile,
                  testrunid, testid,
-                 log_xml_parser, lockfile,
-                 loglevel):
+                 log_xml_parser,
+                 lockfile,
+                 env_logger, case_logger):
         self.cases_func_ref_dict = cases_func_ref_dict
         self.cases_checkfunc_ref_dict = cases_checkfunc_ref_dict
         self.proxy_obj = proxy_obj
-        self.logfile = logfile
         self.testrunid = testrunid
         self.testid = testid
         self.lockfile = lockfile
-        self.loglevel = loglevel
-
+        self.env_logger = env_logger
+        self.case_logger = case_logger
+        self.logfile = logfile
         self.fmt = format.Format(logfile)
         self.log_xml_parser = log_xml_parser
 
         # Save case information to a file in a format
         self.__case_info_save(activity, testrunid)
-
-        base_path = utils.get_base_path()
-        cfg_file = os.path.join(base_path, 'usr/share/libvirt-test-api/config', 'global.cfg')
-        self.env = env_parser.Envparser(cfg_file)
-
         mapper_obj = mapper.Mapper(activity)
         case_list = mapper_obj.module_casename_func_map()
 
@@ -97,23 +91,11 @@ class FuncGen(object):
             add log object into the dictionary of arguments
         """
 
-        envlog = log.EnvLog(self.logfile, self.loglevel)
-        env_logger = envlog.env_log()
         casenumber = len(self.case_name_list)
         start_time = time.strftime("%Y-%m-%d %H:%M:%S")
-        env_logger.info("Checking Testing Environment... ")
-        envck = env_inspect.EnvInspect(self.env, env_logger)
-
-        if envck.env_checking() == 1:
-            sys.exit(1)
-        else:
-            env_logger.info("\nStart Testing:")
-            env_logger.info("    Case Count: %s" % casenumber)
-            env_logger.info("    Log File: %s\n" % self.logfile)
-
-        caselog = log.CaseLog(self.logfile, self.loglevel)
-        case_logger = caselog.case_log()
-
+        self.env_logger.info("\nStart running testsuite with testid: %s", self.testid)
+        self.env_logger.info("    Case Count: %s" % casenumber)
+        self.env_logger.info("    Start Time: %s" % start_time)
         # retflag: [pass, fail, skip]
         retflag = [0, 0, 0]
         case_retlist = []
@@ -127,16 +109,16 @@ class FuncGen(object):
                 clean_flag = True
 
             mod_case = mod_case_func.rsplit(":", 1)[0]
-            self.fmt.print_start(mod_case, env_logger)
+            self.fmt.print_start(mod_case, self.env_logger)
 
             case_params = {k: v
                            for k, v in list(self.case_params_list[i].items())}
-            case_params['logger'] = case_logger
+            case_params['logger'] = self.case_logger
 
             if mod_case_func in self.cases_checkfunc_ref_dict:
                 if self.cases_checkfunc_ref_dict[mod_case_func](case_params):
-                    case_logger.info("Failed to meet testing requirement")
-                    self.fmt.print_end(mod_case, 2, env_logger)
+                    self.case_logger.info("Failed to meet testing requirement")
+                    self.fmt.print_end(mod_case, 2, self.env_logger)
                     retflag[2] += 1
                     continue
 
@@ -147,7 +129,7 @@ class FuncGen(object):
                 try:
                     if mod_case_func == 'sleep':
                         sleepsecs = case_params.get('sleep', 0)
-                        case_logger.info("sleep %s seconds" % sleepsecs)
+                        self.case_logger.error("sleep %s seconds" % sleepsecs)
                         time.sleep(int(sleepsecs))
                         ret = 0
                     else:
@@ -162,16 +144,16 @@ class FuncGen(object):
                             # Pass return flag to cleanup function.
                             case_params['ret_flag'] = ret
                             clean_func = mod_case_func + '_clean'
-                            self.fmt.print_string(12*" " + "Cleaning...\n", env_logger)
+                            self.fmt.print_string(12*" " + "Cleaning...\n",self.env_logger)
                             # the return value of clean function is optional
                             clean_ret = self.cases_func_ref_dict[clean_func](case_params)
                             if clean_ret and clean_ret == 1:
-                                self.fmt.print_string(21*" " + "Fail\n", env_logger)
+                                self.fmt.print_string(21*" " + "Fail\n", self.env_logger)
                                 continue
 
-                            self.fmt.print_string(21*" " + "Done\n", env_logger)
+                            self.fmt.print_string(21*" " + "Done\n", self.env_logger)
                 except Exception as e:
-                    case_logger.error(traceback.format_exc())
+                    self.case_logger.error(traceback.format_exc())
                     continue
             finally:
                 case_end_time = time.strftime("%Y-%m-%d %H:%M:%S")
@@ -182,19 +164,18 @@ class FuncGen(object):
                 elif ret == 2:
                     retflag[2] += 1
 
-                self.fmt.print_end(mod_case, ret, env_logger)
+                self.fmt.print_end(mod_case, ret, self.env_logger)
 
                 # for virtlab
                 if VirtLabFlag:
                     virtlab.result_log(mod_case_func, case_params, ret, case_start_time, case_end_time)
 
                 case_retlist.append(ret)
-        # close hypervisor connection
-        envck.close_hypervisor_connection()
         end_time = time.strftime("%Y-%m-%d %H:%M:%S")
 
-        env_logger.info("\nSummary:")
-        env_logger.info("    Total:%s [Pass:%s Fail:%s Skip:%s]" %
+        self.env_logger.info("\nTest finished at :%s", end_time)
+        self.env_logger.info("\nSummary:")
+        self.env_logger.info("    Total:%s [Pass:%s Fail:%s Skip:%s]" %
                         (casenumber, retflag[0], retflag[1], retflag[2]))
 
         result = (retflag[1] and "FAIL") or "PASS"
