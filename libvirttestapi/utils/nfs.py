@@ -13,7 +13,8 @@ def local_nfs_exported(nfs_path, logger):
     cmd = "grep -nr '%s' /etc/exports" % nfs_path
     ret = process.run(cmd, shell=True, ignore_status=True)
     if ret.exit_status:
-        cmd = "echo '%s *(rw,no_root_squash,async)' >> /etc/exports" % nfs_path
+        dir_name = os.path.dirname(nfs_path)
+        cmd = "echo '%s *(rw,fsid=1,no_root_squash,async)\n%s *(rw,fsid=1,no_root_squash,async)' >> /etc/exports" % (dir_name, nfs_path)
         ret = process.run(cmd, shell=True, ignore_status=True)
         if ret.exit_status:
             logger.error("%s failed: %s." % (cmd, ret.stdout))
@@ -36,7 +37,7 @@ def local_nfs_exported_clean(nfs_path, logger):
 
 def local_restart_service(logger):
     logger.info("Restart nfs server.")
-    if utils.isRelease("8", logger):
+    if utils.Is_Fedora() or utils.isRelease("8", logger):
         cmd = "systemctl restart nfs-server"
     else:
         cmd = "systemctl restart nfs"
