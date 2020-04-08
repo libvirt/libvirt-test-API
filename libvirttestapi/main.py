@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-#
 # Copyright (C) 2010-2012 Red Hat, Inc.
 #
 # libvirt-test-API is free software; you can redistribute it and/or
@@ -37,15 +35,15 @@ from .src.casecfgcheck import CaseCfgCheck
 
 def usage():
     print("Usage: libvirt-test-api <OPTIONS> <ARGUMENTS>")
-    print("\noptions: -h, --help : Display usage information"
-          "\n         -c, --casefile: Specify configuration file"
+    print("\noptions: -h, --help : Show this help message and exit"
+          "\n         -c, --casefile: Specify testsuite configuration file"
           "\n         -t, --template: Print testcase config file template"
           "\n         -f, --logxml: Specify log file with type xml,"
           "\n                       defaults to log.xml in current directory"
           "\n         -l, --log-level: 0 or 1 or 2"
           "\n         -d, --delete-log: Delete log items"
           "\n         -m, --merge: Merge two log xmlfiles"
-          "\n         -r, --rerun: Rerun one or more test")
+          "\n         -r, --rerun: Rerun one or more testsuites")
 
     print("example:"
           "\n         libvirt-test-api -l 0|1|2 -c TEST.CONF"
@@ -232,7 +230,8 @@ class Main(object):
             return 1
         return 0
 
-    def print_casefile(self, testcases):
+    @staticmethod
+    def print_casefile(testcases):
         """print testcase file template"""
         modcasename = []
         for case in testcases:
@@ -241,7 +240,7 @@ class Main(object):
                 return 1
 
             paths = case.split('/')
-            modcasename.append(paths[1] + ':' + paths[2][:-3])
+            modcasename.append(paths[2] + ':' + paths[3][:-3])
 
         proxy_obj = proxy.Proxy(modcasename)
         case_params = proxy_obj.get_params_variables()
@@ -267,9 +266,10 @@ class Main(object):
         priorinit_logger.info(string)
         return 0
 
-    def remove_log(self, testrunid, testid=None):
+    @staticmethod
+    def remove_log(logxml, testrunid, testid=None):
         """  to remove log item in the log xmlfile """
-        log_xml_parser = LogGenerator(self.logxml)
+        log_xml_parser = LogGenerator(logxml)
 
         # remove a test in a testrun
         if testrunid and testid:
@@ -300,12 +300,13 @@ class Main(object):
             usage()
             sys.exit(0)
 
-    def merge_logxmls(self, logxml_two):
+    @staticmethod
+    def merge_logxmls(logxml_one, logxml_two):
         """ to merge two log xml files of log into one"""
-        log_xml_parser = LogGenerator(self.logxml)
+        log_xml_parser = LogGenerator(logxml_one)
         log_xml_parser.merge_xmlfiles(logxml_two)
         priorinit_logger.info("Merge the second log xml file %s to %s successfully " %
-              (logxml_two, self.logxml))
+              (logxml_two, logxml_one))
 
     def rerun(self, testrunid, testid_list):
         """ rerun a specific test or a set of tests """
@@ -321,8 +322,8 @@ class Main(object):
 
 def main():
 
-    casefile = "./case.conf"
-    logxml = "./log.xml"
+    casefile = "case.conf"
+    logxml = "log.xml"
     loglevel = 0
 
     try:
@@ -344,8 +345,7 @@ def main():
             if len(args) <= 0:
                 usage()
                 sys.exit(1)
-            maincase = Main('', '', '')
-            if maincase.print_casefile(args):
+            if Main.print_casefile(args):
                 sys.exit(1)
             sys.exit(0)
         if o == "-f" or o == "--logxml":
@@ -365,17 +365,13 @@ def main():
             if len(args) > 3:
                 usage()
                 sys.exit(1)
-
-            maincase = Main(casefile, logxml, loglevel)
-            maincase.remove_log(testrunid, testid)
+            Main.remove_log(logxml, testrunid, testid)
             sys.exit(0)
         if o == "-m" or o == "--merge":
             if len(args) == 2:
                 logxml_one = args[0]
                 logxml_two = args[1]
-
-                maincase = Main(casefile, logxml_one, loglevel)
-                maincase.merge_logxmls(logxml_two)
+                Main.merge_logxmls(logxml_one, logxml_two)
                 sys.exit(0)
             else:
                 usage()
