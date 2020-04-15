@@ -43,10 +43,13 @@ def prepare_iso(isolink, cache_floder, nfs_server, logger):
     """ Download iso file from isolink to cache_floder
         file into it for automatic guest installation
     """
+    iso_name = os.path.basename(isolink)
+    if utils.Is_Fedora():
+        urllib.request.urlretrieve(isolink, '%s/%s' % (cache_floder,iso_name))
+        return
     cmd = "wget " + isolink + " -P " + cache_floder
     ret, out = utils.exec_cmd(cmd, shell=True)
     if ret:
-        iso_name = os.path.basename(isolink)
         url = "http://" + nfs_server + "/test-api-iso/" + iso_name
         logger.info("Download iso failed. ISO link: %s, out: %s" % (isolink, out))
         logger.info("Try to get iso from server. %s" % url)
@@ -111,7 +114,8 @@ def install_linux_iso(params):
     storage = params.get('storage', 'local')
     sourcehost = params.get('sourcehost', '')
     sourcepath = params.get('sourcepath', '')
-
+    if utils.Is_Fedora():
+        guestos = utils.get_value_from_global("variables", "fedoraos")
     options = [guestname, guestos, guestarch, nicdriver, hddriver,
                imageformat, graphic, video, diskpath, seeksize, storage]
     install_common.prepare_env(options, logger)

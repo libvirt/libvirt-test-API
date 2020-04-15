@@ -245,7 +245,6 @@ def install_linux_bootiso(params):
 
     install_common.remove_all(diskpath, logger)
     install_common.create_image(diskpath, seeksize, imageformat, logger)
-
     logger.info("rhelnewest: %s" % rhelnewest)
     xmlstr = xmlstr.replace('GRAPHIC', graphic)
     xmlstr = install_common.set_disk_xml(hddriver, xmlstr, diskpath, logger)
@@ -263,6 +262,7 @@ def install_linux_bootiso(params):
 
     bootcd = ('%s/custom.iso'
               % (os.path.join(cache_folder, guestname + "_folder")))
+
     xmlstr = xmlstr.replace('CUSTOMISO', bootcd)
     logger.debug('dump installation guest xml:\n%s' % xmlstr)
 

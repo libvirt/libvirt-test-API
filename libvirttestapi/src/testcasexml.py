@@ -4,35 +4,8 @@ from . import exception
 from ..utils import log
 from ..utils import utils
 
-def xml_file_to_str(proxy_obj, mod_case, case_params):
-    """ get xml string from xml file in case_params
-        return a new case_params with the string in it
-    """
-    optional_params = proxy_obj.get_testcase_params(mod_case)[1]
 
-    if "xml" in case_params:
-        file_name = case_params.pop('xml')
-    elif "xml" in optional_params:
-        if optional_params['xml'] is None:
-            return None
-        else:
-            file_name = optional_params['xml']
-    else:
-        return None
-
-    # If file_name is not absolute path, that means
-    # the file is in repos/*/xmls/
-    # if it is absolute use it directly
-    if not os.path.isabs(file_name):
-        mod = mod_case.split(':')[0]
-        file_name = os.path.basename(file_name)
-        if os.path.isdir('/usr/share/libvirt-test-api'):
-            base_path = '/'
-        else:
-            base_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-        file_path = os.path.join(base_path, 'usr/share/libvirt-test-api/xmls', mod, file_name)
-    else:
-        file_path = file_name
+def populate_xml_file(file_path, case_params, optional_params):
 
     text = ''
     if os.path.exists(file_path):
@@ -40,8 +13,7 @@ def xml_file_to_str(proxy_obj, mod_case, case_params):
         text = fh.read()
         fh.close()
     else:
-        #raise exception.FileDoesNotExist("xml file %s doesn't exist" % file_path)
-        raise exception.FileDoesNotExist("xml file %s doesn't exist" % mod)
+        raise exception.FileDoesNotExist("xml file %s doesn't exist" % file_path)
 
     # replace the params that in testcase.conf first
     for (key, value) in list(case_params.items()):
@@ -64,3 +36,31 @@ def xml_file_to_str(proxy_obj, mod_case, case_params):
 
     case_params['xml'] = text
     return case_params
+
+def xml_file_to_str(proxy_obj, mod_case, case_params):
+    """ get xml string from xml file in case_params
+        return a new case_params with the string in it
+    """
+    optional_params = proxy_obj.get_testcase_params(mod_case)[1]
+
+    if "xml" in case_params:
+        file_name = case_params.pop('xml')
+    elif "xml" in optional_params:
+        if optional_params['xml'] is None:
+            return None
+        else:
+            file_name = optional_params['xml']
+    else:
+        return None
+    # If file_name is not absolute path, that means
+    # the file is in repos/*/xmls/
+    # if it is absolute use it directly
+    if not os.path.isabs(file_name):
+        mod = mod_case.split(':')[0]
+        file_name = os.path.basename(file_name)
+        base_path = utils.get_base_path()
+        file_path = os.path.join(base_path, 'usr/share/libvirt-test-api/xmls', mod, file_name)
+    else:
+        file_path = file_name
+
+    populate_xml_file(file_path, case_params, optional_params)
