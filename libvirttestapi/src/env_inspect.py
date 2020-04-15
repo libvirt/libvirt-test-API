@@ -22,6 +22,11 @@ from libvirttestapi.utils import process
 
 
 def check_libvirt(logger):
+    command = 'rpm -q virt-install'
+    result = process.run(command, shell=True, ignore_status=True)
+    if result.exit_status:
+        command = 'dnf install virt-install -y'
+        result = process.run(command, shell=True, ignore_status=True)
     virsh = 'virsh -v'
     result = process.run(virsh, shell=True, ignore_status=True)
     if result.exit_status:
@@ -30,6 +35,13 @@ def check_libvirt(logger):
     else:
         logger.info("    Virsh command line tool of libvirt: %s" % result.stdout)
 
+    command = 'rpm -q libvirt'
+    result = process.run(command, shell=True, ignore_status=True)
+    if result.exit_status:
+        command = 'dnf install libvirt -y'
+        result = process.run(command, shell=True, ignore_status=True)
+    command = 'systemctl start libvirtd'
+    result = process.run(command, shell=True, ignore_status=True)
     libvirtd = 'libvirtd --version'
     result = process.run(libvirtd, shell=True, ignore_status=True)
     if result.exit_status:

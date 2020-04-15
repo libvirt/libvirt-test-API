@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 import operator
 import re
 import libvirt

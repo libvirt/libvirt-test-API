@@ -1,4 +1,3 @@
-#!/usr/bin/evn python
 # To test domain block device statistics with flags
 
 import time

@@ -1,4 +1,3 @@
-#!/usr/bin/evn python
 # Restart libvirtd testing. A running guest is required in
 # this test. During libvirtd restart, the guest remains
 # running and not affected by libvirtd restart.

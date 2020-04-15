@@ -1,4 +1,3 @@
-#!/usr/bin/evn python
 # undefine a network
 
 import os

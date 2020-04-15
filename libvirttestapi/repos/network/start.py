@@ -1,4 +1,3 @@
-#!/usr/bin/evn python
 # Start a network
 
 import time

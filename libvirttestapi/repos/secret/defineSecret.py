@@ -1,5 +1,3 @@
-#!/usr/bin/evn python
-
 import os
 import libvirt
 

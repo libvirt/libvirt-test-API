@@ -1,4 +1,3 @@
-#!/usr/bin/evn python
 # Set and show scheduler parameters with flag, such as "--current", "--live"
 # and "--config"
 

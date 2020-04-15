@@ -1,4 +1,3 @@
-#!/usr/bin/evn python
 # To get domain interface statistics
 
 import libvirt

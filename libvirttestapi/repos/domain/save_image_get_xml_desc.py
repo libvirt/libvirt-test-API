@@ -1,4 +1,3 @@
-#!/usr/bin/python
 """
 To get the XMLDesc from a saved state file and test if it is matching
 with parameter requirement

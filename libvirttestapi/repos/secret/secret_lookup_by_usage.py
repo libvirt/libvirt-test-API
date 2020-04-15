@@ -1,5 +1,3 @@
-#!/usr/bin/evn python
-
 import libvirt
 
 from libvirt import libvirtError

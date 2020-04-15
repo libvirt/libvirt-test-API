@@ -64,6 +64,6 @@ if __name__ == "__main__":
               'console_scripts': ['libvirt-test-api=libvirttestapi.main:main'],
                 
               },
-          install_requires= ["pexpect"],
+          install_requires= ["pexpect", "lxml"],
           )
 

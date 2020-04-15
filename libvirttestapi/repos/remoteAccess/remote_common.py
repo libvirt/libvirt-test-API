@@ -1,4 +1,3 @@
-#!/usr/bin/evn python
 
 from libvirttestapi.utils import utils
 

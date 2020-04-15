@@ -1,4 +1,3 @@
-#!/usr/bin/evn python
 # To test setting guest time
 
 import time

@@ -149,20 +149,20 @@ def install_linux_net_ppc(params):
     check_domain_state(conn, guestname, logger)
 
     mountpath = '/var/lib/libvirt/images'
-    if diskpath is None:
-        if storage is not 'local':
+    if diskpath == None:
+        if storage != 'local':
             mountpath = tempfile.mkdtemp()
         diskpath = mountpath + '/libvirt-test-api'
     else:
-        if storage is not 'local':
+        if storage != 'local':
             mountpath = diskpath.rsplit('/', 1)[0]
 
     sourcehost = params.get('sourcehost')
     sourcepath = params.get('sourcepath')
 
-    if storage is 'nfs':
+    if storage == 'nfs':
         utils.setup_nfs(sourcehost, sourcepath, mountpath, logger)
-    if storage is 'iscsi':
+    if storage == 'iscsi':
         utils.setup_iscsi(sourcehost, sourcepath, mountpath, logger)
 
     logger.info("disk image is %s" % diskpath)
@@ -278,7 +278,7 @@ def install_linux_net_ppc(params):
         interval = 0
         while(interval < 3600):
             time.sleep(10)
-            if installtype is None or installtype == 'define':
+            if installtype == None or installtype == 'define':
                 state = domobj.info()[0]
                 if(state == libvirt.VIR_DOMAIN_SHUTOFF):
                     logger.info("guest installaton of define type is complete")

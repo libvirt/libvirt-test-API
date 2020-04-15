@@ -1,4 +1,3 @@
-#!/usr/bin/python
 """
 Changes the actions of lifecycle events for domain represented
 as <on_$type>$action</on_$type> in the domain XML and test if

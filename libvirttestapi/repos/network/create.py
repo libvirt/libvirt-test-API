@@ -1,4 +1,3 @@
-#!/usr/bin/evn python
 # Create a network
 
 import re

@@ -1,4 +1,3 @@
-#!/usr/bin/evn python
 #Update a network
 
 from libvirt import libvirtError

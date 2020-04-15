@@ -1,4 +1,3 @@
-#!/usr/bin/evn python
 # To test domain blkio parameters
 
 import os

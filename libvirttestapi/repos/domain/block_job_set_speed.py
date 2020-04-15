@@ -1,4 +1,3 @@
-#!/usr/bin/evn python
 # To test blockJobSetSpeed()
 
 import libvirt

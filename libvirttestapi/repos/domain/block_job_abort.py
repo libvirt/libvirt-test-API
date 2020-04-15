@@ -1,4 +1,3 @@
-#!/usr/bin/evn python
 # To test blockJobAbort()
 
 import time

@@ -1,4 +1,3 @@
-#!/usr/bin/evn python
 # Define a network
 
 import os

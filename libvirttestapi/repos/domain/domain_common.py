@@ -1,5 +1,3 @@
-#!/usr/bin/evn python
-
 import libvirt
 import pexpect
 import time

@@ -1,4 +1,3 @@
-#!/usr/bin/evn python
 # Destroy a network
 
 from libvirt import libvirtError

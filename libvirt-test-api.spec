@@ -1,6 +1,6 @@
 # Disable the shebangs checks on scripts that currently dont'
 # define a Python version
-%global __brp_mangle_shebangs_exclude_from multicast_guest.py|netperf_agent.py|ksm_overcommit_guest.py|check_cpu_flag.py|virtio_console_guest.py|boottool.py|VirtIoChannel_guest_send_receive.py|serial_host_send_receive.py
+%global __brp_mangle_shebangs_exclude_from virtlab.py|jenkins.py
 
 %define with_python2 1
 %if 0%{?fedora} > 30 || 0%{?rhel} > 7
@@ -8,32 +8,46 @@
 %endif
 
 %define with_python3 0
-%if 0%{?fedora} || 0%{?rhel} > 7
+%if 0%{?fedora} > 30 || 0%{?rhel} > 7
 %define with_python3 1
 %endif
 
 Summary: Python based regression tests for libvirt API
 Name: libvirt-test-api
-Version: 0.0
+Version: 1.0
 Release: 1%{?dist}
 License: GPLv2
 URL: https://github.com/libvirt/libvirt-test-API
-Source0: https://github.com/libvirt/libvirt-test-API/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-
+Source0: https://releases.pagure.org/libvirt-test-API/%{name}-%{version}.tar.gz
 
 %if %{with_python3}
-BuildRequires: python3-devel, python3-setuptools, python3-six
-Requires: python3-six, python3-lxml
+BuildRequires: python3-devel
+BuildRequires: python3-setuptools
+BuildRequires: python3-six
+
+Requires: libvirt
+Requires: qemu-kvm
+Requires: qemu-img
+Requires: python3-six
+Requires: python3-lxml
+Requires: python3-libvirt
+Requires: virt-install
+
+
 %else
-BuildRequires: python2-devel, python2-setuptools, python-six
-Requires: python-six, python-lxml
+BuildRequires: python2-devel
+BuildRequires: python2-setuptools
+BuildRequires: python-six
+
+Requires: libvirt
+Requires: qemu-kvm
+Requires: python-six
+Requires: python-lxml
+Requires: virt-install
 %endif
 
-%if 0%{?fedora} > 30
-Requires:python3-libvirt
-%endif
 
-%if 0%{?rhel}
+%if 0%{?rhel} && 0%{?rhel} < 8
 Requires:libvirt-python
 %endif
 
@@ -43,7 +57,7 @@ BuildArch: noarch
 Libvirt-test-API is designed to test the functionality of libvirt
 through Python bindings of libvirt API. It supports writing cases
 by using the Python language. It supports testing for KVM and
-Xen ethier paravirt (for which only Fedora and Red Hat Enterprise
+Xen either paravirt (for which only Fedora and Red Hat Enterprise
 Linux guests are currently supported) as well as fully virtualized guests.
 
 %prep
@@ -85,6 +99,6 @@ Linux guests are currently supported) as well as fully virtualized guests.
 
 
 %changelog
-* Mon Dec 2 2019 Lily Nie <lnie@redhat.com> - 0.0-1
+* Mon Dec 2 2019 Lily Nie <lnie@redhat.com> - 1.0-1
 - New release
 

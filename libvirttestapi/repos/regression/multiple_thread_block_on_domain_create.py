@@ -81,7 +81,7 @@ class guest_install(Thread):
         try:
             guestobj = self.conn.createXML(self.xmlstr, 0)
             self.logger.info('guest %s API createXML returned successfuly' % guestobj.name())
-        except libvirtError, e:
+        except libvirtError as e:
             self.logger.error("API error message: %s, error code is %s"
                               % (e.get_error_message(), e.get_error_code()))
             self.logger.error("fail to define domain %s" % self.name)
