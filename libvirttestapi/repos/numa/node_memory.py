@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Test get host node memory info, including host free
 # memory, node free memory and node memory stats.
 

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # test securityLabel() and securityLabelList() API for libvirt
 
 from libvirt import libvirtError

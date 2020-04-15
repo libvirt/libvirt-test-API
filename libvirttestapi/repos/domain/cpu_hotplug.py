@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Test hotplug domain CPU, loop increase cpu to max then decrease
 # to min
 

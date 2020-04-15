@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Creat volume for storage pool of 'rbd' type
 
 from libvirt import libvirtError

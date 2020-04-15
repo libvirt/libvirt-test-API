@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-#
 # Copyright (C) 2010-2012 Red Hat, Inc.
 #
 # libvirt-test-API is free software; you can redistribute it and/or

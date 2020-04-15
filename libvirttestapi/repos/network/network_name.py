@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # To test "virsh net-name" command
 
 from libvirt import libvirtError

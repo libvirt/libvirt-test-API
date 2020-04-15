@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # To test "virsh net-list" command
 
 from libvirt import libvirtError

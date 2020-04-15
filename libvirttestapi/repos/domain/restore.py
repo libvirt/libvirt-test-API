@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Restore domain from a saved statefile
 
 import libvirt

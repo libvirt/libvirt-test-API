@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-#
 # format.py: Print logging message in specific format.
 #
 # Copyright (C) 2010-2012 Red Hat, Inc.

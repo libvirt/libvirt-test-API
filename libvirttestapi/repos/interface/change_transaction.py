@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 import difflib
 from libvirt import libvirtError
 

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # test getCPUModelNames() API for libvirt0
 
 import os

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Define storage pool of 'rbd' type
 
 from libvirt import libvirtError

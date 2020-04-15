@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # volume resize testing with delta flags, libvirt storage
 # driver only support dir now
 

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # volume wipe testing
 
 from libvirttestapi.src import sharedmod

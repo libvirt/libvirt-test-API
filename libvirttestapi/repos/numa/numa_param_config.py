@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Test set domain numa parameters with flag
 # VIR_DOMAIN_AFFECT_CONFIG and check
 

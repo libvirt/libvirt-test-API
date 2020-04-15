@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Test set domain vcpu with flag VIR_DOMAIN_AFFECT_CONFIG or
 # VIR_DOMAIN_VCPU_MAXIMUM, depend on which optional param is
 # given.

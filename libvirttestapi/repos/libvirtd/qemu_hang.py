@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # QEMU get hang should not cause libvirtd hang or dead. This
 # test stop a qemu process and check whether libvird get hang.
 # For doing this test, a running domain is required.

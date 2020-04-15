@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Test enables/disables individual vcpus
 
 from xml.dom import minidom

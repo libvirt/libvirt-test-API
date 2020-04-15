@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Filename: virtlab.py
 # Summary: Writing test logs and case generator for virtlab.
 # Description: This module is for test logs and case generation use.

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # To test domain's isUpdated API
 # If the guest should not be updated when this test
 # was performed set parameter 'updated' to 0

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # This test is for start a guest with img file on nfs storage.
 # Under SElinux boolean virt_use_nfs on or off, combine with
 # setting the dynamic_ownership in /etc/libvirt/qemu.conf,

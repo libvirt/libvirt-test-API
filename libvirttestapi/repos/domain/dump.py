@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # To test core dump of a domain
 
 import os

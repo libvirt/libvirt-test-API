@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Test finding storage pool source of 'logical' type
 
 from xml.dom import minidom

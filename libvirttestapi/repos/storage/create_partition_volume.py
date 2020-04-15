@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Create volume for storage pool of partition type
 
 from libvirt import libvirtError

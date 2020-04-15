@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Save domain as a statefile
 
 from libvirt import libvirtError

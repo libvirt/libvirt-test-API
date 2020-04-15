@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # To test "virsh hostname" command
 
 from libvirttestapi.utils import process

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # To test domain's openGraphicsFD API
 
 import time

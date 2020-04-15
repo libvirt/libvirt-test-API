@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # To test domain screenshot, the screenshot format is
 # hypervisor specific.
 

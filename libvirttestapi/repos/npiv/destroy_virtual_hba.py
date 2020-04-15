@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # To test vHBA destroying.
 
 import time

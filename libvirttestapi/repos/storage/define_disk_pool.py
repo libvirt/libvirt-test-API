@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Define a storage pool of 'disk' type
 
 from libvirt import libvirtError

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # logical storage volume upload testing, offset and length can
 # only be chosen in 0 and 1048576.
 

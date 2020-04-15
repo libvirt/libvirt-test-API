@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 import uuid
 
 from libvirttestapi.src import sharedmod

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Test set domain vcpu with flag VIR_DOMAIN_VCPU_LIVE. Check
 # domain xml and inside domain to get current vcpu number. The
 # live flag only work on running domain, so test on shutoff

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 #test storagePoolLookupByVolume() API for libvirt
 
 import os

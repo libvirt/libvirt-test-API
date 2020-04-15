@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Test domain memory peek
 
 from libvirt import libvirtError

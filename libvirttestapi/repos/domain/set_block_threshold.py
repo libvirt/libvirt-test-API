@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # To test setBlockThreshold() API
 
 from libvirt import libvirtError

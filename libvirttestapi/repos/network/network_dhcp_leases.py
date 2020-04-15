@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 #test DHCPLeases() API for libvirt
 
 import os

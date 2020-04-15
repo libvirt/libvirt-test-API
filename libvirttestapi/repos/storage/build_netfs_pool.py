@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import os
 
 from xml.dom import minidom

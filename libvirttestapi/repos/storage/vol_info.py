@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # storage pool volume info
 
 import libvirt

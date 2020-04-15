@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Attach interface to domain
 
 from libvirt import libvirtError

@@ -1,7 +1,4 @@
-#!/usr/bin/env python
-
 import libvirt
-
 from libvirt import libvirtError
 from libvirttestapi.utils import utils
 

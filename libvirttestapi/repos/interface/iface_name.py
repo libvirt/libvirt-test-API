@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 from libvirttestapi.utils import process
 
 required_params = ()

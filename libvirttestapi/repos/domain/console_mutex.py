@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # To test console mutual exclusivity
 
 import libvirt

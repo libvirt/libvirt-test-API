@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # volume wipe with pattern testing, the supported algorithm are
 # zero and algorithm patterns supported by 'scrub' command which
 # are nnsa|dod|bsi|gutmann|schneier|pfitzner7|pfitzner33|random

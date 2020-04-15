@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Test domain vcpu pin with flag VIR_DOMAIN_AFFECT_CONFIG, check
 # domain config xml with vcpupin configuration.
 

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # test libvirt connection functions related to cpu features
 
 import libvirt

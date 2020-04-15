@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Test secret series command, check the set secret value, get secret value
 
 import base64

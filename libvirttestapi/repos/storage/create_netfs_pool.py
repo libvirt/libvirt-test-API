@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Create a netfs storage pool
 
 import re

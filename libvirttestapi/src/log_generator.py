@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-#
 # log_generator.py: Generate output log file in XML format.
 
 # Copyright (C) 2010-2012 Red Hat, Inc.

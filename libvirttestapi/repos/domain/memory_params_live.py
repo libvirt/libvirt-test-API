@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Test set domain memory parameters with flag
 # VIR_DOMAIN_AFFECT_LIVE
 

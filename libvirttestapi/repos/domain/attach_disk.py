@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Attach a disk device to domain
 
 import time

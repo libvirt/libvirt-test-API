@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-#
 # env_parser.py: Parser for environment config (global.cfg).
 #
 # Copyright (C) 2010-2012 Red Hat, Inc.

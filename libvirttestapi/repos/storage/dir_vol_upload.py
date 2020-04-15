@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # dir storage volume upload testing, only raw format volume is
 # supported, other format might fail. offset and length can
 # only be chosen in 0 and 1048576.

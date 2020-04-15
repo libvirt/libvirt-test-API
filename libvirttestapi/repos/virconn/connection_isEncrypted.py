@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from libvirt import libvirtError
 from libvirttestapi.src import sharedmod
 

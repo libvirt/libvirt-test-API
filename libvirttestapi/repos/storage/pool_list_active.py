@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # list active storage pool testing with flag:
 # libvirt.VIR_CONNECT_LIST_STORAGE_POOLS_ACTIVE
 

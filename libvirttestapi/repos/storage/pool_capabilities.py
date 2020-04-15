@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Get capabilities of storage pool support
 
 import lxml

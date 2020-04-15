@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-#
 # process.py: Multiple process module
 #
 # Copyright (C) 2010-2012 Red Hat, Inc.

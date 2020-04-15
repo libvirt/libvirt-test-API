@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # cdrom & floppy update testing
 
 import os

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # volume clone testing
 
 import os

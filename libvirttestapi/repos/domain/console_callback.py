@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # test console interactions with stream event handler
 # This test open console and add event handler, when libvirt and
 # stream set callback at writeable event, interact with domain

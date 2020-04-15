@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import libvirt
 import libvirt_qemu
 import lxml

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Test migrateGetMaxDowntime()
 
 import json

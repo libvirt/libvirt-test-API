@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 # Install a linux domain from network
 
 import time

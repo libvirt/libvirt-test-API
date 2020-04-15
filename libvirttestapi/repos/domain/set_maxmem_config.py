@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Test set domain max memory with API setMaxMemory.
 
 from xml.dom import minidom

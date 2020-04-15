@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Test get domain memory stats
 
 from libvirt import libvirtError

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Reset a node device
 
 from libvirt import libvirtError

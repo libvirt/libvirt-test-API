@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Delete a storage pool of 'logical' type
 
 import os

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Test storagePoolLookupByTargetPath() API
 
 from libvirt import libvirtError

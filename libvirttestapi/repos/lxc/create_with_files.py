@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """create and start a lxc container from XML"""
 
 import os

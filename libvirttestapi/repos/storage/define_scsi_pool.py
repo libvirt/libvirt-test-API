@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Define a storage pool of 'iscsi' type
 
 from libvirt import libvirtError

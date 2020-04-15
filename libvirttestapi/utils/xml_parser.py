@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-#
 # xml_parser.py: Parse XML document, the result is a python dict.
 #
 # Copyright (C) 2010-2012 Red Hat, Inc.

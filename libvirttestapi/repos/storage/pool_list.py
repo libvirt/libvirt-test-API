@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # List all storage pool
 
 import libvirt

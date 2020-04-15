@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Test setMetadata
 # Accept flag: live, config, current
 # flag should be sperated with '|'

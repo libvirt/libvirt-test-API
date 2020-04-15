@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # To test RHBZ 672226
 
 import os

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Test tuning host node memory parameters
 
 from libvirt import libvirtError

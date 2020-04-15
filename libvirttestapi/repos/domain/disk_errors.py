@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # get and check errors on block devices
 
 import time

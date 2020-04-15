@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # To test vHBA creating with npiv.
 
 import re

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # To test domain CPU affinity
 
 import time

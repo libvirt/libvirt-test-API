@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Detach a disk from domain
 
 import time

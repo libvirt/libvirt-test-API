@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # To test "virsh domid" command
 
 from libvirttestapi.src import sharedmod

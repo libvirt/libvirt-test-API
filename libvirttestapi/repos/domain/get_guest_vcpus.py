@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # get guest vcpus
 
 import time

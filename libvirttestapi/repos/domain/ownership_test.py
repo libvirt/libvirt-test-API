@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Set the dynamic_ownership in /etc/libvirt/qemu.conf,
 # check the ownership of saved domain file. Test could
 # be on local or root_squash nfs. The default owner of

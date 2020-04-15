@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # test console interactions
 # This test sends contents of file 'input' to the guest's console
 # and reads from the console the reply and compares it to 'expect' or

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Test detachDeviceAlias() API
 
 import libvirt

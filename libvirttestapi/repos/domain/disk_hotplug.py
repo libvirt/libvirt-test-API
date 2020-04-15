@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Loop attach/detach a disk through xml on domain using all
 # supported flags
 

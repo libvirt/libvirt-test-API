@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Detach a node device from host
 
 from libvirt import libvirtError

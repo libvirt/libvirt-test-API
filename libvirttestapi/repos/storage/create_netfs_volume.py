@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Creat volume for storage pool of 'netfs' type
 
 from xml.dom import minidom

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """ Query or change the pinning of domain's emulator threads to
   host physical CPUs."""
 

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # test getAllDomainStats() API for libvirt
 
 import libvirt

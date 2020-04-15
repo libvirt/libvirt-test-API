@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 #To test "virsh net-uuid" command and related APIs
 #To test 2 APIs in this case:
 #      networkLookupByUUIDString

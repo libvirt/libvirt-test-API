@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Create a flag file in the guest OS
 
 import time

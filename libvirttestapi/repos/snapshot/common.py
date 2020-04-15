@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 from libvirttestapi.utils.utils import get_disk_path, exec_cmd, version_compare, isRelease, Is_Fedora
 
 

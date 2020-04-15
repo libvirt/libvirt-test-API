@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # test coreDumpWithFormat() API for libvirt
 
 import os

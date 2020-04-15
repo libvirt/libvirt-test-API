@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import operator
 
 from libvirt import libvirtError

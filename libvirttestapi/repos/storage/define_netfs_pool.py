@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # To test netfs type storage pool defining
 
 from libvirt import libvirtError

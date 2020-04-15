@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Install a Windows domain
 
 import os

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-#
 # exception.py: Exceptions for the framework.
 #
 # Copyright (C) 2010-2012 Red Hat, Inc.

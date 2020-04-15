@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # storage pool volume lookup testing
 
 from libvirt import libvirtError

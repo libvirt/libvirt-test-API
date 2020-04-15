@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Test domain's openGraphics API
 
 import time

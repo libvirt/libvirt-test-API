@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Delete a volume from netfs type storage pool
 
 import os

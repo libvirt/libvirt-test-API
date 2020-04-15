@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Re-attach a node device to host
 
 import re

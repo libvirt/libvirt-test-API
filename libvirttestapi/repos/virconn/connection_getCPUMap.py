@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # test libvirt getCPUMap API
 
 import libvirt

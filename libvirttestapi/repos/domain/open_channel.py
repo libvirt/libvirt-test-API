@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Test openChannel
 # Accept flag channel as a number presents which channel to use
 # When no channel is given, will perform test on first avaliable channel

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Checking method for linux domain installation.
 
 import os

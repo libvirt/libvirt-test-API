@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # To test "virsh domname" command
 
 from libvirttestapi.utils import process

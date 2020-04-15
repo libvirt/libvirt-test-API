@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """create and start a lxc container from XML and provide the ability to
    pass across pre-opened file descriptors when starting LXC guests.
 """

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Create a storage pool of 'fs' type.
 
 import re

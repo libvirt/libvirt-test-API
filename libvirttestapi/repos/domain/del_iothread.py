@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import libvirt
 from libvirt import libvirtError
 import lxml

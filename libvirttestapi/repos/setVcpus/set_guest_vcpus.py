@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """Sets state of individual vcpus described by @cpumap via guest
    agent.This API requires the VM to run. Various hypervisors or
    guest agent implementation may limit to operate on just 1

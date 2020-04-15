@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """To update the definition of domain stored in a saved state file.
 """
 

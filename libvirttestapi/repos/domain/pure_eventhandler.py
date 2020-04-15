@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # For testing domain events with pure python event loop which using implement in
 # sample event-tests from libvirt-python. Also the using domainEventRegisterAny
 # for callback.

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Create a logical type storage volume
 
 import os

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import functools
 import time
 import libvirt

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 #get info from a storage pool
 
 from lxml import etree as ET

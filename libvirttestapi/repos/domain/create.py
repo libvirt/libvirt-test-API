@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Create domain from xml
 
 import os

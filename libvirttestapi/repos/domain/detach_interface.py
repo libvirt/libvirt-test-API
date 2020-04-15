@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Detach interface from domain
 
 from libvirt import libvirtError

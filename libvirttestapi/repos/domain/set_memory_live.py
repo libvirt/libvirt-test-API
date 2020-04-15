@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Test set domain balloon memory with flag VIR_DOMAIN_AFFECT_LIVE.
 # Check domain info and inside domain to get current memory value.
 # The live flag only work on running domain, so test on shutoff

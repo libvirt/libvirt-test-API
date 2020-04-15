@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import os
 
 from libvirttestapi.utils import utils

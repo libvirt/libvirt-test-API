@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Delete volume from storage pool of 'dir' type
 
 import os

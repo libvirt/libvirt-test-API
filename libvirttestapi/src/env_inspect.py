@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-#
 # env_inspect.py: Check the testing environment.
 
 # Copyright (C) 2010-2012 Red Hat, Inc.

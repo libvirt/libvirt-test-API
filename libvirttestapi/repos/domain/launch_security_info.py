@@ -1,4 +1,3 @@
-
 from libvirt import libvirtError
 
 from libvirttestapi.src import sharedmod

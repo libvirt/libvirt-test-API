@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Test metadata
 # Accept flag: live, config, current
 # flag should be sperated with '|'

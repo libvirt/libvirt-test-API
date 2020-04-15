@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # test getDomainCapabilities() API for libvirtd
 
 import os

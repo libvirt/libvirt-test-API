@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Test nodedev numbers
 
 from libvirt import libvirtError

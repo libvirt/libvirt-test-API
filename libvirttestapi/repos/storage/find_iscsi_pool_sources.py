@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Test finding storage pool source of 'iscsi' type
 
 from xml.dom import minidom

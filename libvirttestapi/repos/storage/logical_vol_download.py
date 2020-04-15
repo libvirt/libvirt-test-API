@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # logical storage volume download testing
 
 import os

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Define storage pool of 'dir' type
 
 import os

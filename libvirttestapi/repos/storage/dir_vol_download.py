@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # dir storage volume download testing
 
 import os

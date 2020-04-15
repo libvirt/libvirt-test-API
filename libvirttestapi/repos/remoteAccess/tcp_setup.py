@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # To test connection via tcp protocol
 
 import libvirt

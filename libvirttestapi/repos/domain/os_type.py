@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # To test OSType() API
 
 from xml.dom import minidom

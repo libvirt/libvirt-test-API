@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # test listAllInterfaces() API
 
 import os

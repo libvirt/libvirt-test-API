@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # volume wipe testing
 
 import os
