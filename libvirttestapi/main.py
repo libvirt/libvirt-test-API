@@ -100,6 +100,7 @@ class Main(object):
         case_logger = caselog.case_log()
         start_time = time.strftime("%Y-%m-%d %H:%M:%S")
         env_logger.info("\nStarted test at :%s", start_time)
+        env_logger.info("    Case File: %s\n" % self.casefile)
         env_logger.info("    Log File: %s\n" % logfile)
         env_logger.info("Checking Testing Environment... ")
         base_path = utils.get_base_path()

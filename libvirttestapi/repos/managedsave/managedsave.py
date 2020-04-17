@@ -46,6 +46,8 @@ def check_savefile_create(*args):
 
 def get_fileflags():
     """Get the file flags of managed save file"""
+    INSTALL_CMD = "yum install lsof -y"
+    utils.exec_cmd(INSTALL_CMD, shell=True)
     CHECK_CMD = "lsof -w /var/lib/libvirt/qemu/save/" + guestname + ".save" \
         "|awk '/libvirt_i/{print $2}'"
     GET_CMD = "cat /proc/%s/fdinfo/1|grep flags|awk '{print $NF}'"

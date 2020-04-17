@@ -15,8 +15,10 @@ required_params = ('guestname', 'vcpuquota', 'vcpuperiod', 'emulatorperiod',
 optional_params = {'iothreadperiod': '',
                    'iothreadquota': '',
                    }
-
-CGROUP_PATH = '/sys/fs/cgroup/cpu,cpuacct/machine.slice/'
+if utils.Is_Fedora():
+    CGROUP_PATH = '/sys/fs/cgroup/machine.slice/'
+else:
+    CGROUP_PATH = '/sys/fs/cgroup/cpu,cpuacct/machine.slice/'
 CGROUP_RE = 'machine-qemu.*?%s.scope'
 
 
