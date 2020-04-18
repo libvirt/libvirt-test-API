@@ -21,7 +21,7 @@ Version: 1.0
 Release: 1%{?dist}
 License: GPLv2
 URL: https://gitlab.com/libvirt/libvirt-test-API
-Source0: https://gitlab.com/libvirt/libvirt-test-API/-/archive/v1.0/%{name}-%{version}.tar.gz
+Source0: https://gitlab.com/libvirt/libvirt-test-API/-/archive/1.0/%{name}-%{version}.tar.gz
 
 
 %if %{with_python3}
