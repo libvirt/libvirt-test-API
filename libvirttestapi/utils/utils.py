@@ -32,7 +32,7 @@ import math
 import lxml
 import lxml.etree
 import locale
-
+import libvirttestapi
 from xml.dom import minidom
 from ..src import env_parser
 from . import process
@@ -203,7 +203,7 @@ def get_host_frequency():
             cmd = "cat /proc/cpuinfo | grep 'cpu MHz'|uniq"
         output = process.system_output(cmd, shell=True, ignore_status=True)
         if output:
-            freq = output.split(":")[1].split(" ")[1]
+            freq = output.split(":")[1].strip()
             return freq
         else:
             print("warnning:don't get system cpu frequency")
@@ -217,8 +217,8 @@ def get_host_memory():
         cmd = "cat /proc/meminfo | egrep 'MemTotal'"
         output = process.system_output(cmd, shell=True, ignore_status=True)
         str_mem = output.split(":")[1]
-        mem_num = str_mem.split("kB")[0]
-        mem_size = int(mem_num.strip())
+        mem_num = str_mem.strip()
+        mem_size = int(mem_num.split(" ")[0])
         if mem_size:
             return mem_size
         else:
@@ -1554,6 +1554,7 @@ def is_login(target, logger):
 
 
 def get_device_name(target, logger):
+    device_name = ''
     if is_login(target, logger):
         cmd = "iscsiadm -m session -P 3"
         result = process.run(cmd, shell=True, ignore_status=True)

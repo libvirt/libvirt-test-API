@@ -18,7 +18,7 @@
 Summary: Python based regression tests for libvirt API
 Name: libvirt-test-api
 Version: 1.0
-Release: 0%{?dist}
+Release: 1%{?dist}
 License: GPLv2
 URL: https://gitlab.com/libvirt/libvirt-test-API
 Source0: https://gitlab.com/libvirt/libvirt-test-API/-/archive/v1.0/%{name}-%{version}.tar.gz
@@ -118,6 +118,6 @@ Linux guests are currently supported) as well as fully virtualized guests.
 
 
 %changelog
-* Sat Apr 18 2020 Lily Nie <lnie@redhat.com> - 1.0-0
+* Sat Apr 18 2020 Lily Nie <lnie@redhat.com> - 1.0-1
 - New release
 

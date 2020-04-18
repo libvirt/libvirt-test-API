@@ -55,15 +55,15 @@ class Envparser(object):
         return self.cfg.sections()
 
     def options_list(self, section):
-        if self.has_section:
+        if self.has_section(section):
             return self.cfg.options(section)
         else:
             raise exception.SectionDoesNotExist(
                 "In global.cfg, the section %s is nonexist" % section)
 
     def get_value(self, section, option):
-        if self.has_section:
-            if self.has_option:
+        if self.has_section(section):
+            if self.has_option(section, option):
                 return self.cfg.get(section, option)
             else:
                 raise exception.OptionDoesNotExist(
@@ -73,14 +73,14 @@ class Envparser(object):
                 "In global.cfg, the section %s is nonexist" % section)
 
     def get_items(self, section):
-        if self.has_section:
+        if self.has_section(section):
             return self.cfg.items(section)
         else:
             raise exception.SectionDoesNotExist(
                 "In global.cfg, the section %s is nonexist" % section)
 
     def add_section(self, section):
-        if self.has_section:
+        if self.has_section(section):
             raise exception.SectionExist(
                 "Section %s exists already" % section)
         else:
@@ -88,8 +88,8 @@ class Envparser(object):
             return True
 
     def remove_option(self, section, option):
-        if self.has_section:
-            if self.has_option:
+        if self.has_section(section):
+            if self.has_option(option):
                 self.cfg.remove_option(section, option)
                 return True
             else:
@@ -100,7 +100,7 @@ class Envparser(object):
                 "In global.cfg, the section %s is nonexist" % section)
 
     def remove_section(self, section):
-        if self.has_section:
+        if self.has_section(section):
             self.cfg.remove_section(section)
             return True
         else:
@@ -108,8 +108,8 @@ class Envparser(object):
                 "In global.cfg, the section %s is nonexist" % section)
 
     def set_value(self, section, option, value):
-        if self.has_section:
-            if self.has_option:
+        if self.has_section(section):
+            if self.has_option(section, option):
                 self.cfg.set(section, option, value)
                 return True
             else:

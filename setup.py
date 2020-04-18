@@ -15,7 +15,18 @@ import sys
 import glob
 
 # pylint: disable=E0611
-from setuptools import setup, find_packages
+from setuptools import setup, find_packages, Command
+
+class PyTest(Command):
+    user_options = []
+    def initialize_options(self):
+        pass
+    def finalize_options(self):
+        pass
+    def run(self):
+        import subprocess
+        errno = subprocess.call(['py.test'])
+        raise SystemExit(errno)
 
 def get_data_files():
     def add_files(level=[]):
@@ -50,20 +61,21 @@ def get_data_files():
 if __name__ == "__main__":
 
     setup(name='libvirt-test-api',
-          version=2.0,
+          version=1.0,
           description='Python based regression tests for libvirt API',
           author='Libvirt QE Team',
           author_email='lnie@redhat.com',
           url='https://github.com/libvirt/libvirt-test-API',
-          license="GPLv2",
+          license="GPLv2+",
           packages=find_packages(exclude=('selftests*',)),
           package_data={'libvirttestapi': ["*.*"]},
           data_files=get_data_files(),
           include_package_data=True,
+          cmdclass={'test': PyTest},
           entry_points={
               'console_scripts': ['libvirt-test-api=libvirttestapi.main:main'],
                 
               },
-          install_requires= ["pexpect", "lxml"],
+          install_requires= ["pexpect", "lxml", "attrs"],
           )
 
