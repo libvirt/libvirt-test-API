@@ -1,3 +1,5 @@
+# Copyright (C) 2010-2012 Red Hat, Inc.
+# This work is licensed under the GNU GPLv2 or later.
 # Create volume for storage pool of partition type
 
 from libvirt import libvirtError

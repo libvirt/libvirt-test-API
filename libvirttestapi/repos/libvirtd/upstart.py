@@ -1,3 +1,5 @@
+# Copyright (C) 2010-2012 Red Hat, Inc.
+# This work is licensed under the GNU GPLv2 or later.
 # Upstart libvirtd testing
 #
 # NOTES: Libvirtd will be restarted during test, better run this

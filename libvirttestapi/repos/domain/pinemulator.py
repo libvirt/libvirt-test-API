@@ -1,3 +1,5 @@
+# Copyright (C) 2010-2012 Red Hat, Inc.
+# This work is licensed under the GNU GPLv2 or later.
 """ Query or change the pinning of domain's emulator threads to
   host physical CPUs."""
 

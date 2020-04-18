@@ -1,3 +1,5 @@
+# Copyright (C) 2010-2012 Red Hat, Inc.
+# This work is licensed under the GNU GPLv2 or later.
 #get info from a storage pool
 
 from lxml import etree as ET

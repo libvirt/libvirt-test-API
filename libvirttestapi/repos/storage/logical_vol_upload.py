@@ -1,3 +1,5 @@
+# Copyright (C) 2010-2012 Red Hat, Inc.
+# This work is licensed under the GNU GPLv2 or later.
 # logical storage volume upload testing, offset and length can
 # only be chosen in 0 and 1048576.
 

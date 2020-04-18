@@ -1,3 +1,5 @@
+# Copyright (C) 2010-2012 Red Hat, Inc.
+# This work is licensed under the GNU GPLv2 or later.
 # For testing domain events with pure python event loop which using implement in
 # sample event-tests from libvirt-python. Also the using domainEventRegisterAny
 # for callback.

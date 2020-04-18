@@ -1,3 +1,5 @@
+# Copyright (C) 2010-2012 Red Hat, Inc.
+# This work is licensed under the GNU GPLv2 or later.
 """create and start a lxc container from XML and provide the ability to
    pass across pre-opened file descriptors when starting LXC guests.
 """

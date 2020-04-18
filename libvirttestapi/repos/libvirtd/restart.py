@@ -1,3 +1,5 @@
+# Copyright (C) 2010-2012 Red Hat, Inc.
+# This work is licensed under the GNU GPLv2 or later.
 # Restart libvirtd testing. A running guest is required in
 # this test. During libvirtd restart, the guest remains
 # running and not affected by libvirtd restart.

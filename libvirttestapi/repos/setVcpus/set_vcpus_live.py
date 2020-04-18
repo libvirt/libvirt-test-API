@@ -1,3 +1,5 @@
+# Copyright (C) 2010-2012 Red Hat, Inc.
+# This work is licensed under the GNU GPLv2 or later.
 # Test set domain vcpu with flag VIR_DOMAIN_VCPU_LIVE. Check
 # domain xml and inside domain to get current vcpu number. The
 # live flag only work on running domain, so test on shutoff

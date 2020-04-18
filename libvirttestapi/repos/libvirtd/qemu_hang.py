@@ -1,3 +1,5 @@
+# Copyright (C) 2010-2012 Red Hat, Inc.
+# This work is licensed under the GNU GPLv2 or later.
 # QEMU get hang should not cause libvirtd hang or dead. This
 # test stop a qemu process and check whether libvird get hang.
 # For doing this test, a running domain is required.

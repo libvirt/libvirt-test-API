@@ -1,3 +1,5 @@
+# Copyright (C) 2010-2012 Red Hat, Inc.
+# This work is licensed under the GNU GPLv2 or later.
 #To test "virsh pool-uuid" command and related APIs
 #To test 2 APIs in this case:
 #    storagePoolLookupByUUID

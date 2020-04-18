@@ -1,5 +1,8 @@
 #!/usr/bin/python
 
+# Copyright (C) 2010-2012 Red Hat, Inc.
+# This work is licensed under the GNU GPLv2 or later.
+
 ##@ Filename: virtlab.py
 ##@ Summary: This is libvirt-test-API interface for virtlab.
 ##@ Description: This module is for libvirt-test-API interface.

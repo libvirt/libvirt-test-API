@@ -1,3 +1,5 @@
+# Copyright (C) 2010-2012 Red Hat, Inc.
+# This work is licensed under the GNU GPLv2 or later.
 # Test get host node memory info, including host free
 # memory, node free memory and node memory stats.
 

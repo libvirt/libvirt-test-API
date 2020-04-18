@@ -1,3 +1,5 @@
+# Copyright (C) 2010-2012 Red Hat, Inc.
+# This work is licensed under the GNU GPLv2 or later.
 # test console interactions
 # This test sends contents of file 'input' to the guest's console
 # and reads from the console the reply and compares it to 'expect' or

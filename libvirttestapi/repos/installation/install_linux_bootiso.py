@@ -1,3 +1,5 @@
+# Copyright (C) 2010-2012 Red Hat, Inc.
+# This work is licensed under the GNU GPLv2 or later.
 # Install a linux domain from CDROM
 # The iso file may be locked by other proces, and cause the failure of installation
 import os

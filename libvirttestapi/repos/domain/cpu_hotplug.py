@@ -1,3 +1,5 @@
+# Copyright (C) 2010-2012 Red Hat, Inc.
+# This work is licensed under the GNU GPLv2 or later.
 # Test hotplug domain CPU, loop increase cpu to max then decrease
 # to min
 

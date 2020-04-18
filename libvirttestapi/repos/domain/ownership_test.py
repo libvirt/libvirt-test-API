@@ -1,3 +1,5 @@
+# Copyright (C) 2010-2012 Red Hat, Inc.
+# This work is licensed under the GNU GPLv2 or later.
 # Set the dynamic_ownership in /etc/libvirt/qemu.conf,
 # check the ownership of saved domain file. Test could
 # be on local or root_squash nfs. The default owner of

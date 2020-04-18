@@ -1,3 +1,5 @@
+# Copyright (C) 2010-2012 Red Hat, Inc.
+# This work is licensed under the GNU GPLv2 or later.
 """Sets state of individual vcpus described by @cpumap via guest
    agent.This API requires the VM to run. Various hypervisors or
    guest agent implementation may limit to operate on just 1

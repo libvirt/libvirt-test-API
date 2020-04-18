@@ -1,3 +1,5 @@
+# Copyright (C) 2010-2012 Red Hat, Inc.
+# This work is licensed under the GNU GPLv2 or later.
 # Test domain vcpu pin with flag VIR_DOMAIN_AFFECT_CONFIG, check
 # domain config xml with vcpupin configuration.
 

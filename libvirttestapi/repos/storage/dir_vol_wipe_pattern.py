@@ -1,3 +1,5 @@
+# Copyright (C) 2010-2012 Red Hat, Inc.
+# This work is licensed under the GNU GPLv2 or later.
 # volume wipe with pattern testing, the supported algorithm are
 # zero and algorithm patterns supported by 'scrub' command which
 # are nnsa|dod|bsi|gutmann|schneier|pfitzner7|pfitzner33|random

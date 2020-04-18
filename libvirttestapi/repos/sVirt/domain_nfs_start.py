@@ -1,3 +1,5 @@
+# Copyright (C) 2010-2012 Red Hat, Inc.
+# This work is licensed under the GNU GPLv2 or later.
 # This test is for start a guest with img file on nfs storage.
 # Under SElinux boolean virt_use_nfs on or off, combine with
 # setting the dynamic_ownership in /etc/libvirt/qemu.conf,

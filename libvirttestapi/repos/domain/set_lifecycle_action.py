@@ -1,3 +1,5 @@
+# Copyright (C) 2010-2012 Red Hat, Inc.
+# This work is licensed under the GNU GPLv2 or later.
 """
 Changes the actions of lifecycle events for domain represented
 as <on_$type>$action</on_$type> in the domain XML and test if

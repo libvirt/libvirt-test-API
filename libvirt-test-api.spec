@@ -1,29 +1,37 @@
-# Disable the shebangs checks on scripts that currently dont'
-# define a Python version
+# Disable the shebangs checks on scripts that currently don't
+# define a Python version..The point here is that these scripts
+#will be copied to guest VM instances,which may be running
+#Operating Systems that can haveeither Python 2 or Python 3,
+#but it's impossible to know for sure at packaging time.
 %global __brp_mangle_shebangs_exclude_from virtlab.py|jenkins.py
 
-%define with_python2 1
+%global with_python2 1
 %if 0%{?fedora} > 30 || 0%{?rhel} > 7
-%define with_python2 0
+%global with_python2 0
 %endif
 
-%define with_python3 0
+%global with_python3 0
 %if 0%{?fedora} > 30 || 0%{?rhel} > 7
-%define with_python3 1
+%global with_python3 1
 %endif
 
 Summary: Python based regression tests for libvirt API
 Name: libvirt-test-api
 Version: 1.0
-Release: 1%{?dist}
+Release: 0%{?dist}
 License: GPLv2
-URL: https://github.com/libvirt/libvirt-test-API
-Source0: https://releases.pagure.org/libvirt-test-API/%{name}-%{version}.tar.gz
+URL: https://gitlab.com/libvirt/libvirt-test-API
+Source0: https://gitlab.com/libvirt/libvirt-test-API/-/archive/v1.0/%{name}-%{version}.tar.gz
+
 
 %if %{with_python3}
 BuildRequires: python3-devel
+BuildRequires: python3-pytest
 BuildRequires: python3-setuptools
 BuildRequires: python3-six
+BuildRequires: python3-attrs
+BuildRequires: python3-pexpect
+BuildRequires: mock
 
 Requires: libvirt
 Requires: qemu-kvm
@@ -36,8 +44,12 @@ Requires: virt-install
 
 %else
 BuildRequires: python2-devel
+BuildRequires: python2-pytest
 BuildRequires: python2-setuptools
+BuildRequires: python2-attrs
 BuildRequires: python-six
+BuildRequires: python2-pexpect
+BuildRequires: mock
 
 Requires: libvirt
 Requires: qemu-kvm
@@ -62,6 +74,13 @@ Linux guests are currently supported) as well as fully virtualized guests.
 
 %prep
 %setup -q -n %{name}-%{version}
+
+%check
+%if %{with_python3}
+%{__python3} setup.py test
+%else
+%{__python2} setup.py test
+%endif
 
 %build
 %if %{with_python3}
@@ -99,6 +118,6 @@ Linux guests are currently supported) as well as fully virtualized guests.
 
 
 %changelog
-* Mon Dec 2 2019 Lily Nie <lnie@redhat.com> - 1.0-1
+* Sat Apr 18 2020 Lily Nie <lnie@redhat.com> - 1.0-0
 - New release
 
