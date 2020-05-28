@@ -117,9 +117,9 @@ def prepare_conf_ppc(ostree, kscfg, newest, envparser):
 
 
 def prepare_network_ppc(ostree, logger):
-    xmlpath = os.path.join(HOME_PATH, 'usr/share/libvirt-test-api/xmls/installation/pxeboot.xml')
+    xmlpath = os.path.join(HOME_PATH, 'xmls/installation/pxeboot.xml')
     xml_fp = open(xmlpath, 'r')
-    tmppath = os.path.join(HOME_PATH, 'usr/share/libvirt-test-api/xmls/installation/tmp.xml')
+    tmppath = os.path.join(HOME_PATH, 'xmls/installation/tmp.xml')
     tmp_fp = open(tmppath, 'w')
     prodlist = ['RHEL', 'RHEL-ALT']
 

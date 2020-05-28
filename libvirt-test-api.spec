@@ -26,10 +26,12 @@ Source0: https://gitlab.com/libvirt/libvirt-test-API/-/archive/1.0/%{name}-%{ver
 
 %if %{with_python3}
 BuildRequires: python3-devel
+BuildRequires: python3-lxml
 BuildRequires: python3-pytest
 BuildRequires: python3-setuptools
 BuildRequires: python3-six
 BuildRequires: python3-attrs
+BuildRequires: python3-libvirt
 BuildRequires: python3-pexpect
 BuildRequires: mock
 

@@ -1774,14 +1774,16 @@ def check_qemu_package(package):
     
 def get_base_path():
     #fixme working on a better one
-    if os.path.isdir('/usr/share/libvirt-test-api'):
-        base_path = '/'
-    else:
-        base_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    base_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    for base_dir in [base_path, '/']:
+        base_dir = os.path.join(base_dir, 'usr/share/libvirt-test-api')
+        env_file = os.path.join(base_dir, 'config/global.cfg')
+        if os.access(env_file, os.R_OK):
+            return base_dir
     return base_path
 
 def get_value_from_global(section, option):
-    envfile = os.path.join(get_base_path(), 'usr/share/libvirt-test-api/config', 'global.cfg')
+    envfile = os.path.join(get_base_path(), 'config', 'global.cfg')
     envparser = env_parser.Envparser(envfile)
     return envparser.get_value(section, option)
 

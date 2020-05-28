@@ -76,7 +76,7 @@ def prepare_install(default_file, logger):
     logger.info("%s" % cmd)
     ret = process.run(cmd, shell=True, ignore_status=True)
 
-    xmlpath = os.path.join(HOME_PATH, 'usr/share/libvirt-test-api/xmls/installation/pxeboot.xml')
+    xmlpath = os.path.join(HOME_PATH, 'xmls/installation/pxeboot.xml')
     cmd = "virsh net-define %s" % xmlpath
     logger.info("%s" % cmd)
     ret = process.run(cmd, shell=True, ignore_status=True)

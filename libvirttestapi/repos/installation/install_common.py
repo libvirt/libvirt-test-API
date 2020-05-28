@@ -609,5 +609,5 @@ def remove_vmlinuz_initrd(logger):
 
 
 def get_env_parser():
-    envfile = os.path.join(HOME_PATH, 'usr/share/libvirt-test-api/config', 'global.cfg')
+    envfile = os.path.join(HOME_PATH, 'config', 'global.cfg')
     return env_parser.Envparser(envfile)

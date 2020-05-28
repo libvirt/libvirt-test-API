@@ -356,7 +356,7 @@ def install_linux_cdrom(params):
     xmlstr = xmlstr.replace('GRAPHIC', graphic)
 
     logger.info("get system environment information")
-    envfile = os.path.join(HOME_PATH, 'usr/share/libvirt-test-api/config', 'global.cfg')
+    envfile = os.path.join(HOME_PATH, 'config', 'global.cfg')
     logger.info("the environment file is %s" % envfile)
 
     envparser = env_parser.Envparser(envfile)

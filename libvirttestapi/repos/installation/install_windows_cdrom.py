@@ -289,7 +289,7 @@ def install_windows_cdrom(params):
                                     driverpath)
 
     logger.info("get system environment information")
-    envfile = os.path.join(HOME_PATH, 'usr/share/libvirt-test-api/config', 'global.cfg')
+    envfile = os.path.join(HOME_PATH, 'config', 'global.cfg')
     logger.info("the environment file is %s" % envfile)
 
     # Graphic type

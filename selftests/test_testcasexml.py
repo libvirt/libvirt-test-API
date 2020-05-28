@@ -8,7 +8,7 @@ from libvirttestapi.utils import utils
 class TestInputVerify():
     def setup_method(self):
         base_path = utils.get_base_path()
-        file_path = os.path.join(base_path, 'usr/share/libvirt-test-api/xmls', 'test', 'test.xml')
+        file_path = os.path.join(base_path, 'xmls', 'test', 'test.xml')
         self.filepath = file_path
         self.case_params = {
                 'guestname': 'libvirt_test_api',

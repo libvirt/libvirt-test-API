@@ -104,7 +104,7 @@ class Main(object):
         env_logger.info("    Log File: %s\n" % logfile)
         env_logger.info("Checking Testing Environment... ")
         base_path = utils.get_base_path()
-        cfg_file = os.path.join(base_path, 'usr/share/libvirt-test-api/config', 'global.cfg')
+        cfg_file = os.path.join(base_path, 'config', 'global.cfg')
         env = env_parser.Envparser(cfg_file)
         envck = env_inspect.EnvInspect(env, env_logger)
         if envck.env_checking() == 1:

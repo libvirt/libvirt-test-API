@@ -59,7 +59,7 @@ def xml_file_to_str(proxy_obj, mod_case, case_params):
         mod = mod_case.split(':')[0]
         file_name = os.path.basename(file_name)
         base_path = utils.get_base_path()
-        file_path = os.path.join(base_path, 'usr/share/libvirt-test-api/xmls', mod, file_name)
+        file_path = os.path.join(base_path, 'xmls', mod, file_name)
     else:
         file_path = file_name
 

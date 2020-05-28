@@ -38,7 +38,7 @@ class CaseFileParser(object):
         self.debug = debug
         self.casefile = casefile
         base_path = utils.get_base_path()
-        cfg_file = os.path.join(base_path, 'usr/share/libvirt-test-api/config', 'global.cfg')
+        cfg_file = os.path.join(base_path, 'config', 'global.cfg')
         self.env = env_parser.Envparser(cfg_file)
         self.loop_finish = False
         self.loop_start = 0

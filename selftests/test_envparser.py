@@ -15,7 +15,7 @@ from libvirttestapi.utils import utils
 class TestEnvParser():
     def setup_method(self):
         base_path = utils.get_base_path()
-        config_path = os.path.join(base_path, 'usr/share/libvirt-test-api', 'config/', 'global.cfg')
+        config_path = os.path.join(base_path, 'config', 'global.cfg')
         self.configfile = config_path
 
     @patch.object(ConfigParser.ConfigParser, "has_section")

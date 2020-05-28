@@ -57,7 +57,7 @@ def install_linux_clone(params):
         params['diskpath'] = diskpath_backup
         params['guestname'] = guestname_backup
         base_path = utils.get_base_path()
-        xml_file = os.path.join(base_path, 'usr/share/libvirt-test-api/xmls', 'installation/kvm_clone.xml')
+        xml_file = os.path.join(base_path, 'xmls', 'installation/kvm_clone.xml')
         params['xml'] = 'xmls/kvm_clone.xml'
         populate_xml_file(xml_file, params, optional_params)
         ret = install_linux_bootiso.install_linux_bootiso(params)
