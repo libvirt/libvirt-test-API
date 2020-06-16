@@ -40,7 +40,7 @@ def get_data_files():
                        os.path.isfile(path)]
         return [(os.path.join(*(['/'] + installed_location)), files_found)]
     data_files = add_files(["excute"])
-    data_files_dirs = ['templates','cases','xmls','config']
+    data_files_dirs = ['templates','cases','xmls','config', 'docs']
 
     for data_file_dir in data_files_dirs:
         for root, dirs, files in os.walk(data_file_dir):
