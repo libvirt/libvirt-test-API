@@ -31,15 +31,13 @@ class CaseFileParser(object):
     """ Parser the case configuration file to generate a data list.
     """
 
-    def __init__(self, casefile=None, debug=0, case_logger=None):
+    def __init__(self, casefile=None, configfile=None, debug=0, case_logger=None):
         self.list = [[]]
         self.variables = {}
         self.missing_variables = []
         self.debug = debug
         self.casefile = casefile
-        base_path = utils.get_base_path()
-        cfg_file = os.path.join(base_path, 'config', 'global.cfg')
-        self.env = env_parser.Envparser(cfg_file)
+        self.env = env_parser.Envparser(configfile)
         self.loop_finish = False
         self.loop_start = 0
         self.loop_end = 0

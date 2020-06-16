@@ -37,6 +37,7 @@ def usage():
     print("Usage: libvirt-test-api <OPTIONS> <ARGUMENTS>")
     print("\noptions: -h, --help : Show this help message and exit"
           "\n         -c, --casefile: Specify testsuite configuration file"
+          "\n         -k, --configfile: Specify environment configfile"
           "\n         -t, --template: Print testcase config file template"
           "\n         -f, --logxml: Specify log file with type xml,"
           "\n                       defaults to log.xml in current directory"
@@ -47,7 +48,7 @@ def usage():
 
     print("example:"
           "\n         libvirt-test-api -l 0|1|2 -c TEST.CONF"
-          "\n         libvirt-test-api -c TEST.CONF -f TEST.XML"
+          "\n         libvirt-test-api -c TEST.CONF -k global.cfg -f TEST.XML"
           "\n         libvirt-test-api -t repos/domain/start.py ..."
           "\n         libvirt-test-api -m TESTONE.XML TESTTWO.XML"
           "\n         libvirt-test-api -d TEST.XML TESTRUNID TESTID"
@@ -63,10 +64,11 @@ class Main(object):
         testing log and records
     """
 
-    def __init__(self, casefile, logxml, loglevel):
+    def __init__(self, casefile, logxml, loglevel, configfile):
         self.casefile = casefile
         self.logxml = logxml
         self.loglevel = loglevel
+        self.configfile = configfile
 
     def run(self, activities_options_list=None):
         """ Run a test instance """
@@ -104,7 +106,10 @@ class Main(object):
         env_logger.info("    Log File: %s\n" % logfile)
         env_logger.info("Checking Testing Environment... ")
         base_path = utils.get_base_path()
-        cfg_file = os.path.join(base_path, 'config', 'global.cfg')
+        if os.path.exists(self.configfile):
+            cfg_file = self.configfile
+        else:
+            cfg_file = os.path.join(base_path, 'config', 'global.cfg')
         env = env_parser.Envparser(cfg_file)
         envck = env_inspect.EnvInspect(env, env_logger)
         if envck.env_checking() == 1:
@@ -114,7 +119,7 @@ class Main(object):
         # a list of activities and options for the test instance.
         if activities_options_list is None:
             case_logger.debug('Parser the case configuration file to generate a data list')
-            activities_options_list = parser.CaseFileParser(self.casefile, int(self.loglevel), case_logger).get_list()
+            activities_options_list = parser.CaseFileParser(self.casefile, cfg_file, int(self.loglevel), case_logger).get_list()
 
         if "options" in activities_options_list[-1][0]:
             activities_list = activities_options_list[:-1]
@@ -328,8 +333,8 @@ def main():
     loglevel = 0
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hc:tf:l:dmr",
-                                   ["help", "casefile=", "template", "logxml=", "log-level=",
+        opts, args = getopt.getopt(sys.argv[1:], "hc:k:tf:l:dmr",
+                                   ["help", "casefile=", "configfile=", "template", "logxml=", "log-level=",
                                     "delete-log", "merge", "rerun"])
     except getopt.GetoptError as err:
         priorinit_logger.error(str(err))
@@ -342,6 +347,8 @@ def main():
             sys.exit(0)
         if o == "-c" or o == "--casefile":
             casefile = v
+        if o == "-k" or o == "--configfile":
+            configfile = v
         if o == "-t" or o == "--template":
             if len(args) <= 0:
                 usage()
@@ -391,7 +398,7 @@ def main():
                 maincase.rerun(testrunid, testid_list)
                 sys.exit(0)
 
-    maincase = Main(casefile, logxml, loglevel)
+    maincase = Main(casefile, logxml, loglevel, configfile)
     if maincase.run():
         sys.exit(1)
     sys.exit(0)
