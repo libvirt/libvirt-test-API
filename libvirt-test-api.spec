@@ -27,8 +27,8 @@ Name: libvirt-test-api
 Version: 1.1
 Release: 1%{?dist}
 License: GPLv2
-URL: https://gitlab.com/libvirt/libvirt-test-API
-Source0: https://gitlab.com/libvirt/libvirt-test-API/-/archive/1.0/%{name}-%{version}.tar.gz
+URL: https://github.com/libvirt/libvirt-test-API
+Source0: %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 
 BuildRequires: mock
@@ -111,8 +111,8 @@ This package installs the detailed documentation of libvirt-test-api
 %doc docs/
 
 %changelog
-* Sat Apr 18 2020 Lily Nie <lnie@redhat.com> - 1.0-1
-- New release
-
 * Tue Jun 16 2020 Lily Nie <lnie@redhat.com> - 1.1-1
 - add an elaborate user guide
+
+* Sat Apr 18 2020 Lily Nie <lnie@redhat.com> - 1.0-1
+- New release

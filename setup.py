@@ -61,11 +61,11 @@ def get_data_files():
 if __name__ == "__main__":
 
     setup(name='libvirt-test-api',
-          version=1.0,
+          version=1.1,
           description='Python based regression tests for libvirt API',
           author='Libvirt QE Team',
           author_email='lnie@redhat.com',
-          url='https://github.com/libvirt/libvirt-test-API',
+          url='https://gitlab.com/libvirt/libvirt-test-API',
           license="GPLv2+",
           packages=find_packages(exclude=('selftests*',)),
           package_data={'libvirttestapi': ["*.*"]},
