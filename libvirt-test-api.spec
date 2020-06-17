@@ -55,7 +55,6 @@ BuildRequires: python2-setuptools
 BuildRequires: python2-attrs
 BuildRequires: python-six
 BuildRequires: python2-pexpect
-BuildRequires: mock
 
 Requires: python-six
 Requires: python-lxml
@@ -67,8 +66,8 @@ Requires: qemu-img
 Requires: virt-install
 
 %if 0%{?rhel} && 0%{?rhel} < 8
-Requires:libvirt-python
-%endif 
+Requires: libvirt-python
+%endif
 
 BuildArch: noarch
 
@@ -89,14 +88,14 @@ This package installs the detailed documentation of libvirt-test-api
 %prep
 %setup -q -n %{name}-%{version}
 
-%check
-%{__python} setup.py test
-
 %build
 %py_build
 
 %install
 %py_install
+
+%check
+%{__python} setup.py test
 
 %files
 %doc README.md
