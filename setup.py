@@ -61,7 +61,7 @@ def get_data_files():
 if __name__ == "__main__":
 
     setup(name='libvirt-test-api',
-          version=1.1,
+          version=1.2,
           description='Python based regression tests for libvirt API',
           author='Libvirt QE Team',
           author_email='lnie@redhat.com',

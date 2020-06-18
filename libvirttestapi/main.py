@@ -48,7 +48,7 @@ def usage():
 
     print("example:"
           "\n         libvirt-test-api -l 0|1|2 -c TEST.CONF"
-          "\n         libvirt-test-api -c TEST.CONF -k global.cfg -f TEST.XML"
+          "\n         libvirt-test-api -c TEST.CONF -k /home/test/global.cfg -f TEST.XML"
           "\n         libvirt-test-api -t repos/domain/start.py ..."
           "\n         libvirt-test-api -m TESTONE.XML TESTTWO.XML"
           "\n         libvirt-test-api -d TEST.XML TESTRUNID TESTID"
@@ -329,6 +329,7 @@ class Main(object):
 def main():
 
     casefile = "case.conf"
+    configfile = "global.cfg"
     logxml = "log.xml"
     loglevel = 0
 
